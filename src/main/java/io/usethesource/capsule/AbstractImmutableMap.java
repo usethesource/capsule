@@ -37,4 +37,3 @@ public abstract class AbstractImmutableMap<K, V> extends AbstractMap<K, V>
   }
 
 }
-

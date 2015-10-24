@@ -15,36 +15,40 @@ import java.util.Map;
 
 public interface TransientMap<K, V> extends Map<K, V> {
 
-  V get(final Object o);
+  @Override
+  public V get(final Object o);
 
-  V getEquivalent(final Object o, final Comparator<Object> cmp);
+  public V getEquivalent(final Object o, final Comparator<Object> cmp);
 
-  boolean containsKey(final Object o);
+  @Override
+  public boolean containsKey(final Object o);
 
-  boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp);
+  public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp);
 
-  boolean containsValue(final Object o);
+  @Override
+  public boolean containsValue(final Object o);
 
-  boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp);
+  public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp);
 
-  V __put(final K key, final V val);
+  public V __put(final K key, final V val);
 
-  V __putEquivalent(final K key, final V val, final Comparator<Object> cmp);
+  public V __putEquivalent(final K key, final V val, final Comparator<Object> cmp);
 
-  boolean __putAll(final Map<? extends K, ? extends V> map);
+  public boolean __putAll(final Map<? extends K, ? extends V> map);
 
-  boolean __putAllEquivalent(final Map<? extends K, ? extends V> map, final Comparator<Object> cmp);
+  public boolean __putAllEquivalent(final Map<? extends K, ? extends V> map,
+      final Comparator<Object> cmp);
 
-  V __remove(final K key);
+  public V __remove(final K key);
 
-  V __removeEquivalent(final K key, final Comparator<Object> cmp);
+  public V __removeEquivalent(final K key, final Comparator<Object> cmp);
 
-  Iterator<K> keyIterator();
+  public Iterator<K> keyIterator();
 
-  Iterator<V> valueIterator();
+  public Iterator<V> valueIterator();
 
-  Iterator<Map.Entry<K, V>> entryIterator();
+  public Iterator<Map.Entry<K, V>> entryIterator();
 
-  ImmutableMap<K, V> freeze();
+  public ImmutableMap<K, V> freeze();
 
 }
