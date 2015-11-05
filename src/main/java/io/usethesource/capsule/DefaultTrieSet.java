@@ -5,7 +5,8 @@ import java.lang.reflect.Method;
 
 public class DefaultTrieSet {
 
-  private static Class<?> target = TrieSet_5Bits.class;
+  @SuppressWarnings("rawtypes")
+  private static Class<TrieSet_5Bits> target = TrieSet_5Bits.class;
 
   private static Method persistentSetOfEmpty;
   private static Method persistentSetOfKeyValuePairs;
@@ -13,7 +14,8 @@ public class DefaultTrieSet {
   private static Method transientSetOfEmpty;
   private static Method transientSetOfKeyValuePairs;
 
-  public static Class<?> getTargetClass() {
+  @SuppressWarnings("rawtypes")
+  public static Class<TrieSet_5Bits> getTargetClass() {
     return target;
   }
 

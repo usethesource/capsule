@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 
 public class DefaultTrieMap {
 
+  @SuppressWarnings("rawtypes")
   private static Class<TrieMap_5Bits> target = TrieMap_5Bits.class;
 
   private static Method persistentMapOfEmpty;
@@ -13,6 +14,7 @@ public class DefaultTrieMap {
   private static Method transientMapOfEmpty;
   private static Method transientMapOfKeyValuePairs;
 
+  @SuppressWarnings("rawtypes")
   public static Class<TrieMap_5Bits> getTargetClass() {
     return target;
   }
