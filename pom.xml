@@ -3,7 +3,7 @@
 
 	<groupId>io.usethesource</groupId>
 	<artifactId>capsule</artifactId>
-	<version>0.3.0-SNAPSHOT</version>
+	<version>0.3.0.HETEROGENEOUS-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<scm>
