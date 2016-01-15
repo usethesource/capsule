@@ -18,8 +18,60 @@ public final class RangecopyUtils {
    * setInObjectRegion(src, rareBase + idx * addressSize, node);
    */
 
-  final static void setInObjectRegion(Object dst, long dstRegionOffset, int dstPos, Object o) {
-    unsafe.putObject(dst, dstRegionOffset + dstPos * addressSize, o);
+  @Deprecated
+  final static void __setInIntRegion(Object dst, long dstRegionOffset, int dstPos, int value) {
+    unsafe.putInt(dst, dstRegionOffset + dstPos * addressSize, value);
+  }
+  
+  final static long setInIntRegion(Object dst, long dstOffset, int value0, int value1) {
+    long strideSizeInBytes = 4;
+
+    unsafe.putInt(dst, dstOffset, value0);
+    unsafe.putInt(dst, dstOffset + strideSizeInBytes, value1);
+
+    return 2 * strideSizeInBytes;
+  }
+  
+  @Deprecated
+  final static long setInObjectRegion(Object dst, long dstRegionOffset, int dstPos, Object value0,
+      Object value1) {
+    long dstOffset = dstRegionOffset + dstPos * addressSize;
+    return setInObjectRegion(dst, dstOffset, value0, value1);
+  }
+
+  final static long setInObjectRegion(Object dst, long dstOffset, Object value0) {
+    unsafe.putObject(dst, dstOffset, value0);
+    return addressSize;
+  }  
+  
+  final static long setInObjectRegion(Object dst, long dstOffset, Object value0, Object value1) {
+    long strideSizeInBytes = addressSize;
+
+    unsafe.putObject(dst, dstOffset, value0);
+    unsafe.putObject(dst, dstOffset + strideSizeInBytes, value1);
+
+    return 2 * strideSizeInBytes;
+  }
+  
+  final static long setInObjectRegion(Object dst, long dstRegionOffset, int dstPos,
+      Object... values) {
+    long dstOffset = dstRegionOffset + dstPos * addressSize;
+    return setInObjectRegion(dst, dstOffset, values);
+  }
+  
+  final static long setInObjectRegion(Object dst, long dstOffset, Object... values) {
+    long offset = dstOffset;
+
+    for (Object value : values) {
+      unsafe.putObject(dst, offset, value);
+      offset += addressSize;
+    }
+
+    return offset - dstOffset; // bytes copied
+  }
+
+  final static void setInObjectRegion(Object dst, long dstRegionOffset, int dstPos, Object value) {
+    unsafe.putObject(dst, dstRegionOffset + dstPos * addressSize, value);
   }
 
   final static Object getFromObjectRegion(Object dst, long dstRegionOffset, int dstPos) {
@@ -28,68 +80,163 @@ public final class RangecopyUtils {
 
   static final boolean USE_NEXT_CLASS_ARRAY = false;
 
-  private static final boolean USE_COPY_MEMORY = false;
+  private static final boolean USE_COPY_MEMORY = true;
 
-  static final void rangecopyPrimitiveRegion(Object src, long srcOffset, Object dst, long dstOffset,
+  static final long rangecopyPrimitiveRegion(Object src, long srcOffset, Object dst, long dstOffset,
       long sizeInBytes) {
-    if (sizeInBytes == 0) {
-      return;
-    }
+    if (sizeInBytes != 0) {
+      if (USE_COPY_MEMORY) {
+        unsafe.copyMemory(src, srcOffset, dst, dstOffset, sizeInBytes);
+      } else {
+        final int size = 4;
+        final int length = (int) (sizeInBytes / size);
 
+        for (int i = 0; i < length; i++) {
+          unsafe.putInt(dst, dstOffset, unsafe.getInt(src, srcOffset));
+          srcOffset += addressSize;
+          dstOffset += addressSize;
+        }
+      }
+    }
+    
+    return sizeInBytes;
+  }
+
+  static final long rangecopyObjectRegion(Object src, long srcOffset, Object dst, long dstOffset,
+      int length) {
+//    if (length == 0) {
+//      return 0;
+//    }
+    
+    long strideSizeInBytes = addressSize;
+    
     if (USE_COPY_MEMORY) {
-      unsafe.copyMemory(src, srcOffset, dst, dstOffset, sizeInBytes);
+      long sizeInBytes = length * strideSizeInBytes;
+      if (sizeInBytes != 0)
+        unsafe.copyMemory(src, srcOffset, dst, dstOffset, sizeInBytes);
+      return sizeInBytes;
     } else {
-      final int size = 4;
-      final int length = (int) (sizeInBytes / size);
+      long offset = srcOffset;
+
+      for (int i = 0; i < length; i++) {
+        unsafe.putObject(dst, dstOffset, unsafe.getObject(src, srcOffset));
+        srcOffset += strideSizeInBytes;
+        dstOffset += strideSizeInBytes;
+      }
+
+      return offset - srcOffset;
+    }
+  }
+  
+  static final long __rangecopyObjectRegion(Object src, long srcOffset, Object dst, long dstOffset,
+      long sizeInBytes) {
+    if (sizeInBytes != 0) {
+      if (USE_COPY_MEMORY) {
+        unsafe.copyMemory(src, srcOffset, dst, dstOffset, sizeInBytes);
+      } else {
+        final int length = (int) (sizeInBytes / addressSize);
+
+        for (int i = 0; i < length; i++) {
+          unsafe.putObject(dst, dstOffset, unsafe.getObject(src, srcOffset));
+          srcOffset += addressSize;
+          dstOffset += addressSize;
+        }
+      }
+    }
+    return sizeInBytes;
+  }
+
+  static final void __rangecopyObjectRegion(Object src, Object dst, long offset, long sizeInBytes) {
+    if (USE_COPY_MEMORY) {
+      unsafe.copyMemory(src, offset, dst, offset, sizeInBytes);
+    } else {
+      // final int length = (int) (sizeInBytes / addressSize);
+      //
+      // for (int i = 0; i < length; i++) {
+      // unsafe.putObject(dst, offset, unsafe.getObject(src, offset));
+      // offset += addressSize;
+      // }
+    }
+  }
+
+  @Deprecated
+  static final void rangecopyIntRegion(Object src, long srcRegionOffset, int srcPos, Object dst,
+      long dstRegionOffset, int dstPos, int length) {
+    if (length != 0) {
+      int strideSizeInBytes = 4;
+
+      if (USE_COPY_MEMORY) {
+        long sizeInBytes = length * strideSizeInBytes;
+        unsafe.copyMemory(src, srcRegionOffset + srcPos * strideSizeInBytes, dst,
+            dstRegionOffset + dstPos * strideSizeInBytes, sizeInBytes);
+      } else {
+        long srcOffset = srcRegionOffset + srcPos * strideSizeInBytes;
+        long dstOffset = dstRegionOffset + dstPos * strideSizeInBytes;
+
+        for (int i = 0; i < length; i++) {
+          unsafe.putInt(dst, dstOffset, unsafe.getInt(src, srcOffset));
+          srcOffset += strideSizeInBytes;
+          dstOffset += strideSizeInBytes;
+        }
+      }
+    }
+  }
+ 
+  static final long rangecopyIntRegion(Object src, long srcOffset, Object dst,
+      long dstOffset, int length) {
+    if (length == 0) {
+      return 0;
+    }
+      
+    long strideSizeInBytes = 4;
+    
+    if (USE_COPY_MEMORY) {
+      long sizeInBytes = length * strideSizeInBytes;
+      unsafe.copyMemory(src, srcOffset, dst, dstOffset, sizeInBytes);
+      return sizeInBytes;
+    } else {
+      long offset = srcOffset;
 
       for (int i = 0; i < length; i++) {
         unsafe.putInt(dst, dstOffset, unsafe.getInt(src, srcOffset));
-        srcOffset += addressSize;
-        dstOffset += addressSize;
+        srcOffset += strideSizeInBytes;
+        dstOffset += strideSizeInBytes;
       }
+
+      return offset - srcOffset;
     }
   }
-
-  static final void rangecopyObjectRegion(Object src, long srcOffset, Object dst, long dstOffset,
-      long sizeInBytes) {
-    if (sizeInBytes == 0) {
-      return;
-    }
-
-    if (USE_COPY_MEMORY) {
-      unsafe.copyMemory(src, srcOffset, dst, dstOffset, sizeInBytes);
-    } else {
-      final int length = (int) (sizeInBytes / addressSize);
-
-      for (int i = 0; i < length; i++) {
-        unsafe.putObject(dst, dstOffset, unsafe.getObject(src, srcOffset));
-        srcOffset += addressSize;
-        dstOffset += addressSize;
-      }
-    }
-  }
-
+  
+  
   static final void rangecopyObjectRegion(Object src, long srcRegionOffset, int srcPos, Object dst,
       long dstRegionOffset, int dstPos, int length) {
-    if (length == 0) {
-      return;
-    }
+    if (length != 0) {
+      long strideSizeInBytes = addressSize;
 
-    if (USE_COPY_MEMORY) {
-      long sizeInBytes = length * addressSize;
-      unsafe.copyMemory(src, srcRegionOffset + srcPos * addressSize, dst,
-          dstRegionOffset + dstPos * addressSize, sizeInBytes);
-    } else {
-      long srcOffset = srcRegionOffset + srcPos * addressSize;
-      long dstOffset = dstRegionOffset + dstPos * addressSize;
+      if (USE_COPY_MEMORY) {
+        unsafe.copyMemory(src, srcRegionOffset + srcPos * strideSizeInBytes, dst,
+            dstRegionOffset + dstPos * strideSizeInBytes, length * strideSizeInBytes);
+      } else {
+        long srcOffset = srcRegionOffset + srcPos * strideSizeInBytes;
+        long dstOffset = dstRegionOffset + dstPos * strideSizeInBytes;
 
-      for (int i = 0; i < length; i++) {
-        unsafe.putObject(dst, dstOffset, unsafe.getObject(src, srcOffset));
-        srcOffset += addressSize;
-        dstOffset += addressSize;
+        for (int i = 0; i < length; i++) {
+          unsafe.putObject(dst, dstOffset, unsafe.getObject(src, srcOffset));
+          srcOffset += strideSizeInBytes;
+          dstOffset += strideSizeInBytes;
+        }
       }
     }
   }
+
+  // static final void __rangecopyObjectRegion(long regionOffset, Object src, int srcPos, Object
+  // dst,
+  // int dstPos, int length) {
+  // long strideSizeInBytes = addressSize;
+  //
+  // unsafe.copyMemory(src, regionOffset + srcPos * strideSizeInBytes, dst,
+  // regionOffset + dstPos * strideSizeInBytes, length * strideSizeInBytes);
+  // }
 
   static abstract class EitherIntOrObject {
     public enum Type {
@@ -175,13 +322,14 @@ public final class RangecopyUtils {
     return (byte) (rawMap1 & rawMap2 & 0xFF);
   }
 
-  public static boolean isInBitmap(byte bitmap, byte bitpos) {
+  public static boolean isBitInBitmap(byte bitmap, byte bitpos) {
     return (bitmap != 0 && (bitmap == -1 || (bitmap & bitpos) != 0));
+    // return (bitmap & bitpos) != 0;
   }
 
   public static int toState(byte rawMap1, byte rawMap2, byte bitpos) {
-    int bit1 = isInBitmap(rawMap1, bitpos) ? 1 : 0;
-    int bit2 = isInBitmap(rawMap2, bitpos) ? 2 : 0;
+    int bit1 = isBitInBitmap(rawMap1, bitpos) ? 1 : 0;
+    int bit2 = isBitInBitmap(rawMap2, bitpos) ? 2 : 0;
     int bit = bit1 | bit2;
     return bit;
   }
@@ -202,13 +350,14 @@ public final class RangecopyUtils {
     return rawMap1 & rawMap2;
   }
 
-  public static boolean isInBitmap(int bitmap, int bitpos) {
+  public static boolean isBitInBitmap(int bitmap, int bitpos) {
     return (bitmap != 0 && (bitmap == -1 || (bitmap & bitpos) != 0));
+    // return (bitmap & bitpos) != 0;
   }
 
   public static int toState(int rawMap1, int rawMap2, int bitpos) {
-    int bit1 = isInBitmap(rawMap1, bitpos) ? 1 : 0;
-    int bit2 = isInBitmap(rawMap2, bitpos) ? 2 : 0;
+    int bit1 = isBitInBitmap(rawMap1, bitpos) ? 1 : 0;
+    int bit2 = isBitInBitmap(rawMap2, bitpos) ? 2 : 0;
     int bit = bit1 | bit2;
     return bit;
   }
