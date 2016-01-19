@@ -369,4 +369,32 @@ public final class RangecopyUtils {
     return bit;
   }
 
+  static class Companion {
+
+    final int nodeArity;
+
+    final int payloadArity;
+
+    final int slotArity;
+
+    final int untypedSlotArity;
+
+    final long rareBase;
+
+    final long arrayOffsetLast;
+
+    final long nodeBase;
+    
+    Companion(int nodeArity, int payloadArity, int slotArity, int untypedSlotArity, long rareBase, long arrayOffsetLast, long nodeBase) {
+      this.nodeArity = nodeArity;
+      this.payloadArity = payloadArity;
+      this.slotArity = slotArity;
+      this.untypedSlotArity = untypedSlotArity;
+      this.rareBase = rareBase;
+      this.arrayOffsetLast = arrayOffsetLast;
+      this.nodeBase = nodeBase;          
+    }   
+    
+  }
+  
 }
