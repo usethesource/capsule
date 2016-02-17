@@ -1,3 +1,12 @@
+/*******************************************************************************
+ * Copyright (c) 2015-2016 CWI All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which accompanies this
+ * distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *
+ * * Michael Steindorfer - Michael.Steindorfer@cwi.nl - CWI
+ *******************************************************************************/
 package io.usethesource.capsule;
 
 import static io.usethesource.capsule.TrieMap_Heterogeneous_BleedingEdge.AbstractMapNode.unsafe;
@@ -107,12 +116,12 @@ public final class RangecopyUtils {
     return sizeInBytes;
   }
 
-  static final long rangecopyObjectRegion(Object src, long srcOffset, Object dst, long dstOffset,
+  public static final long rangecopyObjectRegion(Object src, long srcOffset, Object dst, long dstOffset,
       int length) {
     // if (length == 0) {
     // return 0;
     // }
-
+    
     if (USE_COPY_MEMORY) {
       long sizeInBytes = length * addressSize;
       if (sizeInBytes != 0)
@@ -120,7 +129,7 @@ public final class RangecopyUtils {
       return sizeInBytes;
     } else {
       long strideSizeInBytes = addressSize;
-      long offset = srcOffset;
+      long sizeInBytes = length * strideSizeInBytes;
 
       for (int i = 0; i < length; i++) {
         unsafe.putObject(dst, dstOffset, unsafe.getObject(src, srcOffset));
@@ -128,7 +137,7 @@ public final class RangecopyUtils {
         dstOffset += strideSizeInBytes;
       }
 
-      return offset - srcOffset;
+      return sizeInBytes;
     }
   }
 
@@ -186,7 +195,7 @@ public final class RangecopyUtils {
     }
   }
 
-  static final long rangecopyIntRegion(Object src, long srcOffset, Object dst, long dstOffset,
+  public static final long rangecopyIntRegion(Object src, long srcOffset, Object dst, long dstOffset,
       int length) {
     // if (length == 0) {
     // return 0;
@@ -318,15 +327,23 @@ public final class RangecopyUtils {
    */
 
   public static byte nodeMap(byte rawMap1, byte rawMap2) {
-    return (byte) (rawMap1 ^ rareMap(rawMap1, rawMap2) & 0xFF);
+    return (byte) (Byte.toUnsignedInt(rawMap1) ^ Byte.toUnsignedInt(rareMap(rawMap1, rawMap2)));
   }
 
+  public static byte nodeMap(byte rawMap1, byte rawMap2, byte rareMap) {
+    return (byte) (Byte.toUnsignedInt(rawMap1) ^ Byte.toUnsignedInt(rareMap));
+  }
+  
   public static byte dataMap(byte rawMap1, byte rawMap2) {
-    return (byte) (rawMap2 ^ rareMap(rawMap1, rawMap2) & 0xFF);
+    return (byte) (Byte.toUnsignedInt(rawMap2) ^ Byte.toUnsignedInt(rareMap(rawMap1, rawMap2)));
   }
 
+  public static byte dataMap(byte rawMap1, byte rawMap2, byte rareMap) {
+    return (byte) (Byte.toUnsignedInt(rawMap2) ^ Byte.toUnsignedInt(rareMap));
+  }
+  
   public static byte rareMap(byte rawMap1, byte rawMap2) {
-    return (byte) (rawMap1 & rawMap2 & 0xFF);
+    return (byte) (Byte.toUnsignedInt(rawMap1) & Byte.toUnsignedInt(rawMap2));
   }
 
   public static boolean isBitInBitmap(byte bitmap, byte bitpos) {

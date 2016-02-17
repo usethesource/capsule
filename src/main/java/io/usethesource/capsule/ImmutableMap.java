@@ -53,4 +53,12 @@ public interface ImmutableMap<K, V> extends Map<K, V> {
 
   public TransientMap<K, V> asTransient();
 
+  default public boolean containsKey(final int key) {
+    throw new UnsupportedOperationException("Not implemented.");
+  }
+  
+  default public ImmutableMap<K, V> __put(final int key, final int val) {
+    throw new UnsupportedOperationException("Not implemented.");
+  }
+  
 }

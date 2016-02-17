@@ -51,4 +51,9 @@ public interface TransientMap<K, V> extends Map<K, V> {
 
   public ImmutableMap<K, V> freeze();
 
+  // TODO: return Option[int]
+  default public Object __put(final int key, final int val) {
+    throw new UnsupportedOperationException("Not implemented.");
+  }
+  
 }
