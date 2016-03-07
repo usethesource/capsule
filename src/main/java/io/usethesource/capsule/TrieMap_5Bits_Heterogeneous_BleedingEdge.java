@@ -10,6 +10,9 @@
 package io.usethesource.capsule;
 
 import static io.usethesource.capsule.AbstractSpecialisedImmutableMap.entryOf;
+import static io.usethesource.capsule.RangecopyUtils.arrayviewcopy;
+import static io.usethesource.capsule.RangecopyUtils.arrayviewcopyInt;
+import static io.usethesource.capsule.RangecopyUtils.arrayviewcopyObject;
 import static io.usethesource.capsule.RangecopyUtils.getFromObjectRegion;
 import static io.usethesource.capsule.RangecopyUtils.isBitInBitmap;
 import static io.usethesource.capsule.RangecopyUtils.rangecopyIntRegion;
@@ -39,8 +42,13 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
+import io.usethesource.capsule.RangecopyUtils.ArrayView;
 import io.usethesource.capsule.RangecopyUtils.Companion;
 import io.usethesource.capsule.RangecopyUtils.EitherIntOrObject;
+import io.usethesource.capsule.RangecopyUtils.IntArrayView;
+import io.usethesource.capsule.RangecopyUtils.ObjectArrayView;
+import io.usethesource.capsule.RangecopyUtils.StreamingCopy;
+import io.usethesource.capsule.TrieMap_5Bits.CompactMapNode;
 import io.usethesource.capsule.TrieMap_5Bits_Heterogeneous_BleedingEdge_Specializations.Map0To0Node_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.TrieMap_5Bits_Heterogeneous_BleedingEdge_Specializations.Map0To1Node_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.TrieMap_5Bits_Heterogeneous_BleedingEdge_Specializations.Map0To2Node_5Bits_Heterogeneous_BleedingEdge;
@@ -1104,6 +1112,21 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
 
     }
 
+    final ArrayView getIntArrayView() {
+      final Class<?> clazz = this.getClass();
+      final int payloadArity = unsafe.getInt(clazz, globalPayloadArityOffset);
+      
+      return new IntArrayView(this, arrayBase, payloadArity * TUPLE_LENGTH);      
+    }
+    
+    final ObjectArrayView getObjectArrayView() {
+      final Class<?> clazz = this.getClass();
+      final int untypedSlotArity = unsafe.getInt(clazz, globalUntypedSlotArityOffset);
+      final long rareBase = unsafe.getLong(clazz, globalRareBaseOffset);
+
+      return new ObjectArrayView(this, rareBase, untypedSlotArity);
+    }   
+    
     static final int hashCodeLength() {
       return 32;
     }
@@ -1443,7 +1466,33 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
 
       return dst;
     }
-
+    
+//    CompactMapNode copyAndInsertRareValue(final AtomicReference<Thread> mutator, final int bitpos,
+//        final int index, final Object key, final Object val) {
+//
+//      ArrayView src1 = getIntArrayView();
+//      ArrayView src2 = getObjectArrayView();
+//
+//      final CompactMapNode dst = allocateHeapRegion(src1.length / 2, src2.length + TUPLE_LENGTH);
+//
+//      dst.rawMap1 = rawMap1 | bitpos;
+//      dst.rawMap2 = rawMap2 | bitpos;
+//
+//      ArrayView dst1 = dst.getIntArrayView();
+//      ArrayView dst2 = dst.getObjectArrayView();
+//
+//      arrayviewcopy(src1, 0, dst1, 0, src1.length);
+//
+//      final int idx2 = index * TUPLE_LENGTH;
+//
+//      arrayviewcopy(src2, 0, dst2, 0, idx2);
+//      dst2.set(idx2 + 0, key);
+//      dst2.set(idx2 + 1, val);
+//      arrayviewcopy(src2, idx2, dst2, idx2 + TUPLE_LENGTH, src2.length - idx2);
+//
+//      return dst;
+//    }
+    
     CompactMapNode copyAndRemoveValue(final AtomicReference<Thread> mutator, final int bitpos) {
       final int valIdx = dataIndex(bitpos);
 
@@ -1583,6 +1632,30 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
 
       return dst;
     }
+    
+//    CompactMapNode copyAndSetNode(final AtomicReference<Thread> mutator, final int index,
+//        final AbstractMapNode node) {
+//      
+//      ArrayView src1 = getIntArrayView();
+//      ArrayView src2 = getObjectArrayView();
+//
+//      final CompactMapNode dst = allocateHeapRegion(getClass());
+//
+//      dst.rawMap1 = rawMap1;
+//      dst.rawMap2 = rawMap2;
+//
+//      ArrayView dst1 = dst.getIntArrayView();
+//      ArrayView dst2 = dst.getObjectArrayView();
+//
+//      arrayviewcopy(src1, 0, dst1, 0, src1.length);
+//
+//      final int idx2 = src2.length - 1 - index;
+//
+//      arrayviewcopy(src2, 0, dst2, 0, src2.length);
+//      dst2.set(idx2, node);
+//
+//      return dst;      
+//    }    
 
     CompactMapNode copyAndMigrateFromInlineToNode(final AtomicReference<Thread> mutator,
         final int bitpos, final int indexOld, final int indexNew, final AbstractMapNode node) {
@@ -1650,6 +1723,130 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
       return dst;
     }
 
+//    // TODO: code ~25ms slower than code above
+//    CompactMapNode copyAndMigrateFromRareInlineToNode(final AtomicReference<Thread> mutator,
+//        final int bitpos, final int indexOld, final int indexNew, final AbstractMapNode node) {
+//
+//      ArrayView src1 = getIntArrayView();
+//      ArrayView src2 = getObjectArrayView();
+//
+//      final CompactMapNode dst = allocateHeapRegion(src1.length / 2, src2.length - TUPLE_LENGTH + 1);
+//
+//      dst.rawMap1 = rawMap1 | bitpos;
+//      dst.rawMap2 = rawMap2 ^ bitpos;
+//
+//      ArrayView dst1 = dst.getIntArrayView();
+//      ArrayView dst2 = dst.getObjectArrayView();
+//
+//      arrayviewcopy(src1, 0, dst1, 0, src1.length);
+//      
+//      final int idxOld2 = indexOld * TUPLE_LENGTH;
+//      final int idxNew2 = dst2.length - 1 - indexNew;
+//      
+//      arrayviewcopy(src2, 0, dst2, 0, idxOld2);
+//      arrayviewcopy(src2, idxOld2 + TUPLE_LENGTH, dst2, idxOld2, idxNew2 - idxOld2);
+//      dst2.set(idxNew2, node);
+//      arrayviewcopy(src2, idxNew2 + TUPLE_LENGTH, dst2, idxNew2 + 1, src2.length - idxNew2 - TUPLE_LENGTH);
+//
+//      return dst;
+//    }
+    
+//    // TODO: code ~XXms slower than code above
+//    CompactMapNode copyAndMigrateFromRareInlineToNode(final AtomicReference<Thread> mutator,
+//        final int bitpos, final int indexOld, final int indexNew, final AbstractMapNode node) {
+//
+//      ArrayView src1 = getIntArrayView();
+//      ObjectArrayView src2 = getObjectArrayView();
+//
+//      final CompactMapNode dst =
+//          allocateHeapRegion(src1.length / 2, src2.length - TUPLE_LENGTH + 1);
+//
+//      dst.rawMap1 = rawMap1 | bitpos;
+//      dst.rawMap2 = rawMap2 ^ bitpos;
+//
+//      ArrayView dst1 = dst.getIntArrayView();
+//      ObjectArrayView dst2 = dst.getObjectArrayView();
+//
+//      arrayviewcopy(src1, 0, dst1, 0, src1.length);
+//
+//      final int idxOld2 = indexOld * TUPLE_LENGTH;
+//      final int idxNew2 = dst2.length - 1 - indexNew;
+//
+//      /***************/
+//      
+////      arrayviewcopy(src2, 0, dst2, 0, idxOld2);
+////      arrayviewcopy(src2, idxOld2 + TUPLE_LENGTH, dst2, idxOld2, idxNew2 - idxOld2);
+////      dst2.set(idxNew2, node);
+////      arrayviewcopy(src2, idxNew2 + TUPLE_LENGTH, dst2, idxNew2 + 1,
+////          src2.length - idxNew2 - TUPLE_LENGTH);
+//
+//      /***************/
+//      
+////      long offset = src1.offset;
+////
+////      offset += rangecopyObjectRegion(src2.base, offset, dst2.base, offset, idxOld2);
+////      offset += rangecopyObjectRegion(src2.base, offset + sizeOfObject() * TUPLE_LENGTH, dst2.base, offset, idxNew2 - idxOld2);
+////      offset += setInObjectRegionVarArgs(dst2.base, offset, node);
+////      offset += rangecopyObjectRegion(src2.base, offset + sizeOfObject(), dst2.base, offset, src2.length - idxNew2 - TUPLE_LENGTH);
+//
+//      /***************/
+//      
+//      StreamingCopy sc = StreamingCopy.streamingCopyTwoOffsets(src2, dst2);
+//      
+//      sc.copy(idxOld2);
+//      sc.skipAtSrc(TUPLE_LENGTH);
+//      sc.copy(idxNew2 - idxOld2);
+//      sc.insert(node);
+//      sc.copy(src2.length - idxNew2 - TUPLE_LENGTH);
+//      
+////      sc.copy(idxOld2);
+////      sc.copyWithSrcForward(idxNew2 - idxOld2, TUPLE_LENGTH);
+////      sc.insert(node);
+////      sc.copyWithSrcForward(src2.length - idxNew2 - TUPLE_LENGTH, TUPLE_LENGTH);
+//      
+////      StreamingCopy sc = StreamingCopy.streamingCopyOneOffset(src2, dst2);
+////
+////      sc.copy(idxOld2);
+////      sc.copyWithSrcForward(idxNew2 - idxOld2, TUPLE_LENGTH);
+////      sc.put(node);
+////      sc.copyWithSrcDstForward(src2.length - idxNew2 - TUPLE_LENGTH, TUPLE_LENGTH, 1);
+//      
+//      return dst;
+//    }
+    
+//    CompactMapNode copyAndMigrateFromRareInlineToNode(final AtomicReference<Thread> mutator,
+//        final int bitpos, final int indexOld, final int indexNew, final AbstractMapNode node) {
+//      final Class srcClass = this.getClass();
+//
+//      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
+//      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+//
+//      final CompactMapNode src = this;
+//      final CompactMapNode dst =
+//          allocateHeapRegion(payloadArity, untypedSlotArity - TUPLE_LENGTH + 1);
+//
+//      // idempotent operation; in case of rare bit was already set before
+//      dst.rawMap1 = (int) (rawMap1 | bitpos);
+//      dst.rawMap2 = (int) (rawMap2 ^ bitpos);
+//
+//      final int pIndexOld = TUPLE_LENGTH * indexOld;
+//      final int pIndexNew = (untypedSlotArity - TUPLE_LENGTH + 1) - 1 - indexNew;
+//
+//      long offset = arrayBase;
+//      offset += rangecopyIntRegion(src, arrayBase, dst, arrayBase, 2 * payloadArity);
+//
+//      offset += rangecopyObjectRegion(src, offset, dst, offset, pIndexOld);
+//      long delta = 2 * sizeOfObject();
+//      offset += rangecopyObjectRegion(src, offset + delta, dst, offset, pIndexNew - pIndexOld);
+//      long delta2 = setInObjectRegionVarArgs(dst, offset, node);
+//      delta -= delta2;
+//      offset += delta2;
+//      offset +=
+//          rangecopyObjectRegion(src, offset + delta, dst, offset, untypedSlotArity - pIndexNew - 2);
+//
+//      return dst;
+//    }    
+    
     CompactMapNode copyAndMigrateFromNodeToInline(final AtomicReference<Thread> mutator,
         final int bitpos, final AbstractMapNode node) {
       final int idxOld = nodeIndex(bitpos);
