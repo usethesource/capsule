@@ -33,10 +33,10 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @SuppressWarnings("rawtypes")
-public class TrieSetMultimap_BleedingEdge<K, V> implements ImmutableSetMultimap<K, V> {
+public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMultimap<K, V> {
 
 	@SuppressWarnings("unchecked")
-	private static final TrieSetMultimap_BleedingEdge EMPTY_SETMULTIMAP = new TrieSetMultimap_BleedingEdge(
+	private static final TrieSetMultimap_ChampBasedPrototype EMPTY_SETMULTIMAP = new TrieSetMultimap_ChampBasedPrototype(
 					CompactSetMultimapNode.EMPTY_NODE, 0, 0);
 
 	private static final boolean DEBUG = false;
@@ -45,7 +45,7 @@ public class TrieSetMultimap_BleedingEdge<K, V> implements ImmutableSetMultimap<
 	private final int hashCode;
 	private final int cachedSize;
 
-	TrieSetMultimap_BleedingEdge(AbstractSetMultimapNode<K, V> rootNode, int hashCode,
+	TrieSetMultimap_ChampBasedPrototype(AbstractSetMultimapNode<K, V> rootNode, int hashCode,
 					int cachedSize) {
 		this.rootNode = rootNode;
 		this.hashCode = hashCode;
@@ -57,7 +57,7 @@ public class TrieSetMultimap_BleedingEdge<K, V> implements ImmutableSetMultimap<
 
 	@SuppressWarnings("unchecked")
 	public static final <K, V> ImmutableSetMultimap<K, V> of() {
-		return TrieSetMultimap_BleedingEdge.EMPTY_SETMULTIMAP;
+		return TrieSetMultimap_ChampBasedPrototype.EMPTY_SETMULTIMAP;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -67,7 +67,7 @@ public class TrieSetMultimap_BleedingEdge<K, V> implements ImmutableSetMultimap<
 							"Length of argument list is uneven: no key/value pairs.");
 		}
 
-		ImmutableSetMultimap<K, V> result = TrieSetMultimap_BleedingEdge.EMPTY_SETMULTIMAP;
+		ImmutableSetMultimap<K, V> result = TrieSetMultimap_ChampBasedPrototype.EMPTY_SETMULTIMAP;
 
 		for (int i = 0; i < keyValuePairs.length; i += 2) {
 			final K key = (K) keyValuePairs[i];
@@ -81,7 +81,7 @@ public class TrieSetMultimap_BleedingEdge<K, V> implements ImmutableSetMultimap<
 
 	@SuppressWarnings("unchecked")
 	public static final <K, V> TransientSetMultimap<K, V> transientOf() {
-		return TrieSetMultimap_BleedingEdge.EMPTY_SETMULTIMAP.asTransient();
+		return TrieSetMultimap_ChampBasedPrototype.EMPTY_SETMULTIMAP.asTransient();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -91,7 +91,7 @@ public class TrieSetMultimap_BleedingEdge<K, V> implements ImmutableSetMultimap<
 							"Length of argument list is uneven: no key/value pairs.");
 		}
 
-		final TransientSetMultimap<K, V> result = TrieSetMultimap_BleedingEdge.EMPTY_SETMULTIMAP
+		final TransientSetMultimap<K, V> result = TrieSetMultimap_ChampBasedPrototype.EMPTY_SETMULTIMAP
 						.asTransient();
 
 		for (int i = 0; i < keyValuePairs.length; i += 2) {
@@ -244,7 +244,7 @@ public class TrieSetMultimap_BleedingEdge<K, V> implements ImmutableSetMultimap<
 
 		if (details.isModified()) {
 			final int valHash = val.hashCode();
-			return new TrieSetMultimap_BleedingEdge<K, V>(newRootNode, hashCode
+			return new TrieSetMultimap_ChampBasedPrototype<K, V>(newRootNode, hashCode
 							+ ((keyHash ^ valHash)), cachedSize + 1);
 		}
 
@@ -261,7 +261,7 @@ public class TrieSetMultimap_BleedingEdge<K, V> implements ImmutableSetMultimap<
 
 		if (details.isModified()) {
 			final int valHash = val.hashCode();
-			return new TrieSetMultimap_BleedingEdge<K, V>(newRootNode, hashCode
+			return new TrieSetMultimap_ChampBasedPrototype<K, V>(newRootNode, hashCode
 							+ ((keyHash ^ valHash)), cachedSize + 1);
 		}
 
@@ -293,7 +293,7 @@ public class TrieSetMultimap_BleedingEdge<K, V> implements ImmutableSetMultimap<
 		if (details.isModified()) {
 			assert details.hasReplacedValue();
 			final int valHash = details.getReplacedValue().hashCode();
-			return new TrieSetMultimap_BleedingEdge<K, V>(newRootNode, hashCode
+			return new TrieSetMultimap_ChampBasedPrototype<K, V>(newRootNode, hashCode
 							- ((keyHash ^ valHash)), cachedSize - 1);
 		}
 
@@ -311,7 +311,7 @@ public class TrieSetMultimap_BleedingEdge<K, V> implements ImmutableSetMultimap<
 		if (details.isModified()) {
 			assert details.hasReplacedValue();
 			final int valHash = details.getReplacedValue().hashCode();
-			return new TrieSetMultimap_BleedingEdge<K, V>(newRootNode, hashCode
+			return new TrieSetMultimap_ChampBasedPrototype<K, V>(newRootNode, hashCode
 							- ((keyHash ^ valHash)), cachedSize - 1);
 		}
 
@@ -381,27 +381,27 @@ public class TrieSetMultimap_BleedingEdge<K, V> implements ImmutableSetMultimap<
 			keySet = new AbstractSet<K>() {
 				@Override
 				public Iterator<K> iterator() {
-					return TrieSetMultimap_BleedingEdge.this.keyIterator();
+					return TrieSetMultimap_ChampBasedPrototype.this.keyIterator();
 				}
 
 				@Override
 				public int size() {
-					return TrieSetMultimap_BleedingEdge.this.size();
+					return TrieSetMultimap_ChampBasedPrototype.this.size();
 				}
 
 				@Override
 				public boolean isEmpty() {
-					return TrieSetMultimap_BleedingEdge.this.isEmpty();
+					return TrieSetMultimap_ChampBasedPrototype.this.isEmpty();
 				}
 
 				@Override
 				public void clear() {
-					TrieSetMultimap_BleedingEdge.this.clear();
+					TrieSetMultimap_ChampBasedPrototype.this.clear();
 				}
 
 				@Override
 				public boolean contains(Object k) {
-					return TrieSetMultimap_BleedingEdge.this.containsKey(k);
+					return TrieSetMultimap_ChampBasedPrototype.this.containsKey(k);
 				}
 			};
 		}
@@ -417,27 +417,27 @@ public class TrieSetMultimap_BleedingEdge<K, V> implements ImmutableSetMultimap<
 			values = new AbstractCollection<V>() {
 				@Override
 				public Iterator<V> iterator() {
-					return TrieSetMultimap_BleedingEdge.this.valueIterator();
+					return TrieSetMultimap_ChampBasedPrototype.this.valueIterator();
 				}
 
 				@Override
 				public int size() {
-					return TrieSetMultimap_BleedingEdge.this.size();
+					return TrieSetMultimap_ChampBasedPrototype.this.size();
 				}
 
 				@Override
 				public boolean isEmpty() {
-					return TrieSetMultimap_BleedingEdge.this.isEmpty();
+					return TrieSetMultimap_ChampBasedPrototype.this.isEmpty();
 				}
 
 				@Override
 				public void clear() {
-					TrieSetMultimap_BleedingEdge.this.clear();
+					TrieSetMultimap_ChampBasedPrototype.this.clear();
 				}
 
 				@Override
 				public boolean contains(Object v) {
-					return TrieSetMultimap_BleedingEdge.this.containsValue(v);
+					return TrieSetMultimap_ChampBasedPrototype.this.containsValue(v);
 				}
 			};
 		}
@@ -475,22 +475,22 @@ public class TrieSetMultimap_BleedingEdge<K, V> implements ImmutableSetMultimap<
 
 				@Override
 				public int size() {
-					return TrieSetMultimap_BleedingEdge.this.size();
+					return TrieSetMultimap_ChampBasedPrototype.this.size();
 				}
 
 				@Override
 				public boolean isEmpty() {
-					return TrieSetMultimap_BleedingEdge.this.isEmpty();
+					return TrieSetMultimap_ChampBasedPrototype.this.isEmpty();
 				}
 
 				@Override
 				public void clear() {
-					TrieSetMultimap_BleedingEdge.this.clear();
+					TrieSetMultimap_ChampBasedPrototype.this.clear();
 				}
 
 				@Override
 				public boolean contains(Object k) {
-					return TrieSetMultimap_BleedingEdge.this.containsKey(k);
+					return TrieSetMultimap_ChampBasedPrototype.this.containsKey(k);
 				}
 			};
 		}
@@ -507,8 +507,8 @@ public class TrieSetMultimap_BleedingEdge<K, V> implements ImmutableSetMultimap<
 			return false;
 		}
 
-		if (other instanceof TrieSetMultimap_BleedingEdge) {
-			TrieSetMultimap_BleedingEdge<?, ?> that = (TrieSetMultimap_BleedingEdge<?, ?>) other;
+		if (other instanceof TrieSetMultimap_ChampBasedPrototype) {
+			TrieSetMultimap_ChampBasedPrototype<?, ?> that = (TrieSetMultimap_ChampBasedPrototype<?, ?>) other;
 
 			if (this.cachedSize != that.cachedSize) {
 				return false;
@@ -2475,7 +2475,7 @@ public class TrieSetMultimap_BleedingEdge<K, V> implements ImmutableSetMultimap<
 		private int cachedSize;
 
 		TransientTrieSetMultimap_BleedingEdge(
-						TrieSetMultimap_BleedingEdge<K, V> trieSetMultimap_BleedingEdge) {
+						TrieSetMultimap_ChampBasedPrototype<K, V> trieSetMultimap_BleedingEdge) {
 			this.mutator = new AtomicReference<Thread>(Thread.currentThread());
 			this.rootNode = trieSetMultimap_BleedingEdge.rootNode;
 			this.hashCode = trieSetMultimap_BleedingEdge.hashCode;
@@ -3070,7 +3070,7 @@ public class TrieSetMultimap_BleedingEdge<K, V> implements ImmutableSetMultimap<
 			}
 
 			mutator.set(null);
-			return new TrieSetMultimap_BleedingEdge<K, V>(rootNode, hashCode, cachedSize);
+			return new TrieSetMultimap_ChampBasedPrototype<K, V>(rootNode, hashCode, cachedSize);
 		}
 	}
 

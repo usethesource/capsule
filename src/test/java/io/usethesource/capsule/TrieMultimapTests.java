@@ -25,7 +25,7 @@ public class TrieMultimapTests {
 
 	@Test
 	public void testInsertTwoTuplesThatShareSameKey() {
-		ImmutableSetMultimap<Integer, String> map = TrieSetMultimap_BleedingEdge
+		ImmutableSetMultimap<Integer, String> map = TrieSetMultimap_ChampBasedPrototype
 						.<Integer, String> of().__put(1, "x").__put(1, "y");
 
 		assertEquals(2, map.size());
@@ -34,7 +34,7 @@ public class TrieMultimapTests {
 
 	@Test
 	public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyX() {
-		ImmutableSetMultimap<Integer, String> map = TrieSetMultimap_BleedingEdge
+		ImmutableSetMultimap<Integer, String> map = TrieSetMultimap_ChampBasedPrototype
 						.<Integer, String> of().__put(1, "x").__put(1, "y").__remove(1, "x");
 
 		assertEquals(1, map.size());
@@ -43,7 +43,7 @@ public class TrieMultimapTests {
 
 	@Test
 	public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyY() {
-		ImmutableSetMultimap<Integer, String> map = TrieSetMultimap_BleedingEdge
+		ImmutableSetMultimap<Integer, String> map = TrieSetMultimap_ChampBasedPrototype
 						.<Integer, String> of().__put(1, "x").__put(1, "y").__remove(1, "y");
 
 		assertEquals(1, map.size());
@@ -52,7 +52,7 @@ public class TrieMultimapTests {
 
 	@Test
 	public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyXY() {
-		ImmutableSetMultimap<Integer, String> map = TrieSetMultimap_BleedingEdge
+		ImmutableSetMultimap<Integer, String> map = TrieSetMultimap_ChampBasedPrototype
 						.<Integer, String> of().__put(1, "x").__put(1, "y").__remove(1, "x")
 						.__remove(1, "y");
 
@@ -62,7 +62,7 @@ public class TrieMultimapTests {
 
 	@Test
 	public void testInsertTwoTuplesThatShareSameKey_Iterate() {
-		ImmutableSetMultimap<Integer, String> map = TrieSetMultimap_BleedingEdge
+		ImmutableSetMultimap<Integer, String> map = TrieSetMultimap_ChampBasedPrototype
 						.<Integer, String> of().__put(1, "x").__put(1, "y");
 
 		Collection<String> values = map.values();
