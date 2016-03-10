@@ -57,7 +57,7 @@ public class RetrofittingHeterogeneousApi {
       case "java.lang.String":
         switch(valueType.getName()) {
           case "int":
-            put((String) keyType.cast(keyInstance), (int) valueInstance);
+            put((String) keyType.cast(keyInstance), (int) (Integer) valueInstance);
             return;
           case "java.lang.Integer":
             put((String) keyType.cast(keyInstance), (Integer) valueInstance);
