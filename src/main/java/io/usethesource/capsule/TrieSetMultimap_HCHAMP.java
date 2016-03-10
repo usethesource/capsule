@@ -9,6 +9,9 @@
  *******************************************************************************/
 package io.usethesource.capsule;
 
+import static io.usethesource.capsule.RangecopyUtils.isBitInBitmap;
+
+
 import java.text.DecimalFormat;
 import java.util.AbstractCollection;
 import java.util.AbstractSet;
@@ -997,7 +1000,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     static final <K, V> CompactSetMultimapNode<K, V> mergeTwoSingletonPairs(final K key0,
         final V val0, final int keyHash0, final K key1, final V val1, final int keyHash1,
         final int shift) {
-      assert !(key0.equals(key1));
+      assert!(key0.equals(key1));
 
       if (shift >= HASH_CODE_LENGTH) {
         throw new IllegalStateException("Hash collision not yet fixed.");
@@ -1033,7 +1036,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     static final <K, V> CompactSetMultimapNode<K, V> mergeCollectionAndSingletonPairs(final K key0,
         final ImmutableSet<V> valColl0, final int keyHash0, final K key1, final V val1,
         final int keyHash1, final int shift) {
-      assert !(key0.equals(key1));
+      assert!(key0.equals(key1));
 
       if (shift >= HASH_CODE_LENGTH) {
         throw new IllegalStateException("Hash collision not yet fixed.");
@@ -1150,17 +1153,17 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       final int dataMap = rawMap2 ^ collMap;
       final int nodeMap = rawMap1 ^ collMap;
 
-      if ((dataMap & bitpos) != 0) {
+      if (isBitInBitmap(dataMap, bitpos)) {
         final int index = index(dataMap, mask, bitpos);
         return getSingletonKey(index).equals(key);
       }
 
-      if ((collMap & bitpos) != 0) {
+      if (isBitInBitmap(collMap, bitpos)) {
         final int index = index(collMap, mask, bitpos);
         return getCollectionKey(index).equals(key);
       }
 
-      if ((nodeMap & bitpos) != 0) {
+      if (isBitInBitmap(nodeMap, bitpos)) {
         final int index = index(nodeMap, mask, bitpos);
         return getNode(index).containsKey(key, keyHash, shift + BIT_PARTITION_SIZE);
       }
@@ -1216,7 +1219,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       final int dataMap = rawMap2 ^ collMap;
       final int nodeMap = rawMap1 ^ collMap;
 
-      if ((dataMap & bitpos) != 0) {
+      if (isBitInBitmap(dataMap, bitpos)) {
         final int dataIndex = index(dataMap, mask, bitpos);
         final K currentKey = getSingletonKey(dataIndex);
 
@@ -1245,7 +1248,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
         }
       }
 
-      if ((collMap & bitpos) != 0) {
+      if (isBitInBitmap(collMap, bitpos)) {
         final int collIndex = index(collMap, mask, bitpos);
         final K currentCollKey = getSingletonKey(collIndex);
 
@@ -1273,7 +1276,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
         }
       }
 
-      if ((nodeMap & bitpos) != 0) {
+      if (isBitInBitmap(nodeMap, bitpos)) {
         final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex(bitpos));
         final CompactSetMultimapNode<K, V> subNodeNew =
             subNode.updated(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details);
@@ -1309,7 +1312,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       final int dataMap = rawMap2 ^ collMap;
       final int nodeMap = rawMap1 ^ collMap;
 
-      if ((dataMap & bitpos) != 0) {
+      if (isBitInBitmap(dataMap, bitpos)) {
         final int dataIndex = index(dataMap, mask, bitpos);
 
         final K currentKey = getSingletonKey(dataIndex);
@@ -1330,7 +1333,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
         }
       }
 
-      if ((collMap & bitpos) != 0) {
+      if (isBitInBitmap(collMap, bitpos)) {
         final int collIndex = index(collMap, mask, bitpos);
 
         final K currentKey = getCollectionKey(collIndex);
@@ -1359,7 +1362,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
         }
       }
 
-      if ((nodeMap & bitpos) != 0) {
+      if (isBitInBitmap(nodeMap, bitpos)) {
         final CompactSetMultimapNode<K, V> subNode = getNode(index(nodeMap, mask, bitpos));
         final CompactSetMultimapNode<K, V> subNodeNew =
             subNode.removed(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details);
@@ -1524,18 +1527,18 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
       if (DEBUG) {
 
-        assert (TUPLE_LENGTH * java.lang.Integer.bitCount(dataMap)
+        assert(TUPLE_LENGTH * java.lang.Integer.bitCount(dataMap)
             + java.lang.Integer.bitCount(nodeMap) == nodes.length);
 
         for (int i = 0; i < TUPLE_LENGTH * payloadArity(); i++) {
-          assert ((nodes[i] instanceof CompactSetMultimapNode) == false);
+          assert((nodes[i] instanceof CompactSetMultimapNode) == false);
         }
         for (int i = TUPLE_LENGTH * payloadArity(); i < nodes.length; i++) {
-          assert ((nodes[i] instanceof CompactSetMultimapNode) == true);
+          assert((nodes[i] instanceof CompactSetMultimapNode) == true);
         }
 
         for (int i = 1; i < TUPLE_LENGTH * payloadArity(); i += 2) {
-          assert ((nodes[i] instanceof ImmutableSet) == true);
+          assert((nodes[i] instanceof ImmutableSet) == true);
         }
       }
 
