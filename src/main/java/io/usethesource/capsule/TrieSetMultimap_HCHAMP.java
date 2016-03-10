@@ -10,9 +10,9 @@
 package io.usethesource.capsule;
 
 import static io.usethesource.capsule.RangecopyUtils.isBitInBitmap;
+import static io.usethesource.capsule.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type.COLLECTION;
+import static io.usethesource.capsule.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type.SINGLETON;
 
-
-import java.text.DecimalFormat;
 import java.util.AbstractCollection;
 import java.util.AbstractSet;
 import java.util.ArrayDeque;
@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -32,6 +33,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import io.usethesource.capsule.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type;
 
 @SuppressWarnings("rawtypes")
 public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> {
@@ -78,6 +81,16 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     return result;
   }
 
+  private static final <T> ImmutableSet<T> setOf(T key1) {
+    // return AbstractSpecialisedImmutableSet.setOf(key1);
+    return DefaultTrieSet.of(key1);
+  }
+
+  private static final <T> ImmutableSet<T> setOf(T key1, T key2) {
+    // return AbstractSpecialisedImmutableSet.setOf(key1, key2);    
+    return DefaultTrieSet.of(key1, key2);
+  }
+  
   @SuppressWarnings("unchecked")
   public static final <K, V> TransientSetMultimap<K, V> transientOf() {
     return TrieSetMultimap_HCHAMP.EMPTY_SETMULTIMAP.asTransient();
@@ -560,127 +573,81 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     return sumNodes;
   }
 
-  /*
-   * For analysis purposes only. Payload X Node
-   */
-  protected int[][] arityCombinationsHistogram() {
-    final Iterator<AbstractSetMultimapNode<K, V>> it = nodeIterator();
-    final int[][] sumArityCombinations = new int[33][33];
-
-    while (it.hasNext()) {
-      final AbstractSetMultimapNode<K, V> node = it.next();
-      sumArityCombinations[node.payloadArity()][node.nodeArity()] += 1;
-    }
-
-    return sumArityCombinations;
-  }
-
-  /*
-   * For analysis purposes only.
-   */
-  protected int[] arityHistogram() {
-    final int[][] sumArityCombinations = arityCombinationsHistogram();
-    final int[] sumArity = new int[33];
-
-    final int maxArity = 32; // TODO: factor out constant
-
-    for (int j = 0; j <= maxArity; j++) {
-      for (int maxRestArity = maxArity - j, k = 0; k <= maxRestArity - j; k++) {
-        sumArity[j + k] += sumArityCombinations[j][k];
-      }
-    }
-
-    return sumArity;
-  }
-
-  /*
-   * For analysis purposes only.
-   */
-  public void printStatistics() {
-    final int[][] sumArityCombinations = arityCombinationsHistogram();
-    final int[] sumArity = arityHistogram();
-    final int sumNodes = getNodeCount();
-
-    final int[] cumsumArity = new int[33];
-    for (int cumsum = 0, i = 0; i < 33; i++) {
-      cumsum += sumArity[i];
-      cumsumArity[i] = cumsum;
-    }
-
-    final float threshhold = 0.01f; // for printing results
-    for (int i = 0; i < 33; i++) {
-      float arityPercentage = (float) (sumArity[i]) / sumNodes;
-      float cumsumArityPercentage = (float) (cumsumArity[i]) / sumNodes;
-
-      if (arityPercentage != 0 && arityPercentage >= threshhold) {
-        // details per level
-        StringBuilder bldr = new StringBuilder();
-        int max = i;
-        for (int j = 0; j <= max; j++) {
-          for (int k = max - j; k <= max - j; k++) {
-            float arityCombinationsPercentage = (float) (sumArityCombinations[j][k]) / sumNodes;
-
-            if (arityCombinationsPercentage != 0 && arityCombinationsPercentage >= threshhold) {
-              bldr.append(String.format("%d/%d: %s, ", j, k,
-                  new DecimalFormat("0.00%").format(arityCombinationsPercentage)));
-            }
-          }
-        }
-        final String detailPercentages = bldr.toString();
-
-        // overview
-        System.out.println(String.format("%2d: %s\t[cumsum = %s]\t%s", i,
-            new DecimalFormat("0.00%").format(arityPercentage),
-            new DecimalFormat("0.00%").format(cumsumArityPercentage), detailPercentages));
-      }
-    }
-  }
-
-  @Deprecated
-  abstract static class Optional<T> {
-    private static final Optional EMPTY = new Optional() {
-      @Override
-      boolean isPresent() {
-        return false;
-      }
-
-      @Override
-      Object get() {
-        return null;
-      }
-    };
-
-    @SuppressWarnings("unchecked")
-    static <T> Optional<T> empty() {
-      return EMPTY;
-    }
-
-    static <T> Optional<T> of(T value) {
-      return new Value<T>(value);
-    }
-
-    abstract boolean isPresent();
-
-    abstract T get();
-
-    private static final class Value<T> extends Optional<T> {
-      private final T value;
-
-      private Value(T value) {
-        this.value = value;
-      }
-
-      @Override
-      boolean isPresent() {
-        return true;
-      }
-
-      @Override
-      T get() {
-        return value;
-      }
-    }
-  }
+  // /*
+  // * For analysis purposes only. Payload X Node
+  // */
+  // protected int[][] arityCombinationsHistogram() {
+  // final Iterator<AbstractSetMultimapNode<K, V>> it = nodeIterator();
+  // final int[][] sumArityCombinations = new int[33][33];
+  //
+  // while (it.hasNext()) {
+  // final AbstractSetMultimapNode<K, V> node = it.next();
+  // sumArityCombinations[node.payloadArity()][node.nodeArity()] += 1;
+  // }
+  //
+  // return sumArityCombinations;
+  // }
+  //
+  // /*
+  // * For analysis purposes only.
+  // */
+  // protected int[] arityHistogram() {
+  // final int[][] sumArityCombinations = arityCombinationsHistogram();
+  // final int[] sumArity = new int[33];
+  //
+  // final int maxArity = 32; // TODO: factor out constant
+  //
+  // for (int j = 0; j <= maxArity; j++) {
+  // for (int maxRestArity = maxArity - j, k = 0; k <= maxRestArity - j; k++) {
+  // sumArity[j + k] += sumArityCombinations[j][k];
+  // }
+  // }
+  //
+  // return sumArity;
+  // }
+  //
+  // /*
+  // * For analysis purposes only.
+  // */
+  // public void printStatistics() {
+  // final int[][] sumArityCombinations = arityCombinationsHistogram();
+  // final int[] sumArity = arityHistogram();
+  // final int sumNodes = getNodeCount();
+  //
+  // final int[] cumsumArity = new int[33];
+  // for (int cumsum = 0, i = 0; i < 33; i++) {
+  // cumsum += sumArity[i];
+  // cumsumArity[i] = cumsum;
+  // }
+  //
+  // final float threshhold = 0.01f; // for printing results
+  // for (int i = 0; i < 33; i++) {
+  // float arityPercentage = (float) (sumArity[i]) / sumNodes;
+  // float cumsumArityPercentage = (float) (cumsumArity[i]) / sumNodes;
+  //
+  // if (arityPercentage != 0 && arityPercentage >= threshhold) {
+  // // details per level
+  // StringBuilder bldr = new StringBuilder();
+  // int max = i;
+  // for (int j = 0; j <= max; j++) {
+  // for (int k = max - j; k <= max - j; k++) {
+  // float arityCombinationsPercentage = (float) (sumArityCombinations[j][k]) / sumNodes;
+  //
+  // if (arityCombinationsPercentage != 0 && arityCombinationsPercentage >= threshhold) {
+  // bldr.append(String.format("%d/%d: %s, ", j, k,
+  // new DecimalFormat("0.00%").format(arityCombinationsPercentage)));
+  // }
+  // }
+  // }
+  // final String detailPercentages = bldr.toString();
+  //
+  // // overview
+  // System.out.println(String.format("%2d: %s\t[cumsum = %s]\t%s", i,
+  // new DecimalFormat("0.00%").format(arityPercentage),
+  // new DecimalFormat("0.00%").format(cumsumArityPercentage), detailPercentages));
+  // }
+  // }
+  // }
 
   static abstract class EitherSingletonOrCollection<T> {
     public enum Type {
@@ -841,10 +808,15 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       };
     }
 
-    abstract boolean hasPayload();
+    // @Deprecated // split data / coll arity
+    // abstract boolean hasPayload();
+    //
+    // @Deprecated // split data / coll arity
+    // abstract int payloadArity();
 
-    @Deprecated // split data / coll arity
-    abstract int payloadArity();
+    abstract boolean hasPayload(EitherSingletonOrCollection.Type type);
+
+    abstract int payloadArity(EitherSingletonOrCollection.Type type);
 
     abstract K getSingletonKey(final int index);
 
@@ -854,7 +826,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
     abstract ImmutableSet<V> getCollectionValue(final int index);
 
-    @Deprecated
     abstract boolean hasSlots();
 
     abstract int slotArity();
@@ -910,6 +881,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
     abstract int rawMap2();
 
+    @Deprecated
     @Override
     int arity() {
       return arity(dataMap()) + arity(collMap()) + arity(nodeMap());
@@ -939,16 +911,17 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     abstract CompactSetMultimapNode<K, V> getNode(final int index);
 
     boolean nodeInvariant() {
-      boolean inv1 = (size() - payloadArity() >= 2 * (arity() - payloadArity()));
-      boolean inv2 = (this.arity() == 0) ? sizePredicate() == SIZE_EMPTY : true;
-      boolean inv3 =
-          (this.arity() == 1 && payloadArity() == 1) ? sizePredicate() == SIZE_ONE : true;
-      boolean inv4 = (this.arity() >= 2) ? sizePredicate() == SIZE_MORE_THAN_ONE : true;
-
-      boolean inv5 = (this.nodeArity() >= 0) && (this.payloadArity() >= 0)
-          && ((this.payloadArity() + this.nodeArity()) == this.arity());
-
-      return inv1 && inv2 && inv3 && inv4 && inv5;
+      return true;
+      // boolean inv1 = (size() - payloadArity() >= 2 * (arity() - payloadArity()));
+      // boolean inv2 = (this.arity() == 0) ? sizePredicate() == SIZE_EMPTY : true;
+      // boolean inv3 =
+      // (this.arity() == 1 && payloadArity() == 1) ? sizePredicate() == SIZE_ONE : true;
+      // boolean inv4 = (this.arity() >= 2) ? sizePredicate() == SIZE_MORE_THAN_ONE : true;
+      //
+      // boolean inv5 = (this.nodeArity() >= 0) && (this.payloadArity() >= 0)
+      // && ((this.payloadArity() + this.nodeArity()) == this.arity());
+      //
+      // return inv1 && inv2 && inv3 && inv4 && inv5;
     }
 
     abstract CompactSetMultimapNode<K, V> copyAndUpdateBitmaps(AtomicReference<Thread> mutator,
@@ -962,10 +935,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
     abstract CompactSetMultimapNode<K, V> copyAndSetNode(final AtomicReference<Thread> mutator,
         final int bitpos, final CompactSetMultimapNode<K, V> node);
-
-    /* ******************************************************** */
-    /* TODO: update interfaces for singleton / value separation */
-    /* ******************************************************** */
 
     abstract CompactSetMultimapNode<K, V> copyAndInsertSingleton(
         final AtomicReference<Thread> mutator, final int bitpos, final K key, final V val);
@@ -1066,41 +1035,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       }
     }
 
-    // static final <K, V> CompactSetMultimapNode<K, V> mergeTwoKeyValPairs(final K key0,
-    // final ImmutableSet<V> valColl0, final int keyHash0, final K key1,
-    // final ImmutableSet<V> valColl1, final int keyHash1, final int shift) {
-    // assert !(key0.equals(key1));
-    //
-    // if (shift >= HASH_CODE_LENGTH) {
-    // // throw new
-    // // IllegalStateException("Hash collision not yet fixed.");
-    // return new HashCollisionSetMultimapNode_BleedingEdge<>(keyHash0,
-    // (K[]) new Object[] {key0, key1},
-    // (ImmutableSet<V>[]) new ImmutableSet[] {valColl0, valColl1});
-    // }
-    //
-    // final int mask0 = mask(keyHash0, shift);
-    // final int mask1 = mask(keyHash1, shift);
-    //
-    // if (mask0 != mask1) {
-    // // both nodes fit on same level
-    // final int dataMap = (int) (bitpos(mask0) | bitpos(mask1));
-    //
-    // if (mask0 < mask1) {
-    // return nodeOf(null, (int) (0), dataMap, new Object[] {key0, valColl0, key1, valColl1});
-    // } else {
-    // return nodeOf(null, (int) (0), dataMap, new Object[] {key1, valColl1, key0, valColl0});
-    // }
-    // } else {
-    // final CompactSetMultimapNode<K, V> node = mergeTwoKeyValPairs(key0, valColl0, keyHash0,
-    // key1, valColl1, keyHash1, shift + BIT_PARTITION_SIZE);
-    // // values fit on next level
-    //
-    // final int nodeMap = bitpos(mask0);
-    // return nodeOf(null, nodeMap, (int) (0), new Object[] {node});
-    // }
-    // }
-
     static final CompactSetMultimapNode EMPTY_NODE;
 
     static {
@@ -1131,14 +1065,19 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       return (bitmap == -1) ? mask : index(bitmap, bitpos);
     }
 
-    // TODO: fix me
+    @Deprecated
     int dataIndex(final int bitpos) {
-      return java.lang.Integer.bitCount(rawMap2() & (bitpos - 1));
+      return java.lang.Integer.bitCount(dataMap() & (bitpos - 1));
     }
 
-    // TODO: fix me
+    @Deprecated
+    int collIndex(final int bitpos) {
+      return java.lang.Integer.bitCount(collMap() & (bitpos - 1));
+    }
+
+    @Deprecated
     int nodeIndex(final int bitpos) {
-      return java.lang.Integer.bitCount(rawMap1() & (bitpos - 1));
+      return java.lang.Integer.bitCount(nodeMap() & (bitpos - 1));
     }
 
     @Override
@@ -1181,23 +1120,47 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
-      if ((rawMap2() & bitpos) != 0) { // inplace value
-        final int index = dataIndex(bitpos);
-        if (getSingletonKey(index).equals(key)) {
-          final ImmutableSet<V> result = getCollectionValue(index);
+      int rawMap1 = this.rawMap1();
+      int rawMap2 = this.rawMap2();
 
-          return Optional.of(result);
+      final int collMap = rawMap1 & rawMap2;
+      final int dataMap = rawMap2 ^ collMap;
+      final int nodeMap = rawMap1 ^ collMap;
+
+      if (isBitInBitmap(dataMap, bitpos)) {
+        final int index = index(dataMap, mask, bitpos);
+
+        final K currentKey = getSingletonKey(index);
+        if (currentKey.equals(key)) {
+
+          final V currentVal = getSingletonValue(index);
+          return Optional.of(setOf(currentVal));
         }
 
         return Optional.empty();
       }
 
-      if ((rawMap1() & bitpos) != 0) { // node (not value)
-        final AbstractSetMultimapNode<K, V> subNode = getNode(nodeIndex(bitpos));
+      if (isBitInBitmap(collMap, bitpos)) {
+        final int index = index(collMap, mask, bitpos);
 
+        final K currentKey = getCollectionKey(index);
+        if (currentKey.equals(key)) {
+
+          final ImmutableSet<V> currentValColl = getCollectionValue(index);
+          return Optional.of(currentValColl);
+        }
+
+        return Optional.empty();
+      }
+
+      if (isBitInBitmap(nodeMap, bitpos)) {
+        final int index = index(nodeMap, mask, bitpos);
+
+        final AbstractSetMultimapNode<K, V> subNode = getNode(index);
         return subNode.findByKey(key, keyHash, shift + BIT_PARTITION_SIZE);
       }
 
+      // default
       return Optional.empty();
     }
 
@@ -1230,7 +1193,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
             return this;
           } else {
             // migrate from singleton to collection
-            final ImmutableSet<V> valColl = AbstractSpecialisedImmutableSet.setOf(currentVal, val);
+            final ImmutableSet<V> valColl = setOf(currentVal, val);
 
             details.modified();
             return copyAndMigrateFromSingletonToCollection(mutator, bitpos, currentKey, valColl);
@@ -1402,16 +1365,16 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       return this;
     }
 
-    abstract EitherSingletonOrCollection.Type typeOfSingleton();
-
-    abstract CompactSetMultimapNode<K, V> canonicalize(AtomicReference<Thread> mutator,
-        final int keyHash, final int shift);
-
     CompactSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
         final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details,
         final Comparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented.");
     }
+
+    abstract EitherSingletonOrCollection.Type typeOfSingleton();
+
+    abstract CompactSetMultimapNode<K, V> canonicalize(AtomicReference<Thread> mutator,
+        final int keyHash, final int shift);
 
     /**
      * @return 0 <= mask <= 2^BIT_PARTITION_SIZE - 1
@@ -1441,28 +1404,49 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
     @Override
     public String toString() {
+      int rawMap1 = this.rawMap1();
+      int rawMap2 = this.rawMap2();
+
+      final int collMap = rawMap1 & rawMap2;
+      final int dataMap = rawMap2 ^ collMap;
+      final int nodeMap = rawMap1 ^ collMap;
+
       final StringBuilder bldr = new StringBuilder();
       bldr.append('[');
 
-      for (byte i = 0; i < payloadArity(); i++) {
-        final byte pos = recoverMask(rawMap2(), (byte) (i + 1));
+      for (byte i = 0; i < arity(dataMap); i++) {
+        final byte pos = recoverMask(dataMap, (byte) (i + 1));
         bldr.append(String.format("@%d<#%d,#%d>", pos, Objects.hashCode(getSingletonKey(i)),
-            Objects.hashCode(getCollectionValue(i))));
+            Objects.hashCode(getSingletonValue(i))));
 
-        if (!((i + 1) == payloadArity())) {
+        if (!((i + 1) == arity(dataMap))) {
           bldr.append(", ");
         }
       }
 
-      if (payloadArity() > 0 && nodeArity() > 0) {
+      if (arity(dataMap) > 0 && arity(collMap) > 0) {
         bldr.append(", ");
       }
 
-      for (byte i = 0; i < nodeArity(); i++) {
-        final byte pos = recoverMask(rawMap1(), (byte) (i + 1));
+      for (byte i = 0; i < arity(collMap); i++) {
+        final byte pos = recoverMask(collMap, (byte) (i + 1));
+        bldr.append(String.format("@%d<#%d,#%d>", pos, Objects.hashCode(getCollectionKey(i)),
+            Objects.hashCode(getCollectionValue(i))));
+
+        if (!((i + 1) == arity(collMap))) {
+          bldr.append(", ");
+        }
+      }
+
+      if (arity(collMap) > 0 && arity(nodeMap) > 0) {
+        bldr.append(", ");
+      }
+
+      for (byte i = 0; i < arity(nodeMap); i++) {
+        final byte pos = recoverMask(nodeMap, (byte) (i + 1));
         bldr.append(String.format("@%d: %s", pos, getNode(i)));
 
-        if (!((i + 1) == nodeArity())) {
+        if (!((i + 1) == arity(nodeMap))) {
           bldr.append(", ");
         }
       }
@@ -1518,27 +1502,48 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     final AtomicReference<Thread> mutator;
     final Object[] nodes;
 
-    private BitmapIndexedSetMultimapNode(final AtomicReference<Thread> mutator, final int nodeMap,
-        final int dataMap, final Object[] nodes) {
-      super(mutator, nodeMap, dataMap);
+    private BitmapIndexedSetMultimapNode(final AtomicReference<Thread> mutator, final int rawMap1,
+        final int rawMap2, final Object[] nodes) {
+      super(mutator, rawMap1, rawMap2);
 
       this.mutator = mutator;
       this.nodes = nodes;
 
       if (DEBUG) {
+        final int collMap = rawMap1 & rawMap2;
+        final int dataMap = rawMap2 ^ collMap;
+        final int nodeMap = rawMap1 ^ collMap;
 
         assert(TUPLE_LENGTH * java.lang.Integer.bitCount(dataMap)
+            + TUPLE_LENGTH * java.lang.Integer.bitCount(collMap)
             + java.lang.Integer.bitCount(nodeMap) == nodes.length);
 
-        for (int i = 0; i < TUPLE_LENGTH * payloadArity(); i++) {
-          assert((nodes[i] instanceof CompactSetMultimapNode) == false);
-        }
-        for (int i = TUPLE_LENGTH * payloadArity(); i < nodes.length; i++) {
-          assert((nodes[i] instanceof CompactSetMultimapNode) == true);
+        for (int i = 0; i < arity(dataMap); i++) {
+          int offset = i * TUPLE_LENGTH;
+
+          assert((nodes[offset + 0] instanceof ImmutableSet) == false);
+          assert((nodes[offset + 1] instanceof ImmutableSet) == false);
+
+          assert((nodes[offset + 0] instanceof CompactSetMultimapNode) == false);
+          assert((nodes[offset + 1] instanceof CompactSetMultimapNode) == false);
         }
 
-        for (int i = 1; i < TUPLE_LENGTH * payloadArity(); i += 2) {
-          assert((nodes[i] instanceof ImmutableSet) == true);
+        for (int i = 0; i < arity(collMap); i++) {
+          int offset = (i + arity(dataMap)) * TUPLE_LENGTH;
+
+          assert((nodes[offset + 0] instanceof ImmutableSet) == false);
+          assert((nodes[offset + 1] instanceof ImmutableSet) == true);
+
+          assert((nodes[offset + 0] instanceof CompactSetMultimapNode) == false);
+          assert((nodes[offset + 1] instanceof CompactSetMultimapNode) == false);
+        }
+
+        for (int i = 0; i < arity(nodeMap); i++) {
+          int offset = (arity(dataMap) + arity(collMap)) * TUPLE_LENGTH;
+
+          assert((nodes[offset + i] instanceof ImmutableSet) == false);
+
+          assert((nodes[offset + i] instanceof CompactSetMultimapNode) == true);
         }
       }
 
@@ -1579,14 +1584,28 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       return (CompactSetMultimapNode<K, V>) nodes[nodes.length - 1 - index];
     }
 
-    @Override
-    boolean hasPayload() {
-      return rawMap2() != 0;
+    // @Override
+    // boolean hasPayload() {
+    // return rawMap2() != 0;
+    // }
+    //
+    // @Override
+    // int payloadArity() {
+    // return java.lang.Integer.bitCount(rawMap2());
+    // }
+
+    boolean hasPayload(EitherSingletonOrCollection.Type type) {
+      return payloadArity(type) != 0;
     }
 
     @Override
-    int payloadArity() {
-      return java.lang.Integer.bitCount(rawMap2());
+    int payloadArity(EitherSingletonOrCollection.Type type) {
+      if (type == Type.SINGLETON) {
+        return java.lang.Integer.bitCount(dataMap());
+      } else {
+        return java.lang.Integer.bitCount(collMap());
+      }
+
     }
 
     @Override
@@ -1939,7 +1958,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       this.vals = vals;
       this.hash = hash;
 
-      assert payloadArity() >= 2;
+      // assert payloadArity() >= 2;
     }
 
     @Override
@@ -2011,7 +2030,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       }
 
       // add new tuple
-      final ImmutableSet<V> valCollNew = AbstractSpecialisedImmutableSet.setOf(val);
+      final ImmutableSet<V> valCollNew = setOf(val);
 
       @SuppressWarnings("unchecked")
       final K[] keysNew = (K[]) new Object[this.keys.length + 1];
@@ -2118,15 +2137,15 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       throw new UnsupportedOperationException("Not yet implemented.");
     }
 
-    @Override
-    boolean hasPayload() {
-      return true;
-    }
-
-    @Override
-    int payloadArity() {
-      return keys.length;
-    }
+    // @Override
+    // boolean hasPayload() {
+    // return true;
+    // }
+    //
+    // @Override
+    // int payloadArity() {
+    // return keys.length;
+    // }
 
     @Override
     boolean hasNodes() {
@@ -2138,10 +2157,10 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       return 0;
     }
 
-    @Override
-    int arity() {
-      return payloadArity();
-    }
+    // @Override
+    // int arity() {
+    // return payloadArity();
+    // }
 
     @Override
     byte sizePredicate() {
@@ -2190,46 +2209,47 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
     @Override
     public boolean equals(Object other) {
-      if (null == other) {
-        return false;
-      }
-      if (this == other) {
-        return true;
-      }
-      if (getClass() != other.getClass()) {
-        return false;
-      }
-
-      HashCollisionSetMultimapNode_BleedingEdge<?, ?> that =
-          (HashCollisionSetMultimapNode_BleedingEdge<?, ?>) other;
-
-      if (hash != that.hash) {
-        return false;
-      }
-
-      if (arity() != that.arity()) {
-        return false;
-      }
-
-      /*
-       * Linear scan for each key, because of arbitrary element order.
-       */
-      outerLoop: for (int i = 0; i < that.payloadArity(); i++) {
-        final Object otherKey = that.getSingletonKey(i);
-        final Object otherVal = that.getCollectionValue(i);
-
-        for (int j = 0; j < keys.length; j++) {
-          final K key = keys[j];
-          final ImmutableSet<V> valColl = vals[j];
-
-          if (key.equals(otherKey) && valColl.equals(otherVal)) {
-            continue outerLoop;
-          }
-        }
-        return false;
-      }
-
-      return true;
+      throw new UnsupportedOperationException();
+      // if (null == other) {
+      // return false;
+      // }
+      // if (this == other) {
+      // return true;
+      // }
+      // if (getClass() != other.getClass()) {
+      // return false;
+      // }
+      //
+      // HashCollisionSetMultimapNode_BleedingEdge<?, ?> that =
+      // (HashCollisionSetMultimapNode_BleedingEdge<?, ?>) other;
+      //
+      // if (hash != that.hash) {
+      // return false;
+      // }
+      //
+      // if (arity() != that.arity()) {
+      // return false;
+      // }
+      //
+      // /*
+      // * Linear scan for each key, because of arbitrary element order.
+      // */
+      // outerLoop: for (int i = 0; i < that.payloadArity(); i++) {
+      // final Object otherKey = that.getSingletonKey(i);
+      // final Object otherVal = that.getCollectionValue(i);
+      //
+      // for (int j = 0; j < keys.length; j++) {
+      // final K key = keys[j];
+      // final ImmutableSet<V> valColl = vals[j];
+      //
+      // if (key.equals(otherKey) && valColl.equals(otherVal)) {
+      // continue outerLoop;
+      // }
+      // }
+      // return false;
+      // }
+      //
+      // return true;
     }
 
     @Override
@@ -2350,6 +2370,18 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       return null;
     }
 
+    @Override
+    boolean hasPayload(Type type) {
+      // TODO Auto-generated method stub
+      return false;
+    }
+
+    @Override
+    int payloadArity(Type type) {
+      // TODO Auto-generated method stub
+      return 0;
+    }
+
   }
 
   /**
@@ -2359,8 +2391,10 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
     private static final int MAX_DEPTH = 7;
 
-    protected int currentValueCursor;
-    protected int currentValueLength;
+    protected int currentValueSingletonCursor;
+    protected int currentValueSingletonLength;
+    protected int currentValueCollectionCursor;
+    protected int currentValueCollectionLength;
     protected AbstractSetMultimapNode<K, V> currentValueNode;
 
     private int currentStackLevel = -1;
@@ -2378,10 +2412,12 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
         nodeCursorsAndLengths[1] = rootNode.nodeArity();
       }
 
-      if (rootNode.hasPayload()) {
+      if (rootNode.hasPayload(SINGLETON) || rootNode.hasPayload(COLLECTION)) {
         currentValueNode = rootNode;
-        currentValueCursor = 0;
-        currentValueLength = rootNode.payloadArity();
+        currentValueSingletonCursor = 0;
+        currentValueSingletonLength = rootNode.payloadArity(SINGLETON);
+        currentValueCollectionCursor = 0;
+        currentValueCollectionLength = rootNode.payloadArity(COLLECTION);
       }
     }
 
@@ -2414,13 +2450,15 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
             nodeCursorsAndLengths[nextLengthIndex] = nextNode.nodeArity();
           }
 
-          if (nextNode.hasPayload()) {
+          if (nextNode.hasPayload(SINGLETON) || nextNode.hasPayload(COLLECTION)) {
             /*
              * found next node that contains values
              */
             currentValueNode = nextNode;
-            currentValueCursor = 0;
-            currentValueLength = nextNode.payloadArity();
+            currentValueSingletonCursor = 0;
+            currentValueSingletonLength = nextNode.payloadArity(SINGLETON);
+            currentValueCollectionCursor = 0;
+            currentValueCollectionLength = nextNode.payloadArity(COLLECTION);
             return true;
           }
         } else {
@@ -2432,7 +2470,8 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     }
 
     public boolean hasNext() {
-      if (currentValueCursor < currentValueLength) {
+      if (currentValueSingletonCursor < currentValueSingletonLength
+          || currentValueCollectionCursor < currentValueCollectionLength) {
         return true;
       } else {
         return searchNextValueNode();
@@ -2456,7 +2495,12 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       if (!hasNext()) {
         throw new NoSuchElementException();
       } else {
-        return currentValueNode.getSingletonKey(currentValueCursor++);
+        // TODO: check case distinction
+        if (currentValueSingletonCursor < currentValueSingletonLength) {
+          return currentValueNode.getSingletonKey(currentValueSingletonCursor++);
+        } else {
+          return currentValueNode.getCollectionKey(currentValueCollectionCursor++);
+        }
       }
     }
 
@@ -2474,7 +2518,12 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       if (!hasNext()) {
         throw new NoSuchElementException();
       } else {
-        return currentValueNode.getCollectionValue(currentValueCursor++);
+        // TODO: check case distinction
+        if (currentValueSingletonCursor < currentValueSingletonLength) {
+          return setOf(currentValueNode.getSingletonValue(currentValueSingletonCursor++));
+        } else {
+          return currentValueNode.getCollectionValue(currentValueCollectionCursor++);
+        }
       }
     }
 
@@ -2501,9 +2550,19 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
         return true;
       } else {
         if (super.hasNext()) {
-          currentKey = currentValueNode.getSingletonKey(currentValueCursor);
-          currentSetIterator = currentValueNode.getCollectionValue(currentValueCursor).iterator();
-          currentValueCursor++;
+          // TODO: check case distinction
+          if (currentValueSingletonCursor < currentValueSingletonLength) {
+            currentKey = currentValueNode.getSingletonKey(currentValueSingletonCursor);
+            currentSetIterator = Collections
+                .singleton(currentValueNode.getSingletonValue(currentValueSingletonCursor))
+                .iterator();
+            currentValueSingletonCursor++;
+          } else {
+            currentKey = currentValueNode.getCollectionKey(currentValueCollectionCursor);
+            currentSetIterator =
+                currentValueNode.getCollectionValue(currentValueCollectionCursor).iterator();
+            currentValueCollectionCursor++;
+          }
 
           return true;
         } else {
