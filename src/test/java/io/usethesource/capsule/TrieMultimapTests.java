@@ -26,7 +26,7 @@ public class TrieMultimapTests {
 	@Test
 	public void testInsertTwoTuplesThatShareSameKey() {
 		ImmutableSetMultimap<Integer, String> map = TrieSetMultimap_HCHAMP
-						.<Integer, String> of().__put(1, "x").__put(1, "y");
+						.<Integer, String> of().__insert(1, "x").__insert(1, "y");
 
 		assertEquals(2, map.size());
 		assertTrue(map.containsKey(1));
@@ -35,7 +35,7 @@ public class TrieMultimapTests {
 	@Test
 	public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyX() {
 		ImmutableSetMultimap<Integer, String> map = TrieSetMultimap_HCHAMP
-						.<Integer, String> of().__put(1, "x").__put(1, "y").__remove(1, "x");
+						.<Integer, String> of().__insert(1, "x").__insert(1, "y").__removeEntry(1, "x");
 
 		assertEquals(1, map.size());
 		assertTrue(map.containsKey(1));
@@ -44,7 +44,7 @@ public class TrieMultimapTests {
 	@Test
 	public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyY() {
 		ImmutableSetMultimap<Integer, String> map = TrieSetMultimap_HCHAMP
-						.<Integer, String> of().__put(1, "x").__put(1, "y").__remove(1, "y");
+						.<Integer, String> of().__insert(1, "x").__insert(1, "y").__removeEntry(1, "y");
 
 		assertEquals(1, map.size());
 		assertTrue(map.containsKey(1));
@@ -53,8 +53,8 @@ public class TrieMultimapTests {
 	@Test
 	public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyXY() {
 		ImmutableSetMultimap<Integer, String> map = TrieSetMultimap_HCHAMP
-						.<Integer, String> of().__put(1, "x").__put(1, "y").__remove(1, "x")
-						.__remove(1, "y");
+						.<Integer, String> of().__insert(1, "x").__insert(1, "y").__removeEntry(1, "x")
+						.__removeEntry(1, "y");
 
 		assertEquals(0, map.size());
 		assertFalse(map.containsKey(1));
@@ -63,7 +63,7 @@ public class TrieMultimapTests {
 	@Test
 	public void testInsertTwoTuplesThatShareSameKey_Iterate() {
 		ImmutableSetMultimap<Integer, String> map = TrieSetMultimap_HCHAMP
-						.<Integer, String> of().__put(1, "x").__put(1, "y");
+						.<Integer, String> of().__insert(1, "x").__insert(1, "y");
 
 		Collection<String> values = map.values();
 

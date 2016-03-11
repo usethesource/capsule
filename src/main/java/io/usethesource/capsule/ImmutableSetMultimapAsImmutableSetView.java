@@ -186,7 +186,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
 		@SuppressWarnings("unchecked")
 		final V val = (V) tupleElementAt.apply(tuple, 1);
 
-		final ImmutableSetMultimap<K, V> multimapNew = multimap.__put(key, val);
+		final ImmutableSetMultimap<K, V> multimapNew = multimap.__insert(key, val);
 
 		if (multimapNew == multimap) {
 			return this;
@@ -206,7 +206,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
 		@SuppressWarnings("unchecked")
 		final V val = (V) tupleElementAt.apply(tuple, 1);
 
-		final ImmutableSetMultimap<K, V> multimapNew = multimap.__putEquivalent(key, val, cmp);
+		final ImmutableSetMultimap<K, V> multimapNew = multimap.__insertEquivalent(key, val, cmp);
 
 		if (multimapNew == multimap) {
 			return this;
@@ -233,7 +233,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
 		@SuppressWarnings("unchecked")
 		final V val = (V) tupleElementAt.apply(tuple, 1);
 
-		final ImmutableSetMultimap<K, V> multimapNew = multimap.__remove(key, val);
+		final ImmutableSetMultimap<K, V> multimapNew = multimap.__removeEntry(key, val);
 
 		return new ImmutableSetMultimapAsImmutableSetView<>(multimapNew, tupleOf, tupleElementAt, tupleChecker);
 	}
@@ -245,7 +245,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
 		@SuppressWarnings("unchecked")
 		final V val = (V) tupleElementAt.apply(tuple, 1);
 
-		final ImmutableSetMultimap<K, V> multimapNew = multimap.__removeEquivalent(key, val, cmp);
+		final ImmutableSetMultimap<K, V> multimapNew = multimap.__removeEntryEquivalent(key, val, cmp);
 
 		return new ImmutableSetMultimapAsImmutableSetView<>(multimapNew, tupleOf, tupleElementAt, tupleChecker);				
 	}
@@ -433,7 +433,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
 			@SuppressWarnings("unchecked")
 			final V val = (V) tupleElementAt.apply(tuple, 1);
 
-			return multimap.__put(key, val);
+			return multimap.__insert(key, val);
 		}
 
 		@Override
@@ -446,7 +446,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
 			@SuppressWarnings("unchecked")
 			final V val = (V) tupleElementAt.apply(tuple, 1);
 
-			return multimap.__putEquivalent(key, val, cmp);
+			return multimap.__insertEquivalent(key, val, cmp);
 		}
 
 		@Override
@@ -466,7 +466,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
 			@SuppressWarnings("unchecked")
 			final V val = (V) tupleElementAt.apply(tuple, 1);
 
-			return multimap.__remove(key, val);			
+			return multimap.__removeTuple(key, val);			
 		}
 
 		@Override
@@ -476,7 +476,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
 			@SuppressWarnings("unchecked")
 			final V val = (V) tupleElementAt.apply(tuple, 1);
 
-			return multimap.__removeEquivalent(key, val, cmp);			
+			return multimap.__removeTupleEquivalent(key, val, cmp);			
 		}
 
 		@Override

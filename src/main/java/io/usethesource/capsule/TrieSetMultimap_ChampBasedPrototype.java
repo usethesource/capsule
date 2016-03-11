@@ -11,6 +11,7 @@
  *******************************************************************************/
 package io.usethesource.capsule;
 
+import java.rmi.activation.UnknownObjectException;
 import java.text.DecimalFormat;
 import java.util.AbstractCollection;
 import java.util.AbstractSet;
@@ -61,21 +62,13 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 	}
 
 	@SuppressWarnings("unchecked")
-	public static final <K, V> ImmutableSetMultimap<K, V> of(Object... keyValuePairs) {
-		if (keyValuePairs.length % 2 != 0) {
-			throw new IllegalArgumentException(
-							"Length of argument list is uneven: no key/value pairs.");
-		}
-
+	public static final <K, V> ImmutableSetMultimap<K, V> of(K key, V... values) {
 		ImmutableSetMultimap<K, V> result = TrieSetMultimap_ChampBasedPrototype.EMPTY_SETMULTIMAP;
 
-		for (int i = 0; i < keyValuePairs.length; i += 2) {
-			final K key = (K) keyValuePairs[i];
-			final V val = (V) keyValuePairs[i + 1];
-
-			result = result.__put(key, val);
-		}
-
+	    for (V value : values) {
+	      result = result.__insert(key, value);
+	    }
+	    
 		return result;
 	}
 
@@ -85,22 +78,14 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 	}
 
 	@SuppressWarnings("unchecked")
-	public static final <K, V> TransientSetMultimap<K, V> transientOf(Object... keyValuePairs) {
-		if (keyValuePairs.length % 2 != 0) {
-			throw new IllegalArgumentException(
-							"Length of argument list is uneven: no key/value pairs.");
-		}
-
+	public static final <K, V> TransientSetMultimap<K, V> transientOf(K key, V... values) {
 		final TransientSetMultimap<K, V> result = TrieSetMultimap_ChampBasedPrototype.EMPTY_SETMULTIMAP
 						.asTransient();
 
-		for (int i = 0; i < keyValuePairs.length; i += 2) {
-			final K key = (K) keyValuePairs[i];
-			final V val = (V) keyValuePairs[i + 1];
-
-			result.__put(key, val);
-		}
-
+        for (V value : values) {
+          result.__insert(key, value);
+        }
+	    
 		return result;
 	}
 
@@ -235,7 +220,11 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 		}
 	}
 
-	public ImmutableSetMultimap<K, V> __put(final K key, final V val) {
+   public ImmutableSetMultimap<K, V> __put(final K key, final V val) {
+     throw new UnsupportedOperationException();
+   }
+	
+	public ImmutableSetMultimap<K, V> __insert(final K key, final V val) {
 		final int keyHash = key.hashCode();
 		final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
@@ -251,7 +240,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 		return this;
 	}
 
-	public ImmutableSetMultimap<K, V> __putEquivalent(final K key, final V val,
+	public ImmutableSetMultimap<K, V> __insertEquivalent(final K key, final V val,
 					final Comparator<Object> cmp) {
 		final int keyHash = key.hashCode();
 		final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
@@ -268,22 +257,22 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 		return this;
 	}
 
-	public ImmutableSetMultimap<K, V> __putAll(
+	public ImmutableSetMultimap<K, V> __insertAll(
 					final SetMultimap<? extends K, ? extends V> setMultimap) {
 		final TransientSetMultimap<K, V> tmpTransient = this.asTransient();
-		tmpTransient.__putAll(setMultimap);
+		tmpTransient.__insertAll(setMultimap);
 		return tmpTransient.freeze();
 	}
 
-	public ImmutableSetMultimap<K, V> __putAllEquivalent(
+	public ImmutableSetMultimap<K, V> __insertAllEquivalent(
 					final SetMultimap<? extends K, ? extends V> setMultimap,
 					final Comparator<Object> cmp) {
 		final TransientSetMultimap<K, V> tmpTransient = this.asTransient();
-		tmpTransient.__putAllEquivalent(setMultimap, cmp);
+		tmpTransient.__insertAllEquivalent(setMultimap, cmp);
 		return tmpTransient.freeze();
 	}
 
-	public ImmutableSetMultimap<K, V> __remove(final K key, final V val) {
+	public ImmutableSetMultimap<K, V> __removeEntry(final K key, final V val) {
 		final int keyHash = key.hashCode();
 		final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
@@ -300,7 +289,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 		return this;
 	}
 
-	public ImmutableSetMultimap<K, V> __removeEquivalent(final K key, final V val,
+	public ImmutableSetMultimap<K, V> __removeEntryEquivalent(final K key, final V val,
 					final Comparator<Object> cmp) {
 		final int keyHash = key.hashCode();
 		final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
@@ -2628,7 +2617,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 			}
 		}
 
-		public boolean __put(final K key, final V val) {
+		public boolean __insert(final K key, final V val) {
 			if (mutator.get() == null) {
 				throw new IllegalStateException("Transient already frozen.");
 			}
@@ -2659,7 +2648,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 			return false;
 		}
 
-		public boolean __putEquivalent(final K key, final V val, final Comparator<Object> cmp) {
+		public boolean __insertEquivalent(final K key, final V val, final Comparator<Object> cmp) {
 			if (mutator.get() == null) {
 				throw new IllegalStateException("Transient already frozen.");
 			}
@@ -2690,28 +2679,28 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 			return false;
 		}
 
-		public boolean __putAll(final SetMultimap<? extends K, ? extends V> setMultimap) {
+		public boolean __insertAll(final SetMultimap<? extends K, ? extends V> setMultimap) {
 			boolean modified = false;
 
 			for (Map.Entry<? extends K, ? extends V> entry : setMultimap.entrySet()) {
-				modified |= this.__put(entry.getKey(), entry.getValue());
+				modified |= this.__insert(entry.getKey(), entry.getValue());
 			}
 
 			return modified;
 		}
 
-		public boolean __putAllEquivalent(final SetMultimap<? extends K, ? extends V> setMultimap,
+		public boolean __insertAllEquivalent(final SetMultimap<? extends K, ? extends V> setMultimap,
 						final Comparator<Object> cmp) {
 			boolean modified = false;
 
 			for (Map.Entry<? extends K, ? extends V> entry : setMultimap.entrySet()) {
-				modified |= this.__putEquivalent(entry.getKey(), entry.getValue(), cmp);
+				modified |= this.__insertEquivalent(entry.getKey(), entry.getValue(), cmp);
 			}
 
 			return modified;
 		}
 
-		public boolean __remove(final K key, final V val) {
+		public boolean __removeTuple(final K key, final V val) {
 			if (mutator.get() == null) {
 				throw new IllegalStateException("Transient already frozen.");
 			}
@@ -2743,7 +2732,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 			return false;
 		}
 
-		public boolean __removeEquivalent(final K key, final V val, final Comparator<Object> cmp) {
+		public boolean __removeTupleEquivalent(final K key, final V val, final Comparator<Object> cmp) {
 			if (mutator.get() == null) {
 				throw new IllegalStateException("Transient already frozen.");
 			}
@@ -2871,7 +2860,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 
 			public void remove() {
 				// TODO: test removal at iteration rigorously
-				collection.__remove(currentKey, currentValue);
+				collection.__removeTuple(currentKey, currentValue);
 			}
 		}
 
@@ -3073,5 +3062,15 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 			return new TrieSetMultimap_ChampBasedPrototype<K, V>(rootNode, hashCode, cachedSize);
 		}
 	}
+
+  @Override
+  public ImmutableSetMultimap<K, V> __remove(K key) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public ImmutableSetMultimap<K, V> __removeEquivalent(K key, Comparator<Object> cmp) {
+    throw new UnsupportedOperationException();
+  }
 
 }
