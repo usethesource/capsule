@@ -389,6 +389,11 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
   }
 
   @Override
+  public Iterator<Map.Entry<K, Object>> nativeEntryIterator() {
+    return new SetMultimapNativeTupleIterator<>(rootNode);
+  }
+  
+  @Override
   public <T> Iterator<T> tupleIterator(final BiFunction<K, V, T> tupleOf) {
     return new SetMultimapTupleIterator<>(rootNode, tupleOf);
   }
@@ -2825,6 +2830,37 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
   }
 
+  protected static class SetMultimapNativeTupleIterator<K, V> extends AbstractSetMultimapIterator<K, V>
+      implements Iterator<Map.Entry<K, Object>> {
+
+    SetMultimapNativeTupleIterator(AbstractSetMultimapNode<K, V> rootNode) {
+      super(rootNode);
+    }
+
+    @Override
+    public Map.Entry<K, Object> next() {
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      } else {
+        // TODO: check case distinction
+        if (currentValueSingletonCursor < currentValueSingletonLength) {
+          final K currentKey = currentValueNode.getSingletonKey(currentValueSingletonCursor);
+          final Object currentValue = currentValueNode.getSingletonValue(currentValueSingletonCursor);
+          currentValueSingletonCursor++;
+              
+          return AbstractSpecialisedImmutableMap.entryOf(currentKey, currentValue);
+        } else {
+          final K currentKey = currentValueNode.getCollectionKey(currentValueCollectionCursor);
+          final Object currentValue = currentValueNode.getCollectionValue(currentValueCollectionCursor);
+          currentValueCollectionCursor++;
+          
+          return AbstractSpecialisedImmutableMap.entryOf(currentKey, currentValue);
+        }
+      }
+    }
+
+  }
+  
   protected static class SetMultimapTupleIterator<K, V, T> extends AbstractSetMultimapIterator<K, V>
       implements Iterator<T> {
 

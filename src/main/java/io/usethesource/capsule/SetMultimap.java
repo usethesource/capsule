@@ -45,4 +45,13 @@ public interface SetMultimap<K, V> {
 
 	boolean isEmpty();
 
+	/*
+	 * Uses semantic of Set<Map.Entry<K, V>> instead of Map<K, Set<V>>.
+	 */
+	@Override
+	int hashCode();
+	
+	@Override
+	boolean equals(Object other);
+	
 }

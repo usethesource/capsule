@@ -322,6 +322,10 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
   public Iterator<Map.Entry<K, V>> entryIterator() {
     return new MapEntryIterator<>(rootNode);
   }
+  
+  public Iterator<Map.Entry<K, Object>> nativeEntryIterator() {
+    return (Iterator<Map.Entry<K, Object>>) (Object) new MapEntryIterator<>(rootNode);
+  }  
 
   @Override
   public <T> Iterator<T> tupleIterator(BiFunction<K, V, T> tupleOf) {

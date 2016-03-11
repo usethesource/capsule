@@ -80,6 +80,8 @@ public interface ImmutableSetMultimap<K, V> extends SetMultimap<K, V> {
   // TODO: Iterator<Map.Entry<K, Set<V>>> groupByKeyIterator();
 
   Iterator<Map.Entry<K, V>> entryIterator();
+  
+  Iterator<Map.Entry<K, Object>> nativeEntryIterator();
 
   <T> Iterator<T> tupleIterator(final BiFunction<K, V, T> tupleOf);
 

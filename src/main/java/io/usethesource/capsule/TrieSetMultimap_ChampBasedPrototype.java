@@ -11,7 +11,6 @@
  *******************************************************************************/
 package io.usethesource.capsule;
 
-import java.rmi.activation.UnknownObjectException;
 import java.text.DecimalFormat;
 import java.util.AbstractCollection;
 import java.util.AbstractSet;
@@ -342,6 +341,10 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 	public Iterator<Map.Entry<K, V>> entryIterator() {
 		return new SetMultimapTupleIterator<>(rootNode, AbstractSpecialisedImmutableMap::entryOf);
 	}
+	
+    public Iterator<Map.Entry<K, Object>> nativeEntryIterator() {
+      throw new UnsupportedOperationException();
+    }	
 
 	public <T> Iterator<T> tupleIterator(final BiFunction<K, V, T> tupleOf) {
 		return new SetMultimapTupleIterator<>(rootNode, tupleOf);
