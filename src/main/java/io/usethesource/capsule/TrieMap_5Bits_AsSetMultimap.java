@@ -341,7 +341,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
 
         @Override
         public int size() {
-          return TrieMap_5Bits_AsSetMultimap.this.size();
+          return TrieMap_5Bits_AsSetMultimap.this.sizeDistinct();
         }
 
         @Override
@@ -2627,7 +2627,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
 
           @Override
           public int size() {
-            return TransientTrieMap_5Bits.this.size();
+            return TransientTrieMap_5Bits.this.sizeDistinct();
           }
 
           @Override

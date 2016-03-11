@@ -14,6 +14,7 @@ package io.usethesource.capsule;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 public interface SetMultimap<K, V> {
@@ -37,6 +38,10 @@ public interface SetMultimap<K, V> {
 	void clear();
 
 	int size();
+	
+	default int sizeDistinct() {
+	  return (int) entrySet().stream().map(Entry::getKey).distinct().count();
+	}
 
 	boolean isEmpty();
 

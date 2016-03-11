@@ -420,7 +420,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
         @Override
         public int size() {
-          return TrieSetMultimap_HCHAMP.this.size();
+          return TrieSetMultimap_HCHAMP.this.sizeDistinct();
         }
 
         @Override
@@ -3278,7 +3278,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
           @Override
           public int size() {
-            return TransientTrieSetMultimap_BleedingEdge.this.size();
+            return TransientTrieSetMultimap_BleedingEdge.this.sizeDistinct();
           }
 
           @Override

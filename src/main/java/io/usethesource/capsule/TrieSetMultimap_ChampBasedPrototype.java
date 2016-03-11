@@ -375,7 +375,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 
 				@Override
 				public int size() {
-					return TrieSetMultimap_ChampBasedPrototype.this.size();
+					return TrieSetMultimap_ChampBasedPrototype.this.sizeDistinct();
 				}
 
 				@Override
@@ -2877,7 +2877,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 
 					@Override
 					public int size() {
-						return TransientTrieSetMultimap_BleedingEdge.this.size();
+						return TransientTrieSetMultimap_BleedingEdge.this.sizeDistinct();
 					}
 
 					@Override
