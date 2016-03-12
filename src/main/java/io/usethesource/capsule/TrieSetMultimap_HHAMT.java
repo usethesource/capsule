@@ -1010,7 +1010,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
       long shiftedBitmap = bitmap;
       for (int i = 0; i < 32; i++) {
-        arities[(int) bitmap & 0b11]++;
+        arities[(int) shiftedBitmap & 0b11]++;
         shiftedBitmap = shiftedBitmap >>> 2;
       }
 
@@ -2019,7 +2019,14 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       dst[idx + 1] = val;
       System.arraycopy(src, idx, dst, idx + 2, src.length - idx);
 
-      return nodeOf(mutator, bitmap() | doubledBitpos, dst);
+      // generally: from 00 to 10
+      // here: set both bits individually
+      long updatedBitmap = bitmap();
+      updatedBitmap |= doubledBitpos; // idempotent
+      updatedBitmap ^= doubledBitpos; // idempotent
+      updatedBitmap |= (doubledBitpos << 1);      
+      
+      return nodeOf(mutator, updatedBitmap, dst);
     }
 
     @Override
@@ -2094,7 +2101,14 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       System.arraycopy(src, 0, dst, 0, idx);
       System.arraycopy(src, idx + 2, dst, idx, src.length - idx - 2);
 
-      return nodeOf(mutator, bitmap() ^ doubledBitpos, dst);
+      // generally: from 10 to 00
+      // here: set both bits individually
+      long updatedBitmap = bitmap();
+      updatedBitmap |= doubledBitpos; // idempotent
+      updatedBitmap ^= doubledBitpos; // idempotent
+      updatedBitmap ^= (doubledBitpos << 1);
+
+      return nodeOf(mutator, updatedBitmap, dst);     
     }
 
     @Override
@@ -2262,11 +2276,12 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
         final int shift) {
       if (shift > 0) {
         long bitmap = this.bitmap();
-        
+
         int[] arities = arities(bitmap);
 
         boolean slotCountEqualsTupleLength = nodes.length == TUPLE_LENGTH;
-        boolean containsPaylaod = arities[PATTERN_DATA_SINGLETON] != 0 || arities[PATTERN_DATA_COLLECTION] != 0;
+        boolean containsPaylaod =
+            arities[PATTERN_DATA_SINGLETON] != 0 || arities[PATTERN_DATA_COLLECTION] != 0;
 
         if (slotCountEqualsTupleLength && containsPaylaod) {
           long newBitmap = doubledBitpos(doubledMask(keyHash, 0));
