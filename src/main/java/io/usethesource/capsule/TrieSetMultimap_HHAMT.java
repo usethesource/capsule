@@ -1094,6 +1094,53 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     abstract CompactSetMultimapNode<K, V> copyAndMigrateFromCollectionToSingleton(
         final AtomicReference<Thread> mutator, final long doubledBitpos, final K key, final V val);
 
+    static final long setBitPattern(final long bitmap, final long doubledBitpos,
+        final int pattern) {
+      /*
+       * TODO: can be optimized for two cases: i) when previous state is known, or ii) when starting
+       * bitmap == 0L
+       */
+
+      switch (pattern) {
+        case PATTERN_NODE: {
+          // generally: from xx to 01
+          // here: set both bits individually
+          long updatedBitmap = bitmap;
+          updatedBitmap |= doubledBitpos;
+          updatedBitmap |= (doubledBitpos << 1);
+          updatedBitmap ^= (doubledBitpos << 1);
+          return updatedBitmap;
+        }
+        case PATTERN_DATA_SINGLETON: {
+          // generally: from xx to 10
+          // here: set both bits individually
+          long updatedBitmap = bitmap;
+          updatedBitmap |= doubledBitpos;
+          updatedBitmap ^= doubledBitpos;
+          updatedBitmap |= (doubledBitpos << 1);
+          return updatedBitmap;
+        }
+        case PATTERN_DATA_COLLECTION: {
+          // generally: from xx to 11
+          // here: set both bits individually
+          long updatedBitmap = bitmap;
+          updatedBitmap |= (doubledBitpos);
+          updatedBitmap |= (doubledBitpos << 1);
+          return updatedBitmap;
+        }
+        default: {
+          // generally: from xx to 00
+          // here: set both bits individually
+          long updatedBitmap = bitmap;
+          updatedBitmap |= doubledBitpos;
+          updatedBitmap ^= doubledBitpos;
+          updatedBitmap |= (doubledBitpos << 1);
+          updatedBitmap ^= (doubledBitpos << 1);
+          return updatedBitmap;
+        }
+      }
+    }
+
     // TODO: fix hash collision support
     static final <K, V> CompactSetMultimapNode<K, V> mergeTwoSingletonPairs(final K key0,
         final V val0, final int keyHash0, final K key1, final V val1, final int keyHash1,
@@ -1111,7 +1158,9 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
       if (mask0 != mask1) {
         // both nodes fit on same level
-        final long bitmap = doubledBitpos(mask0) | doubledBitpos(mask1);
+        long bitmap = 0L;
+        bitmap = setBitPattern(bitmap, doubledBitpos(mask0), PATTERN_DATA_SINGLETON);
+        bitmap = setBitPattern(bitmap, doubledBitpos(mask1), PATTERN_DATA_SINGLETON);
 
         if (mask0 < mask1) {
           return nodeOf(null, bitmap, new Object[] {key0, val0, key1, val1});
@@ -1122,8 +1171,8 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
         final CompactSetMultimapNode<K, V> node = mergeTwoSingletonPairs(key0, val0, keyHash0, key1,
             val1, keyHash1, shift + BIT_PARTITION_SIZE);
         // values fit on next level
+        final long bitmap = setBitPattern(0L, doubledBitpos(mask0), PATTERN_NODE);
 
-        final long bitmap = doubledBitpos(mask0);
         return nodeOf(null, bitmap, new Object[] {node});
       }
     }
@@ -1146,7 +1195,9 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
       if (mask0 != mask1) {
         // both nodes fit on same level
-        final long bitmap = doubledBitpos(mask0) | doubledBitpos(mask1);
+        long bitmap = 0L;
+        bitmap = setBitPattern(bitmap, doubledBitpos(mask0), PATTERN_DATA_COLLECTION);
+        bitmap = setBitPattern(bitmap, doubledBitpos(mask1), PATTERN_DATA_SINGLETON);
 
         // singleton before collection
         return nodeOf(null, bitmap, new Object[] {key1, val1, key0, valColl0});
@@ -1154,8 +1205,8 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
         final CompactSetMultimapNode<K, V> node = mergeCollectionAndSingletonPairs(key0, valColl0,
             keyHash0, key1, val1, keyHash1, shift + BIT_PARTITION_SIZE);
         // values fit on next level
+        final long bitmap = setBitPattern(0L, doubledBitpos(mask0), PATTERN_NODE);
 
-        final long bitmap = doubledBitpos(mask0);
         return nodeOf(null, bitmap, new Object[] {node});
       }
     }
@@ -2024,8 +2075,8 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       long updatedBitmap = bitmap();
       updatedBitmap |= doubledBitpos; // idempotent
       updatedBitmap ^= doubledBitpos; // idempotent
-      updatedBitmap |= (doubledBitpos << 1);      
-      
+      updatedBitmap |= (doubledBitpos << 1);
+
       return nodeOf(mutator, updatedBitmap, dst);
     }
 
@@ -2108,7 +2159,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       updatedBitmap ^= doubledBitpos; // idempotent
       updatedBitmap ^= (doubledBitpos << 1);
 
-      return nodeOf(mutator, updatedBitmap, dst);     
+      return nodeOf(mutator, updatedBitmap, dst);
     }
 
     @Override
@@ -2279,20 +2330,14 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
         int[] arities = arities(bitmap);
 
-        boolean slotCountEqualsTupleLength = nodes.length == TUPLE_LENGTH;
-        boolean containsPaylaod =
-            arities[PATTERN_DATA_SINGLETON] != 0 || arities[PATTERN_DATA_COLLECTION] != 0;
-
-        if (slotCountEqualsTupleLength && containsPaylaod) {
-          long newBitmap = doubledBitpos(doubledMask(keyHash, 0));
-
-          if (arities[PATTERN_DATA_SINGLETON] != 0) {
-            // is data payload
-            return copyAndUpdateBitmaps(mutator, newBitmap);
-          } else {
-            // is coll payload
-            return copyAndUpdateBitmaps(mutator, newBitmap);
-          }
+        if (arities[PATTERN_EMTPY] == 31 && arities[PATTERN_NODE] != 1) {
+          int pattern = 1;
+          while(arities[++pattern] == 0);
+                    
+          final int mask0 = doubledMask(keyHash, 0);
+          final long newBitmap = setBitPattern(0L, doubledBitpos(mask0), pattern);
+          
+          return copyAndUpdateBitmaps(mutator, newBitmap);
         }
       }
 
