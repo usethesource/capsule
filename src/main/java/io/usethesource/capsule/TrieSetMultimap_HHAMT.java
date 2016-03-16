@@ -1572,11 +1572,19 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
               throw new IllegalStateException("Sub-node must have at least one element.");
             }
             case 1: {
-              int[] arities = arities(bitmap);
-              if (arities[PATTERN_NODE] == 1 && arities[PATTERN_DATA_SINGLETON] == 0
-                  && arities[PATTERN_DATA_COLLECTION] == 0) {
-                // escalate (singleton or empty) result
-                return subNodeNew;
+              if (slotArity() == 0) {
+                if (shift == 0) {
+                  // singleton remaining                 
+                  final long doubledBitposAtShift0 = doubledBitpos(bitpos(doubledMask(keyHash, 0)));
+
+                  final long updatedBitmapAtShift0 =
+                      setBitPattern(doubledBitposAtShift0, subNodeNew.patternOfSingleton());
+
+                  return subNodeNew.copyAndUpdateBitmaps(mutator, updatedBitmapAtShift0);
+                } else {
+                  // escalate (singleton or empty) result
+                  return subNodeNew;
+                }
               } else {
                 // inline value (move to front)
                 EitherSingletonOrCollection.Type type = subNodeNew.typeOfSingleton();
@@ -1606,9 +1614,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
               // remove mapping
               details.updated(val);
-              return copyAndRemoveSingleton(mutator, doubledBitpos).canonicalize(mutator, keyHash,
-                  shift);
-
+              return copyAndRemoveSingleton(mutator, doubledBitpos);
             } else {
               return this;
             }
@@ -1707,19 +1713,11 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
             case 1: {
               if (slotArity() == 1) {
                 if (shift == 0) {
-                  // singleton remaining
-                  final long updatedBitmapAtShift0;
+                  // singleton remaining                 
                   final long doubledBitposAtShift0 = doubledBitpos(bitpos(doubledMask(keyHash, 0)));
 
-                  int[] arities = arities(bitmap);
-
-                  if (arities[PATTERN_DATA_SINGLETON] == 2) {
-                    updatedBitmapAtShift0 =
-                        setBitPattern(doubledBitposAtShift0, PATTERN_DATA_SINGLETON);
-                  } else {
-                    updatedBitmapAtShift0 =
-                        setBitPattern(doubledBitposAtShift0, PATTERN_DATA_COLLECTION);
-                  }
+                  final long updatedBitmapAtShift0 =
+                      setBitPattern(doubledBitposAtShift0, subNodeNew.patternOfSingleton());
 
                   return subNodeNew.copyAndUpdateBitmaps(mutator, updatedBitmapAtShift0);
                 } else {
@@ -1819,10 +1817,6 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
     @Deprecated
     abstract State stateOfSingleton();
-
-    @Deprecated
-    abstract CompactSetMultimapNode<K, V> canonicalize(AtomicReference<Thread> mutator,
-        final int keyHash, final int shift);
 
     /**
      * @return 0 <= mask <= 2^BIT_PARTITION_SIZE - 1
@@ -2544,30 +2538,6 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       } else {
         return EitherSingletonOrCollection.Type.COLLECTION;
       }      
-    }
-
-    @Deprecated
-    @Override
-    CompactSetMultimapNode<K, V> canonicalize(AtomicReference<Thread> mutator, final int keyHash,
-        final int shift) {
-      if (shift > 0) {
-        long bitmap = this.bitmap();
-
-        int[] arities = arities(bitmap);
-
-        if (arities[PATTERN_EMPTY] == 31 && arities[PATTERN_NODE] != 1) {
-          int pattern = 1;
-          while (arities[++pattern] == 0);
-
-          final int mask0 = doubledMask(keyHash, 0);
-          final long newBitmap = setBitPattern(0L, doubledBitpos(mask0), pattern);
-
-          return copyAndUpdateBitmaps(mutator, newBitmap);
-        }
-      }
-
-      // default
-      return this;
     }
 
   }
