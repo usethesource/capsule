@@ -10,7 +10,6 @@
 package io.usethesource.capsule;
 
 import static io.usethesource.capsule.BitmapUtils.*;
-import static io.usethesource.capsule.RangecopyUtils.isBitInBitmap;
 import static io.usethesource.capsule.TrieSetMultimap_HHAMT.EitherSingletonOrCollection.Type.COLLECTION;
 import static io.usethesource.capsule.TrieSetMultimap_HHAMT.EitherSingletonOrCollection.Type.SINGLETON;
 
@@ -901,6 +900,8 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       };
     }
 
+    abstract int emptyArity();
+    
     // @Deprecated // split data / coll arity
     // abstract boolean hasPayload();
     //
@@ -909,6 +910,8 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
     abstract boolean hasPayload(EitherSingletonOrCollection.Type type);
 
+    // abstract int payloadArity();
+    
     abstract int payloadArity(EitherSingletonOrCollection.Type type);
 
     abstract K getSingletonKey(final int index);
@@ -998,7 +1001,11 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
     static final int arity(long bitmap, int pattern) {
       if (bitmap == 0) {
-        return 0;
+        if (pattern == PATTERN_EMPTY) {
+          return 32;
+        } else {
+          return 0;
+        }
       } else {
         return Long.bitCount(filter(bitmap, pattern));
       }
@@ -1068,6 +1075,9 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
     abstract CompactSetMultimapNode<K, V> copyAndRemoveSingleton(
         final AtomicReference<Thread> mutator, final long doubledBitpos);
+    
+    abstract CompactSetMultimapNode<K, V> copyAndRemoveSingleton(
+        final AtomicReference<Thread> mutator, final long doubledBitpos, long updatedBitmap);
 
     /*
      * Batch updated, necessary for removedAll.
@@ -1141,6 +1151,39 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       }
     }
 
+    static final long setBitPattern(final long doubledBitpos, final int pattern) {
+      switch (pattern) {
+        case PATTERN_NODE: {
+          // generally: from 00 to 01
+          // here: set both bits individually
+          long updatedBitmap = 0L;
+          updatedBitmap |= doubledBitpos;
+          return updatedBitmap;
+        }
+        case PATTERN_DATA_SINGLETON: {
+          // generally: from 00 to 10
+          // here: set both bits individually
+          long updatedBitmap = 0L;
+          updatedBitmap |= (doubledBitpos << 1);
+          return updatedBitmap;
+        }
+        case PATTERN_DATA_COLLECTION: {
+          // generally: from 00 to 11
+          // here: set both bits individually
+          long updatedBitmap = 0L;
+          updatedBitmap |= (doubledBitpos);
+          updatedBitmap |= (doubledBitpos << 1);
+          return updatedBitmap;
+        }
+        default: {
+          // generally: from 00 to 00
+          // here: set both bits individually
+          long updatedBitmap = 0L;
+          return updatedBitmap;
+        }
+      }
+    }
+    
     // TODO: fix hash collision support
     static final <K, V> CompactSetMultimapNode<K, V> mergeTwoSingletonPairs(final K key0,
         final V val0, final int keyHash0, final K key1, final V val1, final int keyHash1,
@@ -1253,9 +1296,9 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     @Deprecated
     int nodeIndex(final long doubledBitpos) {
       return index01(bitmap(), doubledBitpos);
-    }
+    }    
 
-    final static int PATTERN_EMTPY = 0b00;
+    final static int PATTERN_EMPTY = 0b00;
     final static int PATTERN_NODE = 0b01;
     final static int PATTERN_DATA_SINGLETON = 0b10;
     final static int PATTERN_DATA_COLLECTION = 0b11;
@@ -1268,7 +1311,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       final int pattern = pattern(bitmap, doubledMask);
 
       final long doubledBitpos = doubledBitpos(doubledMask);
-
+      
       switch (pattern) {
         case PATTERN_NODE: {
           int index = index01(bitmap, doubledBitpos);
@@ -1607,6 +1650,34 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       }
     }
 
+    final static boolean hasSingleNode(int[] arities) {
+      return arities[PATTERN_EMPTY] == 31 && arities[PATTERN_NODE] == 1;
+    }
+
+    final static boolean hasTwoPayloads(int[] arities) {
+      return arities[PATTERN_EMPTY] == 30 && arities[PATTERN_NODE] == 0;
+    }    
+    
+    enum State {
+      EMPTY, NODE, PAYLOAD, PAYLOAD_RARE
+    }    
+    
+    static final State toState(final int pattern) {
+//      final State[] states = {State.EMPTY, State.NODE, State.PAYLOAD, State.PAYLOAD_RARE};
+//      return states[pattern];
+      
+      switch (pattern) {
+        case PATTERN_EMPTY:
+          return State.EMPTY;
+        case PATTERN_NODE:
+          return State.NODE;
+        case PATTERN_DATA_SINGLETON:
+          return State.PAYLOAD;
+        default:
+          return State.PAYLOAD_RARE;
+      }
+    }
+    
     @Override
     CompactSetMultimapNode<K, V> removedAll(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final SetMultimapResult<K, V> details) {
@@ -1634,13 +1705,46 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
               throw new IllegalStateException("Sub-node must have at least one element.");
             }
             case 1: {
-              int[] arities = arities(bitmap);
+              if (slotArity() == 1) {
+                if (shift == 0) {
+                  // singleton remaining
+                  final long updatedBitmapAtShift0;
+                  final long doubledBitposAtShift0 = doubledBitpos(bitpos(doubledMask(keyHash, 0)));
 
-              if (arities[PATTERN_NODE] == 1 && arities[PATTERN_DATA_SINGLETON] == 0
-                  && arities[PATTERN_DATA_COLLECTION] == 0) {
-                // escalate (singleton or empty) result
-                return subNodeNew;
+                  int[] arities = arities(bitmap);
+
+                  if (arities[PATTERN_DATA_SINGLETON] == 2) {
+                    updatedBitmapAtShift0 =
+                        setBitPattern(doubledBitposAtShift0, PATTERN_DATA_SINGLETON);
+                  } else {
+                    updatedBitmapAtShift0 =
+                        setBitPattern(doubledBitposAtShift0, PATTERN_DATA_COLLECTION);
+                  }
+
+                  return subNodeNew.copyAndUpdateBitmaps(mutator, updatedBitmapAtShift0);
+                } else {
+                  // escalate (singleton or empty) result
+                  return subNodeNew;
+                }
               } else {
+//                // inline value (move to front)
+//                final State subNodeState = subNodeNew.stateOfSingleton();
+//
+////                switch (subNodeState) {
+////                  case EMPTY:
+////                  case NODE:
+////                  case PAYLOAD:
+////                    return copyAndMigrateFromNodeToSingleton(mutator, doubledBitpos, subNodeNew);
+////                  case PAYLOAD_RARE:
+////                    return copyAndMigrateFromNodeToCollection(mutator, doubledBitpos, subNodeNew);
+////                }
+//                
+//                if (subNodeState == State.PAYLOAD) {
+//                  return copyAndMigrateFromNodeToSingleton(mutator, doubledBitpos, subNodeNew);
+//                } else {
+//                  return copyAndMigrateFromNodeToCollection(mutator, doubledBitpos, subNodeNew);
+//                }         
+                
                 // inline value (move to front)
                 EitherSingletonOrCollection.Type type = subNodeNew.typeOfSingleton();
 
@@ -1650,6 +1754,23 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
                   return copyAndMigrateFromNodeToCollection(mutator, doubledBitpos, subNodeNew);
                 }
 
+//                // inline value (move to front)
+//                final int subNodePattern = subNodeNew.patternOfSingleton();
+//
+//                if (subNodePattern == PATTERN_DATA_SINGLETON) {
+//                  return copyAndMigrateFromNodeToSingleton(mutator, doubledBitpos, subNodeNew);
+//                } else {
+//                  return copyAndMigrateFromNodeToCollection(mutator, doubledBitpos, subNodeNew);
+//                }
+                
+//                switch (subNodePattern) {
+//                  case PATTERN_DATA_SINGLETON:
+//                    return copyAndMigrateFromNodeToSingleton(mutator, doubledBitpos, subNodeNew);
+//                  case PATTERN_DATA_COLLECTION:
+//                    return copyAndMigrateFromNodeToCollection(mutator, doubledBitpos, subNodeNew);
+//                  default:
+//                    return null;
+//                }
               }
             }
             default: {
@@ -1667,8 +1788,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
             final V currentVal = getSingletonValue(dataIndex);
 
             details.updated(currentVal);
-            return copyAndRemoveSingleton(mutator, doubledBitpos).canonicalize(mutator, keyHash,
-                shift);
+            return copyAndRemoveSingleton(mutator, doubledBitpos);
           } else {
             return this;
           }
@@ -1682,8 +1802,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
             final ImmutableSet<V> currentValColl = getCollectionValue(collIndex);
 
             details.updated(currentValColl);
-            return copyAndRemoveCollection(mutator, doubledBitpos).canonicalize(mutator, keyHash,
-                shift);
+            return copyAndRemoveCollection(mutator, doubledBitpos);
           } else {
             return this;
           }
@@ -1693,8 +1812,15 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       }
     }
 
+    abstract int patternOfSingleton();
+    
+    @Deprecated
     abstract EitherSingletonOrCollection.Type typeOfSingleton();
 
+    @Deprecated
+    abstract State stateOfSingleton();
+
+    @Deprecated
     abstract CompactSetMultimapNode<K, V> canonicalize(AtomicReference<Thread> mutator,
         final int keyHash, final int shift);
 
@@ -1904,19 +2030,26 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     // return java.lang.Integer.bitCount(rawMap2());
     // }
 
+    @Override
+    int emptyArity() {
+      return arity(bitmap(), PATTERN_EMPTY);
+    }
+    
     boolean hasPayload(EitherSingletonOrCollection.Type type) {
       return payloadArity(type) != 0;
     }
 
     @Override
     int payloadArity(EitherSingletonOrCollection.Type type) {
-      int[] arities = arities(bitmap());
+      // int[] arities = arities(bitmap());
       // return arities[PATTERN_NODE];
 
       if (type == Type.SINGLETON) {
-        return arities[PATTERN_DATA_SINGLETON];
+        // return arities[PATTERN_DATA_SINGLETON];
+        return arity(bitmap(), PATTERN_DATA_SINGLETON);
       } else {
-        return arities[PATTERN_DATA_COLLECTION];
+        // return arities[PATTERN_DATA_COLLECTION];
+        return arity(bitmap(), PATTERN_DATA_COLLECTION);
       }
     }
 
@@ -1927,8 +2060,9 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
     @Override
     int nodeArity() {
-      int[] arities = arities(bitmap());
-      return arities[PATTERN_NODE];
+//      int[] arities = arities(bitmap());
+//      return arities[PATTERN_NODE];
+        return arity(bitmap(), PATTERN_NODE);
     }
 
     @Override
@@ -1978,19 +2112,71 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
     @Override
     byte sizePredicate() {
-      if (this.nodeArity() == 0) {
-        switch (arity(bitmap(), PATTERN_DATA_SINGLETON)
-            + arity(bitmap(), PATTERN_DATA_COLLECTION)) {
-          case 0:
+
+//      switch (slotArity()) {
+//        case 0:
+//          return SIZE_EMPTY;
+//        case 1:
+//          return SIZE_MORE_THAN_ONE; // works for maps only: must be subnode; patternOfSingleton();
+//        case 2:
+//          return arity(bitmap(), PATTERN_NODE) == 0 ? SIZE_ONE : SIZE_MORE_THAN_ONE;
+//        default:
+//          return SIZE_MORE_THAN_ONE;
+//      }
+      
+//      if (this.nodeArity() == 0) {
+//        switch (this.payloadArity()) {
+//          case 0:
+//            return SIZE_EMPTY;
+//          case 1:
+//            return SIZE_ONE;
+//          default:
+//            return SIZE_MORE_THAN_ONE;
+//        }
+//      } else {
+//        return SIZE_MORE_THAN_ONE;
+//      }
+      
+      
+//      int[] arities = arities(bitmap());
+//      
+//      int nodeArity = arities[PATTERN_NODE];
+//      int emptyArity = arities[PATTERN_EMPTY];
+      
+      final long bitmap = this.bitmap();
+      
+      int nodeArity = arity(bitmap, PATTERN_NODE);
+      int emptyArity = arity(bitmap, PATTERN_EMPTY);
+      
+//      int aritySingleton = arity(bitmap, PATTERN_DATA_SINGLETON);
+//      int arityCollection = arity(bitmap, PATTERN_DATA_COLLECTION);
+      
+      if (nodeArity > 0) {
+        return SIZE_MORE_THAN_ONE;
+      } else {
+        switch (emptyArity) {
+          case 32:
             return SIZE_EMPTY;
-          case 1:
+          case 31:
             return SIZE_ONE;
           default:
             return SIZE_MORE_THAN_ONE;
         }
-      } else {
-        return SIZE_MORE_THAN_ONE;
       }
+      
+//      if (this.nodeArity() == 0) {
+//        switch (arity(bitmap(), PATTERN_DATA_SINGLETON)
+//            + arity(bitmap(), PATTERN_DATA_COLLECTION)) {
+//          case 0:
+//            return SIZE_EMPTY;
+//          case 1:
+//            return SIZE_ONE;
+//          default:
+//            return SIZE_MORE_THAN_ONE;
+//        }
+//      } else {
+//        return SIZE_MORE_THAN_ONE;
+//      }
     }
 
     @Override
@@ -2100,12 +2286,13 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       dst[idxNew + 1] = valColl;
       System.arraycopy(src, idxNew + 2, dst, idxNew + 2, src.length - idxNew - 2);
 
-      // generally: from 10 to 11
-      // here: set both bits individually
-      long updatedBitmap = bitmap();
-      updatedBitmap |= (doubledBitpos);
-      updatedBitmap |= (doubledBitpos << 1);
-
+//      // generally: from 10 to 11
+//      // here: set both bits individually
+//      long updatedBitmap = bitmap();
+//      updatedBitmap |= (doubledBitpos);
+//      updatedBitmap |= (doubledBitpos << 1);
+      
+      long updatedBitmap = setBitPattern(bitmap(), doubledBitpos, PATTERN_DATA_COLLECTION);
       return nodeOf(mutator, updatedBitmap, dst);
     }
 
@@ -2161,7 +2348,23 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
       return nodeOf(mutator, updatedBitmap, dst);
     }
+    
+    // TODO: remove code duplication and merge with above
+    @Override
+    CompactSetMultimapNode<K, V> copyAndRemoveSingleton(final AtomicReference<Thread> mutator,
+        final long doubledBitpos, long updatedBitmap) {
+      final int idx = TUPLE_LENGTH * dataIndex(doubledBitpos);
 
+      final Object[] src = this.nodes;
+      final Object[] dst = new Object[src.length - 2];
+
+      // copy 'src' and remove 2 element(s) at position 'idx'
+      System.arraycopy(src, 0, dst, 0, idx);
+      System.arraycopy(src, idx + 2, dst, idx, src.length - idx - 2);
+
+      return nodeOf(mutator, updatedBitmap, dst);
+    }
+    
     @Override
     CompactSetMultimapNode<K, V> copyAndRemoveCollection(final AtomicReference<Thread> mutator,
         final long doubledBitpos) {
@@ -2308,20 +2511,42 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     }
 
     @Override
-    EitherSingletonOrCollection.Type typeOfSingleton() {
+    int patternOfSingleton() {
       assert this.sizePredicate() == SIZE_ONE;
 
       long bitmap = this.bitmap();
 
-      int[] arities = arities(bitmap);
+      final int doubledMask = Long.numberOfTrailingZeros(bitmap) / 2 * 2;
+      final int pattern = pattern(bitmap, doubledMask);
 
-      if (arities[PATTERN_DATA_SINGLETON] != 0) {
+      return pattern;
+    }
+    
+    @Override
+    State stateOfSingleton() {
+      assert this.sizePredicate() == SIZE_ONE;
+
+      long bitmap = this.bitmap();
+
+      final int doubledMask = Long.numberOfTrailingZeros(bitmap) / 2 * 2;
+      final int pattern = pattern(bitmap, doubledMask);
+
+      return toState(pattern);
+    }    
+    
+    @Deprecated
+    @Override
+    EitherSingletonOrCollection.Type typeOfSingleton() {
+      final int pattern = patternOfSingleton();
+      
+      if (pattern == PATTERN_DATA_SINGLETON) {
         return EitherSingletonOrCollection.Type.SINGLETON;
       } else {
         return EitherSingletonOrCollection.Type.COLLECTION;
-      }
+      }      
     }
 
+    @Deprecated
     @Override
     CompactSetMultimapNode<K, V> canonicalize(AtomicReference<Thread> mutator, final int keyHash,
         final int shift) {
@@ -2330,13 +2555,13 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
         int[] arities = arities(bitmap);
 
-        if (arities[PATTERN_EMTPY] == 31 && arities[PATTERN_NODE] != 1) {
+        if (arities[PATTERN_EMPTY] == 31 && arities[PATTERN_NODE] != 1) {
           int pattern = 1;
-          while(arities[++pattern] == 0);
-                    
+          while (arities[++pattern] == 0);
+
           final int mask0 = doubledMask(keyHash, 0);
           final long newBitmap = setBitPattern(0L, doubledBitpos(mask0), pattern);
-          
+
           return copyAndUpdateBitmaps(mutator, newBitmap);
         }
       }
@@ -2802,15 +3027,17 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     AbstractSetMultimapNode<K, V>[] nodes = new AbstractSetMultimapNode[MAX_DEPTH];
 
     AbstractSetMultimapIterator(AbstractSetMultimapNode<K, V> rootNode) {
-      if (rootNode.hasNodes()) {
+      int nodeArity = rootNode.nodeArity();       
+      if (nodeArity != 0) {
         currentStackLevel = 0;
 
         nodes[0] = rootNode;
         nodeCursorsAndLengths[0] = 0;
-        nodeCursorsAndLengths[1] = rootNode.nodeArity();
+        nodeCursorsAndLengths[1] = nodeArity;
       }
 
-      if (rootNode.hasPayload(SINGLETON) || rootNode.hasPayload(COLLECTION)) {
+      int emptyArity = rootNode.emptyArity();
+      if (emptyArity + nodeArity < 32) {
         currentValueNode = rootNode;
         currentValueSingletonCursor = 0;
         currentValueSingletonLength = rootNode.payloadArity(SINGLETON);
@@ -2835,7 +3062,8 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
               nodes[currentStackLevel].getNode(nodeCursor);
           nodeCursorsAndLengths[currentCursorIndex]++;
 
-          if (nextNode.hasNodes()) {
+          int nodeArity = nextNode.nodeArity();
+          if (nodeArity != 0) {
             /*
              * put node on next stack level for depth-first traversal
              */
@@ -2845,10 +3073,14 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
             nodes[nextStackLevel] = nextNode;
             nodeCursorsAndLengths[nextCursorIndex] = 0;
-            nodeCursorsAndLengths[nextLengthIndex] = nextNode.nodeArity();
+            nodeCursorsAndLengths[nextLengthIndex] = nodeArity;
           }
 
+          
+//          int emptyArity = nextNode.emptyArity();
+//          if (emptyArity + nodeArity < 32) {
           if (nextNode.hasPayload(SINGLETON) || nextNode.hasPayload(COLLECTION)) {
+//          if (payloadAritySingleton != 0 || payloadArityCollection != 0) {
             /*
              * found next node that contains values
              */
@@ -2856,7 +3088,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
             currentValueSingletonCursor = 0;
             currentValueSingletonLength = nextNode.payloadArity(SINGLETON);
             currentValueCollectionCursor = 0;
-            currentValueCollectionLength = nextNode.payloadArity(COLLECTION);
+            currentValueCollectionLength = nextNode.payloadArity(Type.COLLECTION);
             return true;
           }
         } else {

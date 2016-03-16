@@ -12,50 +12,104 @@ package io.usethesource.capsule;
 public final class BitmapUtils {
 
   private static final boolean USE_SELF_WRITTEN_POPULATION_COUNT = false;
+  private static final boolean USE_SELF_WRITTEN_POPULATION_COUNT_CHECK =
+      !USE_SELF_WRITTEN_POPULATION_COUNT && false;
 
+  static final long filter00(long bitmap) {
+    return ((bitmap & 0x5555555555555555L) ^ 0x5555555555555555L) & (((bitmap >> 1) & 0x5555555555555555L) ^ 0x5555555555555555L);        
+  }
+
+  static final long filter01(long bitmap) {
+    return (bitmap & 0x5555555555555555L)
+        & (((bitmap >> 1) & 0x5555555555555555L) ^ 0x5555555555555555L);
+  }
+
+  static final long filter10(long bitmap) {
+    return ((bitmap & 0x5555555555555555L) ^ 0x5555555555555555L)
+        & ((bitmap >> 1) & 0x5555555555555555L);
+  }
+
+  static final long filter11(long bitmap) {
+    return (bitmap & 0x5555555555555555L) & ((bitmap >> 1) & 0x5555555555555555L);
+  }
+  
   static final long filter(long bitmap, int pattern) {
     switch (pattern) {
+      case 0b00:
+        return filter00(bitmap);
       case 0b01:
-        return (bitmap & 0x5555555555555555L)
-            & (((bitmap >> 1) & 0x5555555555555555L) ^ 0x5555555555555555L);
+        return filter01(bitmap);
       case 0b10:
-        return ((bitmap & 0x5555555555555555L) ^ 0x5555555555555555L)
-            & ((bitmap >> 1) & 0x5555555555555555L);
+        return filter10(bitmap);
       case 0b11:
-        return (bitmap & 0x5555555555555555L) & ((bitmap >> 1) & 0x5555555555555555L);
+        return filter11(bitmap);
       default:
         throw new IllegalArgumentException();
     }
   }
 
+  static final int index(long bitmap, int pattern, long bitpos) {
+    return -1;
+  }
+
   static final int index01(final long bitmap, final long bitpos) {
-    // if (USE_SELF_WRITTEN_POPULATION_COUNT) {
-    // return (int) populationCountPattern01(bitmap & (bitpos - 1));
-    // } else {
-    final long filteredBitmap = (bitmap & 0x5555555555555555L)
-        & (((bitmap >> 1) & 0x5555555555555555L) ^ 0x5555555555555555L);
-    return java.lang.Long.bitCount(filteredBitmap & (bitpos - 1));
-    // }
+    if (USE_SELF_WRITTEN_POPULATION_COUNT) {
+      return (int) populationCountPattern01(bitmap & (bitpos - 1));
+    } else {
+      // final long filteredBitmap = (bitmap & 0x5555555555555555L)
+      // & (((bitmap >> 1) & 0x5555555555555555L) ^ 0x5555555555555555L);
+      final long filteredBitmap = filter01(bitmap);
+      final int index = java.lang.Long.bitCount(filteredBitmap & (bitpos - 1));
+
+      if (USE_SELF_WRITTEN_POPULATION_COUNT_CHECK) {
+        final int otherIndex = (int) populationCountPattern01(bitmap & (bitpos - 1));
+        if (index != otherIndex) {
+          throw new IllegalStateException(index + "!=" + otherIndex);
+        }
+      }
+
+      return index;
+    }
   }
 
   static final int index10(final long bitmap, final long bitpos) {
-    // if (USE_SELF_WRITTEN_POPULATION_COUNT) {
-    // return (int) populationCountPattern10(bitmap & (bitpos - 1));
-    // } else {
-    final long filteredBitmap = ((bitmap & 0x5555555555555555L) ^ 0x5555555555555555L)
-        & ((bitmap >> 1) & 0x5555555555555555L);
-    return java.lang.Long.bitCount(filteredBitmap & (bitpos - 1));
-    // }
+    if (USE_SELF_WRITTEN_POPULATION_COUNT) {
+      return (int) populationCountPattern10(bitmap & (bitpos - 1));
+    } else {
+      // final long filteredBitmap = ((bitmap & 0x5555555555555555L) ^ 0x5555555555555555L)
+      // & ((bitmap >> 1) & 0x5555555555555555L);
+      final long filteredBitmap = filter10(bitmap);
+      final int index = java.lang.Long.bitCount(filteredBitmap & (bitpos - 1));
+
+      if (USE_SELF_WRITTEN_POPULATION_COUNT_CHECK) {
+        final int otherIndex = (int) populationCountPattern10(bitmap & (bitpos - 1));
+        if (index != otherIndex) {
+          throw new IllegalStateException(index + "!=" + otherIndex);
+        }
+      }
+
+      return index;
+    }
   }
 
   static final int index11(final long bitmap, final long bitpos) {
-    // if (USE_SELF_WRITTEN_POPULATION_COUNT) {
-    // return (int) populationCountPattern11(bitmap & (bitpos - 1));
-    // } else {
-    final long filteredBitmap =
-        (bitmap & 0x5555555555555555L) & ((bitmap >> 1) & 0x5555555555555555L);
-    return java.lang.Long.bitCount(filteredBitmap & (bitpos - 1));
-    // }
+    if (USE_SELF_WRITTEN_POPULATION_COUNT) {
+      return (int) populationCountPattern11(bitmap & (bitpos - 1));
+    } else {
+      // final long filteredBitmap =
+      // (bitmap & 0x5555555555555555L) & ((bitmap >> 1) & 0x5555555555555555L);
+      final long filteredBitmap = filter11(bitmap);
+      final int index = java.lang.Long.bitCount(filteredBitmap & (bitpos - 1));
+
+      if (USE_SELF_WRITTEN_POPULATION_COUNT_CHECK) {
+        final int otherIndex = (int) populationCountPattern11(bitmap & (bitpos - 1));
+        if (index != otherIndex) {
+          throw new IllegalStateException(index + "!=" + otherIndex);
+        }
+      }
+
+      return index;
+    }
   }
 
   static final long populationCountPattern01(long v) {
