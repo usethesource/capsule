@@ -10,6 +10,7 @@
 package io.usethesource.capsule;
 
 import static io.usethesource.capsule.BitmapUtils.*;
+import static io.usethesource.capsule.SetMultimapUtils.*;
 import static io.usethesource.capsule.TrieSetMultimap_HHAMT.EitherSingletonOrCollection.Type.COLLECTION;
 import static io.usethesource.capsule.TrieSetMultimap_HHAMT.EitherSingletonOrCollection.Type.SINGLETON;
 
@@ -1104,86 +1105,6 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     abstract CompactSetMultimapNode<K, V> copyAndMigrateFromCollectionToSingleton(
         final AtomicReference<Thread> mutator, final long doubledBitpos, final K key, final V val);
 
-    static final long setBitPattern(final long bitmap, final long doubledBitpos,
-        final int pattern) {
-      /*
-       * TODO: can be optimized for two cases: i) when previous state is known, or ii) when starting
-       * bitmap == 0L
-       */
-
-      switch (pattern) {
-        case PATTERN_NODE: {
-          // generally: from xx to 01
-          // here: set both bits individually
-          long updatedBitmap = bitmap;
-          updatedBitmap |= doubledBitpos;
-          updatedBitmap |= (doubledBitpos << 1);
-          updatedBitmap ^= (doubledBitpos << 1);
-          return updatedBitmap;
-        }
-        case PATTERN_DATA_SINGLETON: {
-          // generally: from xx to 10
-          // here: set both bits individually
-          long updatedBitmap = bitmap;
-          updatedBitmap |= doubledBitpos;
-          updatedBitmap ^= doubledBitpos;
-          updatedBitmap |= (doubledBitpos << 1);
-          return updatedBitmap;
-        }
-        case PATTERN_DATA_COLLECTION: {
-          // generally: from xx to 11
-          // here: set both bits individually
-          long updatedBitmap = bitmap;
-          updatedBitmap |= (doubledBitpos);
-          updatedBitmap |= (doubledBitpos << 1);
-          return updatedBitmap;
-        }
-        default: {
-          // generally: from xx to 00
-          // here: set both bits individually
-          long updatedBitmap = bitmap;
-          updatedBitmap |= doubledBitpos;
-          updatedBitmap ^= doubledBitpos;
-          updatedBitmap |= (doubledBitpos << 1);
-          updatedBitmap ^= (doubledBitpos << 1);
-          return updatedBitmap;
-        }
-      }
-    }
-
-    static final long setBitPattern(final long doubledBitpos, final int pattern) {
-      switch (pattern) {
-        case PATTERN_NODE: {
-          // generally: from 00 to 01
-          // here: set both bits individually
-          long updatedBitmap = 0L;
-          updatedBitmap |= doubledBitpos;
-          return updatedBitmap;
-        }
-        case PATTERN_DATA_SINGLETON: {
-          // generally: from 00 to 10
-          // here: set both bits individually
-          long updatedBitmap = 0L;
-          updatedBitmap |= (doubledBitpos << 1);
-          return updatedBitmap;
-        }
-        case PATTERN_DATA_COLLECTION: {
-          // generally: from 00 to 11
-          // here: set both bits individually
-          long updatedBitmap = 0L;
-          updatedBitmap |= (doubledBitpos);
-          updatedBitmap |= (doubledBitpos << 1);
-          return updatedBitmap;
-        }
-        default: {
-          // generally: from 00 to 00
-          // here: set both bits individually
-          long updatedBitmap = 0L;
-          return updatedBitmap;
-        }
-      }
-    }
-    
     // TODO: fix hash collision support
     static final <K, V> CompactSetMultimapNode<K, V> mergeTwoSingletonPairs(final K key0,
         final V val0, final int keyHash0, final K key1, final V val1, final int keyHash1,
@@ -1297,11 +1218,6 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     int nodeIndex(final long doubledBitpos) {
       return index01(bitmap(), doubledBitpos);
     }    
-
-    final static int PATTERN_EMPTY = 0b00;
-    final static int PATTERN_NODE = 0b01;
-    final static int PATTERN_DATA_SINGLETON = 0b10;
-    final static int PATTERN_DATA_COLLECTION = 0b11;
 
     @Override
     boolean containsKey(final K key, final int keyHash, final int shift) {

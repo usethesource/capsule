@@ -9,11 +9,52 @@
  *******************************************************************************/
 package io.usethesource.capsule;
 
-import static io.usethesource.capsule.TrieMap_5Bits_Heterogeneous_BleedingEdge.AbstractMapNode.unsafe;
-import static io.usethesource.capsule.TrieMap_5Bits_Heterogeneous_BleedingEdge.CompactMapNode.addressSize;
+import static io.usethesource.capsule.DataLayoutHelper.unsafe;
 
+import java.util.Objects;
+
+import static io.usethesource.capsule.DataLayoutHelper.addressSize;
+
+import org.openjdk.jol.info.ClassLayout;
+import org.openjdk.jol.util.VMSupport;
+
+@SuppressWarnings({"restriction"})
 public final class RangecopyUtils {
 
+  @SuppressWarnings("unchecked")
+  static final <T> T allocateHeapRegion(final Class<? extends T> clazz) {
+    try {
+      final Object newInstance = unsafe.allocateInstance(clazz);
+      return (T) newInstance;
+    } catch (ClassCastException | InstantiationException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  static final <T> T allocateHeapRegion(final Class<? extends T>[][] lookupTable, final int dim1,
+      final int dim2) {
+    final Class<? extends T> clazz = lookupTable[dim1][dim2];
+    return allocateHeapRegion(clazz);
+  }
+  
+  public static final boolean _do_rangecompareObjectRegion(Object src, Object dst,
+      long offset, int length) {
+    long strideSizeInBytes = addressSize;
+
+    for (int i = 0; i < length; i++) {
+      Object srcObject = unsafe.getObject(src, offset);
+      Object dstObject = unsafe.getObject(dst, offset);
+
+      if (!Objects.equals(srcObject, dstObject)) {
+        return false;
+      } else {
+        offset += strideSizeInBytes;
+      }
+    }
+
+    return true;
+  }
+    
   /*
    * final Object[] src = this.nodes; final Object[] dst = (Object[]) new Object[src.length];
    * 
@@ -55,6 +96,9 @@ public final class RangecopyUtils {
 
   final static long setInObjectRegionVarArgs(Object dst, long dstOffset, Object value0,
       Object value1) {
+//    System.out.println(VMSupport.vmDetails());
+//    System.out.println(ClassLayout.parseClass(dst.getClass()).toPrintable());
+    
     long strideSizeInBytes = addressSize;
 
     unsafe.putObject(dst, dstOffset, value0);
@@ -150,6 +194,18 @@ public final class RangecopyUtils {
     long strideSizeInBytes = addressSize;
     return _do_rangecopyObjectRegion(src, srcRegionOffset + srcPos * strideSizeInBytes, dst, dstRegionOffset + dstPos * strideSizeInBytes, length);
   }
+
+  public static final long rangecopyObjectRegion(Object src, Object dst, long offset,
+      int length) {
+    if (length == 0) {
+      return 0L;
+    }
+    
+    return _do_rangecopyObjectRegion(src, dst, offset, length);
+    
+//    _do_rangecopyObjectRegion(src, srcOffset, dst, dstOffset, length);
+//    return length * addressSize;
+  }  
   
   public static final long rangecopyObjectRegion(Object src, long srcOffset, Object dst, long dstOffset,
       int length) {
@@ -162,6 +218,26 @@ public final class RangecopyUtils {
 //    _do_rangecopyObjectRegion(src, srcOffset, dst, dstOffset, length);
 //    return length * addressSize;
   }  
+  
+  public static final long _do_rangecopyObjectRegion(Object src, Object dst,
+      long offset, int length) {
+    if (USE_COPY_MEMORY) {
+      long strideSizeInBytes = addressSize;
+      long sizeInBytes = length * strideSizeInBytes;
+      unsafe.copyMemory(src, offset, dst, offset, sizeInBytes);
+      return sizeInBytes;
+    } else {
+      long strideSizeInBytes = addressSize;
+      long sizeInBytes = length * strideSizeInBytes;
+      for (int i = 0; i < length; i++) {
+        unsafe.putObject(dst, offset, unsafe.getObject(src, offset));
+        offset += strideSizeInBytes;
+      }
+      return sizeInBytes;
+    }
+    
+//    return sizeInBytes;
+  }
   
   public static final long _do_rangecopyObjectRegion(Object src, long srcOffset, Object dst,
       long dstOffset, int length) {

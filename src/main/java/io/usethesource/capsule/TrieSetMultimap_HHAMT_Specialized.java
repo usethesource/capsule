@@ -9,10 +9,26 @@
  *******************************************************************************/
 package io.usethesource.capsule;
 
-import static io.usethesource.capsule.DataLayoutHelper.*;
+import static io.usethesource.capsule.BitmapUtils.filter;
+import static io.usethesource.capsule.BitmapUtils.index01;
+import static io.usethesource.capsule.BitmapUtils.index10;
+import static io.usethesource.capsule.BitmapUtils.index11;
+import static io.usethesource.capsule.DataLayoutHelper.addressSize;
+import static io.usethesource.capsule.DataLayoutHelper.arrayOffsets;
+import static io.usethesource.capsule.DataLayoutHelper.fieldOffset;
+import static io.usethesource.capsule.DataLayoutHelper.unsafe;
+import static io.usethesource.capsule.RangecopyUtils.allocateHeapRegion;
 import static io.usethesource.capsule.RangecopyUtils.getFromObjectRegion;
-import static io.usethesource.capsule.BitmapUtils.*;
-import static io.usethesource.capsule.SetMultimapUtils.*;
+import static io.usethesource.capsule.RangecopyUtils.rangecopyObjectRegion;
+import static io.usethesource.capsule.RangecopyUtils._do_rangecopyObjectRegion;
+import static io.usethesource.capsule.RangecopyUtils._do_rangecompareObjectRegion;
+import static io.usethesource.capsule.RangecopyUtils.setInObjectRegion;
+import static io.usethesource.capsule.RangecopyUtils.setInObjectRegionVarArgs;
+import static io.usethesource.capsule.SetMultimapUtils.PATTERN_DATA_COLLECTION;
+import static io.usethesource.capsule.SetMultimapUtils.PATTERN_DATA_SINGLETON;
+import static io.usethesource.capsule.SetMultimapUtils.PATTERN_EMPTY;
+import static io.usethesource.capsule.SetMultimapUtils.PATTERN_NODE;
+import static io.usethesource.capsule.SetMultimapUtils.setBitPattern;
 import static io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized.EitherSingletonOrCollection.Type.COLLECTION;
 import static io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized.EitherSingletonOrCollection.Type.SINGLETON;
 
@@ -37,14 +53,19 @@ import java.util.function.BiFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import io.usethesource.capsule.TrieSetMultimap_HHAMT.EitherSingletonOrCollection;
-import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations.*;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations.SetMultimap0To0Node;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations.SetMultimap0To1Node;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations.SetMultimap0To2Node;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations.SetMultimap0To4Node;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations.SetMultimap1To0Node;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations.SetMultimap1To2Node;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations.SetMultimap2To0Node;
 import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized.EitherSingletonOrCollection.Type;
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "restriction"})
 public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMultimap<K, V> {
 
-  protected static final AbstractSetMultimapNode EMPTY_NODE = new SetMultimap0To0Node(null, 0L);
+  protected static final CompactSetMultimapNode EMPTY_NODE = new SetMultimap0To0Node<>(null, 0L);
 
   @SuppressWarnings("unchecked")
   private static final TrieSetMultimap_HHAMT_Specialized EMPTY_SETMULTIMAP =
@@ -958,7 +979,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
   protected static abstract class CompactSetMultimapNode<K, V>
       extends AbstractSetMultimapNode<K, V> {    
     
-    private final long bitmap;
+    private long bitmap;
 
     CompactSetMultimapNode(final AtomicReference<Thread> mutator, final long bitmap) {
       this.bitmap = bitmap;
@@ -994,6 +1015,17 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       return (int) ((bitmap >>> doubledMask) & 0b11);
     }
 
+    static final long initializeArrayBase() {
+      try {
+        // assuems that both are of type Object and next to each other in memory
+        return DataLayoutHelper.arrayOffsets[0];
+      } catch (SecurityException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    static final long arrayBase = initializeArrayBase();    
+    
     static final Class[][] initializeSpecializationsByContentAndNodes() {
       Class[][] next = new Class[33][65];
 
@@ -1021,8 +1053,8 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       return next;
     }
 
-    static final Class[][] specializationsByContentAndNodes =
-        initializeSpecializationsByContentAndNodes();    
+    static final Class<? extends CompactSetMultimapNode>[][] specializationsByContentAndNodes =
+        initializeSpecializationsByContentAndNodes();
     
     static long globalRawMap1Offset =
         fieldOffset(SetMultimap0To2Node.class, "rawMap1");
@@ -1077,31 +1109,29 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       }
     }   
     
+    @SuppressWarnings("unchecked")
     static final <K> K getSingletonKey(final Class<? extends CompactSetMultimapNode> clazz,
         final CompactSetMultimapNode instance, final int index) {
-      long keyOffset = arrayBase + (TUPLE_LENGTH * index + 0) * addressSize;
-      return (K) unsafe.getObject(instance, keyOffset);
+      return (K) getFromObjectRegion(instance, arrayBase, TUPLE_LENGTH * index);      
     }
     
+    @SuppressWarnings("unchecked")
     static final <V> V getSingletonValue(final Class<? extends CompactSetMultimapNode> clazz,
         final CompactSetMultimapNode instance, final int index) {
-      long keyOffset = arrayBase + (TUPLE_LENGTH * index + 1) * addressSize;
-      return (V) unsafe.getObject(instance, keyOffset);
+      return (V) getFromObjectRegion(instance, arrayBase, TUPLE_LENGTH * index + 1);
     }    
 
+    @SuppressWarnings("unchecked")
     static final <K> K getCollectionKey(final Class<? extends CompactSetMultimapNode> clazz,
         final CompactSetMultimapNode instance, final int index) {
       long rareBase = unsafe.getLong(clazz, globalRareBaseOffset);
-      long keyOffset = rareBase + (TUPLE_LENGTH * index + 0) * addressSize;
-
-      return (K) getFromObjectRegion(instance, rareBase, TUPLE_LENGTH * index + 0);
+      return (K) getFromObjectRegion(instance, rareBase, TUPLE_LENGTH * index);
     }
 
+    @SuppressWarnings("unchecked")
     static final <V> ImmutableSet<V> getCollectionValue(final Class<? extends CompactSetMultimapNode> clazz,
         final CompactSetMultimapNode instance, final int index) {   
       long rareBase = unsafe.getLong(clazz, globalRareBaseOffset);
-      long keyOffset = rareBase + (TUPLE_LENGTH * index + 1) * addressSize;
-
       return (ImmutableSet<V>) getFromObjectRegion(instance, rareBase, TUPLE_LENGTH * index + 1);
     }    
     
@@ -1215,17 +1245,27 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
         }
       }
     }
-
     
-    
-    static final CompactSetMultimapNode getNode(final Class<? extends CompactSetMultimapNode> clazz,
+    @SuppressWarnings("unchecked")
+    static final <K, V> CompactSetMultimapNode<K, V> getNode(final Class<? extends CompactSetMultimapNode> clazz,
         final CompactSetMultimapNode instance, final int index) {
       final int untypedSlotArity = unsafe.getInt(clazz, globalUntypedSlotArityOffset);
       final long rareBase = unsafe.getLong(clazz, globalRareBaseOffset);
 
       final int pIndex = untypedSlotArity - 1 - index;
 
-      return (CompactSetMultimapNode) getFromObjectRegion(instance, rareBase, pIndex);
+      return (CompactSetMultimapNode<K, V>) getFromObjectRegion(instance, rareBase, pIndex);      
+      
+//      final int slotArity = unsafe.getInt(clazz, globalSlotArityOffset);      
+//      final int pIndex = slotArity - 1 - index;
+//
+//      return (CompactSetMultimapNode<K, V>) getFromObjectRegion(instance, arrayBase, pIndex);
+            
+//      final long nodeBase = unsafe.getLong(clazz, globalNodeBaseOffset);
+//      return (CompactSetMultimapNode) getFromObjectRegion(instance, nodeBase, -1 -index);
+      
+//      final long arrayOffsetLast = unsafe.getLong(clazz, globalArrayOffsetLastOffset);
+//      return (CompactSetMultimapNode) getFromObjectRegion(instance, arrayOffsetLast, -index);
     }
     
     @Override
@@ -1239,7 +1279,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     }
     
     @Override
-    CompactSetMultimapNode getNode(final int index) {
+    CompactSetMultimapNode<K, V> getNode(final int index) {
       return getNode(this.getClass(), this, index);
     }
 
@@ -1258,45 +1298,217 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     }
 
     CompactSetMultimapNode<K, V> copyAndUpdateBitmaps(AtomicReference<Thread> mutator,
-        final long bitmap) {
-      return null;
+        final long updatedBitmap) {      
+      final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
+
+      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
+      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+
+      final CompactSetMultimapNode src = this;
+      final CompactSetMultimapNode dst = allocateHeapRegion(srcClass);
+
+      // copy and update bitmaps
+      dst.bitmap = updatedBitmap;
+
+      long offset = arrayBase;
+      offset += rangecopyObjectRegion(src, dst, offset, 2 * payloadArity);
+      offset += rangecopyObjectRegion(src, dst, offset, untypedSlotArity);
+
+      return dst;
     }
 
     CompactSetMultimapNode<K, V> copyAndSetSingletonValue(
         final AtomicReference<Thread> mutator, final long doubledBitpos, final V val) {
-      return null;
+      final int index = dataIndex(doubledBitpos);
+
+      final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
+
+      final CompactSetMultimapNode src = this;
+      final CompactSetMultimapNode dst = allocateHeapRegion(srcClass);
+
+      // copy and update bitmaps
+      dst.bitmap = bitmap;
+
+      // TODO: introduce slotArity constant in specializations
+      // final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);      
+      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
+      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+      
+      final int slotArity = TUPLE_LENGTH * payloadArity + untypedSlotArity;
+      
+      int pIndex = TUPLE_LENGTH * index + 1;          
+      
+      rangecopyObjectRegion(src, arrayBase, dst, arrayBase, slotArity);
+      setInObjectRegion(dst, arrayBase, pIndex, val);
+
+      return dst;
     }
 
     CompactSetMultimapNode<K, V> copyAndSetCollectionValue(
         final AtomicReference<Thread> mutator, final long doubledBitpos,
         final ImmutableSet<V> valColl) {
-      return null;
+      final int index = collIndex(doubledBitpos);
+
+      final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
+
+      final CompactSetMultimapNode src = this;
+      final CompactSetMultimapNode dst = allocateHeapRegion(srcClass);
+
+      // copy and update bitmaps
+      dst.bitmap = bitmap;
+
+      // TODO: introduce slotArity constant in specializations
+      // final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);      
+      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
+      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+      
+      final int slotArity = TUPLE_LENGTH * payloadArity + untypedSlotArity;
+      
+      int pIndex = TUPLE_LENGTH * (payloadArity + index) + 1;          
+      
+      rangecopyObjectRegion(src, arrayBase, dst, arrayBase, slotArity);
+      setInObjectRegion(dst, arrayBase, pIndex, valColl);
+
+      return dst;
     }
 
+    @SuppressWarnings("unchecked")
+    static final <K, V> CompactSetMultimapNode<K, V> allocateHeapRegionAndSetBitmap(final Class<? extends CompactSetMultimapNode> clazz, final long bitmap) {
+      try {
+        final CompactSetMultimapNode<K, V> newInstance =
+            (CompactSetMultimapNode<K, V>) unsafe.allocateInstance(clazz);
+        newInstance.bitmap = bitmap;
+        return  newInstance;
+      } catch (ClassCastException | InstantiationException e) {
+        throw new RuntimeException(e);
+      }
+    }    
+    
+    @SuppressWarnings("unchecked")
     CompactSetMultimapNode<K, V> copyAndSetNode(final AtomicReference<Thread> mutator,
-        final long doubledBitpos, final CompactSetMultimapNode<K, V> node) {
-      return null;
+        final int index, final CompactSetMultimapNode<K, V> node) {
+      final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
+
+      final CompactSetMultimapNode src = this;
+      final CompactSetMultimapNode dst = allocateHeapRegionAndSetBitmap(srcClass, bitmap);
+
+//      // copy and update bitmaps
+//      dst.bitmap = bitmap;
+
+      // TODO: introduce slotArity constant in specializations
+      final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);      
+//      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
+//      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+//      final int slotArity = TUPLE_LENGTH * payloadArity + untypedSlotArity;
+      
+      int pIndex = slotArity - 1 - index;
+      
+//      rangecopyObjectRegion(src, arrayBase, dst, arrayBase, slotArity);
+      _do_rangecopyObjectRegion(src, dst, arrayBase, slotArity);
+      setInObjectRegion(dst, arrayBase, pIndex, node);
+
+      return dst;     
     }
 
     CompactSetMultimapNode<K, V> copyAndInsertSingleton(
         final AtomicReference<Thread> mutator, final long doubledBitpos, final K key, final V val) {
-      return null;
+      final int index = dataIndex(doubledBitpos);
+      
+      final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
+
+      // TODO: introduce slotArity constant in specializations
+      // final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);      
+      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
+      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+      
+      final int slotArity = TUPLE_LENGTH * payloadArity + untypedSlotArity;
+
+      final CompactSetMultimapNode src = this;
+      final CompactSetMultimapNode dst =
+          allocateHeapRegion(specializationsByContentAndNodes, payloadArity + 1, untypedSlotArity);
+
+      dst.bitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_DATA_SINGLETON);
+      
+      final int pIndex = TUPLE_LENGTH * index;
+
+      long offset = arrayBase;
+      long delta = 0;
+
+      offset += rangecopyObjectRegion(src, dst, offset, pIndex);
+      delta += setInObjectRegionVarArgs(dst, offset, key, val);
+      offset += rangecopyObjectRegion(src, offset, dst, offset + delta, slotArity - pIndex);
+
+      return dst;
     }
 
     CompactSetMultimapNode<K, V> copyAndMigrateFromSingletonToCollection(
-        final AtomicReference<Thread> mutator, final long doubledBitpos, final K key,
+        final AtomicReference<Thread> mutator, final long doubledBitpos, final int indexOld, final K key,
         final ImmutableSet<V> valColl) {
-      return null;
+      // final int indexOld = dataIndex(doubledBitpos);
+      final int indexNew = collIndex(doubledBitpos);      
+      
+      final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
+
+      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
+      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+
+      final CompactSetMultimapNode src = this;
+      final CompactSetMultimapNode dst = allocateHeapRegion(specializationsByContentAndNodes,
+          payloadArity - 1, untypedSlotArity + 2);
+
+      dst.bitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_DATA_COLLECTION);
+     
+      final int pIndexOld = TUPLE_LENGTH * indexOld;
+      final int pIndexNew = TUPLE_LENGTH * (payloadArity - 1 + indexNew);         
+      
+      /* TODO: test code below; not sure that length arguments are correct */
+      
+      long offset = arrayBase;
+      offset += rangecopyObjectRegion(src, dst, offset, pIndexOld);
+      long delta = 2 * addressSize /* sizeOfInt() */;
+      offset += rangecopyObjectRegion(src, offset + delta, dst, offset,
+          (TUPLE_LENGTH * (payloadArity - 1) - pIndexOld));
+
+      offset += rangecopyObjectRegion(src, offset + delta, dst, offset, pIndexNew);
+      long delta2 = setInObjectRegionVarArgs(dst, offset, key, valColl);
+      delta -= delta2;
+      offset += delta2;
+      offset +=
+          rangecopyObjectRegion(src, offset + delta, dst, offset, untypedSlotArity - pIndexNew);
+
+      return dst;
     }
 
-    CompactSetMultimapNode<K, V> copyAndRemoveSingleton(
-        final AtomicReference<Thread> mutator, final long doubledBitpos) {
-      return null;
-    }
-    
-    CompactSetMultimapNode<K, V> copyAndRemoveSingleton(
-        final AtomicReference<Thread> mutator, final long doubledBitpos, long updatedBitmap) {
-      return null;
+    @SuppressWarnings("unchecked")
+    CompactSetMultimapNode<K, V> copyAndRemoveSingleton(final AtomicReference<Thread> mutator,
+        final long doubledBitpos) {
+      final int indexOld = dataIndex(doubledBitpos);
+
+      final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
+
+      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
+      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+
+      if (payloadArity == 1 && untypedSlotArity == 0) {
+        // TODO: check if this optimization can be performed in caller
+        return EMPTY_NODE;
+      } else {
+        final CompactSetMultimapNode src = this;
+        final CompactSetMultimapNode dst = allocateHeapRegion(specializationsByContentAndNodes,
+            payloadArity - 1, untypedSlotArity);
+
+        dst.bitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_EMPTY);
+
+        final int pIndexOld = TUPLE_LENGTH * indexOld;
+
+        long offset = arrayBase;
+        offset += rangecopyObjectRegion(src, dst, offset, pIndexOld);
+        long delta = 2 * addressSize /* sizeOfInt() */;
+        offset += rangecopyObjectRegion(src, offset + delta, dst, offset,
+            (TUPLE_LENGTH * (payloadArity - 1) - pIndexOld + untypedSlotArity));
+
+        return dst;
+      }
     }
 
     /*
@@ -1304,116 +1516,223 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
      */
     CompactSetMultimapNode<K, V> copyAndRemoveCollection(
         final AtomicReference<Thread> mutator, final long doubledBitpos) {
-      return null;
+      final int indexOld = collIndex(doubledBitpos);
+
+      final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
+
+      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
+      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+
+      if (payloadArity == 0 && untypedSlotArity == TUPLE_LENGTH) {
+        // TODO: check if this optimization can be performed in caller
+        return EMPTY_NODE;
+      } else {
+        final CompactSetMultimapNode src = this;
+        final CompactSetMultimapNode dst = allocateHeapRegion(specializationsByContentAndNodes,
+            payloadArity, untypedSlotArity - TUPLE_LENGTH);
+
+        dst.bitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_EMPTY);
+
+        final int pIndexOld = TUPLE_LENGTH * (payloadArity + indexOld);
+
+        long offset = arrayBase;
+        offset += rangecopyObjectRegion(src, dst, offset, pIndexOld);
+        long delta = 2 * addressSize /* sizeOfInt() */;
+        offset += rangecopyObjectRegion(src, offset + delta, dst, offset,
+            (TUPLE_LENGTH * (payloadArity - 1) - pIndexOld + untypedSlotArity));
+
+        return dst;
+      }
     }
 
     CompactSetMultimapNode<K, V> copyAndMigrateFromSingletonToNode(
-        final AtomicReference<Thread> mutator, final long doubledBitpos,
+        final AtomicReference<Thread> mutator, final long doubledBitpos, final int indexOld, 
         final CompactSetMultimapNode<K, V> node) {
-      return null;
+      // final int indexOld = dataIndex(doubledBitpos);
+      final int indexNew = nodeIndex(doubledBitpos);      
+      
+      final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
+
+      // TODO: introduce slotArity constant in specializations
+      // final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);      
+      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
+      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+      
+      final int slotArity = TUPLE_LENGTH * payloadArity + untypedSlotArity;
+
+      final CompactSetMultimapNode src = this;
+      final CompactSetMultimapNode dst = allocateHeapRegion(specializationsByContentAndNodes,
+          payloadArity - 1, untypedSlotArity + 1);
+
+      dst.bitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_NODE);
+      
+      final int pIndexOld = TUPLE_LENGTH * indexOld;
+      final int pIndexNew = (slotArity - 1) - 1 - indexNew;
+      
+      copyAndMigrateFromXxxToNode(src, dst, slotArity, pIndexOld, pIndexNew, node);
+      
+      return dst;
     }
 
-    CompactSetMultimapNode<K, V> copyAndMigrateFromNodeToSingleton(
-        final AtomicReference<Thread> mutator, final long doubledBitpos,
-        final CompactSetMultimapNode<K, V> node) { // node get's unwrapped inside method
-      return null;
+    private void copyAndMigrateFromXxxToNode(final CompactSetMultimapNode src,
+        final CompactSetMultimapNode dst, final int slotArity, final int pIndexOld,
+        final int pIndexNew, final CompactSetMultimapNode<K, V> node) {
+      long offset = arrayBase;
+      long delta1 = addressSize;
+      long delta2 = 2 * addressSize;
+
+      offset += rangecopyObjectRegion(src, dst, offset, pIndexOld);
+      offset += rangecopyObjectRegion(src, offset + delta2, dst, offset, pIndexNew - pIndexOld);
+
+      setInObjectRegionVarArgs(dst, offset, node);
+
+      offset += rangecopyObjectRegion(src, offset + delta2, dst, offset + delta1,
+          slotArity - pIndexNew - 2);
     }
 
     CompactSetMultimapNode<K, V> copyAndMigrateFromCollectionToNode(
-        final AtomicReference<Thread> mutator, final long doubledBitpos,
+        final AtomicReference<Thread> mutator, final long doubledBitpos, final int indexOld, 
         final CompactSetMultimapNode<K, V> node) {
-      return null;
+      // final int indexOld = collIndex(doubledBitpos);
+      final int indexNew = nodeIndex(doubledBitpos);
+
+      final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
+
+      // TODO: introduce slotArity constant in specializations
+      // final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);
+      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
+      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+
+      final int slotArity = TUPLE_LENGTH * payloadArity + untypedSlotArity;
+
+      final CompactSetMultimapNode src = this;
+      final CompactSetMultimapNode dst = allocateHeapRegion(specializationsByContentAndNodes,
+          payloadArity - 1, untypedSlotArity + 1);
+
+      dst.bitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_NODE);
+
+      final int pIndexOld = TUPLE_LENGTH * (payloadArity + indexOld);
+      final int pIndexNew = (slotArity - 1) - 1 - indexNew;
+
+      copyAndMigrateFromXxxToNode(src, dst, slotArity, pIndexOld, pIndexNew, node);
+
+      return dst;
+    }
+
+    @SuppressWarnings("unchecked")
+    CompactSetMultimapNode<K, V> copyAndMigrateFromNodeToSingleton(
+        final AtomicReference<Thread> mutator, final long doubledBitpos,
+        final CompactSetMultimapNode<K, V> node) { // node get's unwrapped inside method
+
+      final int indexOld = nodeIndex(doubledBitpos);
+      final int indexNew = dataIndex(doubledBitpos);
+      
+      final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
+
+      // TODO: introduce slotArity constant in specializations
+      // final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);      
+      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
+      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+      
+      final int slotArity = TUPLE_LENGTH * payloadArity + untypedSlotArity;
+
+      final CompactSetMultimapNode src = this;
+      final CompactSetMultimapNode dst =
+          allocateHeapRegion(specializationsByContentAndNodes, payloadArity + 1, untypedSlotArity - 1);
+
+      dst.bitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_DATA_SINGLETON);
+      
+      final int pIndexOld = slotArity - 1 - indexOld;
+      final int pIndexNew = TUPLE_LENGTH * indexNew;
+
+      Object keyToInline = node.getSingletonKey(0);
+      Object valToInline = node.getSingletonValue(0);
+      
+      copyAndMigrateFromNodeToXxx(src, dst, slotArity, pIndexOld, pIndexNew, keyToInline,
+          valToInline);
+
+      return dst;
     }
 
     CompactSetMultimapNode<K, V> copyAndMigrateFromNodeToCollection(
         final AtomicReference<Thread> mutator, final long doubledBitpos,
         final CompactSetMultimapNode<K, V> node) { // node get's unwrapped inside method
-      return null;
-    }
+ 
+      final int indexOld = nodeIndex(doubledBitpos);
+      final int indexNew = collIndex(doubledBitpos);
+      
+      final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
 
+      // TODO: introduce slotArity constant in specializations
+      // final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);      
+      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
+      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+      
+      final int slotArity = TUPLE_LENGTH * payloadArity + untypedSlotArity;
+
+      final CompactSetMultimapNode src = this;
+      final CompactSetMultimapNode dst =
+          allocateHeapRegion(specializationsByContentAndNodes, payloadArity, untypedSlotArity - 1 + TUPLE_LENGTH);
+
+      dst.bitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_DATA_COLLECTION);
+      
+      final int pIndexOld = slotArity - 1 - indexOld;
+      final int pIndexNew = TUPLE_LENGTH * indexNew;
+
+      Object keyToInline = node.getCollectionKey(0);
+      Object valToInline = node.getCollectionValue(0);
+      
+      copyAndMigrateFromNodeToXxx(src, dst, slotArity, pIndexOld, pIndexNew, keyToInline,
+          valToInline);
+
+      return dst;
+    }
+        
+    private void copyAndMigrateFromNodeToXxx(final CompactSetMultimapNode src,
+        final CompactSetMultimapNode dst, final int slotArity, final int pIndexOld,
+        final int pIndexNew, Object keyToInline, Object valToInline) {
+      long offset = arrayBase;
+      long delta1 = addressSize;
+      long delta2 = delta1 * 2;
+
+      offset += rangecopyObjectRegion(src, dst, offset, pIndexNew);      
+      setInObjectRegionVarArgs(dst, offset, keyToInline, valToInline);
+      offset += rangecopyObjectRegion(src, offset, dst, offset + delta2, pIndexOld - pIndexNew);
+      offset += rangecopyObjectRegion(src, offset + delta1, dst, offset + delta2, slotArity - pIndexOld - 1);
+    }    
+    
     CompactSetMultimapNode<K, V> copyAndMigrateFromCollectionToSingleton(
         final AtomicReference<Thread> mutator, final long doubledBitpos, final K key, final V val) {
-      return null;
-    }
+      
+      // TODO: does not support src == dst yet for shifting
+      
+      final int indexOld = collIndex(doubledBitpos);
+      final int indexNew = dataIndex(doubledBitpos);      
+      
+      final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
 
-    static final long setBitPattern(final long bitmap, final long doubledBitpos,
-        final int pattern) {
-      /*
-       * TODO: can be optimized for two cases: i) when previous state is known, or ii) when starting
-       * bitmap == 0L
-       */
+      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
+      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
 
-      switch (pattern) {
-        case PATTERN_NODE: {
-          // generally: from xx to 01
-          // here: set both bits individually
-          long updatedBitmap = bitmap;
-          updatedBitmap |= doubledBitpos;
-          updatedBitmap |= (doubledBitpos << 1);
-          updatedBitmap ^= (doubledBitpos << 1);
-          return updatedBitmap;
-        }
-        case PATTERN_DATA_SINGLETON: {
-          // generally: from xx to 10
-          // here: set both bits individually
-          long updatedBitmap = bitmap;
-          updatedBitmap |= doubledBitpos;
-          updatedBitmap ^= doubledBitpos;
-          updatedBitmap |= (doubledBitpos << 1);
-          return updatedBitmap;
-        }
-        case PATTERN_DATA_COLLECTION: {
-          // generally: from xx to 11
-          // here: set both bits individually
-          long updatedBitmap = bitmap;
-          updatedBitmap |= (doubledBitpos);
-          updatedBitmap |= (doubledBitpos << 1);
-          return updatedBitmap;
-        }
-        default: {
-          // generally: from xx to 00
-          // here: set both bits individually
-          long updatedBitmap = bitmap;
-          updatedBitmap |= doubledBitpos;
-          updatedBitmap ^= doubledBitpos;
-          updatedBitmap |= (doubledBitpos << 1);
-          updatedBitmap ^= (doubledBitpos << 1);
-          return updatedBitmap;
-        }
-      }
-    }
+      final CompactSetMultimapNode src = this;
+      final CompactSetMultimapNode dst = allocateHeapRegion(specializationsByContentAndNodes,
+          payloadArity + 1, untypedSlotArity - 2);
 
-    static final long setBitPattern(final long doubledBitpos, final int pattern) {
-      switch (pattern) {
-        case PATTERN_NODE: {
-          // generally: from 00 to 01
-          // here: set both bits individually
-          long updatedBitmap = 0L;
-          updatedBitmap |= doubledBitpos;
-          return updatedBitmap;
-        }
-        case PATTERN_DATA_SINGLETON: {
-          // generally: from 00 to 10
-          // here: set both bits individually
-          long updatedBitmap = 0L;
-          updatedBitmap |= (doubledBitpos << 1);
-          return updatedBitmap;
-        }
-        case PATTERN_DATA_COLLECTION: {
-          // generally: from 00 to 11
-          // here: set both bits individually
-          long updatedBitmap = 0L;
-          updatedBitmap |= (doubledBitpos);
-          updatedBitmap |= (doubledBitpos << 1);
-          return updatedBitmap;
-        }
-        default: {
-          // generally: from 00 to 00
-          // here: set both bits individually
-          long updatedBitmap = 0L;
-          return updatedBitmap;
-        }
-      }
+      dst.bitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_DATA_SINGLETON);
+     
+      final int pIndexOld = TUPLE_LENGTH * (payloadArity + indexOld);
+      final int pIndexNew = TUPLE_LENGTH * indexNew;              
+      
+      long offset = arrayBase;
+      long delta = 0L;
+      
+      offset += rangecopyObjectRegion(src, dst, offset, pIndexNew);
+      delta += setInObjectRegionVarArgs(dst, offset, key, val);
+      offset += rangecopyObjectRegion(src, offset, dst, offset + delta, pIndexOld - pIndexNew);
+      offset += rangecopyObjectRegion(src, offset + delta, dst, offset + delta,
+          TUPLE_LENGTH * (payloadArity - 1) + untypedSlotArity);
+
+      return dst;
     }
     
     // TODO: fix hash collision support
@@ -1508,11 +1827,6 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     int nodeIndex(final long doubledBitpos) {
       return index01(bitmap(), doubledBitpos);
     }    
-
-    final static int PATTERN_EMPTY = 0b00;
-    final static int PATTERN_NODE = 0b01;
-    final static int PATTERN_DATA_SINGLETON = 0b10;
-    final static int PATTERN_DATA_COLLECTION = 0b11;
 
     @Override
     boolean containsKey(final K key, final int keyHash, final int shift) {
@@ -1614,7 +1928,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
               subNode.inserted(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details);
 
           if (details.isModified()) {
-            return copyAndSetNode(mutator, doubledBitpos, subNodeNew);
+            return copyAndSetNode(mutator, nodeIndex, subNodeNew);
           } else {
             return this;
           }
@@ -1633,8 +1947,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
               final ImmutableSet<V> valColl = setOf(currentVal, val);
 
               details.modified();
-              return copyAndMigrateFromSingletonToCollection(mutator, doubledBitpos, currentKey,
-                  valColl);
+              return copyAndMigrateFromSingletonToCollection(mutator, doubledBitpos, dataIndex, currentKey, valColl);
             }
           } else {
             // prefix-collision (case: singleton x singleton)
@@ -1645,7 +1958,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
                 shift + BIT_PARTITION_SIZE);
 
             details.modified();
-            return copyAndMigrateFromSingletonToNode(mutator, doubledBitpos, subNodeNew);
+            return copyAndMigrateFromSingletonToNode(mutator, doubledBitpos, dataIndex, subNodeNew);
           }
         }
         case PATTERN_DATA_COLLECTION: {
@@ -1672,7 +1985,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
                 val, keyHash, shift + BIT_PARTITION_SIZE);
 
             details.modified();
-            return copyAndMigrateFromCollectionToNode(mutator, doubledBitpos, subNodeNew);
+            return copyAndMigrateFromCollectionToNode(mutator, doubledBitpos, collIndex, subNodeNew);
           }
         }
         default: {
@@ -1700,7 +2013,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
               subNode.updated(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details);
 
           if (details.isModified()) {
-            return copyAndSetNode(mutator, doubledBitpos, subNodeNew);
+            return copyAndSetNode(mutator, nodeIndex, subNodeNew);
           } else {
             return this;
           }
@@ -1724,7 +2037,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
                 shift + BIT_PARTITION_SIZE);
 
             details.modified();
-            return copyAndMigrateFromSingletonToNode(mutator, doubledBitpos, subNodeNew);
+            return copyAndMigrateFromSingletonToNode(mutator, doubledBitpos, dataIndex, subNodeNew);
           }
         }
         case PATTERN_DATA_COLLECTION: {
@@ -1746,7 +2059,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
                 val, keyHash, shift + BIT_PARTITION_SIZE);
 
             details.modified();
-            return copyAndMigrateFromCollectionToNode(mutator, doubledBitpos, subNodeNew);
+            return copyAndMigrateFromCollectionToNode(mutator, doubledBitpos, collIndex, subNodeNew);
           }
         }
         default: {
@@ -1810,7 +2123,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
             }
             default: {
               // modify current node (set replacement node)
-              return copyAndSetNode(mutator, doubledBitpos, subNodeNew);
+              return copyAndSetNode(mutator, nodeIndex, subNodeNew);
             }
           }
         }
@@ -1984,7 +2297,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
             }
             default: {
               // modify current node (set replacement node)
-              return copyAndSetNode(mutator, doubledBitpos, subNodeNew);
+              return copyAndSetNode(mutator, nodeIndex, subNodeNew);
             }
           }
         }
@@ -2131,46 +2444,60 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       return bldr.toString();
     }
 
+    @Override
+    public boolean equals(final Object other) {
+      if (null == other) {
+        return false;
+      }
+      if (this == other) {
+        return true;
+      }
+      if (getClass() != other.getClass()) {
+        return false;
+      }
+      CompactSetMultimapNode<?, ?> that = (CompactSetMultimapNode<?, ?>) other;
+      if (bitmap() != that.bitmap()) {
+        return false;
+      }
+
+      return _do_rangecompareObjectRegion(this, that, arrayBase, slotArity());
+    }
+    
     // TODO: return abstract instead of compact node
-    static final <K, V> CompactSetMultimapNode nodeOf1x0(final AtomicReference<Thread> mutator, final long bitmap,
-        final Object slot0) {
-      return new SetMultimap0To1Node(mutator, bitmap, slot0);
+    static final <K, V> CompactSetMultimapNode nodeOf1x0(final AtomicReference<Thread> mutator,
+        final long bitmap, final Object slot0) {
+      return new SetMultimap0To1Node<>(mutator, bitmap, slot0);
     }
 
     // TODO: return abstract instead of compact node
-    static final <K, V> CompactSetMultimapNode nodeOf0x1(final AtomicReference<Thread> mutator, final long bitmap,
-        final K key1, final V val1) {
-      return new SetMultimap1To0Node(mutator, bitmap, key1,
-          val1);
+    static final <K, V> CompactSetMultimapNode nodeOf0x1(final AtomicReference<Thread> mutator,
+        final long bitmap, final K key1, final V val1) {
+      return new SetMultimap1To0Node<>(mutator, bitmap, key1, val1);
     }
 
     // TODO: return abstract instead of compact node
-    static final <K, V> CompactSetMultimapNode nodeOf0x2(final AtomicReference<Thread> mutator, final long bitmap,
-        final K key1, final V val1, final K key2, final V val2) {
-      return new SetMultimap2To0Node(mutator, bitmap, key1, val1,
-          key2, val2);
+    static final <K, V> CompactSetMultimapNode nodeOf0x2(final AtomicReference<Thread> mutator,
+        final long bitmap, final K key1, final V val1, final K key2, final V val2) {
+      return new SetMultimap2To0Node<>(mutator, bitmap, key1, val1, key2, val2);
     }
 
     // TODO: return abstract instead of compact node
-    static final <K, V> CompactSetMultimapNode nodeOf4x0(final AtomicReference<Thread> mutator, final long bitmap,
-        final Object slot0, final Object slot1, final Object slot2,
+    static final <K, V> CompactSetMultimapNode nodeOf4x0(final AtomicReference<Thread> mutator,
+        final long bitmap, final Object slot0, final Object slot1, final Object slot2,
         final Object slot3) {
-      return new SetMultimap0To4Node(mutator, bitmap, slot0,
-          slot1, slot2, slot3);
+      return new SetMultimap0To4Node<>(mutator, bitmap, slot0, slot1, slot2, slot3);
     }
 
     // TODO: return abstract instead of compact node
-    static final <K, V> CompactSetMultimapNode nodeOf2x0(final AtomicReference<Thread> mutator, final long bitmap,
-        final Object slot0, final Object slot1) {
-      return new SetMultimap0To2Node(mutator, bitmap, slot0,
-          slot1);
+    static final <K, V> CompactSetMultimapNode nodeOf2x0(final AtomicReference<Thread> mutator,
+        final long bitmap, final Object slot0, final Object slot1) {
+      return new SetMultimap0To2Node<>(mutator, bitmap, slot0, slot1);
     }
 
     // TODO: return abstract instead of compact node
-    static final <K, V> CompactSetMultimapNode nodeOf2x1(final AtomicReference<Thread> mutator, final long bitmap,
-        final K key1, final V val1, final Object slot0, final Object slot1) {
-      return new SetMultimap1To2Node(mutator, bitmap, key1, val1,
-          slot0, slot1);
+    static final <K, V> CompactSetMultimapNode nodeOf2x1(final AtomicReference<Thread> mutator,
+        final long bitmap, final K key1, final V val1, final Object slot0, final Object slot1) {
+      return new SetMultimap1To2Node<>(mutator, bitmap, key1, val1, slot0, slot1);
     }
         
   }

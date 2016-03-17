@@ -123,26 +123,26 @@ public class DataLayoutHelper {
 
   }
 
-  static final long globalRawMap1Offset = fieldOffset(DataLayoutHelperChild.class, "rawMap1");
-
-  static final long globalRawMap2Offset = fieldOffset(DataLayoutHelperChild.class, "rawMap2");
-
-  static final long globalArrayOffsetsOffset =
-      fieldOffset(DataLayoutHelperChild.class, "arrayOffsets");
-
-  static final long globalNodeArityOffset =
-      fieldOffset(DataLayoutHelperChild.class, "nodeArity");
-
-  static long globalPayloadArityOffset =
-      fieldOffset(DataLayoutHelperChild.class, "payloadArity");
-  
-  static final long globalSlotArityOffset =
-      fieldOffset(DataLayoutHelperChild.class, "slotArity");
-
-  static long globalUntypedSlotArityOffset =
-      fieldOffset(DataLayoutHelperChild.class, "untypedSlotArity");
-
-  static long globalArrayOffsetLastOffset =
-      fieldOffset(DataLayoutHelperChild.class, "arrayOffsetLast");
+//  static final long globalRawMap1Offset = fieldOffset(DataLayoutHelperChild.class, "rawMap1");
+//
+//  static final long globalRawMap2Offset = fieldOffset(DataLayoutHelperChild.class, "rawMap2");
+//
+//  static final long globalArrayOffsetsOffset =
+//      fieldOffset(DataLayoutHelperChild.class, "arrayOffsets");
+//
+//  static final long globalNodeArityOffset =
+//      fieldOffset(DataLayoutHelperChild.class, "nodeArity");
+//
+//  static long globalPayloadArityOffset =
+//      fieldOffset(DataLayoutHelperChild.class, "payloadArity");
+//  
+//  static final long globalSlotArityOffset =
+//      fieldOffset(DataLayoutHelperChild.class, "slotArity");
+//
+//  static long globalUntypedSlotArityOffset =
+//      fieldOffset(DataLayoutHelperChild.class, "untypedSlotArity");
+//
+//  static long globalArrayOffsetLastOffset =
+//      fieldOffset(DataLayoutHelperChild.class, "arrayOffsetLast");
   
 }

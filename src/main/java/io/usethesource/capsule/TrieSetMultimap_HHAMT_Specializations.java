@@ -25,6 +25,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 1;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -98,6 +100,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 29;
 
     static final int untypedSlotArity = 2;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 58 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -250,6 +254,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 10;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 9 * addressSize;
@@ -318,6 +324,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 8;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 7 * addressSize;
@@ -363,6 +371,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 27;
 
     static final int untypedSlotArity = 6;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 54 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -515,6 +525,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 5;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 4 * addressSize;
@@ -553,6 +565,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 34;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -654,6 +668,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 11;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 10 * addressSize;
@@ -701,6 +717,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 11;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -766,6 +784,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 6;
 
     static final int untypedSlotArity = 35;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -890,6 +910,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 20;
 
     static final int untypedSlotArity = 13;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -1027,6 +1049,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 3;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 2 * addressSize;
@@ -1069,6 +1093,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 46;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -1204,6 +1230,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 61;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -1365,6 +1393,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 13;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 46 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 12 * addressSize;
@@ -1514,6 +1544,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 1;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -1613,6 +1645,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 23;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -1759,6 +1793,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 37;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 36 * addressSize;
@@ -1878,6 +1914,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 26;
 
     static final int untypedSlotArity = 7;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 52 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -2028,6 +2066,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 17;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 16 * addressSize;
@@ -2115,6 +2155,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 22;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -2250,6 +2292,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 34;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 33 * addressSize;
@@ -2366,6 +2410,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 12;
 
     static final int untypedSlotArity = 39;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -2526,6 +2572,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 23;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 22 * addressSize;
@@ -2644,6 +2692,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 31;
 
     static final int untypedSlotArity = 0;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 62 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -2800,6 +2850,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -2858,6 +2910,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 16;
 
     static final int untypedSlotArity = 28;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -3011,6 +3065,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 23;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 22 * addressSize;
@@ -3094,6 +3150,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 45;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -3214,6 +3272,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 13;
 
     static final int untypedSlotArity = 32;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -3363,6 +3423,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 12;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 11 * addressSize;
@@ -3501,6 +3563,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 14;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 13 * addressSize;
@@ -3591,6 +3655,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 16;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 15 * addressSize;
@@ -3672,6 +3738,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -3703,6 +3771,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 25;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -3845,6 +3915,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -3912,6 +3984,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -3961,6 +4035,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 44;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -4093,6 +4169,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 24;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 23 * addressSize;
@@ -4178,6 +4256,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 26;
 
     static final int untypedSlotArity = 5;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 52 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -4323,6 +4403,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 34;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 33 * addressSize;
@@ -4449,6 +4531,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 24;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 23 * addressSize;
@@ -4569,6 +4653,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 8;
 
     static final int untypedSlotArity = 47;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -4730,6 +4816,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 18;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 17 * addressSize;
@@ -4824,6 +4912,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 17;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 16 * addressSize;
@@ -4885,6 +4975,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -4907,6 +4999,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 17;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -4986,6 +5080,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 33;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -5088,6 +5184,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 16;
 
     static final int untypedSlotArity = 14;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -5209,6 +5307,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 28;
 
     static final int untypedSlotArity = 1;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 56 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -5354,6 +5454,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 28;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 27 * addressSize;
@@ -5474,6 +5576,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 26;
 
     static final int untypedSlotArity = 8;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 52 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -5626,6 +5730,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 50;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 49 * addressSize;
@@ -5775,6 +5881,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 7;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 6 * addressSize;
@@ -5817,6 +5925,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 19;
 
     static final int untypedSlotArity = 15;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -5954,6 +6064,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -6042,6 +6154,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 51;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -6177,6 +6291,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 11;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 10 * addressSize;
@@ -6251,6 +6367,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 0;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -6304,6 +6422,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 24;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -6453,6 +6573,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 1;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -6535,6 +6657,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 41;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -6687,6 +6811,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 3;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 2 * addressSize;
@@ -6764,6 +6890,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 35;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -6870,6 +6998,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 21;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -6985,6 +7115,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 22;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 21 * addressSize;
@@ -7088,6 +7220,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 21;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 20 * addressSize;
@@ -7166,6 +7300,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 27;
 
     static final int untypedSlotArity = 4;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 54 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -7314,6 +7450,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 9;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 8 * addressSize;
@@ -7396,6 +7534,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 19;
 
     static final int untypedSlotArity = 12;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -7526,6 +7666,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 32;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 31 * addressSize;
@@ -7620,6 +7762,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 12;
 
     static final int untypedSlotArity = 37;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -7776,6 +7920,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 0;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 48 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -7900,6 +8046,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 5;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 4 * addressSize;
@@ -7956,6 +8104,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 9;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 8 * addressSize;
@@ -7994,6 +8144,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 7;
 
     static final int untypedSlotArity = 6;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -8057,6 +8209,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 13;
 
     static final int untypedSlotArity = 11;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -8158,6 +8312,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 22;
 
     static final int untypedSlotArity = 0;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -8274,6 +8430,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 13;
 
     static final int untypedSlotArity = 34;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -8427,6 +8585,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 38;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 37 * addressSize;
@@ -8531,6 +8691,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 27;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 26 * addressSize;
@@ -8610,6 +8772,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 31;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -8739,6 +8903,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 3;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 2 * addressSize;
@@ -8843,6 +9009,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 39;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -8968,6 +9136,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 13;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 12 * addressSize;
@@ -9085,6 +9255,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 57;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -9246,6 +9418,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 10;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 9 * addressSize;
@@ -9295,6 +9469,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 6;
 
     static final int untypedSlotArity = 8;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -9358,6 +9534,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 32;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -9471,6 +9649,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 22;
 
     static final int untypedSlotArity = 18;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -9628,6 +9808,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 38;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 37 * addressSize;
@@ -9776,6 +9958,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 27;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 26 * addressSize;
@@ -9900,6 +10084,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 1;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -9938,6 +10124,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 21;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -10080,6 +10268,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -10133,6 +10323,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 40;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -10282,6 +10474,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 25;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 24 * addressSize;
@@ -10391,6 +10585,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 26;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -10544,6 +10740,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 13;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 12 * addressSize;
@@ -10632,6 +10830,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -10716,6 +10916,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 20;
 
     static final int untypedSlotArity = 14;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -10855,6 +11057,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 16;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 15 * addressSize;
@@ -10918,6 +11122,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 26;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -11044,6 +11250,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 26;
 
     static final int untypedSlotArity = 10;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 52 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -11201,6 +11409,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 14;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 46 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 13 * addressSize;
@@ -11352,6 +11562,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 7;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 6 * addressSize;
@@ -11412,6 +11624,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 13;
 
     static final int untypedSlotArity = 17;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -11526,6 +11740,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 19;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -11662,6 +11878,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 16;
 
     static final int untypedSlotArity = 31;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -11822,6 +12040,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 36;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 35 * addressSize;
@@ -11957,6 +12177,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -11993,6 +12215,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 60;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -12157,6 +12381,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 15;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 14 * addressSize;
@@ -12302,6 +12528,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 19;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 18 * addressSize;
@@ -12411,6 +12639,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 6;
 
     static final int untypedSlotArity = 33;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -12531,6 +12761,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 20;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 19 * addressSize;
@@ -12638,6 +12870,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 30;
 
     static final int untypedSlotArity = 2;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 60 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -12794,6 +13028,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 32;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 31 * addressSize;
@@ -12916,6 +13152,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 19;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 18 * addressSize;
@@ -12990,6 +13228,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 26;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -13080,6 +13320,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 18;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -13205,6 +13447,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 48;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -13349,6 +13593,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 28;
 
     static final int untypedSlotArity = 3;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 56 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -13499,6 +13745,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 20;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 19 * addressSize;
@@ -13562,6 +13810,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 0;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -13647,6 +13897,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 14;
 
     static final int untypedSlotArity = 3;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -13734,6 +13986,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 26;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -13833,6 +14087,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 6;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -13941,6 +14197,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 10;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 9 * addressSize;
@@ -14043,6 +14301,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 25;
 
     static final int untypedSlotArity = 6;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 50 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -14186,6 +14446,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 26;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 25 * addressSize;
@@ -14267,6 +14529,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 33;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -14378,6 +14642,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 22;
 
     static final int untypedSlotArity = 15;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -14528,6 +14794,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 50;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 49 * addressSize;
@@ -14668,6 +14936,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -14730,6 +15000,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 6;
 
     static final int untypedSlotArity = 48;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -14884,6 +15156,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 19;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 18 * addressSize;
@@ -14949,6 +15223,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 20;
 
     static final int untypedSlotArity = 9;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -15077,6 +15353,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 28;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 27 * addressSize;
@@ -15202,6 +15480,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 24;
 
     static final int untypedSlotArity = 15;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 48 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -15361,6 +15641,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 21;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 20 * addressSize;
@@ -15457,6 +15739,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 26;
 
     static final int untypedSlotArity = 3;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 52 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -15597,6 +15881,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 19;
 
     static final int untypedSlotArity = 22;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -15750,6 +16036,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 12;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 11 * addressSize;
@@ -15831,6 +16119,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -15911,6 +16201,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 14;
 
     static final int untypedSlotArity = 35;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -16071,6 +16363,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 24;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 23 * addressSize;
@@ -16201,6 +16495,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -16245,6 +16541,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 28;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -16327,6 +16625,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 23;
 
     static final int untypedSlotArity = 9;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 46 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -16468,6 +16768,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 16;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 15 * addressSize;
@@ -16575,6 +16877,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 18;
 
     static final int untypedSlotArity = 16;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -16710,6 +17014,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 19;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 18 * addressSize;
@@ -16792,6 +17098,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 29;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -16943,6 +17251,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 7;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 6 * addressSize;
@@ -16994,6 +17304,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 14;
 
     static final int untypedSlotArity = 16;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -17110,6 +17422,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 13;
 
     static final int untypedSlotArity = 23;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -17238,6 +17552,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 32;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -17377,6 +17693,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 57;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -17529,6 +17847,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 35;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 34 * addressSize;
@@ -17679,6 +17999,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 39;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 38 * addressSize;
@@ -17812,6 +18134,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 8;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 7 * addressSize;
@@ -17865,6 +18189,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 21;
 
     static final int untypedSlotArity = 0;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -17977,6 +18303,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 14;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 13 * addressSize;
@@ -18026,6 +18354,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 45;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -18187,6 +18517,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 10;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 9 * addressSize;
@@ -18281,6 +18613,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 14;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 13 * addressSize;
@@ -18374,6 +18708,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 32;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -18479,6 +18815,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 19;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 18 * addressSize;
@@ -18570,6 +18908,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 20;
 
     static final int untypedSlotArity = 20;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -18722,6 +19062,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 19;
 
     static final int untypedSlotArity = 25;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -18882,6 +19224,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 3;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 2 * addressSize;
@@ -18915,6 +19259,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 15;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -19034,6 +19380,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 52;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -19171,6 +19519,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 26;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 25 * addressSize;
@@ -19278,6 +19628,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 8;
 
     static final int untypedSlotArity = 30;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -19400,6 +19752,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 1;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -19446,6 +19800,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 21;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -19534,6 +19890,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 37;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -19646,6 +20004,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -19740,6 +20100,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 5;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 4 * addressSize;
@@ -19787,6 +20149,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 21;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -19857,6 +20221,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 21;
 
     static final int untypedSlotArity = 18;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -20010,6 +20376,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 10;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 9 * addressSize;
@@ -20130,6 +20498,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 16;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 15 * addressSize;
@@ -20201,6 +20571,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 17;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -20306,6 +20678,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 13;
 
     static final int untypedSlotArity = 26;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -20440,6 +20814,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 16;
 
     static final int untypedSlotArity = 27;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -20591,6 +20967,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 1;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 52 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -20725,6 +21103,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 48;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -20861,6 +21241,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 12;
 
     static final int untypedSlotArity = 33;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -21008,6 +21390,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 19;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 18 * addressSize;
@@ -21126,6 +21510,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 7;
 
     static final int untypedSlotArity = 46;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -21280,6 +21666,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 13;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 12 * addressSize;
@@ -21371,6 +21759,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 44;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -21494,6 +21884,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 29;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 28 * addressSize;
@@ -21612,6 +22004,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 44;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -21752,6 +22146,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 8;
 
     static final int untypedSlotArity = 43;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -21904,6 +22300,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 58;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 57 * addressSize;
@@ -22053,6 +22451,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 7;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 6 * addressSize;
@@ -22166,6 +22566,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 25;
 
     static final int untypedSlotArity = 4;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 50 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -22305,6 +22707,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 13;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 12 * addressSize;
@@ -22352,6 +22756,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 12;
 
     static final int untypedSlotArity = 7;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -22439,6 +22845,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 4;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -22543,6 +22951,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 17;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 16 * addressSize;
@@ -22612,6 +23022,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 21;
 
     static final int untypedSlotArity = 22;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -22774,6 +23186,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 50;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 49 * addressSize;
@@ -22932,6 +23346,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 40;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 39 * addressSize;
@@ -23040,6 +23456,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 55;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -23184,6 +23602,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -23224,6 +23644,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 17;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -23356,6 +23778,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 28;
 
     static final int untypedSlotArity = 8;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 56 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -23517,6 +23941,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 9;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 8 * addressSize;
@@ -23626,6 +24052,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 23;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 22 * addressSize;
@@ -23726,6 +24154,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 20;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -23830,6 +24260,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 8;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 7 * addressSize;
@@ -23928,6 +24360,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -24003,6 +24437,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 12;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -24116,6 +24552,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 24;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 23 * addressSize;
@@ -24192,6 +24630,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 14;
 
     static final int untypedSlotArity = 5;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -24284,6 +24724,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 28;
 
     static final int untypedSlotArity = 5;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 56 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -24438,6 +24880,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 24;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 23 * addressSize;
@@ -24532,6 +24976,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 10;
 
     static final int untypedSlotArity = 40;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -24686,6 +25132,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 10;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 9 * addressSize;
@@ -24744,6 +25192,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 34;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -24889,6 +25339,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 46;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 45 * addressSize;
@@ -25016,6 +25468,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 31;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 30 * addressSize;
@@ -25104,6 +25558,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 46;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -25249,6 +25705,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 8;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 7 * addressSize;
@@ -25338,6 +25796,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 23;
 
     static final int untypedSlotArity = 2;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 46 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -25463,6 +25923,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 11;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 10 * addressSize;
@@ -25580,6 +26042,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 22;
 
     static final int untypedSlotArity = 12;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -25724,6 +26188,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 39;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 38 * addressSize;
@@ -25839,6 +26305,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 34;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 33 * addressSize;
@@ -25946,6 +26414,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 18;
 
     static final int untypedSlotArity = 5;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -26055,6 +26525,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 8;
 
     static final int untypedSlotArity = 42;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -26204,6 +26676,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 5;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 4 * addressSize;
@@ -26287,6 +26761,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 11;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 10 * addressSize;
@@ -26343,6 +26819,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 59;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -26500,6 +26978,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 24;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 23 * addressSize;
@@ -26604,6 +27084,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 11;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 10 * addressSize;
@@ -26695,6 +27177,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 7;
 
     static final int untypedSlotArity = 44;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -26845,6 +27329,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 37;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 36 * addressSize;
@@ -26973,6 +27459,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 23;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 22 * addressSize;
@@ -27064,6 +27552,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 14;
 
     static final int untypedSlotArity = 33;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -27220,6 +27710,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 38;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 37 * addressSize;
@@ -27364,6 +27856,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -27474,6 +27968,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 27;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -27594,6 +28090,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 15;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 14 * addressSize;
@@ -27682,6 +28180,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 1;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -27711,6 +28211,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 41;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -27823,6 +28325,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 23;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 22 * addressSize;
@@ -27897,6 +28401,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 18;
 
     static final int untypedSlotArity = 8;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -28013,6 +28519,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 25;
 
     static final int untypedSlotArity = 11;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 50 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -28168,6 +28676,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 18;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 17 * addressSize;
@@ -28311,6 +28821,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 9;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 8 * addressSize;
@@ -28389,6 +28901,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 16;
 
     static final int untypedSlotArity = 20;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -28524,6 +29038,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 35;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 34 * addressSize;
@@ -28638,6 +29154,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 13;
 
     static final int untypedSlotArity = 21;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -28761,6 +29279,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 24;
 
     static final int untypedSlotArity = 12;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 48 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -28913,6 +29433,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 31;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 30 * addressSize;
@@ -29046,6 +29568,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 0;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -29148,6 +29672,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 7;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 6 * addressSize;
@@ -29243,6 +29769,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 10;
 
     static final int untypedSlotArity = 41;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -29399,6 +29927,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 3;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 2 * addressSize;
@@ -29450,6 +29980,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 30;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -29602,6 +30134,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 28;
 
     static final int untypedSlotArity = 7;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 56 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -29761,6 +30295,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 9;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 8 * addressSize;
@@ -29862,6 +30398,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 25;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 24 * addressSize;
@@ -29949,6 +30487,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 25;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -30073,6 +30613,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 5;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 4 * addressSize;
@@ -30173,6 +30715,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 7;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 6 * addressSize;
@@ -30246,6 +30790,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 21;
 
     static final int untypedSlotArity = 11;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -30382,6 +30928,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 24;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -30522,6 +31070,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -30562,6 +31112,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 8;
 
     static final int untypedSlotArity = 19;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -30659,6 +31211,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 51;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -30810,6 +31364,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 54;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -30973,6 +31529,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 20;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 19 * addressSize;
@@ -31090,6 +31648,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 13;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 12 * addressSize;
@@ -31163,6 +31723,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 28;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -31255,6 +31817,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 12;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 11 * addressSize;
@@ -31304,6 +31868,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 36;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -31453,6 +32019,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 29;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 28 * addressSize;
@@ -31594,6 +32162,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 8;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 7 * addressSize;
@@ -31700,6 +32270,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 20;
 
     static final int untypedSlotArity = 10;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -31830,6 +32402,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 12;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 11 * addressSize;
@@ -31897,6 +32471,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 36;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -32010,6 +32586,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 54;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -32155,6 +32733,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 29;
 
     static final int untypedSlotArity = 3;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 58 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -32309,6 +32889,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 40;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 39 * addressSize;
@@ -32443,6 +33025,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 25;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -32594,6 +33178,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 30;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 29 * addressSize;
@@ -32711,6 +33297,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 26;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 25 * addressSize;
@@ -32822,6 +33410,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 14;
 
     static final int untypedSlotArity = 27;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -32963,6 +33553,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 18;
 
     static final int untypedSlotArity = 20;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -33107,6 +33699,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 33;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 32 * addressSize;
@@ -33240,6 +33834,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 50;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 49 * addressSize;
@@ -33370,6 +33966,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 23;
 
     static final int untypedSlotArity = 10;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 46 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -33513,6 +34111,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 16;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 15 * addressSize;
@@ -33655,6 +34255,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 10;
 
     static final int untypedSlotArity = 37;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -33802,6 +34404,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 8;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 7 * addressSize;
@@ -33878,6 +34482,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 3;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 2 * addressSize;
@@ -33903,6 +34509,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 5;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -33973,6 +34581,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 22;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -34054,6 +34664,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 8;
 
     static final int untypedSlotArity = 21;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -34156,6 +34768,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 37;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 36 * addressSize;
@@ -34257,6 +34871,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 52;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -34403,6 +35019,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 31;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 30 * addressSize;
@@ -34517,6 +35135,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 23;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -34655,6 +35275,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -34774,6 +35396,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 30;
 
     static final int untypedSlotArity = 1;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 60 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -34928,6 +35552,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 27;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 26 * addressSize;
@@ -35059,6 +35685,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 12;
 
     static final int untypedSlotArity = 38;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -35217,6 +35845,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 45;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 44 * addressSize;
@@ -35355,6 +35985,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 20;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 19 * addressSize;
@@ -35479,6 +36111,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 18;
 
     static final int untypedSlotArity = 27;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -35639,6 +36273,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 7;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 6 * addressSize;
@@ -35744,6 +36380,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 30;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 29 * addressSize;
@@ -35834,6 +36472,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 21;
 
     static final int untypedSlotArity = 17;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -35984,6 +36624,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 30;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 29 * addressSize;
@@ -36091,6 +36733,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 22;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -36208,6 +36852,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 32;
 
     static final int untypedSlotArity = 0;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 64 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -36369,6 +37015,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 41;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 40 * addressSize;
@@ -36506,6 +37154,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 3;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 2 * addressSize;
@@ -36575,6 +37225,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 13;
 
     static final int untypedSlotArity = 15;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -36685,6 +37337,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 19;
 
     static final int untypedSlotArity = 6;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -36801,6 +37455,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 23;
 
     static final int untypedSlotArity = 16;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 46 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -36958,6 +37614,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 9;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 8 * addressSize;
@@ -37049,6 +37707,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 22;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -37193,6 +37853,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 9;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 8 * addressSize;
@@ -37311,6 +37973,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 14;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 13 * addressSize;
@@ -37369,6 +38033,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 7;
 
     static final int untypedSlotArity = 12;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -37446,6 +38112,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 18;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -37581,6 +38249,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 5;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 46 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 4 * addressSize;
@@ -37712,6 +38382,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 11;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 10 * addressSize;
@@ -37839,6 +38511,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 29;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 28 * addressSize;
@@ -37926,6 +38600,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 43;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -38046,6 +38722,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 23;
 
     static final int untypedSlotArity = 8;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 46 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -38185,6 +38863,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -38286,6 +38966,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 18;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -38394,6 +39076,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 20;
 
     static final int untypedSlotArity = 5;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -38513,6 +39197,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 0;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -38544,6 +39230,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 0;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -38611,6 +39299,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 40;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -38729,6 +39419,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 55;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -38881,6 +39573,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 20;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 19 * addressSize;
@@ -38961,6 +39655,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 7;
 
     static final int untypedSlotArity = 15;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -39044,6 +39740,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 48;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -39171,6 +39869,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 25;
 
     static final int untypedSlotArity = 0;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 50 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -39300,6 +40000,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 8;
 
     static final int untypedSlotArity = 44;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -39454,6 +40156,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 19;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 18 * addressSize;
@@ -39581,6 +40285,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 43;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -39719,6 +40425,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 13;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 12 * addressSize;
@@ -39775,6 +40483,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 0;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -39869,6 +40579,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 58;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -40028,6 +40740,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 24;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 23 * addressSize;
@@ -40136,6 +40850,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 28;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 27 * addressSize;
@@ -40243,6 +40959,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 7;
 
     static final int untypedSlotArity = 42;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -40388,6 +41106,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 29;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 28 * addressSize;
@@ -40494,6 +41214,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 12;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 11 * addressSize;
@@ -40597,6 +41319,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 18;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 17 * addressSize;
@@ -40668,6 +41392,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 26;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -40812,6 +41538,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -40887,6 +41615,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 16;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -40981,6 +41711,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 47;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -41119,6 +41851,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 29;
 
     static final int untypedSlotArity = 1;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 58 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -41269,6 +42003,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 10;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 9 * addressSize;
@@ -41380,6 +42116,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 20;
 
     static final int untypedSlotArity = 8;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -41505,6 +42243,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 6;
 
     static final int untypedSlotArity = 52;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -41668,6 +42408,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 56;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 55 * addressSize;
@@ -41826,6 +42568,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 35;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 34 * addressSize;
@@ -41963,6 +42707,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 9;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 8 * addressSize;
@@ -42019,6 +42765,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 53;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -42180,6 +42928,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -42264,6 +43014,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 21;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -42396,6 +43148,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 22;
 
     static final int untypedSlotArity = 19;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -42555,6 +43309,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 56 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -42701,6 +43457,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 42;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 41 * addressSize;
@@ -42819,6 +43577,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 29;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 28 * addressSize;
@@ -42934,6 +43694,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 39;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 38 * addressSize;
@@ -43040,6 +43802,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 42;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -43175,6 +43939,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 30;
 
     static final int untypedSlotArity = 3;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 60 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -43334,6 +44100,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 23;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 22 * addressSize;
@@ -43440,6 +44208,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 15;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 14 * addressSize;
@@ -43514,6 +44284,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 1;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -43534,6 +44306,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 41;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -43654,6 +44428,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 19;
 
     static final int untypedSlotArity = 17;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -43795,6 +44571,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 10;
 
     static final int untypedSlotArity = 39;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -43947,6 +44725,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 7;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 46 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 6 * addressSize;
@@ -44083,6 +44863,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 31;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 30 * addressSize;
@@ -44179,6 +44961,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 13;
 
     static final int untypedSlotArity = 30;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -44323,6 +45107,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 14;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 13 * addressSize;
@@ -44399,6 +45185,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 53;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -44542,6 +45330,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 16;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 15 * addressSize;
@@ -44667,6 +45457,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -44777,6 +45569,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 7;
 
     static final int untypedSlotArity = 43;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -44924,6 +45718,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 10;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 9 * addressSize;
@@ -45005,6 +45801,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 1;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -45069,6 +45867,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 49;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -45211,6 +46011,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 8;
 
     static final int untypedSlotArity = 46;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -45369,6 +46171,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -45494,6 +46298,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 15;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 14 * addressSize;
@@ -45550,6 +46356,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 20;
 
     static final int untypedSlotArity = 7;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -45674,6 +46482,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 27;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 26 * addressSize;
@@ -45770,6 +46580,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 38;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -45893,6 +46705,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 5;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 4 * addressSize;
@@ -45922,6 +46736,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 6;
 
     static final int untypedSlotArity = 9;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -45987,6 +46803,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 52;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -46141,6 +46959,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 14;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 13 * addressSize;
@@ -46209,6 +47029,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 15;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 14 * addressSize;
@@ -46275,6 +47097,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 8;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 7 * addressSize;
@@ -46311,6 +47135,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 3;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -46376,6 +47202,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 49;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -46528,6 +47356,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -46656,6 +47486,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 56;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -46806,6 +47638,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 22;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 21 * addressSize;
@@ -46930,6 +47764,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 45;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -47060,6 +47896,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 13;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 12 * addressSize;
@@ -47170,6 +48008,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 8;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 7 * addressSize;
@@ -47250,6 +48090,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 7;
 
     static final int untypedSlotArity = 18;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -47340,6 +48182,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 21;
 
     static final int untypedSlotArity = 19;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -47495,6 +48339,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 34;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 33 * addressSize;
@@ -47625,6 +48471,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 11;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 10 * addressSize;
@@ -47703,6 +48551,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 42;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -47829,6 +48679,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 42;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -47992,6 +48844,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 32;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 31 * addressSize;
@@ -48149,6 +49003,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 24;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 23 * addressSize;
@@ -48305,6 +49161,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 49;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 48 * addressSize;
@@ -48438,6 +49296,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 15;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 14 * addressSize;
@@ -48538,6 +49398,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 12;
 
     static final int untypedSlotArity = 31;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -48680,6 +49542,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 5;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 4 * addressSize;
@@ -48754,6 +49618,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 0;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -48803,6 +49669,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 6;
 
     static final int untypedSlotArity = 27;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -48909,6 +49777,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 6;
 
     static final int untypedSlotArity = 38;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -49041,6 +49911,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 15;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 14 * addressSize;
@@ -49167,6 +50039,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 37;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -49309,6 +50183,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 53;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -49461,6 +50337,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 48 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -49599,6 +50477,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 52 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -49736,6 +50616,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 7;
 
     static final int untypedSlotArity = 47;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -49892,6 +50774,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 47;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 46 * addressSize;
@@ -50038,6 +50922,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 18;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 17 * addressSize;
@@ -50119,6 +51005,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 0;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -50141,6 +51029,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 29;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -50301,6 +51191,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 5;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 58 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 4 * addressSize;
@@ -50459,6 +51351,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 31;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 30 * addressSize;
@@ -50609,6 +51503,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -50640,6 +51536,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 19;
 
     static final int untypedSlotArity = 23;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -50795,6 +51693,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 29;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 28 * addressSize;
@@ -50927,6 +51827,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 47;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 46 * addressSize;
@@ -51056,6 +51958,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 20;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 19 * addressSize;
@@ -51146,6 +52050,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 18;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 17 * addressSize;
@@ -51210,6 +52116,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 7;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 6 * addressSize;
@@ -51244,6 +52152,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 12;
 
     static final int untypedSlotArity = 13;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -51345,6 +52255,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 23;
 
     static final int untypedSlotArity = 1;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 46 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -51468,6 +52380,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 17;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 16 * addressSize;
@@ -51559,6 +52473,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 18;
 
     static final int untypedSlotArity = 13;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -51686,6 +52602,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 62;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -51845,6 +52763,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 21;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 20 * addressSize;
@@ -52003,6 +52923,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 51;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 50 * addressSize;
@@ -52145,6 +53067,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 33;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 32 * addressSize;
@@ -52281,6 +53205,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 12;
 
     static final int untypedSlotArity = 40;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -52444,6 +53370,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 28;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 27 * addressSize;
@@ -52543,6 +53471,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 3;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 2 * addressSize;
@@ -52639,6 +53569,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 0;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -52679,6 +53611,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 64;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -52843,6 +53777,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -52941,6 +53877,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 33;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 32 * addressSize;
@@ -53034,6 +53972,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -53096,6 +54036,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 10;
 
     static final int untypedSlotArity = 7;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -53175,6 +54117,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 7;
 
     static final int untypedSlotArity = 49;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -53336,6 +54280,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 36;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 35 * addressSize;
@@ -53493,6 +54439,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 1;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -53602,6 +54550,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 29;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 28 * addressSize;
@@ -53698,6 +54648,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 13;
 
     static final int untypedSlotArity = 25;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -53831,6 +54783,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 43;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 42 * addressSize;
@@ -53960,6 +54914,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 32;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 31 * addressSize;
@@ -54085,6 +55041,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 6;
 
     static final int untypedSlotArity = 45;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -54232,6 +55190,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 11;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 10 * addressSize;
@@ -54341,6 +55301,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 27;
 
     static final int untypedSlotArity = 0;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 54 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -54480,6 +55442,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 36;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 35 * addressSize;
@@ -54611,6 +55575,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 25;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 24 * addressSize;
@@ -54716,6 +55682,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 14;
 
     static final int untypedSlotArity = 28;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -54860,6 +55828,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 31;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 30 * addressSize;
@@ -54966,6 +55936,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 9;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 8 * addressSize;
@@ -55013,6 +55985,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 18;
 
     static final int untypedSlotArity = 14;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -55143,6 +56117,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -55268,6 +56244,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 30;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 29 * addressSize;
@@ -55366,6 +56344,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 10;
 
     static final int untypedSlotArity = 35;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -55508,6 +56488,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 39;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -55655,6 +56637,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 30;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 29 * addressSize;
@@ -55790,6 +56774,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 22;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 21 * addressSize;
@@ -55880,6 +56866,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 10;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 9 * addressSize;
@@ -55920,6 +56908,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 34;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -56082,6 +57072,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 17;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 16 * addressSize;
@@ -56236,6 +57228,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 38;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 37 * addressSize;
@@ -56349,6 +57343,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 27;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 26 * addressSize;
@@ -56436,6 +57432,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 30;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -56598,6 +57596,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 1;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -56658,6 +57658,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 10;
 
     static final int untypedSlotArity = 10;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -56743,6 +57745,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 35;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -56841,6 +57845,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 19;
 
     static final int untypedSlotArity = 19;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -56986,6 +57992,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 19;
 
     static final int untypedSlotArity = 26;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -57148,6 +58156,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 14;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 13 * addressSize;
@@ -57250,6 +58260,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 41;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -57380,6 +58392,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 22;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 21 * addressSize;
@@ -57452,6 +58466,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 24;
 
     static final int untypedSlotArity = 4;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 48 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -57585,6 +58601,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 54;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -57739,6 +58757,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 12;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 11 * addressSize;
@@ -57859,6 +58879,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 25;
 
     static final int untypedSlotArity = 12;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 50 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -58016,6 +59038,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 0;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -58091,6 +59115,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 22;
 
     static final int untypedSlotArity = 11;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -58232,6 +59258,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 1;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -58323,6 +59351,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -58372,6 +59402,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 24;
 
     static final int untypedSlotArity = 11;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 48 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -58522,6 +59554,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 21;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 20 * addressSize;
@@ -58671,6 +59705,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 18;
 
     static final int untypedSlotArity = 28;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -58833,6 +59869,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 16;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 15 * addressSize;
@@ -58887,6 +59925,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 20;
 
     static final int untypedSlotArity = 3;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -59002,6 +60042,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 13;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 12 * addressSize;
@@ -59067,6 +60109,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 17;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -59191,6 +60235,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 22;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 21 * addressSize;
@@ -59289,6 +60335,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 23;
 
     static final int untypedSlotArity = 3;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 46 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -59417,6 +60465,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 16;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 15 * addressSize;
@@ -59515,6 +60565,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 60;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -59670,6 +60722,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 14;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 13 * addressSize;
@@ -59781,6 +60835,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 13;
 
     static final int untypedSlotArity = 18;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -59897,6 +60953,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 36;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -60020,6 +61078,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 12;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 11 * addressSize;
@@ -60078,6 +61138,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 20;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -60151,6 +61213,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 25;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -60231,6 +61295,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -60297,6 +61363,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 12;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -60392,6 +61460,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -60485,6 +61555,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 6;
 
     static final int untypedSlotArity = 51;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -60646,6 +61718,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 36;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 35 * addressSize;
@@ -60749,6 +61823,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 40;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -60875,6 +61951,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 55;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -61036,6 +62114,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 28;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 27 * addressSize;
@@ -61170,6 +62250,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 26;
 
     static final int untypedSlotArity = 9;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 52 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -61324,6 +62406,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 25;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 24 * addressSize;
@@ -61420,6 +62504,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 30;
 
     static final int untypedSlotArity = 0;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 60 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -61572,6 +62658,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 36;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 35 * addressSize;
@@ -61671,6 +62759,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 7;
 
     static final int untypedSlotArity = 35;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -61799,6 +62889,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 13;
 
     static final int untypedSlotArity = 33;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -61950,6 +63042,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 19;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 18 * addressSize;
@@ -62064,6 +63158,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 16;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 15 * addressSize;
@@ -62123,6 +63219,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -62176,6 +63274,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 44;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -62312,6 +63412,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 10;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 9 * addressSize;
@@ -62383,6 +63485,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 27;
 
     static final int untypedSlotArity = 5;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 54 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -62533,6 +63637,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 50;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 49 * addressSize;
@@ -62676,6 +63782,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 60;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -62835,6 +63943,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 20;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 19 * addressSize;
@@ -62934,6 +64044,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 17;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 16 * addressSize;
@@ -63016,6 +64128,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 16;
 
     static final int untypedSlotArity = 15;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -63140,6 +64254,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 25;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 24 * addressSize;
@@ -63214,6 +64330,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 18;
 
     static final int untypedSlotArity = 19;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -63356,6 +64474,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 16;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 15 * addressSize;
@@ -63432,6 +64552,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 19;
 
     static final int untypedSlotArity = 14;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -63567,6 +64689,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -63655,6 +64779,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 12;
 
     static final int untypedSlotArity = 26;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -63785,6 +64911,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 18;
 
     static final int untypedSlotArity = 26;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -63942,6 +65070,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 43;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 42 * addressSize;
@@ -64097,6 +65227,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 21;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 20 * addressSize;
@@ -64225,6 +65357,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 24;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 23 * addressSize;
@@ -64314,6 +65448,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 10;
 
     static final int untypedSlotArity = 25;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -64433,6 +65569,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 27;
 
     static final int untypedSlotArity = 8;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 54 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -64590,6 +65728,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 29;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 28 * addressSize;
@@ -64713,6 +65853,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 10;
 
     static final int untypedSlotArity = 36;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -64858,6 +66000,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -64898,6 +66042,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 13;
 
     static final int untypedSlotArity = 7;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -64990,6 +66136,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 46;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -65131,6 +66279,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 3;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 2 * addressSize;
@@ -65169,6 +66319,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 3;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -65243,6 +66395,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 21;
 
     static final int untypedSlotArity = 13;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -65384,6 +66538,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 10;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 9 * addressSize;
@@ -65429,6 +66585,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 12;
 
     static final int untypedSlotArity = 21;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -65548,6 +66706,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 42;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -65702,6 +66862,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 37;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 36 * addressSize;
@@ -65816,6 +66978,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 23;
 
     static final int untypedSlotArity = 12;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 46 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -65963,6 +67127,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 27;
 
     static final int untypedSlotArity = 7;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 54 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -66117,6 +67283,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 22;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 21 * addressSize;
@@ -66229,6 +67397,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 11;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 10 * addressSize;
@@ -66298,6 +67468,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 15;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -66391,6 +67563,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 23;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 22 * addressSize;
@@ -66478,6 +67652,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 8;
 
     static final int untypedSlotArity = 38;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -66618,6 +67794,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 27;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 26 * addressSize;
@@ -66732,6 +67910,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 18;
 
     static final int untypedSlotArity = 21;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -66878,6 +68058,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 26;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 25 * addressSize;
@@ -67017,6 +68199,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 10;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 9 * addressSize;
@@ -67079,6 +68263,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 20;
 
     static final int untypedSlotArity = 12;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -67214,6 +68400,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 22;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 21 * addressSize;
@@ -67281,6 +68469,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 32;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -67381,6 +68571,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 25;
 
     static final int untypedSlotArity = 3;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 50 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -67518,6 +68710,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 19;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 18 * addressSize;
@@ -67640,6 +68834,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 37;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -67791,6 +68987,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 16;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 15 * addressSize;
@@ -67876,6 +69074,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 3;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -67976,6 +69176,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 22;
 
     static final int untypedSlotArity = 2;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -68097,6 +69299,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 8;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 7 * addressSize;
@@ -68190,6 +69394,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 16;
 
     static final int untypedSlotArity = 29;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -68345,6 +69551,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 5;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 4 * addressSize;
@@ -68431,6 +69639,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 35;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -68533,6 +69743,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 6;
 
     static final int untypedSlotArity = 34;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -68655,6 +69867,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 26;
 
     static final int untypedSlotArity = 6;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 52 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -68803,6 +70017,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 9;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 8 * addressSize;
@@ -68876,6 +70092,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 24;
 
     static final int untypedSlotArity = 2;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 48 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -69006,6 +70224,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 35;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 34 * addressSize;
@@ -69125,6 +70345,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 18;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 17 * addressSize;
@@ -69227,6 +70449,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 33;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -69342,6 +70566,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 14;
 
     static final int untypedSlotArity = 23;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -69474,6 +70700,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 27;
 
     static final int untypedSlotArity = 10;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 54 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -69635,6 +70863,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -69693,6 +70923,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 26;
 
     static final int untypedSlotArity = 11;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 52 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -69852,6 +71084,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 7;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 6 * addressSize;
@@ -69907,6 +71141,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 47;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -70033,6 +71269,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 19;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 18 * addressSize;
@@ -70112,6 +71350,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -70149,6 +71389,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 0;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -70167,6 +71409,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 48;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -70308,6 +71552,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 16;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 15 * addressSize;
@@ -70420,6 +71666,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 33;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 32 * addressSize;
@@ -70517,6 +71765,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 8;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 7 * addressSize;
@@ -70585,6 +71835,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 0;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -70648,6 +71900,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 5;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 4 * addressSize;
@@ -70708,6 +71962,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 23;
 
     static final int untypedSlotArity = 15;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 46 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -70863,6 +72119,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 24;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 23 * addressSize;
@@ -70989,6 +72247,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 17;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 16 * addressSize;
@@ -71054,6 +72314,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 18;
 
     static final int untypedSlotArity = 24;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -71207,6 +72469,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 26;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 25 * addressSize;
@@ -71302,6 +72566,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 18;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 17 * addressSize;
@@ -71361,6 +72627,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 7;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 6 * addressSize;
@@ -71399,6 +72667,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 16;
 
     static final int untypedSlotArity = 30;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -71557,6 +72827,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 15;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 14 * addressSize;
@@ -71697,6 +72969,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 62;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -71861,6 +73135,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -71918,6 +73194,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 24;
 
     static final int untypedSlotArity = 9;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 48 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -72064,6 +73342,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 20;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 19 * addressSize;
@@ -72193,6 +73473,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 22;
 
     static final int untypedSlotArity = 9;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -72330,6 +73612,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 12;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 11 * addressSize;
@@ -72414,6 +73698,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 21;
 
     static final int untypedSlotArity = 14;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -72558,6 +73844,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 1;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -72626,6 +73914,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 27;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -72773,6 +74063,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 0;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 58 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -72919,6 +74211,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 7;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 6 * addressSize;
@@ -72984,6 +74278,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 11;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 10 * addressSize;
@@ -73035,6 +74331,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 34;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -73140,6 +74438,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 5;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 4 * addressSize;
@@ -73191,6 +74491,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 39;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -73311,6 +74613,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 39;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -73467,6 +74771,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 49;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 48 * addressSize;
@@ -73596,6 +74902,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 10;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 9 * addressSize;
@@ -73694,6 +75002,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 1;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -73727,6 +75037,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 19;
 
     static final int untypedSlotArity = 13;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -73859,6 +75171,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 56;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -74005,6 +75319,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 5;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 4 * addressSize;
@@ -74038,6 +75354,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 1;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -74134,6 +75452,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 14;
 
     static final int untypedSlotArity = 24;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -74268,6 +75588,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 31;
 
     static final int untypedSlotArity = 2;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 62 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -74429,6 +75751,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 35;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 34 * addressSize;
@@ -74584,6 +75908,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 21;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 20 * addressSize;
@@ -74667,6 +75993,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 25;
 
     static final int untypedSlotArity = 1;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 50 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -74799,6 +76127,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 30;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 29 * addressSize;
@@ -74924,6 +76254,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 8;
 
     static final int untypedSlotArity = 45;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -75080,6 +76412,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 9;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 8 * addressSize;
@@ -75184,6 +76518,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 22;
 
     static final int untypedSlotArity = 20;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -75346,6 +76682,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 8;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 7 * addressSize;
@@ -75386,6 +76724,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 7;
 
     static final int untypedSlotArity = 33;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -75510,6 +76850,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 18;
 
     static final int untypedSlotArity = 23;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -75661,6 +77003,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 52 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -75803,6 +77147,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 23;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 22 * addressSize;
@@ -75926,6 +77272,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 12;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 11 * addressSize;
@@ -76041,6 +77389,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 6;
 
     static final int untypedSlotArity = 32;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -76159,6 +77509,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 8;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 7 * addressSize;
@@ -76217,6 +77569,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 5;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -76295,6 +77649,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 39;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -76406,6 +77762,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 42;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -76519,6 +77877,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 13;
 
     static final int untypedSlotArity = 37;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -76679,6 +78039,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 42;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 41 * addressSize;
@@ -76836,6 +78198,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 46;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 45 * addressSize;
@@ -76966,6 +78330,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 23;
 
     static final int untypedSlotArity = 18;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 46 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -77127,6 +78493,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 3;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 2 * addressSize;
@@ -77209,6 +78577,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 12;
 
     static final int untypedSlotArity = 11;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -77306,6 +78676,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 5;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 4 * addressSize;
@@ -77348,6 +78720,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 22;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -77457,6 +78831,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 0;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -77563,6 +78939,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 39;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -77692,6 +79070,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 11;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 10 * addressSize;
@@ -77814,6 +79194,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 12;
 
     static final int untypedSlotArity = 34;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -77963,6 +79345,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 31;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 30 * addressSize;
@@ -78086,6 +79470,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 28;
 
     static final int untypedSlotArity = 4;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 56 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -78238,6 +79624,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 8;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 7 * addressSize;
@@ -78287,6 +79675,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 8;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -78372,6 +79762,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 14;
 
     static final int untypedSlotArity = 4;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -78461,6 +79853,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 7;
 
     static final int untypedSlotArity = 48;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -78620,6 +80014,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 15;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 14 * addressSize;
@@ -78672,6 +80068,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 16;
 
     static final int untypedSlotArity = 25;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -78818,6 +80216,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 41;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 40 * addressSize;
@@ -78963,6 +80363,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 20;
 
     static final int untypedSlotArity = 18;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -79111,6 +80513,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 1;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -79153,6 +80557,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 6;
 
     static final int untypedSlotArity = 21;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -79245,6 +80651,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 21;
 
     static final int untypedSlotArity = 20;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -79402,6 +80810,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 23;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 22 * addressSize;
@@ -79481,6 +80891,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 1;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -79505,6 +80917,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 5;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -79610,6 +81024,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 14;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -79727,6 +81143,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -79833,6 +81251,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 25;
 
     static final int untypedSlotArity = 5;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 50 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -79974,6 +81394,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 8;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 7 * addressSize;
@@ -80086,6 +81508,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 32;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 31 * addressSize;
@@ -80193,6 +81617,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 53;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -80332,6 +81758,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 15;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 14 * addressSize;
@@ -80428,6 +81856,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 59;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -80589,6 +82019,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 8;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 50 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 7 * addressSize;
@@ -80736,6 +82168,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 17;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 16 * addressSize;
@@ -80854,6 +82288,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 23;
 
     static final int untypedSlotArity = 0;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 46 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -80975,6 +82411,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 7;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 6 * addressSize;
@@ -81058,6 +82496,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 7;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 6 * addressSize;
@@ -81105,6 +82545,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 7;
 
     static final int untypedSlotArity = 1;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -81158,6 +82600,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -81207,6 +82651,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 8;
 
     static final int untypedSlotArity = 40;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -81352,6 +82798,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 43;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 42 * addressSize;
@@ -81467,6 +82915,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 24;
 
     static final int untypedSlotArity = 14;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 48 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -81624,6 +83074,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 39;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 38 * addressSize;
@@ -81761,6 +83213,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 11;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 10 * addressSize;
@@ -81865,6 +83319,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 27;
 
     static final int untypedSlotArity = 3;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 54 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -82010,6 +83466,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 17;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 16 * addressSize;
@@ -82120,6 +83578,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 24;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 23 * addressSize;
@@ -82201,6 +83661,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 16;
 
     static final int untypedSlotArity = 22;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -82341,6 +83803,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 44;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 43 * addressSize;
@@ -82467,6 +83931,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 18;
 
     static final int untypedSlotArity = 17;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -82604,6 +84070,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 13;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 12 * addressSize;
@@ -82686,6 +84154,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 6;
 
     static final int untypedSlotArity = 26;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -82790,6 +84260,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 36;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -82930,6 +84402,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 29;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 28 * addressSize;
@@ -83057,6 +84531,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 10;
 
     static final int untypedSlotArity = 43;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -83218,6 +84694,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 25;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 24 * addressSize;
@@ -83332,6 +84810,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 48;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -83464,6 +84944,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 9;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 8 * addressSize;
@@ -83594,6 +85076,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 33;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -83736,6 +85220,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 19;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 18 * addressSize;
@@ -83823,6 +85309,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 7;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -83932,6 +85420,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 22;
 
     static final int untypedSlotArity = 14;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -84079,6 +85569,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 48;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -84229,6 +85721,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -84309,6 +85803,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 25;
 
     static final int untypedSlotArity = 7;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 50 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -84455,6 +85951,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -84561,6 +86059,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 28;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -84710,6 +86210,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 33;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 32 * addressSize;
@@ -84815,6 +86317,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 14;
 
     static final int untypedSlotArity = 34;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -84973,6 +86477,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 29;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 28 * addressSize;
@@ -85056,6 +86562,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 37;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -85162,6 +86670,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 6;
 
     static final int untypedSlotArity = 46;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -85312,6 +86822,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 32;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 31 * addressSize;
@@ -85456,6 +86968,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -85550,6 +87064,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 14;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 13 * addressSize;
@@ -85635,6 +87151,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 3;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 2 * addressSize;
@@ -85664,6 +87182,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 7;
 
     static final int untypedSlotArity = 50;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -85827,6 +87347,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -85943,6 +87465,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 34;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 33 * addressSize;
@@ -86056,6 +87580,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 11;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 10 * addressSize;
@@ -86116,6 +87642,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 10;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -86206,6 +87734,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 37;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -86331,6 +87861,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 23;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 22 * addressSize;
@@ -86428,6 +87960,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 21;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 20 * addressSize;
@@ -86502,6 +88036,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 22;
 
     static final int untypedSlotArity = 13;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -86648,6 +88184,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 30;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 29 * addressSize;
@@ -86777,6 +88315,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 25;
 
     static final int untypedSlotArity = 10;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 50 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -86929,6 +88469,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 35;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 34 * addressSize;
@@ -87039,6 +88581,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 10;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -87155,6 +88699,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 35;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -87301,6 +88847,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 24;
 
     static final int untypedSlotArity = 13;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 48 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -87455,6 +89003,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 28;
 
     static final int untypedSlotArity = 6;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 56 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -87611,6 +89161,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 31;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 30 * addressSize;
@@ -87766,6 +89318,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 0;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -87855,6 +89409,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 3;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 2 * addressSize;
@@ -87902,6 +89458,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 13;
 
     static final int untypedSlotArity = 1;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -87980,6 +89538,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 57;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -88137,6 +89697,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 10;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 9 * addressSize;
@@ -88190,6 +89752,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 16;
 
     static final int untypedSlotArity = 18;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -88320,6 +89884,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 19;
 
     static final int untypedSlotArity = 20;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -88468,6 +90034,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 30;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 29 * addressSize;
@@ -88553,6 +90121,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 13;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -88667,6 +90237,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 54;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -88808,6 +90380,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 50;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 49 * addressSize;
@@ -88944,6 +90518,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -88988,6 +90564,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 50;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -89142,6 +90720,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 3;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 2 * addressSize;
@@ -89197,6 +90777,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 16;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -89328,6 +90910,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 28;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 27 * addressSize;
@@ -89445,6 +91029,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -89556,6 +91142,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -89640,6 +91228,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 6;
 
     static final int untypedSlotArity = 24;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -89739,6 +91329,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 27;
 
     static final int untypedSlotArity = 1;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 54 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -89880,6 +91472,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 26;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 25 * addressSize;
@@ -89966,6 +91560,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 17;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 16 * addressSize;
@@ -90041,6 +91637,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 16;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 15 * addressSize;
@@ -90108,6 +91706,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 10;
 
     static final int untypedSlotArity = 12;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -90199,6 +91799,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 19;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 18 * addressSize;
@@ -90269,6 +91871,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 12;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 11 * addressSize;
@@ -90314,6 +91918,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 6;
 
     static final int untypedSlotArity = 44;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -90459,6 +92065,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 0;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -90516,6 +92124,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 20;
 
     static final int untypedSlotArity = 22;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -90673,6 +92283,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 16;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 15 * addressSize;
@@ -90775,6 +92387,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 7;
 
     static final int untypedSlotArity = 37;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -90909,6 +92523,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 9;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 8 * addressSize;
@@ -91032,6 +92648,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 18;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 17 * addressSize;
@@ -91130,6 +92748,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 14;
 
     static final int untypedSlotArity = 32;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -91283,6 +92903,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 30;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 29 * addressSize;
@@ -91396,6 +93018,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 13;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 12 * addressSize;
@@ -91474,6 +93098,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 42;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -91596,6 +93222,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 8;
 
     static final int untypedSlotArity = 39;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -91739,6 +93367,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 46 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -91867,6 +93497,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 41;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -92001,6 +93633,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 31;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 30 * addressSize;
@@ -92110,6 +93744,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 20;
 
     static final int untypedSlotArity = 17;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -92256,6 +93892,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 41;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 40 * addressSize;
@@ -92370,6 +94008,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 46;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -92492,6 +94132,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 7;
 
     static final int untypedSlotArity = 40;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -92632,6 +94274,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 28;
 
     static final int untypedSlotArity = 0;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 56 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -92775,6 +94419,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 7;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 6 * addressSize;
@@ -92892,6 +94538,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 23;
 
     static final int untypedSlotArity = 17;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 46 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -93051,6 +94699,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 15;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 14 * addressSize;
@@ -93112,6 +94762,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 1;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -93167,6 +94819,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 3;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -93260,6 +94914,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 0;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -93339,6 +94995,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 20;
 
     static final int untypedSlotArity = 4;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -93456,6 +95114,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 23;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 22 * addressSize;
@@ -93571,6 +95231,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 14;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 13 * addressSize;
@@ -93677,6 +95339,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 32;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -93808,6 +95472,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 18;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 17 * addressSize;
@@ -93928,6 +95594,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 59;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -94081,6 +95749,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 16;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 15 * addressSize;
@@ -94228,6 +95898,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 22;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 21 * addressSize;
@@ -94313,6 +95985,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 53;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -94461,6 +96135,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 31;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 30 * addressSize;
@@ -94553,6 +96229,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 16;
 
     static final int untypedSlotArity = 6;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -94656,6 +96334,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 45;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -94790,6 +96470,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 23;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 22 * addressSize;
@@ -94860,6 +96542,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 23;
 
     static final int untypedSlotArity = 11;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 46 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -95006,6 +96690,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 31;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 30 * addressSize;
@@ -95124,6 +96810,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 19;
 
     static final int untypedSlotArity = 8;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -95244,6 +96932,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 51;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -95392,6 +97082,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 3;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 48 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 2 * addressSize;
@@ -95522,6 +97214,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 13;
 
     static final int untypedSlotArity = 28;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -95662,6 +97356,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 29;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 28 * addressSize;
@@ -95754,6 +97450,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 10;
 
     static final int untypedSlotArity = 44;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -95917,6 +97615,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -95988,6 +97688,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 20;
 
     static final int untypedSlotArity = 11;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -96121,6 +97823,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 0;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -96218,6 +97922,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 7;
 
     static final int untypedSlotArity = 41;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -96360,6 +98066,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 8;
 
     static final int untypedSlotArity = 48;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -96523,6 +98231,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 50 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -96656,6 +98366,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 5;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 4 * addressSize;
@@ -96769,6 +98481,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 22;
 
     static final int untypedSlotArity = 3;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -96892,6 +98606,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -96989,6 +98705,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 31;
 
     static final int untypedSlotArity = 1;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 62 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -97147,6 +98865,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 44;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 43 * addressSize;
@@ -97264,6 +98984,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 16;
 
     static final int untypedSlotArity = 32;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -97426,6 +99148,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 12;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 11 * addressSize;
@@ -97497,6 +99221,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 24;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -97571,6 +99297,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 13;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 12 * addressSize;
@@ -97640,6 +99368,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 43;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -97765,6 +99495,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -97836,6 +99568,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 21;
 
     static final int untypedSlotArity = 10;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -97970,6 +99704,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 58;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -98125,6 +99861,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 18;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 17 * addressSize;
@@ -98263,6 +100001,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -98298,6 +100038,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 12;
 
     static final int untypedSlotArity = 18;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -98411,6 +100153,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 13;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 12 * addressSize;
@@ -98462,6 +100206,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 25;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -98555,6 +100301,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 40;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -98687,6 +100435,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 24;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 23 * addressSize;
@@ -98803,6 +100553,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 36;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -98921,6 +100673,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 0;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -98992,6 +100746,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 55;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -99140,6 +100896,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 40;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 39 * addressSize;
@@ -99253,6 +101011,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 14;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 13 * addressSize;
@@ -99307,6 +101067,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 14;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -99380,6 +101142,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 21;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 20 * addressSize;
@@ -99445,6 +101209,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 52;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -99604,6 +101370,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 7;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 6 * addressSize;
@@ -99731,6 +101499,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -99850,6 +101620,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 12;
 
     static final int untypedSlotArity = 22;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -99971,6 +101743,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 57;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -100119,6 +101893,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 46 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -100251,6 +102027,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 8;
 
     static final int untypedSlotArity = 37;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -100389,6 +102167,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 15;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 14 * addressSize;
@@ -100467,6 +102247,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 26;
 
     static final int untypedSlotArity = 12;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 52 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -100628,6 +102410,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 9;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 8 * addressSize;
@@ -100715,6 +102499,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 9;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 8 * addressSize;
@@ -100766,6 +102552,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 8;
 
     static final int untypedSlotArity = 3;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -100827,6 +102615,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 1;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -100914,6 +102704,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 38;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -101068,6 +102860,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 27;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 26 * addressSize;
@@ -101195,6 +102989,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 49;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -101343,6 +103139,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 38;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 37 * addressSize;
@@ -101460,6 +103258,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 27;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 26 * addressSize;
@@ -101553,6 +103353,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 11;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 10 * addressSize;
@@ -101635,6 +103437,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 52;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -101775,6 +103579,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 25;
 
     static final int untypedSlotArity = 9;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 50 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -101925,6 +103731,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 34;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 33 * addressSize;
@@ -102060,6 +103868,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 17;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 16 * addressSize;
@@ -102187,6 +103997,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 9;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 8 * addressSize;
@@ -102300,6 +104112,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 18;
 
     static final int untypedSlotArity = 22;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -102448,6 +104262,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 30;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 29 * addressSize;
@@ -102542,6 +104358,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 13;
 
     static final int untypedSlotArity = 31;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -102688,6 +104506,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 27;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -102842,6 +104662,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 56;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -103005,6 +104827,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 36;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 35 * addressSize;
@@ -103166,6 +104990,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 21;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 20 * addressSize;
@@ -103275,6 +105101,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 14;
 
     static final int untypedSlotArity = 25;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -103412,6 +105240,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 19;
 
     static final int untypedSlotArity = 16;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -103551,6 +105381,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 28;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 27 * addressSize;
@@ -103664,6 +105496,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -103761,6 +105595,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 6;
 
     static final int untypedSlotArity = 42;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -103902,6 +105738,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 28;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 27 * addressSize;
@@ -103987,6 +105825,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 47;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -104130,6 +105970,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 18;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 17 * addressSize;
@@ -104207,6 +106049,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 19;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 18 * addressSize;
@@ -104268,6 +106112,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 21;
 
     static final int untypedSlotArity = 5;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -104391,6 +106237,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 17;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 16 * addressSize;
@@ -104487,6 +106335,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 16;
 
     static final int untypedSlotArity = 11;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -104601,6 +106451,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 54;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -104751,6 +106603,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 26;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 25 * addressSize;
@@ -104827,6 +106681,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 14;
 
     static final int untypedSlotArity = 22;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -104958,6 +106814,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 10;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 9 * addressSize;
@@ -105083,6 +106941,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -105149,6 +107009,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 20;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -105226,6 +107088,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 22;
 
     static final int untypedSlotArity = 1;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -105344,6 +107208,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 6;
 
     static final int untypedSlotArity = 43;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -105486,6 +107352,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 12;
 
     static final int untypedSlotArity = 36;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -105640,6 +107508,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 0;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -105675,6 +107545,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 12;
 
     static final int untypedSlotArity = 25;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -105804,6 +107676,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 28;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 27 * addressSize;
@@ -105907,6 +107781,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 10;
 
     static final int untypedSlotArity = 26;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -106029,6 +107905,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 29;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 28 * addressSize;
@@ -106138,6 +108016,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 21;
 
     static final int untypedSlotArity = 8;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -106267,6 +108147,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 18;
 
     static final int untypedSlotArity = 25;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -106422,6 +108304,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 1;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 48 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -106548,6 +108432,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 20;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -106688,6 +108574,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 13;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 12 * addressSize;
@@ -106792,6 +108680,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 20;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -106905,6 +108795,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 14;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 13 * addressSize;
@@ -106986,6 +108878,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 12;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 11 * addressSize;
@@ -107040,6 +108934,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 10;
 
     static final int untypedSlotArity = 19;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -107146,6 +109042,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 22;
 
     static final int untypedSlotArity = 5;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -107274,6 +109172,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -107350,6 +109250,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 0;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -107394,6 +109296,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 36;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -107503,6 +109407,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 21;
 
     static final int untypedSlotArity = 1;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -107616,6 +109522,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 20;
 
     static final int untypedSlotArity = 21;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -107770,6 +109678,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 63;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -107932,6 +109842,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 12;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 11 * addressSize;
@@ -108056,6 +109968,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 28;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -108187,6 +110101,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 12;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 11 * addressSize;
@@ -108286,6 +110202,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 16;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 15 * addressSize;
@@ -108375,6 +110293,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 24;
 
     static final int untypedSlotArity = 8;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 48 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -108517,6 +110437,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 17;
 
     static final int untypedSlotArity = 28;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -108675,6 +110597,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 29;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 28 * addressSize;
@@ -108776,6 +110700,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 19;
 
     static final int untypedSlotArity = 3;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -108886,6 +110812,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 7;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 6 * addressSize;
@@ -108986,6 +110914,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 24;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -109098,6 +111028,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 43;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -109231,6 +111163,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 14;
 
     static final int untypedSlotArity = 30;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -109379,6 +111313,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 44;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -109537,6 +111473,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 20;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 19 * addressSize;
@@ -109623,6 +111561,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -109702,6 +111642,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 30;
 
     static final int untypedSlotArity = 4;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 60 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -109863,6 +111805,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 27;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 26 * addressSize;
@@ -109972,6 +111916,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 7;
 
     static final int untypedSlotArity = 38;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -110108,6 +112054,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 5;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 48 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 4 * addressSize;
@@ -110243,6 +112191,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 6;
 
     static final int untypedSlotArity = 47;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -110395,6 +112345,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 20;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 19 * addressSize;
@@ -110462,6 +112414,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 25;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -110546,6 +112500,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 22;
 
     static final int untypedSlotArity = 8;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -110681,6 +112637,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 18;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 17 * addressSize;
@@ -110766,6 +112724,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 16;
 
     static final int untypedSlotArity = 23;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -110908,6 +112868,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 9;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 8 * addressSize;
@@ -110977,6 +112939,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 15;
 
     static final int untypedSlotArity = 33;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -111137,6 +113101,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 28;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 27 * addressSize;
@@ -111232,6 +113198,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 6;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 5 * addressSize;
@@ -111263,6 +113231,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 16;
 
     static final int untypedSlotArity = 24;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -111407,6 +113377,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 7;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 48 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 6 * addressSize;
@@ -111547,6 +113519,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 9;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 8 * addressSize;
@@ -111589,6 +113563,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 20;
 
     static final int untypedSlotArity = 19;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -111740,6 +113716,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 10;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 9 * addressSize;
@@ -111815,6 +113793,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 42;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -111946,6 +113926,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 52;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -112096,6 +114078,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 30;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 29 * addressSize;
@@ -112235,6 +114219,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 7;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 6 * addressSize;
@@ -112366,6 +114352,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 14;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 13 * addressSize;
@@ -112491,6 +114479,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 5;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 4 * addressSize;
@@ -112586,6 +114576,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 25;
 
     static final int untypedSlotArity = 14;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 50 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -112747,6 +114739,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 22;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 21 * addressSize;
@@ -112823,6 +114817,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 53;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -112980,6 +114976,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 32;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 31 * addressSize;
@@ -113070,6 +115068,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 29;
 
     static final int untypedSlotArity = 6;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 58 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -113231,6 +115231,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 49;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 48 * addressSize;
@@ -113386,6 +115388,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 54 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -113528,6 +115532,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 35;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 34 * addressSize;
@@ -113661,6 +115667,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 9;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 8 * addressSize;
@@ -113721,6 +115729,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 14;
 
     static final int untypedSlotArity = 12;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -113829,6 +115839,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 8;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 7 * addressSize;
@@ -113932,6 +115944,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 14;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 13 * addressSize;
@@ -113994,6 +116008,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 10;
 
     static final int untypedSlotArity = 32;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -114130,6 +116146,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 27;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 26 * addressSize;
@@ -114230,6 +116248,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 5;
 
     static final int untypedSlotArity = 38;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -114357,6 +116377,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 20;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 19 * addressSize;
@@ -114451,6 +116473,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 23;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -114562,6 +116586,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 15;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 14 * addressSize;
@@ -114631,6 +116657,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 46;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -114794,6 +116822,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 14;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 13 * addressSize;
@@ -114892,6 +116922,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 38;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -115002,6 +117034,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 27;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 26 * addressSize;
@@ -115085,6 +117119,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 19;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -115186,6 +117222,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 16;
 
     static final int untypedSlotArity = 21;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -115322,6 +117360,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 58;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -115485,6 +117525,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 17;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 16 * addressSize;
@@ -115541,6 +117583,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 12;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -115604,6 +117648,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 40;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -115762,6 +117808,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 3;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 42 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 2 * addressSize;
@@ -115880,6 +117928,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 17;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 16 * addressSize;
@@ -115980,6 +118030,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 24;
 
     static final int untypedSlotArity = 10;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 48 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -116127,6 +118179,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 25;
 
     static final int untypedSlotArity = 13;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 50 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -116286,6 +118340,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 51;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 50 * addressSize;
@@ -116441,6 +118497,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 29;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 28 * addressSize;
@@ -116578,6 +118636,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 18;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 17 * addressSize;
@@ -116645,6 +118705,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 27;
 
     static final int untypedSlotArity = 9;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 54 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -116804,6 +118866,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 20;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 19 * addressSize;
@@ -116925,6 +118989,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -116969,6 +119035,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 13;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -117066,6 +119134,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -117137,6 +119207,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 20;
 
     static final int untypedSlotArity = 23;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -117297,6 +119369,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 7;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 6 * addressSize;
@@ -117366,6 +119440,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 19;
 
     static final int untypedSlotArity = 1;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 38 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -117472,6 +119548,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -117499,6 +119577,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 13;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -117560,6 +119640,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 55;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -117717,6 +119799,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 40;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 39 * addressSize;
@@ -117839,6 +119923,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 0;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase;
@@ -117866,6 +119952,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 14;
 
     static final int untypedSlotArity = 15;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -117981,6 +120069,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 4;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 3 * addressSize;
@@ -118008,6 +120098,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 8;
 
     static final int untypedSlotArity = 33;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -118136,6 +120228,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 7;
 
     static final int untypedSlotArity = 45;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -118288,6 +120382,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 13;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 34 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 12 * addressSize;
@@ -118411,6 +120507,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 26;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 25 * addressSize;
@@ -118527,6 +120625,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 51;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -118666,6 +120766,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 36;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 35 * addressSize;
@@ -118792,6 +120894,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 16;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 15 * addressSize;
@@ -118912,6 +121016,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 4;
 
     static final int untypedSlotArity = 54;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -119071,6 +121177,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 25;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 24 * addressSize;
@@ -119171,6 +121279,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 47;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -119304,6 +121414,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 22;
 
     static final int untypedSlotArity = 10;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -119443,6 +121555,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 9;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 8 * addressSize;
@@ -119538,6 +121652,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 9;
 
     static final int untypedSlotArity = 21;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 18 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -119644,6 +121760,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 16;
 
     static final int untypedSlotArity = 19;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -119777,6 +121895,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 5;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 4 * addressSize;
@@ -119842,6 +121962,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 11;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 10 * addressSize;
@@ -119885,6 +122007,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 1;
 
     static final int untypedSlotArity = 45;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 2 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -120009,6 +122133,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 41;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -120169,6 +122295,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 45;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 10 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 44 * addressSize;
@@ -120311,6 +122439,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 15;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 36 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 14 * addressSize;
@@ -120443,6 +122573,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 41;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 40 * addressSize;
@@ -120566,6 +122698,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 10;
 
     static final int untypedSlotArity = 34;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -120706,6 +122840,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 11;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 20 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 10 * addressSize;
@@ -120793,6 +122929,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 26;
 
     static final int untypedSlotArity = 0;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 52 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -120927,6 +123065,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 22;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 12 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 21 * addressSize;
@@ -121021,6 +123161,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 24;
 
     static final int untypedSlotArity = 16;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 48 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -121182,6 +123324,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 2;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 14 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 1 * addressSize;
@@ -121235,6 +123379,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 22;
 
     static final int untypedSlotArity = 16;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 44 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -121388,6 +123534,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 26;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 32 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 25 * addressSize;
@@ -121536,6 +123684,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 10;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 30 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 9 * addressSize;
@@ -121643,6 +123793,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 30;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 8 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 29 * addressSize;
@@ -121746,6 +123898,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 29;
 
     static final int untypedSlotArity = 4;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 58 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -121902,6 +124056,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 29;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 28 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 28 * addressSize;
@@ -122048,6 +124204,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 34;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 33 * addressSize;
@@ -122143,6 +124301,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 8;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 16 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 7 * addressSize;
@@ -122214,6 +124374,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 3;
 
     static final int untypedSlotArity = 31;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 6 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -122316,6 +124478,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 11;
 
     static final int untypedSlotArity = 31;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 22 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -122454,6 +124618,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 15;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 24 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 14 * addressSize;
@@ -122558,6 +124724,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 2;
 
     static final int untypedSlotArity = 56;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -122712,6 +124880,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 0;
 
     static final int untypedSlotArity = 61;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 0 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -122869,6 +125039,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 49;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 4 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 48 * addressSize;
@@ -123006,6 +125178,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 20;
 
     static final int untypedSlotArity = 24;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 40 * addressSize /* TODO: sizeOf(ts.ds) */;
 
@@ -123168,6 +125342,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
 
     static final int untypedSlotArity = 27;
 
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
+
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
     static final long arrayOffsetLast = rareBase + 26 * addressSize;
@@ -123304,6 +125480,8 @@ public class TrieSetMultimap_HHAMT_Specializations {
     static final int payloadArity = 13;
 
     static final int untypedSlotArity = 38;
+
+    static final int slotArity = payloadArity * TUPLE_LENGTH + untypedSlotArity;
 
     static final long rareBase = arrayBase + 26 * addressSize /* TODO: sizeOf(ts.ds) */;
 
