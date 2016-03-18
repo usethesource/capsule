@@ -44,11 +44,11 @@ public final class RangecopyUtils {
     for (int i = 0; i < length; i++) {
       Object srcObject = unsafe.getObject(src, offset);
       Object dstObject = unsafe.getObject(dst, offset);
+      offset += strideSizeInBytes;
 
-      if (!Objects.equals(srcObject, dstObject)) {
+      // assumes that both srcObject != null
+      if (!((srcObject == dstObject) || (srcObject.equals(dstObject)))) {
         return false;
-      } else {
-        offset += strideSizeInBytes;
       }
     }
 
