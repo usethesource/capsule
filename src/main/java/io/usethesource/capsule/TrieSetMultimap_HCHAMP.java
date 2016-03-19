@@ -10,6 +10,7 @@
 package io.usethesource.capsule;
 
 import static io.usethesource.capsule.RangecopyUtils.isBitInBitmap;
+import static io.usethesource.capsule.SetMultimapUtils.setOf;
 import static io.usethesource.capsule.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type.COLLECTION;
 import static io.usethesource.capsule.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type.SINGLETON;
 
@@ -72,16 +73,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     }
 
     return result;
-  }
-
-  private static final <T> ImmutableSet<T> setOf(T key1) {
-    // return AbstractSpecialisedImmutableSet.setOf(key1);
-    return DefaultTrieSet.of(key1);
-  }
-
-  private static final <T> ImmutableSet<T> setOf(T key1, T key2) {
-    // return AbstractSpecialisedImmutableSet.setOf(key1, key2);
-    return DefaultTrieSet.of(key1, key2);
   }
 
   @SuppressWarnings("unchecked")
@@ -164,14 +155,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       final K key = (K) o0;
       @SuppressWarnings("unchecked")
       final V val = (V) o1;
-      final Optional<ImmutableSet<V>> result =
-          rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
-
-      if (result.isPresent()) {
-        return result.get().contains(val);
-      } else {
-        return false;
-      }
+      return rootNode.containsTuple(key, val, transformHashCode(key.hashCode()), 0);
     } catch (ClassCastException unused) {
       return false;
     }
@@ -848,6 +832,8 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
     abstract boolean containsKey(final K key, final int keyHash, final int shift);
 
+    abstract boolean containsTuple(final K key, final V val, final int keyHash, final int shift);
+    
     abstract Optional<ImmutableSet<V>> findByKey(final K key, final int keyHash, final int shift);
 
     abstract CompactSetMultimapNode<K, V> inserted(final AtomicReference<Thread> mutator,
@@ -1215,6 +1201,36 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     }
 
     @Override
+    boolean containsTuple(final K key, final V val, final int keyHash, final int shift) {
+      final int mask = mask(keyHash, shift);
+      final int bitpos = bitpos(mask);
+
+      int rawMap1 = this.rawMap1();
+      int rawMap2 = this.rawMap2();
+
+      final int collMap = rawMap1 & rawMap2;
+      final int dataMap = rawMap2 ^ collMap;
+      final int nodeMap = rawMap1 ^ collMap;
+
+      if (isBitInBitmap(dataMap, bitpos)) {
+        final int index = index(dataMap, mask, bitpos);
+        return getSingletonKey(index).equals(key) && getSingletonValue(index).equals(val);
+      }
+
+      if (isBitInBitmap(collMap, bitpos)) {
+        final int index = index(collMap, mask, bitpos);
+        return getCollectionKey(index).equals(key) && getCollectionValue(index).contains(val);
+      }
+
+      if (isBitInBitmap(nodeMap, bitpos)) {
+        final int index = index(nodeMap, mask, bitpos);
+        return getNode(index).containsTuple(key, val, keyHash, shift + BIT_PARTITION_SIZE);
+      }
+
+      return false;
+    }
+        
+    @Override
     Optional<ImmutableSet<V>> findByKey(final K key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -1312,7 +1328,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
       if (isBitInBitmap(collMap, bitpos)) {
         final int collIndex = index(collMap, mask, bitpos);
-        final K currentCollKey = getSingletonKey(collIndex);
+        final K currentCollKey = getCollectionKey(collIndex);
 
         if (currentCollKey.equals(key)) {
           final ImmutableSet<V> currentCollVal = getCollectionValue(collIndex);
@@ -1393,7 +1409,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
       if (isBitInBitmap(collMap, bitpos)) {
         final int collIndex = index(collMap, mask, bitpos);
-        final K currentCollKey = getSingletonKey(collIndex);
+        final K currentCollKey = getCollectionKey(collIndex);
 
         if (currentCollKey.equals(key)) {
           final ImmutableSet<V> currentCollVal = getCollectionValue(collIndex);

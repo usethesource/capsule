@@ -36,6 +36,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import io.usethesource.capsule.TrieSetMultimap_HHAMT.EitherSingletonOrCollection.Type;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized.AbstractSetMultimapNode;
 
 @SuppressWarnings("rawtypes")
 public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
@@ -73,16 +74,6 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     }
 
     return result;
-  }
-
-  private static final <T> ImmutableSet<T> setOf(T key1) {
-    // return AbstractSpecialisedImmutableSet.setOf(key1);
-    return DefaultTrieSet.of(key1);
-  }
-
-  private static final <T> ImmutableSet<T> setOf(T key1, T key2) {
-    // return AbstractSpecialisedImmutableSet.setOf(key1, key2);
-    return DefaultTrieSet.of(key1, key2);
   }
 
   @SuppressWarnings("unchecked")
@@ -164,14 +155,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       final K key = (K) o0;
       @SuppressWarnings("unchecked")
       final V val = (V) o1;
-      final Optional<ImmutableSet<V>> result =
-          rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
-
-      if (result.isPresent()) {
-        return result.get().contains(val);
-      } else {
-        return false;
-      }
+      return rootNode.containsTuple(key, val, transformHashCode(key.hashCode()), 0);
     } catch (ClassCastException unused) {
       return false;
     }
@@ -848,6 +832,8 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
     abstract boolean containsKey(final K key, final int keyHash, final int shift);
 
+    abstract boolean containsTuple(final K key, final V val, final int keyHash, final int shift);    
+    
     abstract Optional<ImmutableSet<V>> findByKey(final K key, final int keyHash, final int shift);
 
     abstract CompactSetMultimapNode<K, V> inserted(final AtomicReference<Thread> mutator,
@@ -1252,6 +1238,51 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     }
 
     @Override
+    boolean containsTuple(final K key, final V val, final int keyHash, final int shift) {
+      long bitmap = this.bitmap();
+
+      final int doubledMask = doubledMask(keyHash, shift);
+      final int pattern = pattern(bitmap, doubledMask);
+
+      final long doubledBitpos = doubledBitpos(doubledMask);
+
+      switch (pattern) {
+        case PATTERN_NODE: {
+          int index = index01(bitmap, doubledBitpos);
+
+          final AbstractSetMultimapNode<K, V> subNode = getNode(index);
+          return subNode.containsTuple(key, val, keyHash, shift + BIT_PARTITION_SIZE);
+        }
+        case PATTERN_DATA_SINGLETON: {
+          int index = index10(bitmap, doubledBitpos);
+
+          final K currentKey = getSingletonKey(index);
+          if (currentKey.equals(key)) {
+
+            final V currentVal = getSingletonValue(index);
+            return currentVal.equals(val);
+          }
+
+          return false;
+        }
+        case PATTERN_DATA_COLLECTION: {
+          int index = index11(bitmap, doubledBitpos);
+
+          final K currentKey = getCollectionKey(index);
+          if (currentKey.equals(key)) {
+
+            final ImmutableSet<V> currentValColl = getCollectionValue(index);
+            return currentValColl.contains(val);
+          }
+
+          return false;
+        }
+        default:
+          return false;
+      }
+    }    
+        
+    @Override
     Optional<ImmutableSet<V>> findByKey(final K key, final int keyHash, final int shift) {
       long bitmap = this.bitmap();
 
@@ -1355,7 +1386,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
         }
         case PATTERN_DATA_COLLECTION: {
           int collIndex = index11(bitmap, doubledBitpos);
-          final K currentCollKey = getSingletonKey(collIndex);
+          final K currentCollKey = getCollectionKey(collIndex);
 
           if (currentCollKey.equals(key)) {
             final ImmutableSet<V> currentCollVal = getCollectionValue(collIndex);
@@ -1434,7 +1465,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
         }
         case PATTERN_DATA_COLLECTION: {
           int collIndex = index11(bitmap, doubledBitpos);
-          final K currentCollKey = getSingletonKey(collIndex);
+          final K currentCollKey = getCollectionKey(collIndex);
 
           if (currentCollKey.equals(key)) {
             final ImmutableSet<V> currentCollVal = getCollectionValue(collIndex);

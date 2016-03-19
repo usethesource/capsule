@@ -9,6 +9,7 @@
  *******************************************************************************/
 package io.usethesource.capsule;
 
+import static io.usethesource.capsule.SetMultimapUtils.setOf;
 import static io.usethesource.capsule.BitmapUtils.filter;
 import static io.usethesource.capsule.BitmapUtils.index01;
 import static io.usethesource.capsule.BitmapUtils.index10;
@@ -102,16 +103,6 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     return result;
   }
 
-  private static final <T> ImmutableSet<T> setOf(T key1) {
-    // return AbstractSpecialisedImmutableSet.setOf(key1);
-    return DefaultTrieSet.of(key1);
-  }
-
-  private static final <T> ImmutableSet<T> setOf(T key1, T key2) {
-    // return AbstractSpecialisedImmutableSet.setOf(key1, key2);
-    return DefaultTrieSet.of(key1, key2);
-  }
-
   @SuppressWarnings("unchecked")
   public static final <K, V> TransientSetMultimap<K, V> transientOf() {
     return TrieSetMultimap_HHAMT_Specialized.EMPTY_SETMULTIMAP.asTransient();
@@ -191,14 +182,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       final K key = (K) o0;
       @SuppressWarnings("unchecked")
       final V val = (V) o1;
-      final Optional<ImmutableSet<V>> result =
-          rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
-
-      if (result.isPresent()) {
-        return result.get().contains(val);
-      } else {
-        return false;
-      }
+      return rootNode.containsTuple(key, val, transformHashCode(key.hashCode()), 0);
     } catch (ClassCastException unused) {
       return false;
     }
@@ -875,6 +859,8 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
     abstract boolean containsKey(final K key, final int keyHash, final int shift);
 
+    abstract boolean containsTuple(final K key, final V val, final int keyHash, final int shift);
+    
     abstract Optional<ImmutableSet<V>> findByKey(final K key, final int keyHash, final int shift);
 
     abstract CompactSetMultimapNode<K, V> inserted(final AtomicReference<Thread> mutator,
@@ -1441,6 +1427,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       return dst;
     }
 
+    @SuppressWarnings("unchecked")
     CompactSetMultimapNode<K, V> copyAndMigrateFromSingletonToCollection(
         final AtomicReference<Thread> mutator, final long doubledBitpos, final int indexOld, final K key,
         final ImmutableSet<V> valColl) {
@@ -1449,8 +1436,12 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       
       final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
 
+      // TODO: introduce slotArity constant in specializations
+      // final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);      
       final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
       final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+      
+      final int slotArity = TUPLE_LENGTH * payloadArity + untypedSlotArity;
 
       final CompactSetMultimapNode src = this;
       final CompactSetMultimapNode dst = allocateHeapRegion(specializationsByContentAndNodes,
@@ -1464,17 +1455,12 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       /* TODO: test code below; not sure that length arguments are correct */
       
       long offset = arrayBase;
+      long delta2 = addressSize * 2;
+      
       offset += rangecopyObjectRegion(src, dst, offset, pIndexOld);
-      long delta = 2 * addressSize /* sizeOfInt() */;
-      offset += rangecopyObjectRegion(src, offset + delta, dst, offset,
-          (TUPLE_LENGTH * (payloadArity - 1) - pIndexOld));
-
-      offset += rangecopyObjectRegion(src, offset + delta, dst, offset, pIndexNew);
-      long delta2 = setInObjectRegionVarArgs(dst, offset, key, valColl);
-      delta -= delta2;
-      offset += delta2;
-      offset +=
-          rangecopyObjectRegion(src, offset + delta, dst, offset, untypedSlotArity - pIndexNew);
+      offset += rangecopyObjectRegion(src, offset + delta2, dst, offset, pIndexNew - pIndexOld);
+      setInObjectRegionVarArgs(dst, offset, key, valColl);
+      offset += rangecopyObjectRegion(src, dst, offset + delta2, slotArity - pIndexNew - 2);
 
       return dst;
     }
@@ -1607,7 +1593,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
       final CompactSetMultimapNode src = this;
       final CompactSetMultimapNode dst = allocateHeapRegion(specializationsByContentAndNodes,
-          payloadArity - 1, untypedSlotArity + 1);
+          payloadArity, untypedSlotArity - TUPLE_LENGTH + 1);
 
       dst.bitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_NODE);
 
@@ -1701,6 +1687,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       offset += rangecopyObjectRegion(src, offset + delta1, dst, offset + delta2, slotArity - pIndexOld - 1);
     }    
     
+    @SuppressWarnings("unchecked")
     CompactSetMultimapNode<K, V> copyAndMigrateFromCollectionToSingleton(
         final AtomicReference<Thread> mutator, final long doubledBitpos, final K key, final V val) {
       
@@ -1711,8 +1698,12 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       
       final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
 
+      // TODO: introduce slotArity constant in specializations
+      // final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);      
       final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
       final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+      
+      final int slotArity = TUPLE_LENGTH * payloadArity + untypedSlotArity;
 
       final CompactSetMultimapNode src = this;
       final CompactSetMultimapNode dst = allocateHeapRegion(specializationsByContentAndNodes,
@@ -1721,16 +1712,15 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       dst.bitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_DATA_SINGLETON);
      
       final int pIndexOld = TUPLE_LENGTH * (payloadArity + indexOld);
-      final int pIndexNew = TUPLE_LENGTH * indexNew;              
+      final int pIndexNew = TUPLE_LENGTH * indexNew;
       
       long offset = arrayBase;
-      long delta = 0L;
+      long delta2 = addressSize * 2;
       
       offset += rangecopyObjectRegion(src, dst, offset, pIndexNew);
-      delta += setInObjectRegionVarArgs(dst, offset, key, val);
-      offset += rangecopyObjectRegion(src, offset, dst, offset + delta, pIndexOld - pIndexNew);
-      offset += rangecopyObjectRegion(src, offset + delta, dst, offset + delta,
-          TUPLE_LENGTH * (payloadArity - 1) + untypedSlotArity);
+      setInObjectRegionVarArgs(dst, offset, key, val);
+      offset += rangecopyObjectRegion(src, offset, dst, offset + delta2, pIndexOld - pIndexNew);
+      offset += rangecopyObjectRegion(src, dst, offset + delta2, slotArity - pIndexOld - 2);
 
       return dst;
     }
@@ -1794,7 +1784,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
         bitmap = setBitPattern(bitmap, doubledBitpos(mask1), PATTERN_DATA_SINGLETON);
 
         // singleton before collection
-        return nodeOf0x2(null, bitmap, key1, val1, key0, valColl0);
+        return nodeOf2x1(null, bitmap, key1, val1, key0, valColl0);
       } else {
         final CompactSetMultimapNode<K, V> node = mergeCollectionAndSingletonPairs(key0, valColl0,
             keyHash0, key1, val1, keyHash1, shift + BIT_PARTITION_SIZE);
@@ -1859,6 +1849,51 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
         final Comparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented.");
     }
+    
+    @Override
+    boolean containsTuple(final K key, final V val, final int keyHash, final int shift) {
+      long bitmap = this.bitmap();
+
+      final int doubledMask = doubledMask(keyHash, shift);
+      final int pattern = pattern(bitmap, doubledMask);
+
+      final long doubledBitpos = doubledBitpos(doubledMask);
+
+      switch (pattern) {
+        case PATTERN_NODE: {
+          int index = index01(bitmap, doubledBitpos);
+
+          final AbstractSetMultimapNode<K, V> subNode = getNode(index);
+          return subNode.containsTuple(key, val, keyHash, shift + BIT_PARTITION_SIZE);
+        }
+        case PATTERN_DATA_SINGLETON: {
+          int index = index10(bitmap, doubledBitpos);
+
+          final K currentKey = getSingletonKey(index);
+          if (currentKey.equals(key)) {
+
+            final V currentVal = getSingletonValue(index);
+            return currentVal.equals(val);
+          }
+
+          return false;
+        }
+        case PATTERN_DATA_COLLECTION: {
+          int index = index11(bitmap, doubledBitpos);
+
+          final K currentKey = getCollectionKey(index);
+          if (currentKey.equals(key)) {
+
+            final ImmutableSet<V> currentValColl = getCollectionValue(index);
+            return currentValColl.contains(val);
+          }
+
+          return false;
+        }
+        default:
+          return false;
+      }
+    }    
 
     @Override
     Optional<ImmutableSet<V>> findByKey(final K key, final int keyHash, final int shift) {
@@ -1963,7 +1998,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
         }
         case PATTERN_DATA_COLLECTION: {
           int collIndex = index11(bitmap, doubledBitpos);
-          final K currentCollKey = getSingletonKey(collIndex);
+          final K currentCollKey = getCollectionKey(collIndex);
 
           if (currentCollKey.equals(key)) {
             final ImmutableSet<V> currentCollVal = getCollectionValue(collIndex);
@@ -2042,7 +2077,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
         }
         case PATTERN_DATA_COLLECTION: {
           int collIndex = index11(bitmap, doubledBitpos);
-          final K currentCollKey = getSingletonKey(collIndex);
+          final K currentCollKey = getCollectionKey(collIndex);
 
           if (currentCollKey.equals(key)) {
             final ImmutableSet<V> currentCollVal = getCollectionValue(collIndex);
