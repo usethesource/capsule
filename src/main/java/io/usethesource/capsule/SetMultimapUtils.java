@@ -105,5 +105,13 @@ public class SetMultimapUtils {
         return setBitPattern00(doubledBitpos);
     }
   }  
+
+  static final <T> ImmutableSet<T> setOf(T key1) {
+    return TrieSet_5Bits.of(key1);
+  }
+
+  static final <T> ImmutableSet<T> setOf(T key1, T key2) {
+    return TrieSet_5Bits.of(key1, key2);
+  }  
   
 }
