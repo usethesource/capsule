@@ -50,6 +50,29 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
     return TrieSet_5Bits.EMPTY_SET;
   }
 
+  public static final <K> ImmutableSet<K> of(K key0) {
+    final int keyHash0 = key0.hashCode();
+
+    final int nodeMap = 0;
+    final int dataMap = CompactSetNode.bitpos(CompactSetNode.mask(keyHash0, 0));
+
+    CompactSetNode<K> newRootNode = CompactSetNode.nodeOf(null, nodeMap, dataMap, key0);
+
+    return new TrieSet_5Bits<K>(newRootNode, keyHash0, 1);
+  }
+
+  public static final <K> ImmutableSet<K> of(K key0, K key1) {
+    assert !Objects.equals(key0, key1);
+    
+    final int keyHash0 = key0.hashCode();
+    final int keyHash1 = key1.hashCode();
+    
+    CompactSetNode<K> newRootNode =
+        CompactSetNode.mergeTwoKeyValPairs(key0, keyHash0, key1, keyHash1, 0);
+
+    return new TrieSet_5Bits<K>(newRootNode, keyHash0 + keyHash1, 2);
+  }  
+  
   @SuppressWarnings("unchecked")
   public static final <K> ImmutableSet<K> of(K... keys) {
     ImmutableSet<K> result = TrieSet_5Bits.EMPTY_SET;
@@ -60,7 +83,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
 
     return result;
   }
-
+ 
   @SuppressWarnings("unchecked")
   public static final <K> TransientSet<K> transientOf() {
     return TrieSet_5Bits.EMPTY_SET.asTransient();
