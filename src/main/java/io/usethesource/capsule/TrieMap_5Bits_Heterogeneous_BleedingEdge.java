@@ -236,9 +236,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
 
     if (details.isModified()) {
       if (details.hasReplacedValue()) {
-        // final int valHashOld = details.getReplacedValue().getInt();
-        // TODO: current workaround, fix & remove
-        final int valHashOld = details.getReplacedValue().getAsObject().hashCode();
+        final int valHashOld = details.getReplacedValue().getInt();
         
         final int valHashNew = val;
 
