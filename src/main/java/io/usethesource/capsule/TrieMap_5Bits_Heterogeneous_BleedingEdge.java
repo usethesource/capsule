@@ -236,7 +236,10 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
 
     if (details.isModified()) {
       if (details.hasReplacedValue()) {
-        final int valHashOld = details.getReplacedValue().getInt();
+        // final int valHashOld = details.getReplacedValue().getInt();
+        // TODO: current workaround, fix & remove
+        final int valHashOld = details.getReplacedValue().getAsObject().hashCode();
+        
         final int valHashNew = val;
 
         return new TrieMap_5Bits_Heterogeneous_BleedingEdge(newRootNode,
@@ -1050,7 +1053,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
               next[m][n] = null;
             } else {
               next[m][n] = Class.forName(String.format(
-                  "io.usethesource.capsule.TrieMap_5Bits_Heterogeneous_BleedingEdge_Specializations$Map%dTo%dNode_5Bits_Heterogeneous_BleedingEdge",
+                  "io.usethesource.capsule.TrieMap_5Bits_Heterogeneous_BleedingEdge_IntIntSpecializations$Map%dTo%dNode_5Bits_Heterogeneous_BleedingEdge",
                   mNext, nNext));
             }
           }

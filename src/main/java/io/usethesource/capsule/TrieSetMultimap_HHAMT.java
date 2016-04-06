@@ -537,9 +537,13 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
         return false;
       }
 
-      if (this.hashCode != that.hashCode) {
-        return false;
-      }
+      /*
+       * TODO: Fix __put(K key, ImmutableSet<V> valColl) for batch insertion and re-enabled
+       * fast-fail check.
+       */
+//      if (this.hashCode != that.hashCode) {
+//        return false;
+//      }
 
       return rootNode.equals(that.rootNode);
     } else if (other instanceof SetMultimap) {
@@ -843,6 +847,10 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     abstract CompactSetMultimapNode<K, V> updated(final AtomicReference<Thread> mutator,
         final K key, final V val, final int keyHash, final int shift,
         final SetMultimapResult<K, V> details);
+    
+    abstract CompactSetMultimapNode<K, V> updated(final AtomicReference<Thread> mutator,
+        final K key, final ImmutableSet<V> val, final int keyHash, final int shift,
+        final SetMultimapResult<K, V> details);
 
     abstract CompactSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator,
         final K key, final V val, final int keyHash, final int shift,
@@ -1055,6 +1063,10 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
     abstract CompactSetMultimapNode<K, V> copyAndInsertSingleton(
         final AtomicReference<Thread> mutator, final long doubledBitpos, final K key, final V val);
+    
+    abstract CompactSetMultimapNode<K, V> copyAndInsertCollection(
+        final AtomicReference<Thread> mutator, final long doubledBitpos, final K key,
+        final ImmutableSet<V> valColl);
 
     abstract CompactSetMultimapNode<K, V> copyAndMigrateFromSingletonToCollection(
         final AtomicReference<Thread> mutator, final long doubledBitpos, final K key,
@@ -1127,6 +1139,43 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       }
     }
 
+    // TODO: fix hash collision support
+    static final <K, V> CompactSetMultimapNode<K, V> mergeTwoCollectionPairs(final K key0,
+        final ImmutableSet<V> valColl0, final int keyHash0, final K key1,
+        final ImmutableSet<V> valColl1, final int keyHash1,
+        final int shift) {
+      assert !(key0.equals(key1));
+
+      if (shift >= HASH_CODE_LENGTH) {
+        throw new IllegalStateException("Hash collision not yet fixed.");
+        // return new HashCollisionSetMultimapNode_BleedingEdge<>(keyHash0,
+        // (K[]) new Object[] {key0, key1}, (ImmutableSet<V>[]) new ImmutableSet[] {val0, val1});
+      }
+
+      final int mask0 = doubledMask(keyHash0, shift);
+      final int mask1 = doubledMask(keyHash1, shift);
+
+      if (mask0 != mask1) {
+        // both nodes fit on same level
+        long bitmap = 0L;
+        bitmap = setBitPattern(bitmap, doubledBitpos(mask0), PATTERN_DATA_COLLECTION);
+        bitmap = setBitPattern(bitmap, doubledBitpos(mask1), PATTERN_DATA_COLLECTION);
+
+        if (mask0 < mask1) {
+          return nodeOf(null, bitmap, new Object[] {key0, valColl0, key1, valColl1});
+        } else {
+          return nodeOf(null, bitmap, new Object[] {key1, valColl1, key0, valColl0});
+        }
+      } else {
+        final CompactSetMultimapNode<K, V> node = mergeTwoCollectionPairs(key0, valColl0, keyHash0,
+            key1, valColl1, keyHash1, shift + BIT_PARTITION_SIZE);
+        // values fit on next level
+        final long bitmap = setBitPattern(0L, doubledBitpos(mask0), PATTERN_NODE);
+
+        return nodeOf(null, bitmap, new Object[] {node});
+      }
+    }    
+    
     // TODO: fix hash collision support
     static final <K, V> CompactSetMultimapNode<K, V> mergeCollectionAndSingletonPairs(final K key0,
         final ImmutableSet<V> valColl0, final int keyHash0, final K key1, final V val1,
@@ -1491,7 +1540,110 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
         }
       }
     }
+    
+    @Override
+    CompactSetMultimapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key,
+        final ImmutableSet<V> valColl, final int keyHash, final int shift, final SetMultimapResult<K, V> details) {
+      long bitmap = this.bitmap();
 
+      final int doubledMask = doubledMask(keyHash, shift);
+      final int pattern = pattern(bitmap, doubledMask);
+
+      final long doubledBitpos = doubledBitpos(doubledMask);
+
+      switch (pattern) {
+        case PATTERN_NODE: {
+          int nodeIndex = index01(bitmap, doubledBitpos);
+          final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
+          final CompactSetMultimapNode<K, V> subNodeNew =
+              subNode.updated(mutator, key, valColl, keyHash, shift + BIT_PARTITION_SIZE, details);
+
+          if (details.isModified()) {
+            return copyAndSetNode(mutator, doubledBitpos, subNodeNew);
+          } else {
+            return this;
+          }
+        }
+        case PATTERN_DATA_SINGLETON: {
+          int dataIndex = index10(bitmap, doubledBitpos);
+          final K currentKey = getSingletonKey(dataIndex);
+
+          if (currentKey.equals(key)) {
+            final V currentVal = getSingletonValue(dataIndex);
+
+            // migrate from singleton to collection
+            details.updated(currentVal);
+            return copyAndMigrateFromSingletonToCollection(mutator, doubledBitpos, currentKey,
+                valColl);
+//            
+//            
+//            // update singleton value
+//            details.updated(currentVal);
+//            return copyAndSetSingletonValue(mutator, doubledBitpos, valColl);
+          } else {
+            // prefix-collision (case: collection x singleton)
+            final V currentVal = getSingletonValue(dataIndex);
+
+            final CompactSetMultimapNode<K, V> subNodeNew = mergeCollectionAndSingletonPairs(
+                key, valColl, keyHash, currentKey,
+                currentVal, transformHashCode(currentKey.hashCode()), shift + BIT_PARTITION_SIZE);
+
+            details.modified();
+            return copyAndMigrateFromSingletonToNode(mutator, doubledBitpos, subNodeNew);
+            
+//            // prefix-collision (case: singleton x singleton)
+//            final V currentVal = getSingletonValue(dataIndex);
+//
+//            final CompactSetMultimapNode<K, V> subNodeNew = mergeTwoSingletonPairs(currentKey,
+//                currentVal, transformHashCode(currentKey.hashCode()), key, valColl, keyHash,
+//                shift + BIT_PARTITION_SIZE);
+//
+//            details.modified();
+//            return copyAndMigrateFromSingletonToNode(mutator, doubledBitpos, subNodeNew);
+          }
+        }
+        case PATTERN_DATA_COLLECTION: {
+          int collIndex = index11(bitmap, doubledBitpos);
+          final K currentCollKey = getCollectionKey(collIndex);
+
+          if (currentCollKey.equals(key)) {
+            final ImmutableSet<V> currentCollVal = getCollectionValue(collIndex);
+
+            // update collection value
+            details.updated(currentCollVal);
+            return copyAndSetCollectionValue(mutator, doubledBitpos, valColl);            
+            
+//            // migrate from collection to singleton
+//            details.updated(currentCollVal);
+//            return copyAndMigrateFromCollectionToSingleton(mutator, doubledBitpos, currentCollKey,
+//                valColl);
+          } else {
+            // prefix-collision (case: collection x collection)
+            final ImmutableSet<V> currentValNode = getCollectionValue(collIndex);
+            final CompactSetMultimapNode<K, V> subNodeNew = mergeTwoCollectionPairs(currentCollKey,
+                currentValNode, transformHashCode(currentCollKey.hashCode()), key, valColl, keyHash,
+                shift + BIT_PARTITION_SIZE);
+            
+            details.modified();
+            return copyAndMigrateFromCollectionToNode(mutator, doubledBitpos, subNodeNew);
+                        
+//            // prefix-collision (case: collection x singleton)
+//            final ImmutableSet<V> currentValNode = getCollectionValue(collIndex);
+//            final CompactSetMultimapNode<K, V> subNodeNew = mergeCollectionAndSingletonPairs(
+//                currentCollKey, currentValNode, transformHashCode(currentCollKey.hashCode()), key,
+//                valColl, keyHash, shift + BIT_PARTITION_SIZE);
+//
+//            details.modified();
+//            return copyAndMigrateFromCollectionToNode(mutator, doubledBitpos, subNodeNew);
+          }
+        }
+        default: {
+          details.modified();
+          return copyAndInsertCollection(mutator, doubledBitpos, key, valColl);
+        }
+      }
+    }
+    
     @Override
     CompactSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
         final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details) {
@@ -2206,6 +2358,29 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
       return nodeOf(mutator, updatedBitmap, dst);
     }
+    
+    @Override
+    CompactSetMultimapNode<K, V> copyAndInsertCollection(final AtomicReference<Thread> mutator,
+        final long doubledBitpos, final K key, final ImmutableSet<V> valColl) {
+      final int idx = TUPLE_LENGTH * (arity(bitmap(), PATTERN_DATA_SINGLETON) + collIndex(doubledBitpos));
+
+      final Object[] src = this.nodes;
+      final Object[] dst = new Object[src.length + 2];
+
+      // copy 'src' and insert 2 element(s) at position 'idx'
+      System.arraycopy(src, 0, dst, 0, idx);
+      dst[idx + 0] = key;
+      dst[idx + 1] = valColl;
+      System.arraycopy(src, idx, dst, idx + 2, src.length - idx);
+
+      // generally: from 00 to 11
+      // here: set both bits individually
+      long updatedBitmap = bitmap();
+      updatedBitmap |= doubledBitpos;
+      updatedBitmap |= (doubledBitpos << 1);
+
+      return nodeOf(mutator, updatedBitmap, dst);
+    }    
 
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromSingletonToCollection(
@@ -3348,6 +3523,81 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     }
 
     @Override
+    public boolean __put(K key, ImmutableSet<V> valColl) {
+      if (mutator.get() == null) {
+        throw new IllegalStateException("Transient already frozen.");
+      }
+      
+//      if (valColl.size() == 1) {
+//        throw new IllegalStateException();
+//      }
+     
+      final int keyHash = key.hashCode();
+      final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
+
+      final CompactSetMultimapNode<K, V> newRootNode =
+          rootNode.updated(null, key, valColl, transformHashCode(keyHash), 0, details);
+
+      if (details.isModified()) {
+        if (details.hasReplacedValue()) {
+          if (details.getType() == EitherSingletonOrCollection.Type.SINGLETON) {
+            final int valHashOld = details.getReplacedValue().hashCode();
+            final int valHashNew = valColl.hashCode();
+
+            rootNode = newRootNode;
+//            hashCode += 0;
+//            cachedSize += 0;
+            
+//            return new TrieSetMultimap_HHAMT<K, V>(newRootNode,
+//                hashCode + ((keyHash ^ valHashNew)) - ((keyHash ^ valHashOld)), cachedSize);
+
+            throw new IllegalStateException();
+//            
+//            return true;
+          } else {
+            int sumOfReplacedHashes = 0;
+
+            for (V replaceValue : details.getReplacedCollection()) {
+              sumOfReplacedHashes += (keyHash ^ replaceValue.hashCode());
+            }
+
+            final int valHashNew = valColl.hashCode();
+
+            rootNode = newRootNode;
+//          hashCode += 0;
+//          cachedSize += 0;
+            
+//            return new TrieSetMultimap_HHAMT<K, V>(newRootNode,
+//                hashCode + ((keyHash ^ valHashNew)) - sumOfReplacedHashes,
+//                cachedSize - details.getReplacedCollection().size() + 1);
+
+            throw new IllegalStateException();            
+//            
+//            return true;         
+          }
+        }
+
+        int sumOfNewHashes = 0;
+        
+//        for (V newValue : valColl) {
+//          sumOfNewHashes += (keyHash ^ newValue.hashCode());
+//        }
+
+        rootNode = newRootNode;
+        hashCode += sumOfNewHashes;
+        cachedSize += valColl.size();
+        
+//        final int valHash = valColl.hashCode();
+//        return new TrieSetMultimap_HHAMT<K, V>(newRootNode, hashCode + ((keyHash ^ valHash)),
+//            cachedSize + 1);
+        
+        return true;
+      }
+
+      return false;
+    }
+        
+    @Override
     public boolean __insert(final K key, final V val) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -3360,10 +3610,13 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
           rootNode.inserted(mutator, key, val, transformHashCode(keyHash), 0, details);
 
       if (details.isModified()) {
-
-        final int valHashNew = val.hashCode();
+        /*
+         * TODO: Fix __put(K key, ImmutableSet<V> valColl) for batch insertion and re-enabled
+         * fast-fail check.
+         */
+//        final int valHashNew = val.hashCode();
         rootNode = newRootNode;
-        hashCode += (keyHash ^ valHashNew);
+//        hashCode += (keyHash ^ valHashNew);
         cachedSize += 1;
 
         if (DEBUG) {
@@ -3691,9 +3944,13 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
           return false;
         }
 
-        if (this.hashCode != that.hashCode) {
-          return false;
-        }
+        /*
+         * TODO: Fix __put(K key, ImmutableSet<V> valColl) for batch insertion and re-enabled
+         * fast-fail check.
+         */
+//        if (this.hashCode != that.hashCode) {
+//          return false;
+//        }
 
         return rootNode.equals(that.rootNode);
       } else if (other instanceof SetMultimap) {

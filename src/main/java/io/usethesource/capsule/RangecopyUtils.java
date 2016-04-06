@@ -431,6 +431,9 @@ public final class RangecopyUtils {
     abstract int getInt();
 
     abstract Object getObject();
+    
+    @Deprecated
+    abstract Object getAsObject();
   }
 
   static final class EitherAsInt extends EitherIntOrObject {
@@ -455,6 +458,12 @@ public final class RangecopyUtils {
       throw new UnsupportedOperationException(
           String.format("Requested type %s but actually found %s.", Type.OBJECT, Type.INT));
     }
+    
+    @Deprecated
+    @Override
+    Object getAsObject() {
+      return (Integer) value;
+    }
   }
 
   static final class EitherAsObject extends EitherIntOrObject {
@@ -478,6 +487,12 @@ public final class RangecopyUtils {
     @Override
     Object getObject() {
       return value;
+    }
+    
+    @Deprecated
+    @Override
+    Object getAsObject() {
+      return getObject();
     }
   }
 
