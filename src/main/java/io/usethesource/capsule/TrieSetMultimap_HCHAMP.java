@@ -1890,17 +1890,16 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       } else {
         return java.lang.Integer.bitCount(collMap());
       }
-
     }
 
     @Override
     boolean hasNodes() {
-      return rawMap1() != 0;
+      return nodeArity() != 0;
     }
 
     @Override
     int nodeArity() {
-      return java.lang.Integer.bitCount(rawMap1());
+      return java.lang.Integer.bitCount(nodeMap());
     }
 
     @Override
