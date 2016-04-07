@@ -9,8 +9,16 @@
  *******************************************************************************/
 package io.usethesource.capsule;
 
-import static io.usethesource.capsule.BitmapUtils.*;
-import static io.usethesource.capsule.SetMultimapUtils.*;
+import static io.usethesource.capsule.BitmapUtils.filter;
+import static io.usethesource.capsule.BitmapUtils.index01;
+import static io.usethesource.capsule.BitmapUtils.index10;
+import static io.usethesource.capsule.BitmapUtils.index11;
+import static io.usethesource.capsule.SetMultimapUtils.PATTERN_DATA_COLLECTION;
+import static io.usethesource.capsule.SetMultimapUtils.PATTERN_DATA_SINGLETON;
+import static io.usethesource.capsule.SetMultimapUtils.PATTERN_EMPTY;
+import static io.usethesource.capsule.SetMultimapUtils.PATTERN_NODE;
+import static io.usethesource.capsule.SetMultimapUtils.setBitPattern;
+import static io.usethesource.capsule.SetMultimapUtils.setOf;
 import static io.usethesource.capsule.TrieSetMultimap_HHAMT.EitherSingletonOrCollection.Type.COLLECTION;
 import static io.usethesource.capsule.TrieSetMultimap_HHAMT.EitherSingletonOrCollection.Type.SINGLETON;
 
@@ -36,7 +44,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import io.usethesource.capsule.TrieSetMultimap_HHAMT.EitherSingletonOrCollection.Type;
-import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized.AbstractSetMultimapNode;
 
 @SuppressWarnings("rawtypes")
 public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
