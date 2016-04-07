@@ -59,28 +59,28 @@ public class TrieSet<K> implements Set.Immutable<K> {
   }
 
   public static final <K> Set.Immutable<K> of(K key0, K key1) {
-    assert !Objects.equals(key0, key1);
-    
+    assert!Objects.equals(key0, key1);
+
     final int keyHash0 = key0.hashCode();
     final int keyHash1 = key1.hashCode();
-    
+
     CompactSetNode<K> newRootNode =
         CompactSetNode.mergeTwoKeyValPairs(key0, keyHash0, key1, keyHash1, 0);
 
     return new TrieSet<K>(newRootNode, keyHash0 + keyHash1, 2);
-  }  
-  
+  }
+
   @SuppressWarnings("unchecked")
   public static final <K> Set.Immutable<K> of(K... keys) {
     Set.Immutable<K> result = TrieSet.EMPTY_SET;
 
     for (final K key : keys) {
-      result = result.__insert(key);
+      result = result.insert(key);
     }
 
     return result;
   }
- 
+
   @SuppressWarnings("unchecked")
   public static final <K> Set.Transient<K> transientOf() {
     return TrieSet.EMPTY_SET.asTransient();
@@ -91,7 +91,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
     final Set.Transient<K> result = TrieSet.EMPTY_SET.asTransient();
 
     for (final K key : keys) {
-      result.__insert(key);
+      result.insert(key);
     }
 
     return result;
@@ -167,7 +167,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
     }
   }
 
-  public Set.Immutable<K> __insert(final K key) {
+  public Set.Immutable<K> insert(final K key) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -181,7 +181,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
     return this;
   }
 
-  public Set.Immutable<K> __insertEquivalent(final K key, final Comparator<Object> cmp) {
+  public Set.Immutable<K> insertEquivalent(final K key, final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -195,20 +195,20 @@ public class TrieSet<K> implements Set.Immutable<K> {
     return this;
   }
 
-  public Set.Immutable<K> __insertAll(final java.util.Set<? extends K> set) {
+  public Set.Immutable<K> insertAll(final java.util.Set<? extends K> set) {
     final Set.Transient<K> tmpTransient = this.asTransient();
-    tmpTransient.__insertAll(set);
-    return tmpTransient.freeze();
+    tmpTransient.insertAll(set);
+    return tmpTransient.asImmutable();
   }
 
-  public Set.Immutable<K> __insertAllEquivalent(final java.util.Set<? extends K> set,
-      final Comparator<Object> cmp) {
-    final Set.Transient<K> tmpTransient = this.asTransient();
-    tmpTransient.__insertAllEquivalent(set, cmp);
-    return tmpTransient.freeze();
-  }
+  // public Set.Immutable<K> insertAllEquivalent(final java.util.Set<? extends K> set,
+  // final Comparator<Object> cmp) {
+  // final Set.Transient<K> tmpTransient = this.asTransient();
+  // tmpTransient.insertAllEquivalent(set, cmp);
+  // return tmpTransient.asImmutable();
+  // }
 
-  public Set.Immutable<K> __remove(final K key) {
+  public Set.Immutable<K> remove(final K key) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -222,7 +222,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
     return this;
   }
 
-  public Set.Immutable<K> __removeEquivalent(final K key, final Comparator<Object> cmp) {
+  public Set.Immutable<K> removeEquivalent(final K key, final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -236,55 +236,55 @@ public class TrieSet<K> implements Set.Immutable<K> {
     return this;
   }
 
-  public Set.Immutable<K> __removeAll(final java.util.Set<? extends K> set) {
+  public Set.Immutable<K> removeAll(final java.util.Set<? extends K> set) {
     final Set.Transient<K> tmpTransient = this.asTransient();
-    tmpTransient.__removeAll(set);
-    return tmpTransient.freeze();
+    tmpTransient.removeAll(set);
+    return tmpTransient.asImmutable();
   }
 
-  public Set.Immutable<K> __removeAllEquivalent(final java.util.Set<? extends K> set,
-      final Comparator<Object> cmp) {
+  // public Set.Immutable<K> removeAllEquivalent(final java.util.Set<? extends K> set,
+  // final Comparator<Object> cmp) {
+  // final Set.Transient<K> tmpTransient = this.asTransient();
+  // tmpTransient.removeAllEquivalent(set, cmp);
+  // return tmpTransient.asImmutable();
+  // }
+
+  public Set.Immutable<K> retainAll(final java.util.Set<? extends K> set) {
     final Set.Transient<K> tmpTransient = this.asTransient();
-    tmpTransient.__removeAllEquivalent(set, cmp);
-    return tmpTransient.freeze();
+    tmpTransient.retainAll(set);
+    return tmpTransient.asImmutable();
   }
 
-  public Set.Immutable<K> __retainAll(final java.util.Set<? extends K> set) {
-    final Set.Transient<K> tmpTransient = this.asTransient();
-    tmpTransient.__retainAll(set);
-    return tmpTransient.freeze();
-  }
+  // public Set.Immutable<K> retainAllEquivalent(final Set.Transient<? extends K> transientSet,
+  // final Comparator<Object> cmp) {
+  // final Set.Transient<K> tmpTransient = this.asTransient();
+  // tmpTransient.retainAllEquivalent(transientSet, cmp);
+  // return tmpTransient.asImmutable();
+  // }
 
-  public Set.Immutable<K> __retainAllEquivalent(final Set.Transient<? extends K> transientSet,
-      final Comparator<Object> cmp) {
-    final Set.Transient<K> tmpTransient = this.asTransient();
-    tmpTransient.__retainAllEquivalent(transientSet, cmp);
-    return tmpTransient.freeze();
-  }
-
-  public boolean add(final K key) {
-    throw new UnsupportedOperationException();
-  }
-
-  public boolean addAll(final Collection<? extends K> c) {
-    throw new UnsupportedOperationException();
-  }
-
-  public void clear() {
-    throw new UnsupportedOperationException();
-  }
-
-  public boolean remove(final Object key) {
-    throw new UnsupportedOperationException();
-  }
-
-  public boolean removeAll(final Collection<?> c) {
-    throw new UnsupportedOperationException();
-  }
-
-  public boolean retainAll(final Collection<?> c) {
-    throw new UnsupportedOperationException();
-  }
+  // public boolean add(final K key) {
+  // throw new UnsupportedOperationException();
+  // }
+  //
+  // public boolean addAll(final Collection<? extends K> c) {
+  // throw new UnsupportedOperationException();
+  // }
+  //
+  // public void clear() {
+  // throw new UnsupportedOperationException();
+  // }
+  //
+  // public boolean remove(final Object key) {
+  // throw new UnsupportedOperationException();
+  // }
+  //
+  // public boolean removeAll(final Collection<?> c) {
+  // throw new UnsupportedOperationException();
+  // }
+  //
+  // public boolean retainAll(final Collection<?> c) {
+  // throw new UnsupportedOperationException();
+  // }
 
   @Override
   public boolean containsAll(final Collection<?> c) {
@@ -296,15 +296,15 @@ public class TrieSet<K> implements Set.Immutable<K> {
     return true;
   }
 
-  @Override
-  public boolean containsAllEquivalent(final Collection<?> c, final Comparator<Object> cmp) {
-    for (Object item : c) {
-      if (!containsEquivalent(item, cmp)) {
-        return false;
-      }
-    }
-    return true;
-  }
+  // @Override
+  // public boolean containsAllEquivalent(final Collection<?> c, final Comparator<Object> cmp) {
+  // for (Object item : c) {
+  // if (!containsEquivalent(item, cmp)) {
+  // return false;
+  // }
+  // }
+  // return true;
+  // }
 
   public int size() {
     return cachedSize;
@@ -322,28 +322,28 @@ public class TrieSet<K> implements Set.Immutable<K> {
     return new SetKeyIterator<>(rootNode);
   }
 
-//  @Override
-//  public Object[] toArray() {
-//    Object[] array = new Object[cachedSize];
-//
-//    int idx = 0;
-//    for (K key : this) {
-//      array[idx++] = key;
-//    }
-//
-//    return array;
-//  }
-//
-//  @Override
-//  public <T> T[] toArray(final T[] a) {
-//    List<K> list = new ArrayList<K>(cachedSize);
-//
-//    for (K key : this) {
-//      list.add(key);
-//    }
-//
-//    return list.toArray(a);
-//  }
+  // @Override
+  // public Object[] toArray() {
+  // Object[] array = new Object[cachedSize];
+  //
+  // int idx = 0;
+  // for (K key : this) {
+  // array[idx++] = key;
+  // }
+  //
+  // return array;
+  // }
+  //
+  // @Override
+  // public <T> T[] toArray(final T[] a) {
+  // List<K> list = new ArrayList<K>(cachedSize);
+  //
+  // for (K key : this) {
+  // list.add(key);
+  // }
+  //
+  // return list.toArray(a);
+  // }
 
   @Override
   public boolean equals(final Object other) {
@@ -1905,29 +1905,29 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return hash == targetHash && size == targetSize;
     }
 
-    public boolean add(final K key) {
-      throw new UnsupportedOperationException();
-    }
-
-    public boolean addAll(final Collection<? extends K> c) {
-      throw new UnsupportedOperationException();
-    }
-
-    public void clear() {
-      throw new UnsupportedOperationException();
-    }
-
-    public boolean remove(final Object key) {
-      throw new UnsupportedOperationException();
-    }
-
-    public boolean removeAll(final Collection<?> c) {
-      throw new UnsupportedOperationException();
-    }
-
-    public boolean retainAll(final Collection<?> c) {
-      throw new UnsupportedOperationException();
-    }
+    // public boolean add(final K key) {
+    // throw new UnsupportedOperationException();
+    // }
+    //
+    // public boolean addAll(final Collection<? extends K> c) {
+    // throw new UnsupportedOperationException();
+    // }
+    //
+    // public void clear() {
+    // throw new UnsupportedOperationException();
+    // }
+    //
+    // public boolean remove(final Object key) {
+    // throw new UnsupportedOperationException();
+    // }
+    //
+    // public boolean removeAll(final Collection<?> c) {
+    // throw new UnsupportedOperationException();
+    // }
+    //
+    // public boolean retainAll(final Collection<?> c) {
+    // throw new UnsupportedOperationException();
+    // }
 
     public boolean contains(final Object o) {
       try {
@@ -1982,7 +1982,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       }
     }
 
-    public boolean __insert(final K key) {
+    public boolean insert(final K key) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -2012,7 +2012,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return false;
     }
 
-    public boolean __insertEquivalent(final K key, final Comparator<Object> cmp) {
+    public boolean insertEquivalent(final K key, final Comparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -2042,27 +2042,28 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return false;
     }
 
-    public boolean __insertAll(final java.util.Set<? extends K> set) {
+    public boolean insertAll(final java.util.Set<? extends K> set) {
       boolean modified = false;
 
       for (final K key : set) {
-        modified |= this.__insert(key);
+        modified |= this.insert(key);
       }
 
       return modified;
     }
 
-    public boolean __insertAllEquivalent(final java.util.Set<? extends K> set, final Comparator<Object> cmp) {
+    public boolean insertAllEquivalent(final java.util.Set<? extends K> set,
+        final Comparator<Object> cmp) {
       boolean modified = false;
 
       for (final K key : set) {
-        modified |= this.__insertEquivalent(key, cmp);
+        modified |= this.insertEquivalent(key, cmp);
       }
 
       return modified;
     }
 
-    public boolean __remove(final K key) {
+    public boolean remove(final K key) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -2091,7 +2092,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return false;
     }
 
-    public boolean __removeEquivalent(final K key, final Comparator<Object> cmp) {
+    public boolean removeEquivalent(final K key, final Comparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -2120,27 +2121,28 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return false;
     }
 
-    public boolean __removeAll(final java.util.Set<? extends K> set) {
+    public boolean removeAll(final java.util.Set<? extends K> set) {
       boolean modified = false;
 
       for (final K key : set) {
-        modified |= this.__remove(key);
+        modified |= this.remove(key);
       }
 
       return modified;
     }
 
-    public boolean __removeAllEquivalent(final java.util.Set<? extends K> set, final Comparator<Object> cmp) {
+    public boolean removeAllEquivalent(final java.util.Set<? extends K> set,
+        final Comparator<Object> cmp) {
       boolean modified = false;
 
       for (final K key : set) {
-        modified |= this.__removeEquivalent(key, cmp);
+        modified |= this.removeEquivalent(key, cmp);
       }
 
       return modified;
     }
 
-    public boolean __retainAll(final java.util.Set<? extends K> set) {
+    public boolean retainAll(final java.util.Set<? extends K> set) {
       boolean modified = false;
 
       Iterator<K> thisIterator = iterator();
@@ -2154,20 +2156,20 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return modified;
     }
 
-    public boolean __retainAllEquivalent(final Set.Transient<? extends K> transientSet,
-        final Comparator<Object> cmp) {
-      boolean modified = false;
-
-      Iterator<K> thisIterator = iterator();
-      while (thisIterator.hasNext()) {
-        if (!transientSet.containsEquivalent(thisIterator.next(), cmp)) {
-          thisIterator.remove();
-          modified = true;
-        }
-      }
-
-      return modified;
-    }
+    // public boolean retainAllEquivalent(final Set.Transient<? extends K> transientSet,
+    // final Comparator<Object> cmp) {
+    // boolean modified = false;
+    //
+    // Iterator<K> thisIterator = iterator();
+    // while (thisIterator.hasNext()) {
+    // if (!transientSet.containsEquivalent(thisIterator.next(), cmp)) {
+    // thisIterator.remove();
+    // modified = true;
+    // }
+    // }
+    //
+    // return modified;
+    // }
 
     @Override
     public boolean containsAll(Collection<?> c) {
@@ -2179,15 +2181,15 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return true;
     }
 
-    @Override
-    public boolean containsAllEquivalent(Collection<?> c, Comparator<Object> cmp) {
-      for (Object item : c) {
-        if (!containsEquivalent(item, cmp)) {
-          return false;
-        }
-      }
-      return true;
-    }
+    // @Override
+    // public boolean containsAllEquivalent(Collection<?> c, Comparator<Object> cmp) {
+    // for (Object item : c) {
+    // if (!containsEquivalent(item, cmp)) {
+    // return false;
+    // }
+    // }
+    // return true;
+    // }
 
     public int size() {
       return cachedSize;
@@ -2220,32 +2222,32 @@ public class TrieSet<K> implements Set.Immutable<K> {
 
       public void remove() {
         // TODO: test removal at iteration rigorously
-        collection.__remove(lastKey);
+        collection.remove(lastKey);
       }
     }
 
-//    @Override
-//    public Object[] toArray() {
-//      Object[] array = new Object[cachedSize];
-//
-//      int idx = 0;
-//      for (K key : this) {
-//        array[idx++] = key;
-//      }
-//
-//      return array;
-//    }
-//
-//    @Override
-//    public <T> T[] toArray(final T[] a) {
-//      List<K> list = new ArrayList<K>(cachedSize);
-//
-//      for (K key : this) {
-//        list.add(key);
-//      }
-//
-//      return list.toArray(a);
-//    }
+    // @Override
+    // public Object[] toArray() {
+    // Object[] array = new Object[cachedSize];
+    //
+    // int idx = 0;
+    // for (K key : this) {
+    // array[idx++] = key;
+    // }
+    //
+    // return array;
+    // }
+    //
+    // @Override
+    // public <T> T[] toArray(final T[] a) {
+    // List<K> list = new ArrayList<K>(cachedSize);
+    //
+    // for (K key : this) {
+    // list.add(key);
+    // }
+    //
+    // return list.toArray(a);
+    // }
 
     @Override
     public boolean equals(final Object other) {
@@ -2286,7 +2288,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
     }
 
     @Override
-    public Set.Immutable<K> freeze() {
+    public Set.Immutable<K> asImmutable() {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }

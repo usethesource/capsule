@@ -10,24 +10,19 @@
 package io.usethesource.capsule;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
 
-public interface Set<K> {
+public interface Set<K> extends Iterable<K> {
 
   boolean containsAll(final Collection<?> c);
 
-  boolean containsAllEquivalent(final Collection<?> c, final Comparator<Object> cmp);
-
   K get(final Object o);
-
-  K getEquivalent(final Object o, final Comparator<Object> cmp);
 
   boolean contains(final Object o);
 
-  boolean containsEquivalent(final Object o, final Comparator<Object> cmp);
-
-  Iterator<K> keyIterator();
+  Iterator<K> iterator();
+  
+  
 
   public static interface Immutable<K> extends Set<K> {
 
@@ -35,57 +30,31 @@ public interface Set<K> {
 
     Set.Transient<K> asTransient();
 
-    Set.Immutable<K> __insert(final K key);
+    Set.Immutable<K> insert(final K key);
 
-    Set.Immutable<K> __insertEquivalent(final K key, final Comparator<Object> cmp);
+    Set.Immutable<K> insertAll(final java.util.Set<? extends K> set);
 
-    Set.Immutable<K> __insertAll(final java.util.Set<? extends K> set);
+    Set.Immutable<K> remove(final K key);
 
-    Set.Immutable<K> __insertAllEquivalent(final java.util.Set<? extends K> set,
-        final Comparator<Object> cmp);
+    Set.Immutable<K> removeAll(final java.util.Set<? extends K> set);
 
-    Set.Immutable<K> __remove(final K key);
-
-    Set.Immutable<K> __removeEquivalent(final K key, final Comparator<Object> cmp);
-
-    Set.Immutable<K> __removeAll(final java.util.Set<? extends K> set);
-
-    Set.Immutable<K> __removeAllEquivalent(final java.util.Set<? extends K> set,
-        final Comparator<Object> cmp);
-
-    Set.Immutable<K> __retainAll(final java.util.Set<? extends K> set);
-
-    Set.Immutable<K> __retainAllEquivalent(
-        final Set.Transient<? extends K> transientSet, final Comparator<Object> cmp);
+    Set.Immutable<K> retainAll(final java.util.Set<? extends K> set);
 
   }
 
   public static interface Transient<K> extends Set<K> {
 
-    Set.Immutable<K> freeze();
+    Set.Immutable<K> asImmutable();
 
-    boolean __insert(final K key);
+    boolean insert(final K key);
 
-    boolean __insertEquivalent(final K key, final Comparator<Object> cmp);
+    boolean insertAll(final java.util.Set<? extends K> set);
 
-    boolean __insertAll(final java.util.Set<? extends K> set);
+    boolean remove(final K key);
 
-    boolean __insertAllEquivalent(final java.util.Set<? extends K> set,
-        final Comparator<Object> cmp);
+    boolean removeAll(final java.util.Set<? extends K> set);
 
-    boolean __remove(final K key);
-
-    boolean __removeEquivalent(final K key, final Comparator<Object> cmp);
-
-    boolean __removeAll(final java.util.Set<? extends K> set);
-
-    boolean __removeAllEquivalent(final java.util.Set<? extends K> set,
-        final Comparator<Object> cmp);
-
-    boolean __retainAll(final java.util.Set<? extends K> set);
-
-    boolean __retainAllEquivalent(final Set.Transient<? extends K> transientSet,
-        final Comparator<Object> cmp);
+    boolean retainAll(final java.util.Set<? extends K> set);
 
   }
 
