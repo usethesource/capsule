@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 @SuppressWarnings("rawtypes")
@@ -198,13 +197,13 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
     return this;
   }
 
-  public ImmutableSet<K> __insertAll(final Set<? extends K> set) {
+  public ImmutableSet<K> __insertAll(final java.util.Set<? extends K> set) {
     final TransientSet<K> tmpTransient = this.asTransient();
     tmpTransient.__insertAll(set);
     return tmpTransient.freeze();
   }
 
-  public ImmutableSet<K> __insertAllEquivalent(final Set<? extends K> set,
+  public ImmutableSet<K> __insertAllEquivalent(final java.util.Set<? extends K> set,
       final Comparator<Object> cmp) {
     final TransientSet<K> tmpTransient = this.asTransient();
     tmpTransient.__insertAllEquivalent(set, cmp);
@@ -239,20 +238,20 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
     return this;
   }
 
-  public ImmutableSet<K> __removeAll(final Set<? extends K> set) {
+  public ImmutableSet<K> __removeAll(final java.util.Set<? extends K> set) {
     final TransientSet<K> tmpTransient = this.asTransient();
     tmpTransient.__removeAll(set);
     return tmpTransient.freeze();
   }
 
-  public ImmutableSet<K> __removeAllEquivalent(final Set<? extends K> set,
+  public ImmutableSet<K> __removeAllEquivalent(final java.util.Set<? extends K> set,
       final Comparator<Object> cmp) {
     final TransientSet<K> tmpTransient = this.asTransient();
     tmpTransient.__removeAllEquivalent(set, cmp);
     return tmpTransient.freeze();
   }
 
-  public ImmutableSet<K> __retainAll(final Set<? extends K> set) {
+  public ImmutableSet<K> __retainAll(final java.util.Set<? extends K> set) {
     final TransientSet<K> tmpTransient = this.asTransient();
     tmpTransient.__retainAll(set);
     return tmpTransient.freeze();
@@ -369,8 +368,8 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
       }
 
       return rootNode.equals(that.rootNode);
-    } else if (other instanceof Set) {
-      Set that = (Set) other;
+    } else if (other instanceof java.util.Set) {
+      java.util.Set that = (java.util.Set) other;
 
       if (this.size() != that.size())
         return false;
@@ -2045,7 +2044,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
       return false;
     }
 
-    public boolean __insertAll(final Set<? extends K> set) {
+    public boolean __insertAll(final java.util.Set<? extends K> set) {
       boolean modified = false;
 
       for (final K key : set) {
@@ -2055,7 +2054,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
       return modified;
     }
 
-    public boolean __insertAllEquivalent(final Set<? extends K> set, final Comparator<Object> cmp) {
+    public boolean __insertAllEquivalent(final java.util.Set<? extends K> set, final Comparator<Object> cmp) {
       boolean modified = false;
 
       for (final K key : set) {
@@ -2123,7 +2122,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
       return false;
     }
 
-    public boolean __removeAll(final Set<? extends K> set) {
+    public boolean __removeAll(final java.util.Set<? extends K> set) {
       boolean modified = false;
 
       for (final K key : set) {
@@ -2133,7 +2132,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
       return modified;
     }
 
-    public boolean __removeAllEquivalent(final Set<? extends K> set, final Comparator<Object> cmp) {
+    public boolean __removeAllEquivalent(final java.util.Set<? extends K> set, final Comparator<Object> cmp) {
       boolean modified = false;
 
       for (final K key : set) {
@@ -2143,7 +2142,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
       return modified;
     }
 
-    public boolean __retainAll(final Set<? extends K> set) {
+    public boolean __retainAll(final java.util.Set<? extends K> set) {
       boolean modified = false;
 
       Iterator<K> thisIterator = iterator();
@@ -2272,7 +2271,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
 
         return rootNode.equals(that.rootNode);
       } else if (other instanceof Set) {
-        Set that = (Set) other;
+        java.util.Set that = (java.util.Set) other;
 
         if (this.size() != that.size())
           return false;
