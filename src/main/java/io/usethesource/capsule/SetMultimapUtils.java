@@ -106,12 +106,26 @@ public class SetMultimapUtils {
     }
   }  
 
+  @Deprecated
   static final <T> ImmutableSet<T> setOf(T key1) {
     return TrieSet_5Bits.of(key1);
   }
 
+  @Deprecated
   static final <T> ImmutableSet<T> setOf(T key1, T key2) {
     return TrieSet_5Bits.of(key1, key2);
   }  
+
+  static final <T> Set.Immutable<T> setOfNew() {
+    return TrieSet.of();
+  }
+  
+  static final <T> Set.Immutable<T> setOfNew(T key1) {
+    return TrieSet.of(key1);
+  }
+
+  static final <T> Set.Immutable<T> setOfNew(T key1, T key2) {
+    return TrieSet.of(key1, key2);
+  }    
   
 }

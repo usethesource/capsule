@@ -20,12 +20,16 @@ public interface SetMultimap<K, V>
   long size();
   
   boolean isEmpty();
-  
-  boolean containsKey(final Object o);
 
-  boolean containsValue(final Object o);
+  boolean contains(final K key);
 
-  boolean containsEntry(final Object o0, final Object o1);
+  boolean contains(final K key, V val);
+
+//  boolean containsKey(final Object o);
+//
+//  boolean containsValue(final Object o);
+//
+//  boolean containsEntry(final Object o0, final Object o1);
 
   // Set<V> get(final java.lang.Object o);
 
@@ -67,6 +71,8 @@ public interface SetMultimap<K, V>
 
   @Override
   boolean equals(Object other);
+  
+  SetMultimap.Immutable<K, V> asImmutable();  
 
   public static interface Immutable<K, V> extends SetMultimap<K, V> {
 
@@ -82,11 +88,11 @@ public interface SetMultimap<K, V>
     
     SetMultimap.Immutable<K, V> remove(final K key);
     
-    SetMultimap.Immutable<K, V> insertAll(final SetMultimap<? extends K, ? extends V> setMultimap);
+    SetMultimap.Immutable<K, V> union(final SetMultimap<? extends K, ? extends V> setMultimap);
 
-    SetMultimap.Immutable<K, V> removeAll(final SetMultimap<? extends K, ? extends V> setMultimap);
+    SetMultimap.Immutable<K, V> intersect(final SetMultimap<? extends K, ? extends V> setMultimap);
 
-    SetMultimap.Immutable<K, V> retainAll(final SetMultimap<? extends K, ? extends V> setMultimap);
+    SetMultimap.Immutable<K, V> complement(final SetMultimap<? extends K, ? extends V> setMultimap);
 
     boolean isTransientSupported();
 
@@ -96,9 +102,9 @@ public interface SetMultimap<K, V>
 
   public static interface Transient<K, V> extends SetMultimap<K, V> {
 
-    Set<V> put(final K key, final V val);
+    boolean put(final K key, final V val); // TODO: return Set<V> instead of boolean?
 
-    Set<V> put(final K key, final Set<V> values);
+    boolean put(final K key, final Set<V> values); // TODO: return Set<V> instead of boolean?
 
     boolean insert(final K key, final V val);
 
@@ -108,13 +114,11 @@ public interface SetMultimap<K, V>
 
     boolean remove(final K key);
 
-    boolean insertAll(final SetMultimap<? extends K, ? extends V> setMultimap);
+    boolean union(final SetMultimap<? extends K, ? extends V> setMultimap);
 
-    boolean removeAll(final SetMultimap<? extends K, ? extends V> setMultimap);
+    boolean intersect(final SetMultimap<? extends K, ? extends V> setMultimap);
 
-    boolean retainAll(final SetMultimap<? extends K, ? extends V> setMultimap);
-
-    SetMultimap.Immutable<K, V> asImmutable();
+    boolean complement(final SetMultimap<? extends K, ? extends V> setMultimap);
 
   }
 
