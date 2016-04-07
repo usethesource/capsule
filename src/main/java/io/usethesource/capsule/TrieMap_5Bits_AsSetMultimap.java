@@ -230,14 +230,14 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
     throw new UnsupportedOperationException();
   }
 
-  public ImmutableSetMultimap<K, V> __insertAll(final SetMultimap<? extends K, ? extends V> map) {
+  public ImmutableSetMultimap<K, V> __insertAll(final SetMultimap_Legacy<? extends K, ? extends V> map) {
     final TransientSetMultimap<K, V> tmpTransient = this.asTransient();
     tmpTransient.__insertAll(map);
     return tmpTransient.freeze();
   }
 
   public ImmutableSetMultimap<K, V> __insertAllEquivalent(
-      final SetMultimap<? extends K, ? extends V> map, final Comparator<Object> cmp) {
+      final SetMultimap_Legacy<? extends K, ? extends V> map, final Comparator<Object> cmp) {
     final TransientSetMultimap<K, V> tmpTransient = this.asTransient();
     tmpTransient.__insertAllEquivalent(map, cmp);
     return tmpTransient.freeze();
@@ -291,7 +291,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
     throw new UnsupportedOperationException();
   }
 
-  public void putAll(final SetMultimap<? extends K, ? extends V> m) {
+  public void putAll(final SetMultimap_Legacy<? extends K, ? extends V> m) {
     throw new UnsupportedOperationException();
   }
 
@@ -2249,7 +2249,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
       throw new UnsupportedOperationException();
     }
 
-    public void putAll(final SetMultimap<? extends K, ? extends V> m) {
+    public void putAll(final SetMultimap_Legacy<? extends K, ? extends V> m) {
       throw new UnsupportedOperationException();
     }
 
@@ -2455,7 +2455,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
       return false;
     }
 
-    public boolean __insertAll(final SetMultimap<? extends K, ? extends V> map) {
+    public boolean __insertAll(final SetMultimap_Legacy<? extends K, ? extends V> map) {
       boolean modified = false;
 
       for (Map.Entry<? extends K, ? extends V> entry : map.entrySet()) {
@@ -2465,7 +2465,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
       return modified;
     }
 
-    public boolean __insertAllEquivalent(final SetMultimap<? extends K, ? extends V> map,
+    public boolean __insertAllEquivalent(final SetMultimap_Legacy<? extends K, ? extends V> map,
         final Comparator<Object> cmp) {
       boolean modified = false;
 

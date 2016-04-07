@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-public interface TransientSetMultimap<K, V> extends SetMultimap<K, V> {
+public interface TransientSetMultimap<K, V> extends SetMultimap_Legacy<K, V> {
 
   ImmutableSet<V> get(final Object o);
 
@@ -44,9 +44,9 @@ public interface TransientSetMultimap<K, V> extends SetMultimap<K, V> {
 
   boolean __insertEquivalent(final K key, final V val, final Comparator<Object> cmp);
 
-  boolean __insertAll(final SetMultimap<? extends K, ? extends V> setMultimap);
+  boolean __insertAll(final SetMultimap_Legacy<? extends K, ? extends V> setMultimap);
 
-  boolean __insertAllEquivalent(final SetMultimap<? extends K, ? extends V> setMultimap,
+  boolean __insertAllEquivalent(final SetMultimap_Legacy<? extends K, ? extends V> setMultimap,
       final Comparator<Object> cmp);
 
   boolean __removeTuple(final K key, final V val);

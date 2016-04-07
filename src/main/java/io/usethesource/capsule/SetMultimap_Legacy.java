@@ -17,13 +17,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public interface SetMultimap<K, V> {
+public interface SetMultimap_Legacy<K, V> {
 
 	V put(final K key, final V val);
 
 	V remove(final java.lang.Object key, final java.lang.Object val);
 
-	void putAll(final SetMultimap<? extends K, ? extends V> multimap);
+	void putAll(final SetMultimap_Legacy<? extends K, ? extends V> multimap);
 
 	boolean containsValue(Object value);	
 

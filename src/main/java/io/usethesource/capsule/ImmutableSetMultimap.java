@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-public interface ImmutableSetMultimap<K, V> extends SetMultimap<K, V> {
+public interface ImmutableSetMultimap<K, V> extends SetMultimap_Legacy<K, V> {
 
   ImmutableSet<V> get(final Object o);
 
@@ -49,10 +49,10 @@ public interface ImmutableSetMultimap<K, V> extends SetMultimap<K, V> {
   ImmutableSetMultimap<K, V> __insertEquivalent(final K key, final V val,
       final Comparator<Object> cmp);
 
-  ImmutableSetMultimap<K, V> __insertAll(final SetMultimap<? extends K, ? extends V> setMultimap);
+  ImmutableSetMultimap<K, V> __insertAll(final SetMultimap_Legacy<? extends K, ? extends V> setMultimap);
 
   ImmutableSetMultimap<K, V> __insertAllEquivalent(
-      final SetMultimap<? extends K, ? extends V> setMultimap, final Comparator<Object> cmp);
+      final SetMultimap_Legacy<? extends K, ? extends V> setMultimap, final Comparator<Object> cmp);
 
   
   

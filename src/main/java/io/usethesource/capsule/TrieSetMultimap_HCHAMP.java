@@ -254,7 +254,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
   @Override
   public ImmutableSetMultimap<K, V> __insertAll(
-      final SetMultimap<? extends K, ? extends V> setMultimap) {
+      final SetMultimap_Legacy<? extends K, ? extends V> setMultimap) {
     final TransientSetMultimap<K, V> tmpTransient = this.asTransient();
     tmpTransient.__insertAll(setMultimap);
     return tmpTransient.freeze();
@@ -262,7 +262,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
   @Override
   public ImmutableSetMultimap<K, V> __insertAllEquivalent(
-      final SetMultimap<? extends K, ? extends V> setMultimap, final Comparator<Object> cmp) {
+      final SetMultimap_Legacy<? extends K, ? extends V> setMultimap, final Comparator<Object> cmp) {
     final TransientSetMultimap<K, V> tmpTransient = this.asTransient();
     tmpTransient.__insertAllEquivalent(setMultimap, cmp);
     return tmpTransient.freeze();
@@ -333,7 +333,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
   }
 
   @Override
-  public void putAll(final SetMultimap<? extends K, ? extends V> m) {
+  public void putAll(final SetMultimap_Legacy<? extends K, ? extends V> m) {
     throw new UnsupportedOperationException();
   }
 
@@ -542,8 +542,8 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       }
 
       return rootNode.equals(that.rootNode);
-    } else if (other instanceof SetMultimap) {
-      SetMultimap that = (SetMultimap) other;
+    } else if (other instanceof SetMultimap_Legacy) {
+      SetMultimap_Legacy that = (SetMultimap_Legacy) other;
 
       if (this.size() != that.size())
         return false;
@@ -3020,7 +3020,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     }
 
     @Override
-    public void putAll(final SetMultimap<? extends K, ? extends V> m) {
+    public void putAll(final SetMultimap_Legacy<? extends K, ? extends V> m) {
       throw new UnsupportedOperationException();
     }
 
@@ -3152,7 +3152,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     }
 
     @Override
-    public boolean __insertAll(final SetMultimap<? extends K, ? extends V> setMultimap) {
+    public boolean __insertAll(final SetMultimap_Legacy<? extends K, ? extends V> setMultimap) {
       boolean modified = false;
 
       for (Map.Entry<? extends K, ? extends V> entry : setMultimap.entrySet()) {
@@ -3163,7 +3163,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     }
 
     @Override
-    public boolean __insertAllEquivalent(final SetMultimap<? extends K, ? extends V> setMultimap,
+    public boolean __insertAllEquivalent(final SetMultimap_Legacy<? extends K, ? extends V> setMultimap,
         final Comparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented.");
     }
@@ -3463,8 +3463,8 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
         }
 
         return rootNode.equals(that.rootNode);
-      } else if (other instanceof SetMultimap) {
-        SetMultimap that = (SetMultimap) other;
+      } else if (other instanceof SetMultimap_Legacy) {
+        SetMultimap_Legacy that = (SetMultimap_Legacy) other;
 
         if (this.size() != that.size())
           return false;
