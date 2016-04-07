@@ -31,12 +31,12 @@ public class TrieSet<K> implements Set.Immutable<K> {
   private static final boolean DEBUG = false;
 
   private final AbstractSetNode<K> rootNode;
-  private final int hashCode;
+  private final int cachedHashCode;
   private final int cachedSize;
 
   TrieSet(AbstractSetNode<K> rootNode, int hashCode, int cachedSize) {
     this.rootNode = rootNode;
-    this.hashCode = hashCode;
+    this.cachedHashCode = hashCode;
     this.cachedSize = cachedSize;
     if (DEBUG) {
       assert checkHashCodeAndSize(hashCode, cachedSize);
@@ -136,37 +136,42 @@ public class TrieSet<K> implements Set.Immutable<K> {
     }
   }
 
-  public K get(final Object o) {
-    try {
-      @SuppressWarnings("unchecked")
-      final K key = (K) o;
-      final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
-
-      if (result.isPresent()) {
-        return result.get();
-      } else {
-        return null;
-      }
-    } catch (ClassCastException unused) {
-      return null;
-    }
+  @Override
+  public Optional<K> apply(K key) {
+    return rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
   }
-
-  public K getEquivalent(final Object o, final Comparator<Object> cmp) {
-    try {
-      @SuppressWarnings("unchecked")
-      final K key = (K) o;
-      final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
-
-      if (result.isPresent()) {
-        return result.get();
-      } else {
-        return null;
-      }
-    } catch (ClassCastException unused) {
-      return null;
-    }
-  }
+  
+//  public K get(final Object o) {
+//    try {
+//      @SuppressWarnings("unchecked")
+//      final K key = (K) o;
+//      final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
+//
+//      if (result.isPresent()) {
+//        return result.get();
+//      } else {
+//        return null;
+//      }
+//    } catch (ClassCastException unused) {
+//      return null;
+//    }
+//  }
+//
+//  public K getEquivalent(final Object o, final Comparator<Object> cmp) {
+//    try {
+//      @SuppressWarnings("unchecked")
+//      final K key = (K) o;
+//      final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
+//
+//      if (result.isPresent()) {
+//        return result.get();
+//      } else {
+//        return null;
+//      }
+//    } catch (ClassCastException unused) {
+//      return null;
+//    }
+//  }
 
   public Set.Immutable<K> insert(final K key) {
     final int keyHash = key.hashCode();
@@ -176,7 +181,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
         rootNode.updated(null, key, transformHashCode(keyHash), 0, details);
 
     if (details.isModified()) {
-      return new TrieSet<K>(newRootNode, hashCode + keyHash, cachedSize + 1);
+      return new TrieSet<K>(newRootNode, cachedHashCode ^ keyHash, cachedSize + 1);
     }
 
     return this;
@@ -190,7 +195,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
         rootNode.updated(null, key, transformHashCode(keyHash), 0, details, cmp);
 
     if (details.isModified()) {
-      return new TrieSet<K>(newRootNode, hashCode + keyHash, cachedSize + 1);
+      return new TrieSet<K>(newRootNode, cachedHashCode ^ keyHash, cachedSize + 1);
     }
 
     return this;
@@ -217,7 +222,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
         rootNode.removed(null, key, transformHashCode(keyHash), 0, details);
 
     if (details.isModified()) {
-      return new TrieSet<K>(newRootNode, hashCode - keyHash, cachedSize - 1);
+      return new TrieSet<K>(newRootNode, cachedHashCode ^ keyHash, cachedSize - 1);
     }
 
     return this;
@@ -231,7 +236,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
         rootNode.removed(null, key, transformHashCode(keyHash), 0, details, cmp);
 
     if (details.isModified()) {
-      return new TrieSet<K>(newRootNode, hashCode - keyHash, cachedSize - 1);
+      return new TrieSet<K>(newRootNode, cachedHashCode ^ keyHash, cachedSize - 1);
     }
 
     return this;
@@ -362,7 +367,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
         return false;
       }
 
-      if (this.hashCode != that.hashCode) {
+      if (this.cachedHashCode != that.cachedHashCode) {
         return false;
       }
 
@@ -381,7 +386,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
 
   @Override
   public int hashCode() {
-    return hashCode;
+    return cachedHashCode;
   }
 
   @Override
@@ -1879,16 +1884,16 @@ public class TrieSet<K> implements Set.Immutable<K> {
   static final class TransientTrieSet<K> implements Set.Transient<K> {
     final private AtomicReference<Thread> mutator;
     private AbstractSetNode<K> rootNode;
-    private int hashCode;
+    private int cachedHashCode;
     private int cachedSize;
 
     TransientTrieSet(TrieSet<K> trieSet_5Bits) {
       this.mutator = new AtomicReference<Thread>(Thread.currentThread());
       this.rootNode = trieSet_5Bits.rootNode;
-      this.hashCode = trieSet_5Bits.hashCode;
+      this.cachedHashCode = trieSet_5Bits.cachedHashCode;
       this.cachedSize = trieSet_5Bits.cachedSize;
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
     }
 
@@ -1950,38 +1955,43 @@ public class TrieSet<K> implements Set.Immutable<K> {
       }
     }
 
-    public K get(final Object o) {
-      try {
-        @SuppressWarnings("unchecked")
-        final K key = (K) o;
-        final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
-
-        if (result.isPresent()) {
-          return result.get();
-        } else {
-          return null;
-        }
-      } catch (ClassCastException unused) {
-        return null;
-      }
-    }
-
-    public K getEquivalent(final Object o, final Comparator<Object> cmp) {
-      try {
-        @SuppressWarnings("unchecked")
-        final K key = (K) o;
-        final Optional<K> result =
-            rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
-
-        if (result.isPresent()) {
-          return result.get();
-        } else {
-          return null;
-        }
-      } catch (ClassCastException unused) {
-        return null;
-      }
-    }
+    @Override
+    public Optional<K> apply(K key) {
+      return rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
+    }    
+    
+//    public K get(final Object o) {
+//      try {
+//        @SuppressWarnings("unchecked")
+//        final K key = (K) o;
+//        final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
+//
+//        if (result.isPresent()) {
+//          return result.get();
+//        } else {
+//          return null;
+//        }
+//      } catch (ClassCastException unused) {
+//        return null;
+//      }
+//    }
+//
+//    public K getEquivalent(final Object o, final Comparator<Object> cmp) {
+//      try {
+//        @SuppressWarnings("unchecked")
+//        final K key = (K) o;
+//        final Optional<K> result =
+//            rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
+//
+//        if (result.isPresent()) {
+//          return result.get();
+//        } else {
+//          return null;
+//        }
+//      } catch (ClassCastException unused) {
+//        return null;
+//      }
+//    }
 
     public boolean insert(final K key) {
       if (mutator.get() == null) {
@@ -1997,18 +2007,18 @@ public class TrieSet<K> implements Set.Immutable<K> {
       if (details.isModified()) {
 
         rootNode = newRootNode;
-        hashCode += keyHash;
+        cachedHashCode ^= keyHash;
         cachedSize += 1;
 
         if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
+          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
         }
         return true;
 
       }
 
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
       return false;
     }
@@ -2027,18 +2037,18 @@ public class TrieSet<K> implements Set.Immutable<K> {
       if (details.isModified()) {
 
         rootNode = newRootNode;
-        hashCode += keyHash;
+        cachedHashCode ^= keyHash;
         cachedSize += 1;
 
         if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
+          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
         }
         return true;
 
       }
 
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
       return false;
     }
@@ -2077,17 +2087,17 @@ public class TrieSet<K> implements Set.Immutable<K> {
 
       if (details.isModified()) {
         rootNode = newRootNode;
-        hashCode = hashCode - keyHash;
+        cachedHashCode = cachedHashCode ^ keyHash;
         cachedSize = cachedSize - 1;
 
         if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
+          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
         }
         return true;
       }
 
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
 
       return false;
@@ -2106,17 +2116,17 @@ public class TrieSet<K> implements Set.Immutable<K> {
 
       if (details.isModified()) {
         rootNode = newRootNode;
-        hashCode = hashCode - keyHash;
+        cachedHashCode = cachedHashCode ^ keyHash;
         cachedSize = cachedSize - 1;
 
         if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
+          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
         }
         return true;
       }
 
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
 
       return false;
@@ -2266,7 +2276,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
           return false;
         }
 
-        if (this.hashCode != that.hashCode) {
+        if (this.cachedHashCode != that.cachedHashCode) {
           return false;
         }
 
@@ -2285,7 +2295,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
 
     @Override
     public int hashCode() {
-      return hashCode;
+      return cachedHashCode;
     }
 
     @Override
@@ -2295,7 +2305,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       }
 
       mutator.set(null);
-      return new TrieSet<K>(rootNode, hashCode, cachedSize);
+      return new TrieSet<K>(rootNode, cachedHashCode, cachedSize);
     }
   }
 
