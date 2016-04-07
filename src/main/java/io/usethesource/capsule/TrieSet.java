@@ -312,7 +312,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
   // return true;
   // }
 
-  public int size() {
+  public long size() {
     return cachedSize;
   }
 
@@ -2202,7 +2202,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
     // return true;
     // }
 
-    public int size() {
+    public long size() {
       return cachedSize;
     }
 

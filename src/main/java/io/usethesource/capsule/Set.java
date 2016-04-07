@@ -16,6 +16,10 @@ import java.util.function.Function;
 
 public interface Set<K> extends Iterable<K>, Function<K, Optional<K>> {
 
+  long size();
+
+  boolean isEmpty();
+  
   boolean contains(final Object o);
 
   boolean containsAll(final Collection<?> c);
@@ -27,9 +31,9 @@ public interface Set<K> extends Iterable<K>, Function<K, Optional<K>> {
 
   /**
    * The hash code of a set is order independent by combining the hashes of the elements via a
-   * bitwise XOR operation.
+   * bitwise xor operation.
    * 
-   * @return XOR reduction of all hashes of elements
+   * @return xor reduction of all hashes of elements
    */
   @Override
   int hashCode();
