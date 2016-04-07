@@ -47,12 +47,12 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
   private static final boolean DEBUG = false;
 
   private final AbstractSetMultimapNode<K, V> rootNode;
-  private final int hashCode;
+  private final int cachedHashCode;
   private final int cachedSize;
 
   TrieSetMultimap(AbstractSetMultimapNode<K, V> rootNode, int hashCode, long cachedSize) {
     this.rootNode = rootNode;
-    this.hashCode = hashCode;
+    this.cachedHashCode = hashCode;
     this.cachedSize = Math.toIntExact(cachedSize); // does not support long yet
     if (DEBUG) {
       assert checkHashCodeAndSize(hashCode, cachedSize);
@@ -184,24 +184,26 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
           final int valHashNew = val.hashCode();
 
           return new TrieSetMultimap<K, V>(newRootNode,
-              hashCode + ((keyHash ^ valHashNew)) - ((keyHash ^ valHashOld)), cachedSize);
+              cachedHashCode ^ ((keyHash ^ valHashNew)) ^ ((keyHash ^ valHashOld)), cachedSize);
         } else {
-          int sumOfReplacedHashes = 0;
-
-          for (V replaceValue : details.getReplacedCollection()) {
-            sumOfReplacedHashes += (keyHash ^ replaceValue.hashCode());
+          final int sumOfReplacedHashes;
+          
+          if ((1 + details.getReplacedCollection().size()) % 2 == 0) {
+            sumOfReplacedHashes = details.getReplacedCollection().hashCode();
+          } else {
+            sumOfReplacedHashes = details.getReplacedCollection().hashCode() ^ keyHash;
           }
-
+           
           final int valHashNew = val.hashCode();
 
           return new TrieSetMultimap<K, V>(newRootNode,
-              hashCode + ((keyHash ^ valHashNew)) - sumOfReplacedHashes,
+              cachedHashCode ^ ((keyHash ^ valHashNew)) ^ sumOfReplacedHashes,
               cachedSize - details.getReplacedCollection().size() + 1);
         }
       }
 
       final int valHash = val.hashCode();
-      return new TrieSetMultimap<K, V>(newRootNode, hashCode + ((keyHash ^ valHash)),
+      return new TrieSetMultimap<K, V>(newRootNode, cachedHashCode ^ ((keyHash ^ valHash)),
           cachedSize + 1);
     }
 
@@ -223,7 +225,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
     if (details.isModified()) {
       final int valHash = val.hashCode();
-      return new TrieSetMultimap<K, V>(newRootNode, hashCode + ((keyHash ^ valHash)),
+      return new TrieSetMultimap<K, V>(newRootNode, cachedHashCode ^ ((keyHash ^ valHash)),
           cachedSize + 1);
     }
 
@@ -246,7 +248,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
     if (details.isModified()) {
       assert details.hasReplacedValue();
       final int valHash = details.getReplacedValue().hashCode();
-      return new TrieSetMultimap<K, V>(newRootNode, hashCode - ((keyHash ^ valHash)),
+      return new TrieSetMultimap<K, V>(newRootNode, cachedHashCode ^ ((keyHash ^ valHash)),
           cachedSize - 1);
     }
 
@@ -266,16 +268,18 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
       if (details.getType() == EitherSingletonOrCollection.Type.SINGLETON) {
         final int valHash = details.getReplacedValue().hashCode();
-        return new TrieSetMultimap<K, V>(newRootNode, hashCode - ((keyHash ^ valHash)),
+        return new TrieSetMultimap<K, V>(newRootNode, cachedHashCode ^ ((keyHash ^ valHash)),
             cachedSize - 1);
       } else {
-        int sumOfReplacedHashes = 0;
-
-        for (V replaceValue : details.getReplacedCollection()) {
-          sumOfReplacedHashes += (keyHash ^ replaceValue.hashCode());
+        final int sumOfReplacedHashes;
+        
+        if ((details.getReplacedCollection().size()) % 2 == 0) {
+          sumOfReplacedHashes = details.getReplacedCollection().hashCode();
+        } else {
+          sumOfReplacedHashes = details.getReplacedCollection().hashCode() ^ keyHash;
         }
-
-        return new TrieSetMultimap<K, V>(newRootNode, hashCode - sumOfReplacedHashes,
+        
+        return new TrieSetMultimap<K, V>(newRootNode, cachedHashCode ^ sumOfReplacedHashes,
             cachedSize - details.getReplacedCollection().size());
       }
     }
@@ -522,7 +526,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
         return false;
       }
 
-      if (this.hashCode != that.hashCode) {
+      if (this.cachedHashCode != that.cachedHashCode) {
         return false;
       }
 
@@ -562,7 +566,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
   @Override
   public int hashCode() {
-    return hashCode;
+    return cachedHashCode;
   }
 
   @Override
@@ -3373,16 +3377,16 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
   static final class TransientTrieSetMultimap<K, V> implements SetMultimap.Transient<K, V> {
     final private AtomicReference<Thread> mutator;
     private AbstractSetMultimapNode<K, V> rootNode;
-    private int hashCode;
+    private int cachedHashCode;
     private long cachedSize;
 
     TransientTrieSetMultimap(TrieSetMultimap<K, V> TrieSetMultimap) {
       this.mutator = new AtomicReference<Thread>(Thread.currentThread());
       this.rootNode = TrieSetMultimap.rootNode;
-      this.hashCode = TrieSetMultimap.hashCode;
+      this.cachedHashCode = TrieSetMultimap.cachedHashCode;
       this.cachedSize = TrieSetMultimap.cachedSize;
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
     }
 
@@ -3482,10 +3486,10 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
             if ((1 + values.size()) % 2 == 0) {
               // keyHash count is even
-              hashCode = hashCode ^ valHashOld ^ valHashNew;
+              cachedHashCode = cachedHashCode ^ valHashOld ^ valHashNew;
             } else {
               // keyHash count is odd
-              hashCode = hashCode ^ valHashOld ^ valHashNew ^ keyHash;
+              cachedHashCode = cachedHashCode ^ valHashOld ^ valHashNew ^ keyHash;
             }
 
             // return setOfNew(details.getReplacedValue());
@@ -3502,10 +3506,10 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
             if ((details.getReplacedCollection().size() + values.size()) % 2 == 0) {
               // keyHash count is even
-              hashCode = hashCode ^ valHashOld ^ valHashNew;
+              cachedHashCode = cachedHashCode ^ valHashOld ^ valHashNew;
             } else {
               // keyHash count is odd
-              hashCode = hashCode ^ valHashOld ^ valHashNew ^ keyHash;
+              cachedHashCode = cachedHashCode ^ valHashOld ^ valHashNew ^ keyHash;
             }
 
             // TODO: likely expensive
@@ -3523,10 +3527,10 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
         if ((values.size()) % 2 == 0) {
           // keyHash count is even
-          hashCode = hashCode ^ valHashOld ^ valHashNew;
+          cachedHashCode = cachedHashCode ^ valHashOld ^ valHashNew;
         } else {
           // keyHash count is odd
-          hashCode = hashCode ^ valHashOld ^ valHashNew ^ keyHash;
+          cachedHashCode = cachedHashCode ^ valHashOld ^ valHashNew ^ keyHash;
         }
 
         // return setOfNew();
@@ -3552,18 +3556,18 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
       if (details.isModified()) {
         final int valHashNew = val.hashCode();
         rootNode = newRootNode;
-        hashCode ^= (keyHash ^ valHashNew);
+        cachedHashCode ^= (keyHash ^ valHashNew);
         cachedSize += 1;
 
         if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
+          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
         }
         return true;
 
       }
 
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
       return false;
     }
@@ -3590,17 +3594,17 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
         final int valHash = details.getReplacedValue().hashCode();
 
         rootNode = newRootNode;
-        hashCode = hashCode - (keyHash ^ valHash);
+        cachedHashCode = cachedHashCode ^ (keyHash ^ valHash);
         cachedSize = cachedSize - 1;
 
         if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
+          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
         }
         return true;
       }
 
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
 
       return false;
@@ -3887,7 +3891,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
           return false;
         }
 
-        if (this.hashCode != that.hashCode) {
+        if (this.cachedHashCode != that.cachedHashCode) {
           return false;
         }
 
@@ -3929,7 +3933,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
     @Override
     public int hashCode() {
-      return hashCode;
+      return cachedHashCode;
     }
 
     @Override
@@ -3939,7 +3943,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
       }
 
       mutator.set(null);
-      return new TrieSetMultimap<K, V>(rootNode, hashCode, cachedSize);
+      return new TrieSetMultimap<K, V>(rootNode, cachedHashCode, cachedSize);
     }
   }
 
