@@ -19,6 +19,7 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 @SuppressWarnings("rawtypes")
@@ -390,7 +391,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
 
   @Override
   public Set.Transient<K> asTransient() {
-    return new TransientTrieSet_5Bits<K>(this);
+    return new TransientTrieSet<K>(this);
   }
 
   /*
@@ -404,7 +405,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
    * For analysis purposes only.
    */
   protected Iterator<AbstractSetNode<K>> nodeIterator() {
-    return new TrieSet_5BitsNodeIterator<>(rootNode);
+    return new SetNodeIterator<>(rootNode);
   }
 
   /*
@@ -497,50 +498,50 @@ public class TrieSet<K> implements Set.Immutable<K> {
     }
   }
 
-  abstract static class Optional<T> {
-    private static final Optional EMPTY = new Optional() {
-      @Override
-      boolean isPresent() {
-        return false;
-      }
-
-      @Override
-      Object get() {
-        return null;
-      }
-    };
-
-    @SuppressWarnings("unchecked")
-    static <T> Optional<T> empty() {
-      return EMPTY;
-    }
-
-    static <T> Optional<T> of(T value) {
-      return new Value<T>(value);
-    }
-
-    abstract boolean isPresent();
-
-    abstract T get();
-
-    private static final class Value<T> extends Optional<T> {
-      private final T value;
-
-      private Value(T value) {
-        this.value = value;
-      }
-
-      @Override
-      boolean isPresent() {
-        return true;
-      }
-
-      @Override
-      T get() {
-        return value;
-      }
-    }
-  }
+  // abstract static class Optional<T> {
+  // private static final Optional EMPTY = new Optional() {
+  // @Override
+  // boolean isPresent() {
+  // return false;
+  // }
+  //
+  // @Override
+  // Object get() {
+  // return null;
+  // }
+  // };
+  //
+  // @SuppressWarnings("unchecked")
+  // static <T> Optional<T> empty() {
+  // return EMPTY;
+  // }
+  //
+  // static <T> Optional<T> of(T value) {
+  // return new Value<T>(value);
+  // }
+  //
+  // abstract boolean isPresent();
+  //
+  // abstract T get();
+  //
+  // private static final class Value<T> extends Optional<T> {
+  // private final T value;
+  //
+  // private Value(T value) {
+  // this.value = value;
+  // }
+  //
+  // @Override
+  // boolean isPresent() {
+  // return true;
+  // }
+  //
+  // @Override
+  // T get() {
+  // return value;
+  // }
+  // }
+  // }
 
   static final class SetResult<K> {
     private K replacedValue;
@@ -750,7 +751,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       if (shift >= HASH_CODE_LENGTH) {
         // throw new
         // IllegalStateException("Hash collision not yet fixed.");
-        return new HashCollisionSetNode_5Bits<>(keyHash0, (K[]) new Object[] {key0, key1});
+        return new HashCollisionSetNode<>(keyHash0, (K[]) new Object[] {key0, key1});
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -1400,12 +1401,12 @@ public class TrieSet<K> implements Set.Immutable<K> {
 
   }
 
-  private static final class HashCollisionSetNode_5Bits<K> extends CompactSetNode<K> {
+  private static final class HashCollisionSetNode<K> extends CompactSetNode<K> {
     private final K[] keys;
 
     private final int hash;
 
-    HashCollisionSetNode_5Bits(final int hash, final K[] keys) {
+    HashCollisionSetNode(final int hash, final K[] keys) {
       this.keys = keys;
 
       this.hash = hash;
@@ -1478,7 +1479,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
           this.keys.length - keys.length);
 
       details.modified();
-      return new HashCollisionSetNode_5Bits<>(keyHash, keysNew);
+      return new HashCollisionSetNode<>(keyHash, keysNew);
     }
 
     CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key, final int keyHash,
@@ -1502,7 +1503,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
           this.keys.length - keys.length);
 
       details.modified();
-      return new HashCollisionSetNode_5Bits<>(keyHash, keysNew);
+      return new HashCollisionSetNode<>(keyHash, keysNew);
     }
 
     CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key, final int keyHash,
@@ -1531,7 +1532,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
             System.arraycopy(this.keys, 0, keysNew, 0, idx);
             System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
 
-            return new HashCollisionSetNode_5Bits<>(keyHash, keysNew);
+            return new HashCollisionSetNode<>(keyHash, keysNew);
           }
         }
       }
@@ -1564,7 +1565,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
             System.arraycopy(this.keys, 0, keysNew, 0, idx);
             System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
 
-            return new HashCollisionSetNode_5Bits<>(keyHash, keysNew);
+            return new HashCollisionSetNode<>(keyHash, keysNew);
           }
         }
       }
@@ -1647,7 +1648,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
         return false;
       }
 
-      HashCollisionSetNode_5Bits<?> that = (HashCollisionSetNode_5Bits<?>) other;
+      HashCollisionSetNode<?> that = (HashCollisionSetNode<?>) other;
 
       if (hash != that.hash) {
         return false;
@@ -1829,11 +1830,11 @@ public class TrieSet<K> implements Set.Immutable<K> {
   /**
    * Iterator that first iterates over inlined-values and then continues depth first recursively.
    */
-  private static class TrieSet_5BitsNodeIterator<K> implements Iterator<AbstractSetNode<K>> {
+  private static class SetNodeIterator<K> implements Iterator<AbstractSetNode<K>> {
 
     final Deque<Iterator<? extends AbstractSetNode<K>>> nodeIteratorStack;
 
-    TrieSet_5BitsNodeIterator(AbstractSetNode<K> rootNode) {
+    SetNodeIterator(AbstractSetNode<K> rootNode) {
       nodeIteratorStack = new ArrayDeque<>();
       nodeIteratorStack.push(Collections.singleton(rootNode).iterator());
     }
@@ -1875,13 +1876,13 @@ public class TrieSet<K> implements Set.Immutable<K> {
     }
   }
 
-  static final class TransientTrieSet_5Bits<K> implements Set.Transient<K> {
+  static final class TransientTrieSet<K> implements Set.Transient<K> {
     final private AtomicReference<Thread> mutator;
     private AbstractSetNode<K> rootNode;
     private int hashCode;
     private int cachedSize;
 
-    TransientTrieSet_5Bits(TrieSet<K> trieSet_5Bits) {
+    TransientTrieSet(TrieSet<K> trieSet_5Bits) {
       this.mutator = new AtomicReference<Thread>(Thread.currentThread());
       this.rootNode = trieSet_5Bits.rootNode;
       this.hashCode = trieSet_5Bits.hashCode;
@@ -2208,10 +2209,10 @@ public class TrieSet<K> implements Set.Immutable<K> {
     }
 
     public static class TransientSetKeyIterator<K> extends SetKeyIterator<K> {
-      final TransientTrieSet_5Bits<K> collection;
+      final TransientTrieSet<K> collection;
       K lastKey;
 
-      public TransientSetKeyIterator(final TransientTrieSet_5Bits<K> collection) {
+      public TransientSetKeyIterator(final TransientTrieSet<K> collection) {
         super(collection.rootNode);
         this.collection = collection;
       }
@@ -2258,8 +2259,8 @@ public class TrieSet<K> implements Set.Immutable<K> {
         return false;
       }
 
-      if (other instanceof TransientTrieSet_5Bits) {
-        TransientTrieSet_5Bits<?> that = (TransientTrieSet_5Bits<?>) other;
+      if (other instanceof TransientTrieSet) {
+        TransientTrieSet<?> that = (TransientTrieSet<?>) other;
 
         if (this.cachedSize != that.cachedSize) {
           return false;

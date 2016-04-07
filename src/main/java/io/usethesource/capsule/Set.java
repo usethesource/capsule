@@ -14,47 +14,52 @@ import java.util.Iterator;
 
 public interface Set<K> extends Iterable<K> {
 
+  boolean contains(final Object o);
+
   boolean containsAll(final Collection<?> c);
 
   K get(final Object o);
 
-  boolean contains(final Object o);
-
+  @Override
   Iterator<K> iterator();
-  
-  
+
+  @Override
+  int hashCode();
+
+  @Override
+  boolean equals(Object other);
 
   public static interface Immutable<K> extends Set<K> {
 
-    boolean isTransientSupported();
-
-    Set.Transient<K> asTransient();
-
     Set.Immutable<K> insert(final K key);
 
-    Set.Immutable<K> insertAll(final java.util.Set<? extends K> set);
-
     Set.Immutable<K> remove(final K key);
+
+    Set.Immutable<K> insertAll(final java.util.Set<? extends K> set);
 
     Set.Immutable<K> removeAll(final java.util.Set<? extends K> set);
 
     Set.Immutable<K> retainAll(final java.util.Set<? extends K> set);
 
+    boolean isTransientSupported();
+
+    Set.Transient<K> asTransient();
+
   }
 
   public static interface Transient<K> extends Set<K> {
 
-    Set.Immutable<K> asImmutable();
-
     boolean insert(final K key);
 
-    boolean insertAll(final java.util.Set<? extends K> set);
-
     boolean remove(final K key);
+
+    boolean insertAll(final java.util.Set<? extends K> set);
 
     boolean removeAll(final java.util.Set<? extends K> set);
 
     boolean retainAll(final java.util.Set<? extends K> set);
+
+    Set.Immutable<K> asImmutable();
 
   }
 
