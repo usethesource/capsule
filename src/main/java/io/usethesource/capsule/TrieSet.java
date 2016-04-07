@@ -201,13 +201,13 @@ public class TrieSet<K> implements Set.Immutable<K> {
     return this;
   }
 
-  public Set.Immutable<K> insertAll(final java.util.Set<? extends K> set) {
+  public Set.Immutable<K> insertAll(final Set<? extends K> set) {
     final Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.insertAll(set);
     return tmpTransient.asImmutable();
   }
 
-  // public Set.Immutable<K> insertAllEquivalent(final java.util.Set<? extends K> set,
+  // public Set.Immutable<K> insertAllEquivalent(final Set<? extends K> set,
   // final Comparator<Object> cmp) {
   // final Set.Transient<K> tmpTransient = this.asTransient();
   // tmpTransient.insertAllEquivalent(set, cmp);
@@ -242,20 +242,20 @@ public class TrieSet<K> implements Set.Immutable<K> {
     return this;
   }
 
-  public Set.Immutable<K> removeAll(final java.util.Set<? extends K> set) {
+  public Set.Immutable<K> removeAll(final Set<? extends K> set) {
     final Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.removeAll(set);
     return tmpTransient.asImmutable();
   }
 
-  // public Set.Immutable<K> removeAllEquivalent(final java.util.Set<? extends K> set,
+  // public Set.Immutable<K> removeAllEquivalent(final Set<? extends K> set,
   // final Comparator<Object> cmp) {
   // final Set.Transient<K> tmpTransient = this.asTransient();
   // tmpTransient.removeAllEquivalent(set, cmp);
   // return tmpTransient.asImmutable();
   // }
 
-  public Set.Immutable<K> retainAll(final java.util.Set<? extends K> set) {
+  public Set.Immutable<K> retainAll(final Set<? extends K> set) {
     final Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.retainAll(set);
     return tmpTransient.asImmutable();
@@ -290,26 +290,6 @@ public class TrieSet<K> implements Set.Immutable<K> {
   //
   // public boolean retainAll(final Collection<?> c) {
   // throw new UnsupportedOperationException();
-  // }
-
-  @Override
-  public boolean containsAll(final Collection<?> c) {
-    for (Object item : c) {
-      if (!contains(item)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  // @Override
-  // public boolean containsAllEquivalent(final Collection<?> c, final Comparator<Object> cmp) {
-  // for (Object item : c) {
-  // if (!containsEquivalent(item, cmp)) {
-  // return false;
-  // }
-  // }
-  // return true;
   // }
 
   public long size() {
@@ -372,13 +352,13 @@ public class TrieSet<K> implements Set.Immutable<K> {
       }
 
       return rootNode.equals(that.rootNode);
-    } else if (other instanceof java.util.Set) {
-      java.util.Set that = (java.util.Set) other;
+    } else if (other instanceof Set) {
+      Set that = (Set) other;
 
       if (this.size() != that.size())
         return false;
 
-      return containsAll(that);
+      return contains(that);
     }
 
     return false;
@@ -399,6 +379,11 @@ public class TrieSet<K> implements Set.Immutable<K> {
     return new TransientTrieSet<K>(this);
   }
 
+  @Override
+  public Set.Immutable<K> asImmutable() {
+    return this;
+  }
+  
   /*
    * For analysis purposes only.
    */
@@ -2053,7 +2038,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return false;
     }
 
-    public boolean insertAll(final java.util.Set<? extends K> set) {
+    public boolean insertAll(final Set<? extends K> set) {
       boolean modified = false;
 
       for (final K key : set) {
@@ -2063,7 +2048,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return modified;
     }
 
-    public boolean insertAllEquivalent(final java.util.Set<? extends K> set,
+    public boolean insertAllEquivalent(final Set<? extends K> set,
         final Comparator<Object> cmp) {
       boolean modified = false;
 
@@ -2132,7 +2117,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return false;
     }
 
-    public boolean removeAll(final java.util.Set<? extends K> set) {
+    public boolean removeAll(final Set<? extends K> set) {
       boolean modified = false;
 
       for (final K key : set) {
@@ -2142,7 +2127,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return modified;
     }
 
-    public boolean removeAllEquivalent(final java.util.Set<? extends K> set,
+    public boolean removeAllEquivalent(final Set<? extends K> set,
         final Comparator<Object> cmp) {
       boolean modified = false;
 
@@ -2153,7 +2138,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return modified;
     }
 
-    public boolean retainAll(final java.util.Set<? extends K> set) {
+    public boolean retainAll(final Set<? extends K> set) {
       boolean modified = false;
 
       Iterator<K> thisIterator = iterator();
@@ -2180,26 +2165,6 @@ public class TrieSet<K> implements Set.Immutable<K> {
     // }
     //
     // return modified;
-    // }
-
-    @Override
-    public boolean containsAll(Collection<?> c) {
-      for (Object item : c) {
-        if (!contains(item)) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    // @Override
-    // public boolean containsAllEquivalent(Collection<?> c, Comparator<Object> cmp) {
-    // for (Object item : c) {
-    // if (!containsEquivalent(item, cmp)) {
-    // return false;
-    // }
-    // }
-    // return true;
     // }
 
     public long size() {
@@ -2282,12 +2247,12 @@ public class TrieSet<K> implements Set.Immutable<K> {
 
         return rootNode.equals(that.rootNode);
       } else if (other instanceof Set) {
-        java.util.Set that = (java.util.Set) other;
+        Set that = (Set) other;
 
         if (this.size() != that.size())
           return false;
 
-        return containsAll(that);
+        return contains(that);
       }
 
       return false;

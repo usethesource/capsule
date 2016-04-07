@@ -9,7 +9,6 @@
  *******************************************************************************/
 package io.usethesource.capsule;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Function;
@@ -22,7 +21,15 @@ public interface Set<K> extends Iterable<K>, Function<K, Optional<K>> {
   
   boolean contains(final Object o);
 
-  boolean containsAll(final Collection<?> c);
+  default boolean contains(final Set<K> set) {
+    for (K item : set) {
+      if (!contains(item)) {
+        return false;
+      }
+    }
+    return true;
+    
+  }
 
   // K get(final Object o);
 
@@ -41,17 +48,19 @@ public interface Set<K> extends Iterable<K>, Function<K, Optional<K>> {
   @Override
   boolean equals(Object other);
 
+  Set.Immutable<K> asImmutable();
+  
   public static interface Immutable<K> extends Set<K> {
 
     Set.Immutable<K> insert(final K key);
 
     Set.Immutable<K> remove(final K key);
 
-    Set.Immutable<K> insertAll(final java.util.Set<? extends K> set);
+    Set.Immutable<K> insertAll(final Set<? extends K> set);
 
-    Set.Immutable<K> removeAll(final java.util.Set<? extends K> set);
+    Set.Immutable<K> removeAll(final Set<? extends K> set);
 
-    Set.Immutable<K> retainAll(final java.util.Set<? extends K> set);
+    Set.Immutable<K> retainAll(final Set<? extends K> set);
 
     boolean isTransientSupported();
 
@@ -65,13 +74,11 @@ public interface Set<K> extends Iterable<K>, Function<K, Optional<K>> {
 
     boolean remove(final K key);
 
-    boolean insertAll(final java.util.Set<? extends K> set);
+    boolean insertAll(final Set<? extends K> set);
 
-    boolean removeAll(final java.util.Set<? extends K> set);
+    boolean removeAll(final Set<? extends K> set);
 
-    boolean retainAll(final java.util.Set<? extends K> set);
-
-    Set.Immutable<K> asImmutable();
+    boolean retainAll(final Set<? extends K> set);
 
   }
 
