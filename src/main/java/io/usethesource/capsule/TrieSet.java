@@ -11,20 +11,18 @@ package io.usethesource.capsule;
 
 import java.text.DecimalFormat;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 @SuppressWarnings("rawtypes")
-public class TrieSet<K> implements ImmutableSet<K> {
+public class TrieSet<K> implements CapsuleSet.Immutable<K> {
 
   @SuppressWarnings("unchecked")
   private static final TrieSet EMPTY_SET = new TrieSet(CompactSetNode.EMPTY_NODE, 0, 0);
@@ -45,11 +43,11 @@ public class TrieSet<K> implements ImmutableSet<K> {
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K> ImmutableSet<K> of() {
+  public static final <K> CapsuleSet.Immutable<K> of() {
     return TrieSet.EMPTY_SET;
   }
 
-  public static final <K> ImmutableSet<K> of(K key0) {
+  public static final <K> CapsuleSet.Immutable<K> of(K key0) {
     final int keyHash0 = key0.hashCode();
 
     final int nodeMap = 0;
@@ -60,7 +58,7 @@ public class TrieSet<K> implements ImmutableSet<K> {
     return new TrieSet<K>(newRootNode, keyHash0, 1);
   }
 
-  public static final <K> ImmutableSet<K> of(K key0, K key1) {
+  public static final <K> CapsuleSet.Immutable<K> of(K key0, K key1) {
     assert !Objects.equals(key0, key1);
     
     final int keyHash0 = key0.hashCode();
@@ -73,8 +71,8 @@ public class TrieSet<K> implements ImmutableSet<K> {
   }  
   
   @SuppressWarnings("unchecked")
-  public static final <K> ImmutableSet<K> of(K... keys) {
-    ImmutableSet<K> result = TrieSet.EMPTY_SET;
+  public static final <K> CapsuleSet.Immutable<K> of(K... keys) {
+    CapsuleSet.Immutable<K> result = TrieSet.EMPTY_SET;
 
     for (final K key : keys) {
       result = result.__insert(key);
@@ -84,13 +82,13 @@ public class TrieSet<K> implements ImmutableSet<K> {
   }
  
   @SuppressWarnings("unchecked")
-  public static final <K> TransientSet<K> transientOf() {
+  public static final <K> CapsuleSet.Transient<K> transientOf() {
     return TrieSet.EMPTY_SET.asTransient();
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K> TransientSet<K> transientOf(K... keys) {
-    final TransientSet<K> result = TrieSet.EMPTY_SET.asTransient();
+  public static final <K> CapsuleSet.Transient<K> transientOf(K... keys) {
+    final CapsuleSet.Transient<K> result = TrieSet.EMPTY_SET.asTransient();
 
     for (final K key : keys) {
       result.__insert(key);
@@ -169,7 +167,7 @@ public class TrieSet<K> implements ImmutableSet<K> {
     }
   }
 
-  public ImmutableSet<K> __insert(final K key) {
+  public CapsuleSet.Immutable<K> __insert(final K key) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -183,7 +181,7 @@ public class TrieSet<K> implements ImmutableSet<K> {
     return this;
   }
 
-  public ImmutableSet<K> __insertEquivalent(final K key, final Comparator<Object> cmp) {
+  public CapsuleSet.Immutable<K> __insertEquivalent(final K key, final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -197,20 +195,20 @@ public class TrieSet<K> implements ImmutableSet<K> {
     return this;
   }
 
-  public ImmutableSet<K> __insertAll(final java.util.Set<? extends K> set) {
-    final TransientSet<K> tmpTransient = this.asTransient();
+  public CapsuleSet.Immutable<K> __insertAll(final java.util.Set<? extends K> set) {
+    final CapsuleSet.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__insertAll(set);
     return tmpTransient.freeze();
   }
 
-  public ImmutableSet<K> __insertAllEquivalent(final java.util.Set<? extends K> set,
+  public CapsuleSet.Immutable<K> __insertAllEquivalent(final java.util.Set<? extends K> set,
       final Comparator<Object> cmp) {
-    final TransientSet<K> tmpTransient = this.asTransient();
+    final CapsuleSet.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__insertAllEquivalent(set, cmp);
     return tmpTransient.freeze();
   }
 
-  public ImmutableSet<K> __remove(final K key) {
+  public CapsuleSet.Immutable<K> __remove(final K key) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -224,7 +222,7 @@ public class TrieSet<K> implements ImmutableSet<K> {
     return this;
   }
 
-  public ImmutableSet<K> __removeEquivalent(final K key, final Comparator<Object> cmp) {
+  public CapsuleSet.Immutable<K> __removeEquivalent(final K key, final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -238,28 +236,28 @@ public class TrieSet<K> implements ImmutableSet<K> {
     return this;
   }
 
-  public ImmutableSet<K> __removeAll(final java.util.Set<? extends K> set) {
-    final TransientSet<K> tmpTransient = this.asTransient();
+  public CapsuleSet.Immutable<K> __removeAll(final java.util.Set<? extends K> set) {
+    final CapsuleSet.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__removeAll(set);
     return tmpTransient.freeze();
   }
 
-  public ImmutableSet<K> __removeAllEquivalent(final java.util.Set<? extends K> set,
+  public CapsuleSet.Immutable<K> __removeAllEquivalent(final java.util.Set<? extends K> set,
       final Comparator<Object> cmp) {
-    final TransientSet<K> tmpTransient = this.asTransient();
+    final CapsuleSet.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__removeAllEquivalent(set, cmp);
     return tmpTransient.freeze();
   }
 
-  public ImmutableSet<K> __retainAll(final java.util.Set<? extends K> set) {
-    final TransientSet<K> tmpTransient = this.asTransient();
+  public CapsuleSet.Immutable<K> __retainAll(final java.util.Set<? extends K> set) {
+    final CapsuleSet.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__retainAll(set);
     return tmpTransient.freeze();
   }
 
-  public ImmutableSet<K> __retainAllEquivalent(final TransientSet<? extends K> transientSet,
+  public CapsuleSet.Immutable<K> __retainAllEquivalent(final CapsuleSet.Transient<? extends K> transientSet,
       final Comparator<Object> cmp) {
-    final TransientSet<K> tmpTransient = this.asTransient();
+    final CapsuleSet.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__retainAllEquivalent(transientSet, cmp);
     return tmpTransient.freeze();
   }
@@ -324,28 +322,28 @@ public class TrieSet<K> implements ImmutableSet<K> {
     return new SetKeyIterator<>(rootNode);
   }
 
-  @Override
-  public Object[] toArray() {
-    Object[] array = new Object[cachedSize];
-
-    int idx = 0;
-    for (K key : this) {
-      array[idx++] = key;
-    }
-
-    return array;
-  }
-
-  @Override
-  public <T> T[] toArray(final T[] a) {
-    List<K> list = new ArrayList<K>(cachedSize);
-
-    for (K key : this) {
-      list.add(key);
-    }
-
-    return list.toArray(a);
-  }
+//  @Override
+//  public Object[] toArray() {
+//    Object[] array = new Object[cachedSize];
+//
+//    int idx = 0;
+//    for (K key : this) {
+//      array[idx++] = key;
+//    }
+//
+//    return array;
+//  }
+//
+//  @Override
+//  public <T> T[] toArray(final T[] a) {
+//    List<K> list = new ArrayList<K>(cachedSize);
+//
+//    for (K key : this) {
+//      list.add(key);
+//    }
+//
+//    return list.toArray(a);
+//  }
 
   @Override
   public boolean equals(final Object other) {
@@ -391,7 +389,7 @@ public class TrieSet<K> implements ImmutableSet<K> {
   }
 
   @Override
-  public TransientSet<K> asTransient() {
+  public CapsuleSet.Transient<K> asTransient() {
     return new TransientTrieSet_5Bits<K>(this);
   }
 
@@ -1877,7 +1875,7 @@ public class TrieSet<K> implements ImmutableSet<K> {
     }
   }
 
-  static final class TransientTrieSet_5Bits<K> implements TransientSet<K> {
+  static final class TransientTrieSet_5Bits<K> implements CapsuleSet.Transient<K> {
     final private AtomicReference<Thread> mutator;
     private AbstractSetNode<K> rootNode;
     private int hashCode;
@@ -2156,7 +2154,7 @@ public class TrieSet<K> implements ImmutableSet<K> {
       return modified;
     }
 
-    public boolean __retainAllEquivalent(final TransientSet<? extends K> transientSet,
+    public boolean __retainAllEquivalent(final CapsuleSet.Transient<? extends K> transientSet,
         final Comparator<Object> cmp) {
       boolean modified = false;
 
@@ -2226,28 +2224,28 @@ public class TrieSet<K> implements ImmutableSet<K> {
       }
     }
 
-    @Override
-    public Object[] toArray() {
-      Object[] array = new Object[cachedSize];
-
-      int idx = 0;
-      for (K key : this) {
-        array[idx++] = key;
-      }
-
-      return array;
-    }
-
-    @Override
-    public <T> T[] toArray(final T[] a) {
-      List<K> list = new ArrayList<K>(cachedSize);
-
-      for (K key : this) {
-        list.add(key);
-      }
-
-      return list.toArray(a);
-    }
+//    @Override
+//    public Object[] toArray() {
+//      Object[] array = new Object[cachedSize];
+//
+//      int idx = 0;
+//      for (K key : this) {
+//        array[idx++] = key;
+//      }
+//
+//      return array;
+//    }
+//
+//    @Override
+//    public <T> T[] toArray(final T[] a) {
+//      List<K> list = new ArrayList<K>(cachedSize);
+//
+//      for (K key : this) {
+//        list.add(key);
+//      }
+//
+//      return list.toArray(a);
+//    }
 
     @Override
     public boolean equals(final Object other) {
@@ -2270,7 +2268,7 @@ public class TrieSet<K> implements ImmutableSet<K> {
         }
 
         return rootNode.equals(that.rootNode);
-      } else if (other instanceof Set) {
+      } else if (other instanceof CapsuleSet) {
         java.util.Set that = (java.util.Set) other;
 
         if (this.size() != that.size())
@@ -2288,7 +2286,7 @@ public class TrieSet<K> implements ImmutableSet<K> {
     }
 
     @Override
-    public ImmutableSet<K> freeze() {
+    public CapsuleSet.Immutable<K> freeze() {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
