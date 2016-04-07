@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 
-public interface CapsuleSet<K> {
+public interface Set<K> {
 
   boolean containsAll(final Collection<?> c);
 
@@ -29,40 +29,40 @@ public interface CapsuleSet<K> {
 
   Iterator<K> keyIterator();
 
-  public static interface Immutable<K> extends CapsuleSet<K> {
+  public static interface Immutable<K> extends Set<K> {
 
     boolean isTransientSupported();
 
-    CapsuleSet.Transient<K> asTransient();
+    Set.Transient<K> asTransient();
 
-    CapsuleSet.Immutable<K> __insert(final K key);
+    Set.Immutable<K> __insert(final K key);
 
-    CapsuleSet.Immutable<K> __insertEquivalent(final K key, final Comparator<Object> cmp);
+    Set.Immutable<K> __insertEquivalent(final K key, final Comparator<Object> cmp);
 
-    CapsuleSet.Immutable<K> __insertAll(final java.util.Set<? extends K> set);
+    Set.Immutable<K> __insertAll(final java.util.Set<? extends K> set);
 
-    CapsuleSet.Immutable<K> __insertAllEquivalent(final java.util.Set<? extends K> set,
+    Set.Immutable<K> __insertAllEquivalent(final java.util.Set<? extends K> set,
         final Comparator<Object> cmp);
 
-    CapsuleSet.Immutable<K> __remove(final K key);
+    Set.Immutable<K> __remove(final K key);
 
-    CapsuleSet.Immutable<K> __removeEquivalent(final K key, final Comparator<Object> cmp);
+    Set.Immutable<K> __removeEquivalent(final K key, final Comparator<Object> cmp);
 
-    CapsuleSet.Immutable<K> __removeAll(final java.util.Set<? extends K> set);
+    Set.Immutable<K> __removeAll(final java.util.Set<? extends K> set);
 
-    CapsuleSet.Immutable<K> __removeAllEquivalent(final java.util.Set<? extends K> set,
+    Set.Immutable<K> __removeAllEquivalent(final java.util.Set<? extends K> set,
         final Comparator<Object> cmp);
 
-    CapsuleSet.Immutable<K> __retainAll(final java.util.Set<? extends K> set);
+    Set.Immutable<K> __retainAll(final java.util.Set<? extends K> set);
 
-    CapsuleSet.Immutable<K> __retainAllEquivalent(
-        final CapsuleSet.Transient<? extends K> transientSet, final Comparator<Object> cmp);
+    Set.Immutable<K> __retainAllEquivalent(
+        final Set.Transient<? extends K> transientSet, final Comparator<Object> cmp);
 
   }
 
-  public static interface Transient<K> extends CapsuleSet<K> {
+  public static interface Transient<K> extends Set<K> {
 
-    CapsuleSet.Immutable<K> freeze();
+    Set.Immutable<K> freeze();
 
     boolean __insert(final K key);
 
@@ -84,7 +84,7 @@ public interface CapsuleSet<K> {
 
     boolean __retainAll(final java.util.Set<? extends K> set);
 
-    boolean __retainAllEquivalent(final CapsuleSet.Transient<? extends K> transientSet,
+    boolean __retainAllEquivalent(final Set.Transient<? extends K> transientSet,
         final Comparator<Object> cmp);
 
   }
