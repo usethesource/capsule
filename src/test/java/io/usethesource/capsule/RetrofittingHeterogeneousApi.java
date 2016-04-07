@@ -112,7 +112,7 @@ class IntAndBigIntSetImpl implements IntAndBigIntSet {
   
 }
 
-interface IntAndBigIntSet extends Set<EitherIntOrGeneric<BigInteger>> {
+interface IntAndBigIntSet extends SetInterface<EitherIntOrGeneric<BigInteger>> {
   
   @Override
   boolean add(EitherIntOrGeneric<BigInteger> e);
@@ -124,7 +124,7 @@ interface IntAndBigIntSet extends Set<EitherIntOrGeneric<BigInteger>> {
   
 }
 
-class SetImpl<E> implements Set<E> {
+class SetImpl<E> implements SetInterface<E> {
  
   @Override
   public boolean add(E value) {
@@ -140,7 +140,7 @@ class SetImpl<E> implements Set<E> {
   
 }
 
-interface Set<E> extends Collection<E> {  
+interface SetInterface<E> extends Collection<E> {  
   
   boolean add(E e);
   

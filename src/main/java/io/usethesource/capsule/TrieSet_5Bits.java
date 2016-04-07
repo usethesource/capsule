@@ -2270,7 +2270,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
         }
 
         return rootNode.equals(that.rootNode);
-      } else if (other instanceof Set) {
+      } else if (other instanceof java.util.Set) {
         java.util.Set that = (java.util.Set) other;
 
         if (this.size() != that.size())
