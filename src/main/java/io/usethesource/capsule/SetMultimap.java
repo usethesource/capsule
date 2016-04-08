@@ -15,21 +15,21 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public interface SetMultimap<K, V>
-    extends Iterable<Map.Entry<K, V>>, Function<K, Optional<Set<V>>> {
+    extends Iterable<Map.Entry<K, V>>, Function<K, Optional<Set.Immutable<V>>> {
 
   long size();
-  
+
   boolean isEmpty();
 
   boolean contains(final K key);
 
   boolean contains(final K key, V val);
 
-//  boolean containsKey(final Object o);
-//
-//  boolean containsValue(final Object o);
-//
-//  boolean containsEntry(final Object o0, final Object o1);
+  // boolean containsKey(final Object o);
+  //
+  // boolean containsValue(final Object o);
+  //
+  // boolean containsEntry(final Object o0, final Object o1);
 
   // Set<V> get(final java.lang.Object o);
 
@@ -47,8 +47,6 @@ public interface SetMultimap<K, V>
 
   // Iterator<Map.Entry<K, V>> entryIterator();
   //
-  // Iterator<Map.Entry<K, Object>> nativeEntryIterator();
-  //
   // <T> Iterator<T> tupleIterator(final BiFunction<K, V, T> tupleOf);
 
   // default int sizeDistinct() {
@@ -56,23 +54,25 @@ public interface SetMultimap<K, V>
   // }
   //
   // boolean isEmpty();
-  
+
   @Override
   Iterator<Map.Entry<K, V>> iterator();
-  
+
+  Iterator<Map.Entry<K, Object>> nativeEntryIterator();
+
   /**
    * The hash code of a multimap is order independent by combining the hashes of the elements (both
    * keys and values) via a bitwise xor operation.
    * 
    * @return xor reduction of all hashes of elements
-   */  
+   */
   @Override
   int hashCode();
 
   @Override
   boolean equals(Object other);
-  
-  SetMultimap.Immutable<K, V> asImmutable();  
+
+  SetMultimap.Immutable<K, V> asImmutable();
 
   public static interface Immutable<K, V> extends SetMultimap<K, V> {
 
@@ -85,9 +85,9 @@ public interface SetMultimap<K, V>
     SetMultimap.Immutable<K, V> insert(final K key, final Set<V> values);
 
     SetMultimap.Immutable<K, V> remove(final K key, final V val);
-    
+
     SetMultimap.Immutable<K, V> remove(final K key);
-    
+
     SetMultimap.Immutable<K, V> union(final SetMultimap<? extends K, ? extends V> setMultimap);
 
     SetMultimap.Immutable<K, V> intersect(final SetMultimap<? extends K, ? extends V> setMultimap);

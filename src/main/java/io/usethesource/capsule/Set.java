@@ -21,7 +21,7 @@ public interface Set<K> extends Iterable<K>, Function<K, Optional<K>> {
   
   boolean contains(final Object o);
 
-  default boolean contains(final Set<K> set) {
+  default boolean containsAll(final Set<K> set) {
     for (K item : set) {
       if (!contains(item)) {
         return false;

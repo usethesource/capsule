@@ -142,7 +142,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
   // }
 
   @Override
-  public Optional<Set<V>> apply(K key) {
+  public Optional<Set.Immutable<V>> apply(K key) {
     return rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
   }
 
@@ -360,12 +360,12 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
   // public Iterator<Map.Entry<K, V>> entryIterator() {
   // return new SetMultimapTupleIterator<>(rootNode, AbstractSpecialisedImmutableMap::entryOf);
   // }
-  //
-  // @Override
-  // public Iterator<Map.Entry<K, Object>> nativeEntryIterator() {
-  // return new SetMultimapNativeTupleIterator<>(rootNode);
-  // }
-  //
+
+  @Override
+  public Iterator<Map.Entry<K, Object>> nativeEntryIterator() {
+    return new SetMultimapNativeTupleIterator<>(rootNode);
+  }
+
   // @Override
   // public <T> Iterator<T> tupleIterator(final BiFunction<K, V, T> tupleOf) {
   // return new SetMultimapTupleIterator<>(rootNode, tupleOf);
@@ -541,7 +541,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
         for (Map.Entry<K, V> entry : that) {
           final K key = (K) entry.getKey();
-          final Optional<Set<V>> result =
+          final Optional<Set.Immutable<V>> result =
               rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
           if (!result.isPresent()) {
@@ -697,7 +697,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
       return new SomeSingleton<>(value);
     }
 
-    public static final <T> EitherSingletonOrCollection of(ImmutableSet<T> value) {
+    public static final <T> EitherSingletonOrCollection of(Set.Immutable<T> value) {
       return new SomeCollection<>(value);
     }
 
@@ -705,7 +705,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
     abstract T getSingleton();
 
-    abstract ImmutableSet<T> getCollection();
+    abstract Set.Immutable<T> getCollection();
   }
 
   static final class SomeSingleton<T> extends EitherSingletonOrCollection<T> {
@@ -726,16 +726,16 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
     }
 
     @Override
-    ImmutableSet<T> getCollection() {
+    Set.Immutable<T> getCollection() {
       throw new UnsupportedOperationException(String
           .format("Requested type %s but actually found %s.", Type.COLLECTION, Type.SINGLETON));
     }
   }
 
   static final class SomeCollection<T> extends EitherSingletonOrCollection<T> {
-    private final ImmutableSet<T> value;
+    private final Set.Immutable<T> value;
 
-    private SomeCollection(ImmutableSet<T> value) {
+    private SomeCollection(Set.Immutable<T> value) {
       this.value = value;
     }
 
@@ -751,7 +751,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
     }
 
     @Override
-    ImmutableSet<T> getCollection() {
+    Set.Immutable<T> getCollection() {
       return value;
     }
   }
@@ -824,7 +824,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
     abstract boolean containsTuple(final K key, final V val, final int keyHash, final int shift);
 
-    abstract Optional<Set<V>> findByKey(final K key, final int keyHash, final int shift);
+    abstract Optional<Set.Immutable<V>> findByKey(final K key, final int keyHash, final int shift);
 
     abstract CompactSetMultimapNode<K, V> inserted(final AtomicReference<Thread> mutator,
         final K key, final V val, final int keyHash, final int shift,
@@ -1098,7 +1098,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
       if (shift >= HASH_CODE_LENGTH) {
         throw new IllegalStateException("Hash collision not yet fixed.");
         // return new HashCollisionSetMultimapNode_BleedingEdge<>(keyHash0,
-        // (K[]) new Object[] {key0, key1}, (Set.Immutable<V>[]) new ImmutableSet[] {val0, val1});
+        // (K[]) new Object[] {key0, key1}, (Set.Immutable<V>[]) new Set.Immutable[] {val0, val1});
       }
 
       final int mask0 = doubledMask(keyHash0, shift);
@@ -1134,7 +1134,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
       if (shift >= HASH_CODE_LENGTH) {
         throw new IllegalStateException("Hash collision not yet fixed.");
         // return new HashCollisionSetMultimapNode_BleedingEdge<>(keyHash0,
-        // (K[]) new Object[] {key0, key1}, (Set.Immutable<V>[]) new ImmutableSet[] {val0, val1});
+        // (K[]) new Object[] {key0, key1}, (Set.Immutable<V>[]) new Set.Immutable[] {val0, val1});
       }
 
       final int mask0 = doubledMask(keyHash0, shift);
@@ -1171,7 +1171,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
         throw new IllegalStateException("Hash collision not yet fixed.");
         // return new HashCollisionSetMultimapNode_BleedingEdge<>(keyHash0,
         // (K[]) new Object[] {key0, key1},
-        // (Set.Immutable<V>[]) new ImmutableSet[] {valColl0, val1});
+        // (Set.Immutable<V>[]) new Set.Immutable[] {valColl0, val1});
       }
 
       final int mask0 = doubledMask(keyHash0, shift);
@@ -1317,7 +1317,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
     }
 
     @Override
-    Optional<Set<V>> findByKey(final K key, final int keyHash, final int shift) {
+    Optional<Set.Immutable<V>> findByKey(final K key, final int keyHash, final int shift) {
       long bitmap = this.bitmap();
 
       final int doubledMask = doubledMask(keyHash, shift);
@@ -2036,8 +2036,8 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
         for (int i = 0; i < arities[PATTERN_DATA_SINGLETON]; i++) {
           int offset = i * TUPLE_LENGTH;
 
-          assert((nodes[offset + 0] instanceof ImmutableSet) == false);
-          assert((nodes[offset + 1] instanceof ImmutableSet) == false);
+          assert((nodes[offset + 0] instanceof Set.Immutable) == false);
+          assert((nodes[offset + 1] instanceof Set.Immutable) == false);
 
           assert((nodes[offset + 0] instanceof CompactSetMultimapNode) == false);
           assert((nodes[offset + 1] instanceof CompactSetMultimapNode) == false);
@@ -2046,8 +2046,8 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
         for (int i = 0; i < arities[PATTERN_DATA_COLLECTION]; i++) {
           int offset = (i + arities[PATTERN_DATA_SINGLETON]) * TUPLE_LENGTH;
 
-          assert((nodes[offset + 0] instanceof ImmutableSet) == false);
-          assert((nodes[offset + 1] instanceof ImmutableSet) == true);
+          assert((nodes[offset + 0] instanceof Set.Immutable) == false);
+          assert((nodes[offset + 1] instanceof Set.Immutable) == true);
 
           assert((nodes[offset + 0] instanceof CompactSetMultimapNode) == false);
           assert((nodes[offset + 1] instanceof CompactSetMultimapNode) == false);
@@ -2057,7 +2057,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
           int offset =
               (arities[PATTERN_DATA_SINGLETON] + arities[PATTERN_DATA_COLLECTION]) * TUPLE_LENGTH;
 
-          assert((nodes[offset + i] instanceof ImmutableSet) == false);
+          assert((nodes[offset + i] instanceof Set.Immutable) == false);
 
           assert((nodes[offset + i] instanceof CompactSetMultimapNode) == true);
         }
@@ -2719,7 +2719,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
   //
   // final Set.Immutable<V>[] src = this.vals;
   // @SuppressWarnings("unchecked")
-  // final Set.Immutable<V>[] dst = new ImmutableSet[src.length];
+  // final Set.Immutable<V>[] dst = new Set.Immutable[src.length];
   //
   // // copy 'src' and set 1 element(s) at position 'idx'
   // System.arraycopy(src, 0, dst, 0, src.length);
@@ -2748,7 +2748,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
   // this.keys.length - keys.length);
   //
   // @SuppressWarnings("unchecked")
-  // final Set.Immutable<V>[] valsNew = new ImmutableSet[this.vals.length + 1];
+  // final Set.Immutable<V>[] valsNew = new Set.Immutable[this.vals.length + 1];
   //
   // // copy 'this.vals' and insert 1 element(s) at position
   // // 'vals.length'
@@ -2777,7 +2777,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
   // if (valCollNew.size() != 0) {
   // // update mapping
   // @SuppressWarnings("unchecked")
-  // final Set.Immutable<V>[] valsNew = new ImmutableSet[this.vals.length];
+  // final Set.Immutable<V>[] valsNew = new Set.Immutable[this.vals.length];
   //
   // // copy 'this.vals' and set 1 element(s) at position
   // // 'idx'
@@ -2810,7 +2810,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
   // System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
   //
   // @SuppressWarnings("unchecked")
-  // final Set.Immutable<V>[] valsNew = new ImmutableSet[this.vals.length - 1];
+  // final Set.Immutable<V>[] valsNew = new Set.Immutable[this.vals.length - 1];
   //
   // // copy 'this.vals' and remove 1 element(s) at
   // // position 'idx'
@@ -3423,7 +3423,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
     // }
 
     @Override
-    public Optional<Set<V>> apply(K key) {
+    public Optional<Set.Immutable<V>> apply(K key) {
       return rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
     }
 
@@ -3493,6 +3493,11 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
             }
 
             // return setOfNew(details.getReplacedValue());
+           
+            if (DEBUG) {
+              assert checkHashCodeAndSize(cachedHashCode, cachedSize);
+            }
+            
             return true;
           } else {
             final int valHashOld = details.getReplacedCollection().hashCode();
@@ -3515,6 +3520,11 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
             // TODO: likely expensive
             // TODO: first calculate difference before swapping
             // return values.asImmutable().removeAll(details.getReplacedCollection());
+            
+            if (DEBUG) {
+              assert checkHashCodeAndSize(cachedHashCode, cachedSize);
+            }
+            
             return true;
           }
         }
@@ -3534,6 +3544,11 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
         }
 
         // return setOfNew();
+        
+        if (DEBUG) {
+          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
+        }
+        
         return true;
       }
 
@@ -3653,6 +3668,12 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
           AbstractSpecialisedImmutableMap::entryOf);
     }
 
+    // TODO: make transient version of this iterator
+    @Override
+    public Iterator<Map.Entry<K, Object>> nativeEntryIterator() {
+      return new SetMultimapNativeTupleIterator<>(rootNode);
+    }
+    
     // @Override
     // public Iterator<K> keyIterator() {
     // return new TransientSetMultimapKeyIterator<>(this);
@@ -3906,7 +3927,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
           for (Map.Entry<K, V> entry : that) {
             final K key = (K) entry.getKey();
-            final Optional<Set<V>> result =
+            final Optional<Set.Immutable<V>> result =
                 rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
             if (!result.isPresent()) {
