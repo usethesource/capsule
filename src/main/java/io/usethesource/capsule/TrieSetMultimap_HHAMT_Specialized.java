@@ -54,6 +54,7 @@ import java.util.function.BiFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import io.usethesource.capsule.TrieSetMultimap_HHAMT.CompactSetMultimapNode;
 import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations.SetMultimap0To0Node;
 import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations.SetMultimap0To1Node;
 import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations.SetMultimap0To2Node;
@@ -1012,8 +1013,38 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
     static final long arrayBase = initializeArrayBase();    
     
-    static final Class[][] initializeSpecializationsByContentAndNodes() {
-      Class[][] next = new Class[33][65];
+//    static final Class[][] initializeSpecializationsByContentAndNodes() {
+//      Class[][] next = new Class[33][65];
+//
+//      try {
+//        for (int m = 0; m <= 32; m++) {
+//          for (int n = 0; n <= 64; n++) {
+//            int mNext = m;
+//            int nNext = n;
+//
+//            // TODO: last expression is not properly generated yet and maybe incorrect
+//            if (mNext < 0 || mNext > 32 || nNext < 0 || nNext > 64
+//                || Math.ceil(nNext / 2.0) + mNext > 32) {
+//              next[m][n] = null;
+//            } else {
+//              next[m][n] = Class.forName(String.format(
+//                  "io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations$SetMultimap%dTo%dNode",
+//                  mNext, nNext));
+//            }
+//          }
+//        }
+//      } catch (ClassNotFoundException e) {
+//        throw new RuntimeException(e);
+//      }
+//
+//      return next;
+//    }
+//
+//    static final Class<? extends CompactSetMultimapNode>[][] specializationsByContentAndNodes =
+//        initializeSpecializationsByContentAndNodes();
+    
+    static final Class[] initializeSpecializationsByContentAndNodes() {
+      Class[] next = new Class[33 * 65];
 
       try {
         for (int m = 0; m <= 32; m++) {
@@ -1024,9 +1055,9 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
             // TODO: last expression is not properly generated yet and maybe incorrect
             if (mNext < 0 || mNext > 32 || nNext < 0 || nNext > 64
                 || Math.ceil(nNext / 2.0) + mNext > 32) {
-              next[m][n] = null;
+              next[65 * m + n] = null;
             } else {
-              next[m][n] = Class.forName(String.format(
+              next[65 * m + n] = Class.forName(String.format(
                   "io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations$SetMultimap%dTo%dNode",
                   mNext, nNext));
             }
@@ -1039,8 +1070,54 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       return next;
     }
 
-    static final Class<? extends CompactSetMultimapNode>[][] specializationsByContentAndNodes =
-        initializeSpecializationsByContentAndNodes();
+    static final Class<? extends CompactSetMultimapNode>[] specializationsByContentAndNodes =
+        initializeSpecializationsByContentAndNodes();    
+
+    static final <T> T allocateHeapRegion(final Class<? extends T>[] lookupTable, final int dim1,
+        final int dim2) {
+      final Class<? extends T> clazz = lookupTable[65 * dim1 + dim2];
+      return RangecopyUtils.allocateHeapRegion(clazz);
+    }
+    
+//    static final byte[] initializeMetadataByContentAndNodes() {
+//      byte[] next = new byte[33 * 65 * 4];
+//
+//      try {
+//        for (int m = 0; m <= 32; m++) {
+//          for (int n = 0; n <= 64; n++) {
+//            int mNext = m;
+//            int nNext = n;
+//
+//            // TODO: last expression is not properly generated yet and maybe incorrect
+//            if (mNext < 0 || mNext > 32 || nNext < 0 || nNext > 64
+//                || Math.ceil(nNext / 2.0) + mNext > 32) {
+////              int section = (65 * m + n) * 4;              
+////              next[65 * m + n] = 0;
+//            } else {
+//              Class clazz = Class.forName(String.format(
+//                  "io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations$SetMultimap%dTo%dNode",
+//                  mNext, nNext));
+//              
+//              int section = (65 * m + n) * 4;
+//              next[section + 0] = (byte) unsafe.getLong(clazz, globalRareBaseOffset);
+//              next[section + 1] = (byte) unsafe.getInt(clazz, globalPayloadArityOffset);
+//              next[section + 2] = (byte) unsafe.getInt(clazz, globalUntypedSlotArityOffset);
+//              next[section + 3] = (byte) unsafe.getInt(clazz, globalSlotArityOffset);
+//              
+//              if (next[section + 0] < 0)
+//                System.out.println(next[section + 0]);
+//            }
+//          }
+//        }
+//      } catch (ClassNotFoundException e) {
+//        throw new RuntimeException(e);
+//      }
+//
+//      return next;
+//    }
+//
+//    static final byte[] metadataByContentAndNodes =
+//        initializeMetadataByContentAndNodes();        
     
     static long globalRawMap1Offset =
         fieldOffset(SetMultimap0To2Node.class, "rawMap1");
@@ -1238,7 +1315,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       final int untypedSlotArity = unsafe.getInt(clazz, globalUntypedSlotArityOffset);
       final long rareBase = unsafe.getLong(clazz, globalRareBaseOffset);
 
-      final int pIndex = untypedSlotArity - 1 - index;
+      final int pIndex = untypedSlotArity - 1 - index;    
 
       return (CompactSetMultimapNode<K, V>) getFromObjectRegion(instance, rareBase, pIndex);      
       
@@ -1269,8 +1346,8 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       return getNode(this.getClass(), this, index);
     }
 
-    boolean nodeInvariant() {
-      return true;
+    void assertNodeInvariant() {
+      // return true;
       // boolean inv1 = (size() - payloadArity() >= 2 * (arity() - payloadArity()));
       // boolean inv2 = (this.arity() == 0) ? sizePredicate() == SIZE_EMPTY : true;
       // boolean inv3 =
@@ -1281,7 +1358,45 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       // && ((this.payloadArity() + this.nodeArity()) == this.arity());
       //
       // return inv1 && inv2 && inv3 && inv4 && inv5;
-    }
+      
+      
+//      if (DEBUG) {
+        int[] arities = arities(bitmap);
+
+        assert (TUPLE_LENGTH * arities[PATTERN_DATA_SINGLETON]
+            + TUPLE_LENGTH * arities[PATTERN_DATA_COLLECTION]
+            + arities[PATTERN_NODE] == slotArity());
+
+        for (int i = 0; i < arities[PATTERN_DATA_SINGLETON]; i++) {
+          int offset = i * TUPLE_LENGTH;
+
+          assert ((getSlot(offset + 0) instanceof ImmutableSet) == false);
+          assert ((getSlot(offset + 1) instanceof ImmutableSet) == false);
+
+          assert ((getSlot(offset + 0) instanceof CompactSetMultimapNode) == false);
+          assert ((getSlot(offset + 1) instanceof CompactSetMultimapNode) == false);
+        }
+
+        for (int i = 0; i < arities[PATTERN_DATA_COLLECTION]; i++) {
+          int offset = (i + arities[PATTERN_DATA_SINGLETON]) * TUPLE_LENGTH;
+
+          assert ((getSlot(offset + 0) instanceof ImmutableSet) == false);
+          assert ((getSlot(offset + 1) instanceof ImmutableSet) == true);
+
+          assert ((getSlot(offset + 0) instanceof CompactSetMultimapNode) == false);
+          assert ((getSlot(offset + 1) instanceof CompactSetMultimapNode) == false);
+        }
+
+        for (int i = 0; i < arities[PATTERN_NODE]; i++) {
+          int offset =
+              (arities[PATTERN_DATA_SINGLETON] + arities[PATTERN_DATA_COLLECTION]) * TUPLE_LENGTH;
+
+          assert ((getSlot(offset + i) instanceof ImmutableSet) == false);
+
+          assert ((getSlot(offset + i) instanceof CompactSetMultimapNode) == true);
+        }
+      }      
+//    }
 
     CompactSetMultimapNode<K, V> copyAndUpdateBitmaps(AtomicReference<Thread> mutator,
         final long updatedBitmap) {      
@@ -1291,7 +1406,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
 
       final CompactSetMultimapNode src = this;
-      final CompactSetMultimapNode dst = allocateHeapRegion(srcClass);
+      final CompactSetMultimapNode dst = RangecopyUtils.allocateHeapRegion(srcClass);
 
       // copy and update bitmaps
       dst.bitmap = updatedBitmap;
@@ -1300,6 +1415,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       offset += rangecopyObjectRegion(src, dst, offset, 2 * payloadArity);
       offset += rangecopyObjectRegion(src, dst, offset, untypedSlotArity);
 
+      // dst.assertNodeInvariant();
       return dst;
     }
 
@@ -1310,7 +1426,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
 
       final CompactSetMultimapNode src = this;
-      final CompactSetMultimapNode dst = allocateHeapRegion(srcClass);
+      final CompactSetMultimapNode dst = RangecopyUtils.allocateHeapRegion(srcClass);
 
       // copy and update bitmaps
       dst.bitmap = bitmap;
@@ -1327,6 +1443,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       rangecopyObjectRegion(src, arrayBase, dst, arrayBase, slotArity);
       setInObjectRegion(dst, arrayBase, pIndex, val);
 
+      // dst.assertNodeInvariant();
       return dst;
     }
 
@@ -1338,7 +1455,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
 
       final CompactSetMultimapNode src = this;
-      final CompactSetMultimapNode dst = allocateHeapRegion(srcClass);
+      final CompactSetMultimapNode dst = RangecopyUtils.allocateHeapRegion(srcClass);
 
       // copy and update bitmaps
       dst.bitmap = bitmap;
@@ -1355,6 +1472,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       rangecopyObjectRegion(src, arrayBase, dst, arrayBase, slotArity);
       setInObjectRegion(dst, arrayBase, pIndex, valColl);
 
+      // dst.assertNodeInvariant();
       return dst;
     }
 
@@ -1376,12 +1494,13 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
 
       final CompactSetMultimapNode src = this;
-      final CompactSetMultimapNode dst = allocateHeapRegionAndSetBitmap(srcClass, bitmap);
+      final CompactSetMultimapNode dst = RangecopyUtils.allocateHeapRegion(srcClass);
 
-//      // copy and update bitmaps
-//      dst.bitmap = bitmap;
+      // copy and update bitmaps
+      dst.bitmap = bitmap;
 
       // TODO: introduce slotArity constant in specializations
+//      final int slotArity = slotArity();
       final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);      
 //      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
 //      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
@@ -1393,6 +1512,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       _do_rangecopyObjectRegion(src, dst, arrayBase, slotArity);
       setInObjectRegion(dst, arrayBase, pIndex, node);
 
+      // dst.assertNodeInvariant();
       return dst;     
     }
 
@@ -1424,6 +1544,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       delta += setInObjectRegionVarArgs(dst, offset, key, val);
       offset += rangecopyObjectRegion(src, offset, dst, offset + delta, slotArity - pIndex);
 
+      // dst.assertNodeInvariant();
       return dst;
     }
 
@@ -1462,6 +1583,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       setInObjectRegionVarArgs(dst, offset, key, valColl);
       offset += rangecopyObjectRegion(src, dst, offset + delta2, slotArity - pIndexNew - 2);
 
+      // dst.assertNodeInvariant();
       return dst;
     }
 
@@ -1493,6 +1615,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
         offset += rangecopyObjectRegion(src, offset + delta, dst, offset,
             (TUPLE_LENGTH * (payloadArity - 1) - pIndexOld + untypedSlotArity));
 
+        // dst.assertNodeInvariant();
         return dst;
       }
     }
@@ -1527,6 +1650,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
         offset += rangecopyObjectRegion(src, offset + delta, dst, offset,
             (TUPLE_LENGTH * (payloadArity - 1) - pIndexOld + untypedSlotArity));
 
+        // dst.assertNodeInvariant();
         return dst;
       }
     }
@@ -1557,6 +1681,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       
       copyAndMigrateFromXxxToNode(src, dst, slotArity, pIndexOld, pIndexNew, node);
       
+      // dst.assertNodeInvariant();
       return dst;
     }
 
@@ -1602,6 +1727,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
       copyAndMigrateFromXxxToNode(src, dst, slotArity, pIndexOld, pIndexNew, node);
 
+      // dst.assertNodeInvariant();
       return dst;
     }
 
@@ -1637,6 +1763,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       copyAndMigrateFromNodeToXxx(src, dst, slotArity, pIndexOld, pIndexNew, keyToInline,
           valToInline);
 
+      // dst.assertNodeInvariant();
       return dst;
     }
 
@@ -1671,6 +1798,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       copyAndMigrateFromNodeToXxx(src, dst, slotArity, pIndexOld, pIndexNew, keyToInline,
           valToInline);
 
+      // dst.assertNodeInvariant();
       return dst;
     }
         
@@ -1722,6 +1850,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       offset += rangecopyObjectRegion(src, offset, dst, offset + delta2, pIndexOld - pIndexNew);
       offset += rangecopyObjectRegion(src, dst, offset + delta2, slotArity - pIndexOld - 2);
 
+      // dst.assertNodeInvariant();
       return dst;
     }
     
