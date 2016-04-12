@@ -20,11 +20,13 @@ import static io.usethesource.capsule.DataLayoutHelper.fieldOffset;
 import static io.usethesource.capsule.DataLayoutHelper.unsafe;
 import static io.usethesource.capsule.RangecopyUtils.allocateHeapRegion;
 import static io.usethesource.capsule.RangecopyUtils.getFromObjectRegion;
+import static io.usethesource.capsule.RangecopyUtils.getFromObjectRegionAndCast;
 import static io.usethesource.capsule.RangecopyUtils.rangecopyObjectRegion;
 import static io.usethesource.capsule.RangecopyUtils._do_rangecopyObjectRegion;
 import static io.usethesource.capsule.RangecopyUtils._do_rangecompareObjectRegion;
 import static io.usethesource.capsule.RangecopyUtils.setInObjectRegion;
 import static io.usethesource.capsule.RangecopyUtils.setInObjectRegionVarArgs;
+import static io.usethesource.capsule.RangecopyUtils.uncheckedCast;
 import static io.usethesource.capsule.SetMultimapUtils.PATTERN_DATA_COLLECTION;
 import static io.usethesource.capsule.SetMultimapUtils.PATTERN_DATA_SINGLETON;
 import static io.usethesource.capsule.SetMultimapUtils.PATTERN_EMPTY;
@@ -972,7 +974,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       this.bitmap = bitmap;
     }
 
-    public long bitmap() {
+    final long bitmap() {
       return bitmap;
     }
     
@@ -1149,6 +1151,23 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     static long globalNodeBaseOffset =
         fieldOffset(SetMultimap0To2Node.class, "nodeBase");    
     
+
+    private final long staticRareBase() {
+      return unsafe.getLong(this.getClass(), globalRareBaseOffset);
+    }    
+    
+    private final int staticSlotArity() {
+      return unsafe.getInt(this.getClass(), globalSlotArityOffset);
+    }
+
+    private final int staticUntypedSlotArity() {
+      return unsafe.getInt(this.getClass(), globalUntypedSlotArityOffset);
+    }
+        
+    private final int staticPayloadArity() {
+      return unsafe.getInt(this.getClass(), globalPayloadArityOffset);
+    }    
+            
     // @Deprecated
     // abstract int dataMap();
     //
@@ -1159,84 +1178,56 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     // abstract int nodeMap();
 
     @Override
-    boolean hasPayload(EitherSingletonOrCollection.Type type) {
+    final boolean hasPayload(EitherSingletonOrCollection.Type type) {
       return payloadArity(type) != 0;
     }
 
     @Override
-    int payloadArity(EitherSingletonOrCollection.Type type) {
+    final int payloadArity(EitherSingletonOrCollection.Type type) {
       if (type == Type.SINGLETON) {
         return arity(bitmap(), PATTERN_DATA_SINGLETON);
       } else {
         return arity(bitmap(), PATTERN_DATA_COLLECTION);
       }
-    }   
-    
-    @SuppressWarnings("unchecked")
-    static final <K> K getSingletonKey(final Class<? extends CompactSetMultimapNode> clazz,
-        final CompactSetMultimapNode instance, final int index) {
-      return (K) getFromObjectRegion(instance, arrayBase, TUPLE_LENGTH * index);      
-    }
-    
-    @SuppressWarnings("unchecked")
-    static final <V> V getSingletonValue(final Class<? extends CompactSetMultimapNode> clazz,
-        final CompactSetMultimapNode instance, final int index) {
-      return (V) getFromObjectRegion(instance, arrayBase, TUPLE_LENGTH * index + 1);
-    }    
-
-    @SuppressWarnings("unchecked")
-    static final <K> K getCollectionKey(final Class<? extends CompactSetMultimapNode> clazz,
-        final CompactSetMultimapNode instance, final int index) {
-      long rareBase = unsafe.getLong(clazz, globalRareBaseOffset);
-      return (K) getFromObjectRegion(instance, rareBase, TUPLE_LENGTH * index);
-    }
-
-    @SuppressWarnings("unchecked")
-    static final <V> ImmutableSet<V> getCollectionValue(final Class<? extends CompactSetMultimapNode> clazz,
-        final CompactSetMultimapNode instance, final int index) {   
-      long rareBase = unsafe.getLong(clazz, globalRareBaseOffset);
-      return (ImmutableSet<V>) getFromObjectRegion(instance, rareBase, TUPLE_LENGTH * index + 1);
     }    
     
+    @SuppressWarnings("unchecked")
     @Override
-    K getSingletonKey(final int index) {
-      return getSingletonKey(this.getClass(), this, index);
+    final K getSingletonKey(final int index) {
+      return (K) getFromObjectRegion(this, arrayBase, TUPLE_LENGTH * index);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    V getSingletonValue(final int index) {
-      return getSingletonValue(this.getClass(), this, index);
+    final V getSingletonValue(final int index) {
+      return (V) getFromObjectRegion(this, arrayBase, TUPLE_LENGTH * index + 1);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    K getCollectionKey(final int index) {
-      return getCollectionKey(this.getClass(), this, index);
+    final K getCollectionKey(final int index) {
+      return (K) getFromObjectRegion(this, staticRareBase(), TUPLE_LENGTH * index);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    ImmutableSet<V> getCollectionValue(final int index) {
-      return getCollectionValue(this.getClass(), this, index);
+    final ImmutableSet<V> getCollectionValue(final int index) {
+      return (ImmutableSet<V>) getFromObjectRegion(this, staticRareBase(), TUPLE_LENGTH * index + 1);
     }
             
     @Override
-    boolean hasSlots() {
+    final boolean hasSlots() {
       return slotArity() != 0;
     }
     
     @Override
-    int slotArity() {
-      return unsafe.getInt(this.getClass(), globalSlotArityOffset);
+    final int slotArity() {
+      return staticSlotArity();
     }
-
-    static final Object getSlot(final Class<? extends CompactSetMultimapNode> clazz,
-        final CompactSetMultimapNode instance, final int index) {
-      long offset = arrayBase + index * addressSize;
-      return unsafe.getObject(instance, offset);
-    }    
     
     @Override
     Object getSlot(final int index) {
-      return getSlot(this.getClass(), this, index);
+      return getFromObjectRegion(this, arrayBase, index);
     }
 
     int emptyArity() {
@@ -1308,29 +1299,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
         }
       }
     }
-    
-    @SuppressWarnings("unchecked")
-    static final <K, V> CompactSetMultimapNode<K, V> getNode(final Class<? extends CompactSetMultimapNode> clazz,
-        final CompactSetMultimapNode instance, final int index) {
-      final int untypedSlotArity = unsafe.getInt(clazz, globalUntypedSlotArityOffset);
-      final long rareBase = unsafe.getLong(clazz, globalRareBaseOffset);
-
-      final int pIndex = untypedSlotArity - 1 - index;    
-
-      return (CompactSetMultimapNode<K, V>) getFromObjectRegion(instance, rareBase, pIndex);      
-      
-//      final int slotArity = unsafe.getInt(clazz, globalSlotArityOffset);      
-//      final int pIndex = slotArity - 1 - index;
-//
-//      return (CompactSetMultimapNode<K, V>) getFromObjectRegion(instance, arrayBase, pIndex);
-            
-//      final long nodeBase = unsafe.getLong(clazz, globalNodeBaseOffset);
-//      return (CompactSetMultimapNode) getFromObjectRegion(instance, nodeBase, -1 -index);
-      
-//      final long arrayOffsetLast = unsafe.getLong(clazz, globalArrayOffsetLastOffset);
-//      return (CompactSetMultimapNode) getFromObjectRegion(instance, arrayOffsetLast, -index);
-    }
-    
+        
     @Override
     boolean hasNodes() {
       return nodeArity() != 0;
@@ -1341,9 +1310,20 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       return arity(bitmap(), PATTERN_NODE);
     }
     
+    @SuppressWarnings("unchecked")
     @Override
-    CompactSetMultimapNode<K, V> getNode(final int index) {
-      return getNode(this.getClass(), this, index);
+    final CompactSetMultimapNode<K, V> getNode(final int index) {
+      final int slotArity = staticSlotArity();
+      final int pIndex = slotArity - 1 - index;
+      
+      return (CompactSetMultimapNode<K, V>) getFromObjectRegion(this, arrayBase, pIndex);
+      
+//      final long rareBase = staticRareBase();
+//      
+//      final int untypedSlotArity = staticUntypedSlotArity();
+//      final int pIndex = untypedSlotArity - 1 - index;    
+//
+//      return (CompactSetMultimapNode<K, V>) getFromObjectRegion(this, rareBase, pIndex);      
     }
 
     void assertNodeInvariant() {
@@ -1402,18 +1382,13 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
         final long updatedBitmap) {      
       final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
 
-      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
-      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
-
       final CompactSetMultimapNode src = this;
       final CompactSetMultimapNode dst = RangecopyUtils.allocateHeapRegion(srcClass);
 
       // copy and update bitmaps
       dst.bitmap = updatedBitmap;
 
-      long offset = arrayBase;
-      offset += rangecopyObjectRegion(src, dst, offset, 2 * payloadArity);
-      offset += rangecopyObjectRegion(src, dst, offset, untypedSlotArity);
+      rangecopyObjectRegion(src, dst, arrayBase, staticSlotArity());
 
       // dst.assertNodeInvariant();
       return dst;
@@ -1431,14 +1406,8 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       // copy and update bitmaps
       dst.bitmap = bitmap;
 
-      // TODO: introduce slotArity constant in specializations
-      // final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);      
-      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
-      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
-      
-      final int slotArity = TUPLE_LENGTH * payloadArity + untypedSlotArity;
-      
-      int pIndex = TUPLE_LENGTH * index + 1;          
+      final int slotArity = staticSlotArity();
+      int pIndex = TUPLE_LENGTH * index + 1;      
       
       rangecopyObjectRegion(src, arrayBase, dst, arrayBase, slotArity);
       setInObjectRegion(dst, arrayBase, pIndex, val);
@@ -1459,18 +1428,12 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
       // copy and update bitmaps
       dst.bitmap = bitmap;
-
-      // TODO: introduce slotArity constant in specializations
-      // final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);      
-      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
-      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
-      
-      final int slotArity = TUPLE_LENGTH * payloadArity + untypedSlotArity;
-      
-      int pIndex = TUPLE_LENGTH * (payloadArity + index) + 1;          
+     
+      final int slotArity = staticSlotArity();      
+      int pIndex = TUPLE_LENGTH * index + 1;          
       
       rangecopyObjectRegion(src, arrayBase, dst, arrayBase, slotArity);
-      setInObjectRegion(dst, arrayBase, pIndex, valColl);
+      setInObjectRegion(dst, staticRareBase(), pIndex, valColl);
 
       // dst.assertNodeInvariant();
       return dst;
@@ -1499,19 +1462,13 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       // copy and update bitmaps
       dst.bitmap = bitmap;
 
-      // TODO: introduce slotArity constant in specializations
-//      final int slotArity = slotArity();
-      final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);      
-//      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
-//      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
-//      final int slotArity = TUPLE_LENGTH * payloadArity + untypedSlotArity;
+      final int slotArity = staticSlotArity();
+      final int pIndex = slotArity - 1 - index;
       
-      int pIndex = slotArity - 1 - index;
-      
-//      rangecopyObjectRegion(src, arrayBase, dst, arrayBase, slotArity);
-      _do_rangecopyObjectRegion(src, dst, arrayBase, slotArity);
+      // single copy spanning over all references      
+      rangecopyObjectRegion(src, dst, arrayBase, slotArity);
       setInObjectRegion(dst, arrayBase, pIndex, node);
-
+      
       // dst.assertNodeInvariant();
       return dst;     
     }
@@ -1524,8 +1481,8 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
       // TODO: introduce slotArity constant in specializations
       // final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);      
-      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
-      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+      final int payloadArity = staticPayloadArity();
+      final int untypedSlotArity = staticUntypedSlotArity();
       
       final int slotArity = TUPLE_LENGTH * payloadArity + untypedSlotArity;
 
@@ -1559,8 +1516,8 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
       // TODO: introduce slotArity constant in specializations
       // final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);      
-      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
-      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+      final int payloadArity = staticPayloadArity();
+      final int untypedSlotArity = staticUntypedSlotArity();
       
       final int slotArity = TUPLE_LENGTH * payloadArity + untypedSlotArity;
 
@@ -1594,8 +1551,8 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
       final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
 
-      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
-      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+      final int payloadArity = staticPayloadArity();
+      final int untypedSlotArity = staticUntypedSlotArity();
 
       if (payloadArity == 1 && untypedSlotArity == 0) {
         // TODO: check if this optimization can be performed in caller
@@ -1629,8 +1586,8 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
       final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
 
-      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
-      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+      final int payloadArity = staticPayloadArity();
+      final int untypedSlotArity = staticUntypedSlotArity();
 
       if (payloadArity == 0 && untypedSlotArity == TUPLE_LENGTH) {
         // TODO: check if this optimization can be performed in caller
@@ -1665,8 +1622,8 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
       // TODO: introduce slotArity constant in specializations
       // final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);      
-      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
-      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+      final int payloadArity = staticPayloadArity();
+      final int untypedSlotArity = staticUntypedSlotArity();
       
       final int slotArity = TUPLE_LENGTH * payloadArity + untypedSlotArity;
 
@@ -1711,8 +1668,8 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
       // TODO: introduce slotArity constant in specializations
       // final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);
-      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
-      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+      final int payloadArity = staticPayloadArity();
+      final int untypedSlotArity = staticUntypedSlotArity();
 
       final int slotArity = TUPLE_LENGTH * payloadArity + untypedSlotArity;
 
@@ -1743,8 +1700,8 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
       // TODO: introduce slotArity constant in specializations
       // final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);      
-      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
-      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+      final int payloadArity = staticPayloadArity();
+      final int untypedSlotArity = staticUntypedSlotArity();
       
       final int slotArity = TUPLE_LENGTH * payloadArity + untypedSlotArity;
 
@@ -1778,8 +1735,8 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
       // TODO: introduce slotArity constant in specializations
       // final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);      
-      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
-      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+      final int payloadArity = staticPayloadArity();
+      final int untypedSlotArity = staticUntypedSlotArity();
       
       final int slotArity = TUPLE_LENGTH * payloadArity + untypedSlotArity;
 
@@ -1828,8 +1785,8 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
       // TODO: introduce slotArity constant in specializations
       // final int slotArity = unsafe.getInt(srcClass, globalSlotArityOffset);      
-      final int payloadArity = unsafe.getInt(srcClass, globalPayloadArityOffset);
-      final int untypedSlotArity = unsafe.getInt(srcClass, globalUntypedSlotArityOffset);
+      final int payloadArity = staticPayloadArity();
+      final int untypedSlotArity = staticUntypedSlotArity();
       
       final int slotArity = TUPLE_LENGTH * payloadArity + untypedSlotArity;
 

@@ -135,6 +135,16 @@ public final class RangecopyUtils {
   final static Object getFromObjectRegion(Object dst, long dstRegionOffset, int dstPos) {
     return unsafe.getObject(dst, dstRegionOffset + dstPos * addressSize);
   }
+  
+  @SuppressWarnings("unchecked")
+  final static <T> T getFromObjectRegionAndCast(Object dst, long dstRegionOffset, int dstPos) {
+    return (T) unsafe.getObject(dst, dstRegionOffset + dstPos * addressSize);
+  }
+  
+  @SuppressWarnings("unchecked")
+  final static <T> T uncheckedCast(Object o) {
+    return (T) o;
+  }
 
   static final boolean USE_NEXT_CLASS_ARRAY = false;
 
