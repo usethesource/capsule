@@ -111,6 +111,15 @@ public final class BitmapUtils {
       return index;
     }
   }
+  
+  static final long populationCountPattern00(long v) {
+    long c = ((v & 0x5555555555555555L) ^ 0x5555555555555555L) & (((v >> 1) & 0x5555555555555555L) ^ 0x5555555555555555L);
+    c = (c & 0x3333333333333333L) + ((c >> 2) & 0x3333333333333333L);
+    c = (c & 0x0F0F0F0F0F0F0F0FL) + ((c >> 4) & 0x0F0F0F0F0F0F0F0FL);
+    c = (c & 0x00FF00FF00FF00FFL) + ((c >> 8) & 0x00FF00FF00FF00FFL);
+    c = (c & 0x0000FFFF0000FFFFL) + ((c >> 16) & 0x0000FFFF0000FFFFL);
+    return c;
+  }
 
   static final long populationCountPattern01(long v) {
     long c = (v & 0x5555555555555555L) & (((v >> 1) & 0x5555555555555555L) ^ 0x5555555555555555L);
