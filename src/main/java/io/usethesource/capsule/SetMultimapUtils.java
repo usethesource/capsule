@@ -105,7 +105,27 @@ public class SetMultimapUtils {
         return setBitPattern00(doubledBitpos);
     }
   }  
+  
+  @Deprecated
+  static final <T> ImmutableSet<T> setFromNode(io.usethesource.capsule.TrieSet_5Bits.AbstractSetNode<T> rootNode) {
+    return new TrieSet_5Bits<>(rootNode);
+  }
 
+  @Deprecated
+  static final <T> io.usethesource.capsule.TrieSet_5Bits.AbstractSetNode<T> setNodeOf(T key1) {
+    return ((TrieSet_5Bits) TrieSet_5Bits.of(key1)).getRootNode();
+  }
+
+  @Deprecated
+  static final <T> io.usethesource.capsule.TrieSet_5Bits.AbstractSetNode<T> setToNode(io.usethesource.capsule.ImmutableSet<T> set) {
+    return ((TrieSet_5Bits) set).getRootNode();
+  }
+  
+  @Deprecated
+  static final <T> io.usethesource.capsule.TrieSet_5Bits.AbstractSetNode<T> setNodeOf(T key1, T key2) {
+    return ((TrieSet_5Bits) TrieSet_5Bits.of(key1, key2)).getRootNode();
+  }
+  
   @Deprecated
   static final <T> ImmutableSet<T> setOf(T key1) {
     return TrieSet_5Bits.of(key1);

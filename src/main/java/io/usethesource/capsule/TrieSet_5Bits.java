@@ -35,6 +35,12 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
   private final int hashCode;
   private final int cachedSize;
 
+  TrieSet_5Bits(AbstractSetNode<K> rootNode) {
+    this.rootNode = rootNode;
+    this.hashCode = hashCode(rootNode);
+    this.cachedSize = size(rootNode);
+  }
+  
   TrieSet_5Bits(AbstractSetNode<K> rootNode, int hashCode, int cachedSize) {
     this.rootNode = rootNode;
     this.hashCode = hashCode;
@@ -99,6 +105,26 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
     return result;
   }
 
+  private static <K> int hashCode(AbstractSetNode<K> rootNode) {
+    int hash = 0;
+
+    for (Iterator<K> it = new SetKeyIterator<>(rootNode); it.hasNext();) {
+      hash += it.next().hashCode();
+    }
+
+    return hash;
+  }
+
+  private static <K> int size(AbstractSetNode<K> rootNode) {
+    int size = 0;
+
+    for (Iterator<K> it = new SetKeyIterator<>(rootNode); it.hasNext(); it.next()) {
+      size += 1;
+    }
+    
+    return size;
+  }
+  
   private boolean checkHashCodeAndSize(final int targetHash, final int targetSize) {
     int hash = 0;
     int size = 0;

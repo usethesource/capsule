@@ -19,6 +19,9 @@ import static io.usethesource.capsule.SetMultimapUtils.PATTERN_EMPTY;
 import static io.usethesource.capsule.SetMultimapUtils.PATTERN_NODE;
 import static io.usethesource.capsule.SetMultimapUtils.setBitPattern;
 import static io.usethesource.capsule.SetMultimapUtils.setOf;
+import static io.usethesource.capsule.SetMultimapUtils.setFromNode;
+import static io.usethesource.capsule.SetMultimapUtils.setNodeOf;
+import static io.usethesource.capsule.SetMultimapUtils.setToNode;
 import static io.usethesource.capsule.TrieSetMultimap_HHAMT_Interlinked.EitherSingletonOrCollection.Type.COLLECTION;
 import static io.usethesource.capsule.TrieSetMultimap_HHAMT_Interlinked.EitherSingletonOrCollection.Type.SINGLETON;
 
@@ -44,6 +47,8 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import io.usethesource.capsule.TrieSetMultimap_HHAMT_Interlinked.EitherSingletonOrCollection.Type;
+import io.usethesource.capsule.TrieSet_5Bits.AbstractSetNode;
+import io.usethesource.capsule.TrieSet_5Bits.SetResult;
 
 @SuppressWarnings("rawtypes")
 public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMultimap<K, V> {
@@ -179,11 +184,11 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
     try {
       @SuppressWarnings("unchecked")
       final K key = (K) o;
-      final Optional<ImmutableSet<V>> result =
+      final Optional<AbstractSetNode<V>> result =
           rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
       if (result.isPresent()) {
-        return result.get();
+        return setFromNode(result.get());
       } else {
         return null;
       }
@@ -216,7 +221,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
         } else {
           int sumOfReplacedHashes = 0;
 
-          for (V replaceValue : details.getReplacedCollection()) {
+          for (V replaceValue : setFromNode(details.getReplacedCollection())) {
             sumOfReplacedHashes += (keyHash ^ replaceValue.hashCode());
           }
 
@@ -317,7 +322,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
       } else {
         int sumOfReplacedHashes = 0;
 
-        for (V replaceValue : details.getReplacedCollection()) {
+        for (V replaceValue : setFromNode(details.getReplacedCollection())) {
           sumOfReplacedHashes += (keyHash ^ replaceValue.hashCode());
         }
 
@@ -371,7 +376,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
   @Override
   public Iterator<V> valueIterator() {
-    return valueCollectionsStream().flatMap(Set::stream).iterator();
+    return valueCollectionsStream().flatMap(node -> setFromNode(node).stream()).iterator();
   }
 
   @Override
@@ -389,7 +394,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
     return new SetMultimapTupleIterator<>(rootNode, tupleOf);
   }
 
-  private Spliterator<ImmutableSet<V>> valueCollectionsSpliterator() {
+  private Spliterator<AbstractSetNode<V>> valueCollectionsSpliterator() {
     /*
      * TODO: specialize between mutable / immutable ({@see Spliterator.IMMUTABLE})
      */
@@ -398,7 +403,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
         characteristics);
   }
 
-  private Stream<ImmutableSet<V>> valueCollectionsStream() {
+  private Stream<AbstractSetNode<V>> valueCollectionsStream() {
     boolean isParallel = false;
     return StreamSupport.stream(valueCollectionsSpliterator(), isParallel);
   }
@@ -545,7 +550,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
       }
 
       /*
-       * TODO: Fix __put(K key, ImmutableSet<V> valColl) for batch insertion and re-enabled
+       * TODO: Fix __put(K key, AbstractSetNode<V> valColl) for batch insertion and re-enabled
        * fast-fail check.
        */
 //      if (this.hashCode != that.hashCode) {
@@ -566,14 +571,14 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
         try {
           @SuppressWarnings("unchecked")
           final K key = (K) entry.getKey();
-          final Optional<ImmutableSet<V>> result =
+          final Optional<AbstractSetNode<V>> result =
               rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
           if (!result.isPresent()) {
             return false;
           } else {
             @SuppressWarnings("unchecked")
-            final ImmutableSet<V> valColl = (ImmutableSet<V>) entry.getValue();
+            final AbstractSetNode<V> valColl = (AbstractSetNode<V>) entry.getValue();
 
             if (!result.get().equals(valColl)) {
               return false;
@@ -718,7 +723,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
       return new SomeSingleton<>(value);
     }
 
-    public static final <T> EitherSingletonOrCollection of(ImmutableSet<T> value) {
+    public static final <T> EitherSingletonOrCollection of(AbstractSetNode<T> value) {
       return new SomeCollection<>(value);
     }
 
@@ -726,7 +731,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
     abstract T getSingleton();
 
-    abstract ImmutableSet<T> getCollection();
+    abstract AbstractSetNode<T> getCollection();
   }
 
   static final class SomeSingleton<T> extends EitherSingletonOrCollection<T> {
@@ -747,16 +752,16 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
     }
 
     @Override
-    ImmutableSet<T> getCollection() {
+    AbstractSetNode<T> getCollection() {
       throw new UnsupportedOperationException(String
           .format("Requested type %s but actually found %s.", Type.COLLECTION, Type.SINGLETON));
     }
   }
 
   static final class SomeCollection<T> extends EitherSingletonOrCollection<T> {
-    private final ImmutableSet<T> value;
+    private final AbstractSetNode<T> value;
 
-    private SomeCollection(ImmutableSet<T> value) {
+    private SomeCollection(AbstractSetNode<T> value) {
       this.value = value;
     }
 
@@ -772,14 +777,14 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
     }
 
     @Override
-    ImmutableSet<T> getCollection() {
+    AbstractSetNode<T> getCollection() {
       return value;
     }
   }
 
   static final class SetMultimapResult<K, V> {
     private V replacedValue;
-    private ImmutableSet<V> replacedValueCollection;
+    private AbstractSetNode<V> replacedValueCollection;
     private EitherSingletonOrCollection.Type replacedType;
 
     private boolean isModified;
@@ -797,7 +802,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
       this.replacedType = SINGLETON;
     }
 
-    public void updated(ImmutableSet<V> replacedValueCollection) {
+    public void updated(AbstractSetNode<V> replacedValueCollection) {
       this.replacedValueCollection = replacedValueCollection;
       this.isModified = true;
       this.isReplaced = true;
@@ -828,7 +833,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
       return replacedValue;
     }
 
-    public ImmutableSet<V> getReplacedCollection() {
+    public AbstractSetNode<V> getReplacedCollection() {
       assert getType() == COLLECTION;
       return replacedValueCollection;
     }
@@ -845,7 +850,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
     abstract boolean containsTuple(final K key, final V val, final int keyHash, final int shift);    
     
-    abstract Optional<ImmutableSet<V>> findByKey(final K key, final int keyHash, final int shift);
+    abstract Optional<AbstractSetNode<V>> findByKey(final K key, final int keyHash, final int shift);
 
     abstract CompactSetMultimapNode<K, V> inserted(final AtomicReference<Thread> mutator,
         final K key, final V val, final int keyHash, final int shift,
@@ -856,7 +861,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
         final SetMultimapResult<K, V> details);
     
     abstract CompactSetMultimapNode<K, V> updated(final AtomicReference<Thread> mutator,
-        final K key, final ImmutableSet<V> val, final int keyHash, final int shift,
+        final K key, final AbstractSetNode<V> val, final int keyHash, final int shift,
         final SetMultimapResult<K, V> details);
 
     abstract CompactSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator,
@@ -922,7 +927,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
     abstract K getCollectionKey(final int index);
 
-    abstract ImmutableSet<V> getCollectionValue(final int index);
+    abstract AbstractSetNode<V> getCollectionValue(final int index);
 
     abstract boolean hasSlots();
 
@@ -1063,7 +1068,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
     abstract CompactSetMultimapNode<K, V> copyAndSetCollectionValue(
         final AtomicReference<Thread> mutator, final long doubledBitpos,
-        final ImmutableSet<V> valColl);
+        final AbstractSetNode<V> valColl);
 
     abstract CompactSetMultimapNode<K, V> copyAndSetNode(final AtomicReference<Thread> mutator,
         final long doubledBitpos, final CompactSetMultimapNode<K, V> node);
@@ -1073,11 +1078,11 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
     
     abstract CompactSetMultimapNode<K, V> copyAndInsertCollection(
         final AtomicReference<Thread> mutator, final long doubledBitpos, final K key,
-        final ImmutableSet<V> valColl);
+        final AbstractSetNode<V> valColl);
 
     abstract CompactSetMultimapNode<K, V> copyAndMigrateFromSingletonToCollection(
         final AtomicReference<Thread> mutator, final long doubledBitpos, final K key,
-        final ImmutableSet<V> valColl);
+        final AbstractSetNode<V> valColl);
 
     abstract CompactSetMultimapNode<K, V> copyAndRemoveSingleton(
         final AtomicReference<Thread> mutator, final long doubledBitpos);
@@ -1119,7 +1124,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
       if (shift >= HASH_CODE_LENGTH) {
         throw new IllegalStateException("Hash collision not yet fixed.");
         // return new HashCollisionSetMultimapNode_BleedingEdge<>(keyHash0,
-        // (K[]) new Object[] {key0, key1}, (ImmutableSet<V>[]) new ImmutableSet[] {val0, val1});
+        // (K[]) new Object[] {key0, key1}, (AbstractSetNode<V>[]) new ImmutableSet[] {val0, val1});
       }
 
       final int mask0 = doubledMask(keyHash0, shift);
@@ -1148,15 +1153,15 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
     // TODO: fix hash collision support
     static final <K, V> CompactSetMultimapNode<K, V> mergeTwoCollectionPairs(final K key0,
-        final ImmutableSet<V> valColl0, final int keyHash0, final K key1,
-        final ImmutableSet<V> valColl1, final int keyHash1,
+        final AbstractSetNode<V> valColl0, final int keyHash0, final K key1,
+        final AbstractSetNode<V> valColl1, final int keyHash1,
         final int shift) {
       assert !(key0.equals(key1));
 
       if (shift >= HASH_CODE_LENGTH) {
         throw new IllegalStateException("Hash collision not yet fixed.");
         // return new HashCollisionSetMultimapNode_BleedingEdge<>(keyHash0,
-        // (K[]) new Object[] {key0, key1}, (ImmutableSet<V>[]) new ImmutableSet[] {val0, val1});
+        // (K[]) new Object[] {key0, key1}, (AbstractSetNode<V>[]) new ImmutableSet[] {val0, val1});
       }
 
       final int mask0 = doubledMask(keyHash0, shift);
@@ -1185,7 +1190,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
     
     // TODO: fix hash collision support
     static final <K, V> CompactSetMultimapNode<K, V> mergeCollectionAndSingletonPairs(final K key0,
-        final ImmutableSet<V> valColl0, final int keyHash0, final K key1, final V val1,
+        final AbstractSetNode<V> valColl0, final int keyHash0, final K key1, final V val1,
         final int keyHash1, final int shift) {
       assert !(key0.equals(key1));
 
@@ -1193,7 +1198,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
         throw new IllegalStateException("Hash collision not yet fixed.");
         // return new HashCollisionSetMultimapNode_BleedingEdge<>(keyHash0,
         // (K[]) new Object[] {key0, key1},
-        // (ImmutableSet<V>[]) new ImmutableSet[] {valColl0, val1});
+        // (AbstractSetNode<V>[]) new ImmutableSet[] {valColl0, val1});
       }
 
       final int mask0 = doubledMask(keyHash0, shift);
@@ -1234,7 +1239,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
     }
 
     static final <K, V> CompactSetMultimapNode<K, V> nodeOf(AtomicReference<Thread> mutator,
-        final long bitmap, final K key, final ImmutableSet<V> valColl) {
+        final long bitmap, final K key, final AbstractSetNode<V> valColl) {
       return nodeOf(mutator, bitmap, new Object[] {key, valColl});
     }
 
@@ -1327,8 +1332,8 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           final K currentKey = getCollectionKey(index);
           if (currentKey.equals(key)) {
 
-            final ImmutableSet<V> currentValColl = getCollectionValue(index);
-            return currentValColl.contains(val);
+            final AbstractSetNode<V> currentValColl = getCollectionValue(index);
+            return currentValColl.contains(val, val.hashCode(), 0);
           }
 
           return false;
@@ -1339,7 +1344,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
     }    
         
     @Override
-    Optional<ImmutableSet<V>> findByKey(final K key, final int keyHash, final int shift) {
+    Optional<AbstractSetNode<V>> findByKey(final K key, final int keyHash, final int shift) {
       long bitmap = this.bitmap();
 
       final int doubledMask = doubledMask(keyHash, shift);
@@ -1361,7 +1366,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           if (currentKey.equals(key)) {
 
             final V currentVal = getSingletonValue(index);
-            return Optional.of(setOf(currentVal));
+            return Optional.of(((TrieSet_5Bits)setOf(currentVal)).getRootNode());
           }
 
           return Optional.empty();
@@ -1372,7 +1377,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           final K currentKey = getCollectionKey(index);
           if (currentKey.equals(key)) {
 
-            final ImmutableSet<V> currentValColl = getCollectionValue(index);
+            final AbstractSetNode<V> currentValColl = getCollectionValue(index);
             return Optional.of(currentValColl);
           }
 
@@ -1383,7 +1388,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
       }
     }
 
-    Optional<ImmutableSet<V>> findByKey(final K key, final int keyHash, final int shift,
+    Optional<AbstractSetNode<V>> findByKey(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented.");
     }
@@ -1422,8 +1427,8 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
               return this;
             } else {
               // migrate from singleton to collection
-              final ImmutableSet<V> valColl = setOf(currentVal, val);
-
+              final AbstractSetNode<V> valColl = ((TrieSet_5Bits)setOf(currentVal, val)).getRootNode();
+              
               details.modified();
               return copyAndMigrateFromSingletonToCollection(mutator, doubledBitpos, currentKey,
                   valColl);
@@ -1445,20 +1450,20 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           final K currentCollKey = getCollectionKey(collIndex);
 
           if (currentCollKey.equals(key)) {
-            final ImmutableSet<V> currentCollVal = getCollectionValue(collIndex);
+            final AbstractSetNode<V> currentCollVal = getCollectionValue(collIndex);
 
-            if (currentCollVal.contains(val)) {
+            if (currentCollVal.contains(val, val.hashCode(), 0)) {
               return this;
             } else {
               // add new mapping
-              final ImmutableSet<V> newCollVal = currentCollVal.__insert(val);
+              final AbstractSetNode<V> newCollVal = currentCollVal.updated(mutator, val, val.hashCode(), 0, SetResult.unchanged());
 
               details.modified();
               return copyAndSetCollectionValue(mutator, doubledBitpos, newCollVal);
             }
           } else {
             // prefix-collision (case: collection x singleton)
-            final ImmutableSet<V> currentValNode = getCollectionValue(collIndex);
+            final AbstractSetNode<V> currentValNode = getCollectionValue(collIndex);
             final CompactSetMultimapNode<K, V> subNodeNew = mergeCollectionAndSingletonPairs(
                 currentCollKey, currentValNode, transformHashCode(currentCollKey.hashCode()), key,
                 val, keyHash, shift + BIT_PARTITION_SIZE);
@@ -1524,7 +1529,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           final K currentCollKey = getCollectionKey(collIndex);
 
           if (currentCollKey.equals(key)) {
-            final ImmutableSet<V> currentCollVal = getCollectionValue(collIndex);
+            final AbstractSetNode<V> currentCollVal = getCollectionValue(collIndex);
 
             // migrate from collection to singleton
             details.updated(currentCollVal);
@@ -1532,7 +1537,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
                 val);
           } else {
             // prefix-collision (case: collection x singleton)
-            final ImmutableSet<V> currentValNode = getCollectionValue(collIndex);
+            final AbstractSetNode<V> currentValNode = getCollectionValue(collIndex);
             final CompactSetMultimapNode<K, V> subNodeNew = mergeCollectionAndSingletonPairs(
                 currentCollKey, currentValNode, transformHashCode(currentCollKey.hashCode()), key,
                 val, keyHash, shift + BIT_PARTITION_SIZE);
@@ -1550,7 +1555,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
     
     @Override
     CompactSetMultimapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key,
-        final ImmutableSet<V> valColl, final int keyHash, final int shift, final SetMultimapResult<K, V> details) {
+        final AbstractSetNode<V> valColl, final int keyHash, final int shift, final SetMultimapResult<K, V> details) {
       long bitmap = this.bitmap();
 
       final int doubledMask = doubledMask(keyHash, shift);
@@ -1614,7 +1619,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           final K currentCollKey = getCollectionKey(collIndex);
 
           if (currentCollKey.equals(key)) {
-            final ImmutableSet<V> currentCollVal = getCollectionValue(collIndex);
+            final AbstractSetNode<V> currentCollVal = getCollectionValue(collIndex);
 
             // update collection value
             details.updated(currentCollVal);
@@ -1626,7 +1631,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 //                valColl);
           } else {
             // prefix-collision (case: collection x collection)
-            final ImmutableSet<V> currentValNode = getCollectionValue(collIndex);
+            final AbstractSetNode<V> currentValNode = getCollectionValue(collIndex);
             final CompactSetMultimapNode<K, V> subNodeNew = mergeTwoCollectionPairs(currentCollKey,
                 currentValNode, transformHashCode(currentCollKey.hashCode()), key, valColl, keyHash,
                 shift + BIT_PARTITION_SIZE);
@@ -1635,7 +1640,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
             return copyAndMigrateFromCollectionToNode(mutator, doubledBitpos, subNodeNew);
                         
 //            // prefix-collision (case: collection x singleton)
-//            final ImmutableSet<V> currentValNode = getCollectionValue(collIndex);
+//            final AbstractSetNode<V> currentValNode = getCollectionValue(collIndex);
 //            final CompactSetMultimapNode<K, V> subNodeNew = mergeCollectionAndSingletonPairs(
 //                currentCollKey, currentValNode, transformHashCode(currentCollKey.hashCode()), key,
 //                valColl, keyHash, shift + BIT_PARTITION_SIZE);
@@ -1734,17 +1739,17 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           final K currentKey = getCollectionKey(collIndex);
           if (currentKey.equals(key)) {
 
-            final ImmutableSet<V> currentValColl = getCollectionValue(collIndex);
-            if (currentValColl.contains(val)) {
+            final AbstractSetNode<V> currentValColl = getCollectionValue(collIndex);
+            if (currentValColl.contains(val, val.hashCode(), 0)) {
 
               // remove mapping
               details.updated(val);
 
-              final ImmutableSet<V> newValColl = currentValColl.__remove(val);
+              final AbstractSetNode<V> newValColl = currentValColl.removed(mutator, val, val.hashCode(), 0, SetResult.unchanged());
 
               if (newValColl.size() == 1) {
                 // TODO: investigate options for unboxing singleton collections
-                V remainingVal = newValColl.iterator().next();
+                V remainingVal = setFromNode(newValColl).iterator().next();
                 return copyAndMigrateFromCollectionToSingleton(mutator, doubledBitpos, key,
                     remainingVal);
               } else {
@@ -1903,7 +1908,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           final K currentKey = getCollectionKey(collIndex);
           if (currentKey.equals(key)) {
 
-            final ImmutableSet<V> currentValColl = getCollectionValue(collIndex);
+            final AbstractSetNode<V> currentValColl = getCollectionValue(collIndex);
 
             details.updated(currentValColl);
             return copyAndRemoveCollection(mutator, doubledBitpos);
@@ -2108,10 +2113,10 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
     @SuppressWarnings("unchecked")
     @Override
-    ImmutableSet<V> getCollectionValue(final int index) {
+    AbstractSetNode<V> getCollectionValue(final int index) {
       // TODO: improve on offset calculation (caching it, etc)
       int offset = TUPLE_LENGTH * (arity(bitmap(), PATTERN_DATA_SINGLETON) + index) + 1;
-      return (ImmutableSet<V>) nodes[offset];
+      return (AbstractSetNode<V>) nodes[offset];
     }
 
     @SuppressWarnings("unchecked")
@@ -2291,7 +2296,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
     @Override
     CompactSetMultimapNode<K, V> copyAndSetCollectionValue(final AtomicReference<Thread> mutator,
-        final long doubledBitpos, final ImmutableSet<V> valColl) {
+        final long doubledBitpos, final AbstractSetNode<V> valColl) {
 
       final int idx =
           TUPLE_LENGTH * (arity(bitmap(), PATTERN_DATA_SINGLETON) + collIndex(doubledBitpos)) + 1;
@@ -2368,7 +2373,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
     
     @Override
     CompactSetMultimapNode<K, V> copyAndInsertCollection(final AtomicReference<Thread> mutator,
-        final long doubledBitpos, final K key, final ImmutableSet<V> valColl) {
+        final long doubledBitpos, final K key, final AbstractSetNode<V> valColl) {
       final int idx = TUPLE_LENGTH * (arity(bitmap(), PATTERN_DATA_SINGLETON) + collIndex(doubledBitpos));
 
       final Object[] src = this.nodes;
@@ -2391,7 +2396,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromSingletonToCollection(
-        AtomicReference<Thread> mutator, long doubledBitpos, K key, ImmutableSet<V> valColl) {
+        AtomicReference<Thread> mutator, long doubledBitpos, K key, AbstractSetNode<V> valColl) {
 
       final int idxOld = TUPLE_LENGTH * dataIndex(doubledBitpos);
       final int idxNew =
@@ -2674,11 +2679,11 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
   // private static final class HashCollisionSetMultimapNode_BleedingEdge<K, V>
   // extends CompactSetMultimapNode<K, V> {
   // private final K[] keys;
-  // private final ImmutableSet<V>[] vals;
+  // private final AbstractSetNode<V>[] vals;
   // private final int hash;
   //
   // HashCollisionSetMultimapNode_BleedingEdge(final int hash, final K[] keys,
-  // final ImmutableSet<V>[] vals) {
+  // final AbstractSetNode<V>[] vals) {
   // this.keys = keys;
   // this.vals = vals;
   // this.hash = hash;
@@ -2705,11 +2710,11 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
   // }
   //
   // @Override
-  // Optional<ImmutableSet<V>> findByKey(final K key, final int keyHash, final int shift) {
+  // Optional<AbstractSetNode<V>> findByKey(final K key, final int keyHash, final int shift) {
   // for (int i = 0; i < keys.length; i++) {
   // final K _key = keys[i];
   // if (key.equals(_key)) {
-  // final ImmutableSet<V> valColl = vals[i];
+  // final AbstractSetNode<V> valColl = vals[i];
   // return Optional.of(valColl);
   // }
   // }
@@ -2717,7 +2722,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
   // }
   //
   // @Override
-  // Optional<ImmutableSet<V>> findByKey(final K key, final int keyHash, final int shift,
+  // Optional<AbstractSetNode<V>> findByKey(final K key, final int keyHash, final int shift,
   // final Comparator<Object> cmp) {
   // throw new UnsupportedOperationException("Not yet implemented.");
   // }
@@ -2729,17 +2734,17 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
   //
   // for (int idx = 0; idx < keys.length; idx++) {
   // if (keys[idx].equals(key)) {
-  // final ImmutableSet<V> currentValColl = vals[idx];
+  // final AbstractSetNode<V> currentValColl = vals[idx];
   //
   // if (currentValColl.contains(val)) {
   // return this;
   // } else {
   // // add new mapping
-  // final ImmutableSet<V> valCollNew = currentValColl.__insert(val);
+  // final AbstractSetNode<V> valCollNew = currentValColl.__insert(val);
   //
-  // final ImmutableSet<V>[] src = this.vals;
+  // final AbstractSetNode<V>[] src = this.vals;
   // @SuppressWarnings("unchecked")
-  // final ImmutableSet<V>[] dst = new ImmutableSet[src.length];
+  // final AbstractSetNode<V>[] dst = new ImmutableSet[src.length];
   //
   // // copy 'src' and set 1 element(s) at position 'idx'
   // System.arraycopy(src, 0, dst, 0, src.length);
@@ -2755,7 +2760,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
   // }
   //
   // // add new tuple
-  // final ImmutableSet<V> valCollNew = setOf(val);
+  // final AbstractSetNode<V> valCollNew = setOf(val);
   //
   // @SuppressWarnings("unchecked")
   // final K[] keysNew = (K[]) new Object[this.keys.length + 1];
@@ -2768,7 +2773,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
   // this.keys.length - keys.length);
   //
   // @SuppressWarnings("unchecked")
-  // final ImmutableSet<V>[] valsNew = new ImmutableSet[this.vals.length + 1];
+  // final AbstractSetNode<V>[] valsNew = new ImmutableSet[this.vals.length + 1];
   //
   // // copy 'this.vals' and insert 1 element(s) at position
   // // 'vals.length'
@@ -2786,18 +2791,18 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
   // final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details) {
   // for (int idx = 0; idx < keys.length; idx++) {
   // if (keys[idx].equals(key)) {
-  // final ImmutableSet<V> currentValColl = getCollectionValue(idx);
+  // final AbstractSetNode<V> currentValColl = getCollectionValue(idx);
   //
   // if (currentValColl.contains(val)) {
   // details.updated(val);
   //
   // // remove tuple
-  // final ImmutableSet<V> valCollNew = currentValColl.__remove(val);
+  // final AbstractSetNode<V> valCollNew = currentValColl.__remove(val);
   //
   // if (valCollNew.size() != 0) {
   // // update mapping
   // @SuppressWarnings("unchecked")
-  // final ImmutableSet<V>[] valsNew = new ImmutableSet[this.vals.length];
+  // final AbstractSetNode<V>[] valsNew = new ImmutableSet[this.vals.length];
   //
   // // copy 'this.vals' and set 1 element(s) at position
   // // 'idx'
@@ -2813,7 +2818,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
   // * root returned, or b) unwrapped and inlined.
   // */
   // final K theOtherKey = (idx == 0) ? keys[1] : keys[0];
-  // final ImmutableSet<V> theOtherVal = (idx == 0) ? vals[1] : vals[0];
+  // final AbstractSetNode<V> theOtherVal = (idx == 0) ? vals[1] : vals[0];
   //
   // final int nodeMap = 0;
   // final int dataMap = doubledBitpos(mask(hash, 0));
@@ -2830,7 +2835,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
   // System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
   //
   // @SuppressWarnings("unchecked")
-  // final ImmutableSet<V>[] valsNew = new ImmutableSet[this.vals.length - 1];
+  // final AbstractSetNode<V>[] valsNew = new ImmutableSet[this.vals.length - 1];
   //
   // // copy 'this.vals' and remove 1 element(s) at
   // // position 'idx'
@@ -2884,7 +2889,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
   // }
   //
   // @Override
-  // ImmutableSet<V> getCollectionValue(final int index) {
+  // AbstractSetNode<V> getCollectionValue(final int index) {
   // return vals[index];
   // }
   //
@@ -2951,7 +2956,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
   // //
   // // for (int j = 0; j < keys.length; j++) {
   // // final K key = keys[j];
-  // // final ImmutableSet<V> valColl = vals[j];
+  // // final AbstractSetNode<V> valColl = vals[j];
   // //
   // // if (key.equals(otherKey) && valColl.equals(otherVal)) {
   // // continue outerLoop;
@@ -2965,7 +2970,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
   //
   // @Override
   // CompactSetMultimapNode<K, V> copyAndSetCollectionValue(final AtomicReference<Thread> mutator,
-  // final long doubledBitpos, final ImmutableSet<V> valColl) {
+  // final long doubledBitpos, final AbstractSetNode<V> valColl) {
   // throw new UnsupportedOperationException();
   // }
   //
@@ -3023,7 +3028,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
   //
   // @Override
   // CompactSetMultimapNode<K, V> copyAndMigrateFromSingletonToCollection(
-  // AtomicReference<Thread> mutator, long doubledBitpos, K key, ImmutableSet<V> valColl) {
+  // AtomicReference<Thread> mutator, long doubledBitpos, K key, AbstractSetNode<V> valColl) {
   // throw new UnsupportedOperationException();
   // }
   //
@@ -3236,20 +3241,20 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
   }
 
   protected static class SetMultimapValueIterator<K, V> extends AbstractSetMultimapIterator<K, V>
-      implements Iterator<ImmutableSet<V>> {
+      implements Iterator<AbstractSetNode<V>> {
 
     SetMultimapValueIterator(AbstractSetMultimapNode<K, V> rootNode) {
       super(rootNode);
     }
 
     @Override
-    public ImmutableSet<V> next() {
+    public AbstractSetNode<V> next() {
       if (!hasNext()) {
         throw new NoSuchElementException();
       } else {
         // TODO: check case distinction
         if (currentValueSingletonCursor < currentValueSingletonLength) {
-          return setOf(currentValueNode.getSingletonValue(currentValueSingletonCursor++));
+          return setNodeOf(currentValueNode.getSingletonValue(currentValueSingletonCursor++));
         } else {
           return currentValueNode.getCollectionValue(currentValueCollectionCursor++);
         }
@@ -3322,7 +3327,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           } else {
             currentKey = currentValueNode.getCollectionKey(currentValueCollectionCursor);
             currentSetIterator =
-                currentValueNode.getCollectionValue(currentValueCollectionCursor).iterator();
+                setFromNode(currentValueNode.getCollectionValue(currentValueCollectionCursor)).iterator();
             currentValueCollectionCursor++;
           }
 
@@ -3487,11 +3492,11 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
         final K key = (K) o0;
         @SuppressWarnings("unchecked")
         final V val = (V) o1;
-        final Optional<ImmutableSet<V>> result =
+        final Optional<AbstractSetNode<V>> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
         if (result.isPresent()) {
-          return result.get().contains(val);
+          return result.get().contains(val, val.hashCode(), 0);
         } else {
           return false;
         }
@@ -3511,11 +3516,11 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
       try {
         @SuppressWarnings("unchecked")
         final K key = (K) o;
-        final Optional<ImmutableSet<V>> result =
+        final Optional<AbstractSetNode<V>> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
         if (result.isPresent()) {
-          return result.get();
+          return setFromNode(result.get());
         } else {
           return null;
         }
@@ -3543,7 +3548,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
       final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
       final CompactSetMultimapNode<K, V> newRootNode =
-          rootNode.updated(null, key, valColl, transformHashCode(keyHash), 0, details);
+          rootNode.updated(null, key, setToNode(valColl), transformHashCode(keyHash), 0, details);
 
       if (details.isModified()) {
         if (details.hasReplacedValue()) {
@@ -3564,7 +3569,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           } else {
             int sumOfReplacedHashes = 0;
 
-            for (V replaceValue : details.getReplacedCollection()) {
+            for (V replaceValue : setFromNode(details.getReplacedCollection())) {
               sumOfReplacedHashes += (keyHash ^ replaceValue.hashCode());
             }
 
@@ -3618,7 +3623,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
       if (details.isModified()) {
         /*
-         * TODO: Fix __put(K key, ImmutableSet<V> valColl) for batch insertion and re-enabled
+         * TODO: Fix __put(K key, AbstractSetNode<V> valColl) for batch insertion and re-enabled
          * fast-fail check.
          */
 //        final int valHashNew = val.hashCode();
@@ -3716,7 +3721,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
     @Override
     public Iterator<V> valueIterator() {
-      return valueCollectionsStream().flatMap(Set::stream).iterator();
+      return valueCollectionsStream().flatMap(node -> setFromNode(node).stream()).iterator();
     }
 
     @Override
@@ -3730,7 +3735,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
       return new TransientSetMultimapTupleIterator<>(this, tupleOf);
     }
 
-    private Spliterator<ImmutableSet<V>> valueCollectionsSpliterator() {
+    private Spliterator<AbstractSetNode<V>> valueCollectionsSpliterator() {
       /*
        * TODO: specialize between mutable / immutable ({@see Spliterator.IMMUTABLE})
        */
@@ -3739,7 +3744,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           characteristics);
     }
 
-    private Stream<ImmutableSet<V>> valueCollectionsStream() {
+    private Stream<AbstractSetNode<V>> valueCollectionsStream() {
       boolean isParallel = false;
       return StreamSupport.stream(valueCollectionsSpliterator(), isParallel);
     }
@@ -3776,7 +3781,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
       }
 
       @Override
-      public ImmutableSet<V> next() {
+      public AbstractSetNode<V> next() {
         return super.next();
       }
 
@@ -3952,7 +3957,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
         }
 
         /*
-         * TODO: Fix __put(K key, ImmutableSet<V> valColl) for batch insertion and re-enabled
+         * TODO: Fix __put(K key, AbstractSetNode<V> valColl) for batch insertion and re-enabled
          * fast-fail check.
          */
 //        if (this.hashCode != that.hashCode) {
@@ -3973,14 +3978,14 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           try {
             @SuppressWarnings("unchecked")
             final K key = (K) entry.getKey();
-            final Optional<ImmutableSet<V>> result =
+            final Optional<AbstractSetNode<V>> result =
                 rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
             if (!result.isPresent()) {
               return false;
             } else {
               @SuppressWarnings("unchecked")
-              final ImmutableSet<V> valColl = (ImmutableSet<V>) entry.getValue();
+              final AbstractSetNode<V> valColl = (AbstractSetNode<V>) entry.getValue();
 
               if (!result.get().equals(valColl)) {
                 return false;
