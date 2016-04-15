@@ -35,8 +35,8 @@ import static io.usethesource.capsule.SetMultimapUtils.PATTERN_NODE;
 import static io.usethesource.capsule.SetMultimapUtils.setBitPattern;
 import static io.usethesource.capsule.SetMultimapUtils.setOf;
 import static io.usethesource.capsule.SetMultimapUtils.*;
-import static io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized_Interlinked.EitherSingletonOrCollection.Type.COLLECTION;
-import static io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized_Interlinked.EitherSingletonOrCollection.Type.SINGLETON;
+import static io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EitherSingletonOrCollection.Type.COLLECTION;
+import static io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EitherSingletonOrCollection.Type.SINGLETON;
 
 import java.util.AbstractCollection;
 import java.util.AbstractSet;
@@ -60,25 +60,25 @@ import java.util.function.BiFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations_Interlinked.SetMultimap0To0Node;
-import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations_Interlinked.SetMultimap0To1Node;
-import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations_Interlinked.SetMultimap0To2Node;
-import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations_Interlinked.SetMultimap0To4Node;
-import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations_Interlinked.SetMultimap1To0Node;
-import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations_Interlinked.SetMultimap1To2Node;
-import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations_Interlinked.SetMultimap2To0Node;
-import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized_Interlinked.EitherSingletonOrCollection.Type;
-import io.usethesource.capsule.TrieSet_5Bits.AbstractSetNode;
-import io.usethesource.capsule.TrieSet_5Bits.SetResult;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.SetMultimap0To0Node;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.SetMultimap0To1Node;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.SetMultimap0To2Node;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.SetMultimap0To4Node;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.SetMultimap1To0Node;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.SetMultimap1To2Node;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.SetMultimap2To0Node;
+import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EitherSingletonOrCollection.Type;
+import io.usethesource.capsule.TrieSet_5Bits_Spec0To8.AbstractSetNode;
+import io.usethesource.capsule.TrieSet_5Bits_Spec0To8.SetResult;
 
 @SuppressWarnings({"rawtypes", "restriction"})
-public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements ImmutableSetMultimap<K, V> {
+public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements ImmutableSetMultimap<K, V> {
 
   protected static final CompactSetMultimapNode EMPTY_NODE = new SetMultimap0To0Node<>(null, 0L);
 
   @SuppressWarnings("unchecked")
-  private static final TrieSetMultimap_HHAMT_Specialized_Interlinked EMPTY_SETMULTIMAP =
-      new TrieSetMultimap_HHAMT_Specialized_Interlinked(EMPTY_NODE, 0, 0);
+  private static final TrieSetMultimap_HHAMT_Specialized_Path_Interlinked EMPTY_SETMULTIMAP =
+      new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked(EMPTY_NODE, 0, 0);
 
   private static final boolean DEBUG = false;
 
@@ -86,7 +86,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
   private final int hashCode;
   private final int cachedSize;
 
-  TrieSetMultimap_HHAMT_Specialized_Interlinked(AbstractSetMultimapNode<K, V> rootNode, int hashCode,
+  TrieSetMultimap_HHAMT_Specialized_Path_Interlinked(AbstractSetMultimapNode<K, V> rootNode, int hashCode,
       int cachedSize) {
     this.rootNode = rootNode;
     this.hashCode = hashCode;
@@ -98,12 +98,12 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
 
   @SuppressWarnings("unchecked")
   public static final <K, V> ImmutableSetMultimap<K, V> of() {
-    return TrieSetMultimap_HHAMT_Specialized_Interlinked.EMPTY_SETMULTIMAP;
+    return TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EMPTY_SETMULTIMAP;
   }
 
   @SuppressWarnings("unchecked")
   public static final <K, V> ImmutableSetMultimap<K, V> of(K key, V... values) {
-    ImmutableSetMultimap<K, V> result = TrieSetMultimap_HHAMT_Specialized_Interlinked.EMPTY_SETMULTIMAP;
+    ImmutableSetMultimap<K, V> result = TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EMPTY_SETMULTIMAP;
 
     for (V value : values) {
       result = result.__insert(key, value);
@@ -114,13 +114,13 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
 
   @SuppressWarnings("unchecked")
   public static final <K, V> TransientSetMultimap<K, V> transientOf() {
-    return TrieSetMultimap_HHAMT_Specialized_Interlinked.EMPTY_SETMULTIMAP.asTransient();
+    return TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EMPTY_SETMULTIMAP.asTransient();
   }
 
   @SuppressWarnings("unchecked")
   public static final <K, V> TransientSetMultimap<K, V> transientOf(K key, V... values) {
     final TransientSetMultimap<K, V> result =
-        TrieSetMultimap_HHAMT_Specialized_Interlinked.EMPTY_SETMULTIMAP.asTransient();
+        TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EMPTY_SETMULTIMAP.asTransient();
 
     for (V value : values) {
       result.__insert(key, value);
@@ -241,7 +241,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
           final int valHashOld = details.getReplacedValue().hashCode();
           final int valHashNew = val.hashCode();
 
-          return new TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>(newRootNode,
+          return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(newRootNode,
               hashCode + ((keyHash ^ valHashNew)) - ((keyHash ^ valHashOld)), cachedSize);
         } else {
           int sumOfReplacedHashes = 0;
@@ -252,14 +252,14 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
 
           final int valHashNew = val.hashCode();
 
-          return new TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>(newRootNode,
+          return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(newRootNode,
               hashCode + ((keyHash ^ valHashNew)) - sumOfReplacedHashes,
               cachedSize - details.getReplacedCollection().size() + 1);
         }
       }
 
       final int valHash = val.hashCode();
-      return new TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>(newRootNode,
+      return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(newRootNode,
           hashCode + ((keyHash ^ valHash)), cachedSize + 1);
     }
 
@@ -276,7 +276,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
 
     if (details.isModified()) {
       final int valHash = val.hashCode();
-      return new TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>(newRootNode,
+      return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(newRootNode,
           hashCode + ((keyHash ^ valHash)), cachedSize + 1);
     }
 
@@ -317,7 +317,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
     if (details.isModified()) {
       assert details.hasReplacedValue();
       final int valHash = details.getReplacedValue().hashCode();
-      return new TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>(newRootNode,
+      return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(newRootNode,
           hashCode - ((keyHash ^ valHash)), cachedSize - 1);
     }
 
@@ -343,7 +343,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
 
       if (details.getType() == EitherSingletonOrCollection.Type.SINGLETON) {
         final int valHash = details.getReplacedValue().hashCode();
-        return new TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>(newRootNode,
+        return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(newRootNode,
             hashCode - ((keyHash ^ valHash)), cachedSize - 1);
       } else {
         int sumOfReplacedHashes = 0;
@@ -352,7 +352,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
           sumOfReplacedHashes += (keyHash ^ replaceValue.hashCode());
         }
 
-        return new TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>(newRootNode,
+        return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(newRootNode,
             hashCode - sumOfReplacedHashes, cachedSize - details.getReplacedCollection().size());
       }
     }
@@ -445,27 +445,27 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
       keySet = new AbstractSet<K>() {
         @Override
         public Iterator<K> iterator() {
-          return TrieSetMultimap_HHAMT_Specialized_Interlinked.this.keyIterator();
+          return TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.this.keyIterator();
         }
 
         @Override
         public int size() {
-          return TrieSetMultimap_HHAMT_Specialized_Interlinked.this.sizeDistinct();
+          return TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.this.sizeDistinct();
         }
 
         @Override
         public boolean isEmpty() {
-          return TrieSetMultimap_HHAMT_Specialized_Interlinked.this.isEmpty();
+          return TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.this.isEmpty();
         }
 
         @Override
         public void clear() {
-          TrieSetMultimap_HHAMT_Specialized_Interlinked.this.clear();
+          TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.this.clear();
         }
 
         @Override
         public boolean contains(Object k) {
-          return TrieSetMultimap_HHAMT_Specialized_Interlinked.this.containsKey(k);
+          return TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.this.containsKey(k);
         }
       };
     }
@@ -481,27 +481,27 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
       values = new AbstractCollection<V>() {
         @Override
         public Iterator<V> iterator() {
-          return TrieSetMultimap_HHAMT_Specialized_Interlinked.this.valueIterator();
+          return TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.this.valueIterator();
         }
 
         @Override
         public int size() {
-          return TrieSetMultimap_HHAMT_Specialized_Interlinked.this.size();
+          return TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.this.size();
         }
 
         @Override
         public boolean isEmpty() {
-          return TrieSetMultimap_HHAMT_Specialized_Interlinked.this.isEmpty();
+          return TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.this.isEmpty();
         }
 
         @Override
         public void clear() {
-          TrieSetMultimap_HHAMT_Specialized_Interlinked.this.clear();
+          TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.this.clear();
         }
 
         @Override
         public boolean contains(Object v) {
-          return TrieSetMultimap_HHAMT_Specialized_Interlinked.this.containsValue(v);
+          return TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.this.containsValue(v);
         }
       };
     }
@@ -539,22 +539,22 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
 
         @Override
         public int size() {
-          return TrieSetMultimap_HHAMT_Specialized_Interlinked.this.size();
+          return TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.this.size();
         }
 
         @Override
         public boolean isEmpty() {
-          return TrieSetMultimap_HHAMT_Specialized_Interlinked.this.isEmpty();
+          return TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.this.isEmpty();
         }
 
         @Override
         public void clear() {
-          TrieSetMultimap_HHAMT_Specialized_Interlinked.this.clear();
+          TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.this.clear();
         }
 
         @Override
         public boolean contains(Object k) {
-          return TrieSetMultimap_HHAMT_Specialized_Interlinked.this.containsKey(k);
+          return TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.this.containsKey(k);
         }
       };
     }
@@ -571,9 +571,9 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
       return false;
     }
 
-    if (other instanceof TrieSetMultimap_HHAMT_Specialized_Interlinked) {
-      TrieSetMultimap_HHAMT_Specialized_Interlinked<?, ?> that =
-          (TrieSetMultimap_HHAMT_Specialized_Interlinked<?, ?>) other;
+    if (other instanceof TrieSetMultimap_HHAMT_Specialized_Path_Interlinked) {
+      TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<?, ?> that =
+          (TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<?, ?>) other;
 
       if (this.cachedSize != that.cachedSize) {
         return false;
@@ -1058,7 +1058,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
     // next[m][n] = null;
     // } else {
     // next[m][n] = Class.forName(String.format(
-    // "io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked$SetMultimap%dTo%dNode",
+    // "io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations_Interlinked$SetMultimap%dTo%dNode",
     // mNext, nNext));
     // }
     // }
@@ -1088,7 +1088,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
               next[65 * m + n] = null;
             } else {
               next[65 * m + n] = Class.forName(String.format(
-                  "io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations_Interlinked$SetMultimap%dTo%dNode",
+                  "io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked$SetMultimap%dTo%dNode",
                   mNext, nNext));
             }
           }
@@ -1125,7 +1125,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
     //// next[65 * m + n] = 0;
     // } else {
     // Class clazz = Class.forName(String.format(
-    // "io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked$SetMultimap%dTo%dNode",
+    // "io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations_Interlinked$SetMultimap%dTo%dNode",
     // mNext, nNext));
     //
     // int section = (65 * m + n) * 4;
@@ -2100,7 +2100,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
           if (currentKey.equals(key)) {
 
             final V currentVal = getSingletonValue(index);
-            return Optional.of(setNodeOf(currentVal));
+            return Optional.of(specSetNodeOf(currentVal));
           }
 
           return Optional.empty();
@@ -2161,7 +2161,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
               return this;
             } else {
               // migrate from singleton to collection
-              final AbstractSetNode<V> valColl = setNodeOf(currentVal, val);
+              final AbstractSetNode<V> valColl = specSetNodeOf(currentVal, val);
 
               details.modified();
               return copyAndMigrateFromSingletonToCollection(mutator, doubledBitpos, dataIndex,
@@ -3257,7 +3257,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
       } else {
         // TODO: check case distinction
         if (currentValueSingletonCursor < currentValueSingletonLength) {
-          return setNodeOf(currentValueNode.getSingletonValue(currentValueSingletonCursor++));
+          return specSetNodeOf(currentValueNode.getSingletonValue(currentValueSingletonCursor++));
         } else {
           return currentValueNode.getCollectionValue(currentValueCollectionCursor++);
         }
@@ -3411,7 +3411,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
     private int cachedSize;
 
     TransientTrieSetMultimap_BleedingEdge(
-        TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> trieSetMultimap_BleedingEdge) {
+        TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> trieSetMultimap_BleedingEdge) {
       this.mutator = new AtomicReference<Thread>(Thread.currentThread());
       this.rootNode = trieSetMultimap_BleedingEdge.rootNode;
       this.hashCode = trieSetMultimap_BleedingEdge.hashCode;
@@ -3936,7 +3936,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V> implements Immu
       }
 
       mutator.set(null);
-      return new TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>(rootNode, hashCode, cachedSize);
+      return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(rootNode, hashCode, cachedSize);
     }
   }
 
