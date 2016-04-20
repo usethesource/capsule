@@ -86,10 +86,10 @@ public class DataLayoutHelper {
 
   static final long addressSize = initializeAddressSize();
   
-  private abstract static class DataLayoutHelperBase {
+  abstract static class DataLayoutHelperBase {
     
-    private final int rawMap1;
-    private final int rawMap2;
+    final int rawMap1;
+    final int rawMap2;
     
     public DataLayoutHelperBase(Object unused, final int rawMap1, final int rawMap2) {
      this.rawMap1 = rawMap1;
@@ -98,9 +98,9 @@ public class DataLayoutHelper {
     
   }
   
-  private abstract static class DataLayoutHelperChild extends DataLayoutHelperBase {
+  static class DataLayoutHelperChild extends DataLayoutHelperBase {
 
-    private static final long[] arrayOffsets =
+    static final long[] arrayOffsets =
         arrayOffsets(DataLayoutHelperChild.class, new String[] {"slot0", "slot1"});
 
     static final int nodeArity = 0;
@@ -113,12 +113,20 @@ public class DataLayoutHelper {
 
     static final long arrayOffsetLast = /* arrayBase + 1 * addressSize */ -1;    
     
-    public final Object slot0 = null;
+    public final Object slot0;
 
-    public final Object slot1 = null;
+    public final Object slot1;
 
-    private DataLayoutHelperChild() {
+    DataLayoutHelperChild() {
       super(null, (byte) 0, (byte) 0);
+      this.slot0 = null;
+      this.slot1 = null;      
+    }
+    
+    DataLayoutHelperChild(final Object slot0, final Object slot1) {
+      super(null, (byte) 0, (byte) 0);
+      this.slot0 = slot0;
+      this.slot1 = slot1;
     }
 
   }

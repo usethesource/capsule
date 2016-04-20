@@ -18,6 +18,8 @@ import static io.usethesource.capsule.DataLayoutHelper.addressSize;
 import org.openjdk.jol.info.ClassLayout;
 import org.openjdk.jol.util.VMSupport;
 
+import io.usethesource.capsule.DataLayoutHelper.DataLayoutHelperChild;
+
 @SuppressWarnings({"restriction"})
 public final class RangecopyUtils {
 
@@ -156,9 +158,47 @@ public final class RangecopyUtils {
   }
 
   static final boolean USE_NEXT_CLASS_ARRAY = false;
+  
+  private static final boolean isCopyMemorySupported() {
+    DataLayoutHelperChild src = new DataLayoutHelperChild(new Object(), new Object());
+    DataLayoutHelperChild dst = new DataLayoutHelperChild();
 
-  private static final boolean USE_COPY_MEMORY = true;
+    try {
+      unsafe.copyMemory(src, DataLayoutHelperChild.arrayOffsets[0], dst,
+          DataLayoutHelperChild.arrayOffsets[0], 2 * addressSize);      
+      return src.slot0 == dst.slot0 && src.slot1 == dst.slot1;
+    } catch (IllegalArgumentException e) {          
+      return false;
+    }
+  }
+  
+  private static final boolean IS_COPY_MEMORY_SUPPORTED;
 
+  private static final boolean USE_COPY_MEMORY;
+  
+  static {
+    IS_COPY_MEMORY_SUPPORTED = isCopyMemorySupported();
+    
+    if (IS_COPY_MEMORY_SUPPORTED) {
+      System.out.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
+          "isSunMiscUnsafeCopyMemorySupported", "true"));
+    } else {
+      System.out.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
+          "isSunMiscUnsafeCopyMemorySupported", "false"));
+    }
+    
+    USE_COPY_MEMORY = IS_COPY_MEMORY_SUPPORTED && !Boolean.getBoolean(
+        String.format("%s.%s", RangecopyUtils.class.getName(), "dontUseSunMiscUnsafeCopyMemory"));
+    
+    if (USE_COPY_MEMORY) {
+      System.out.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
+          "useSunMiscUnsafeCopyMemory", "true"));
+    } else {
+      System.out.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
+          "useSunMiscUnsafeCopyMemory", "false"));
+    }
+  }
+  
   static final long rangecopyPrimitiveRegion(Object src, long srcOffset, Object dst, long dstOffset,
       long sizeInBytes) {
     if (sizeInBytes != 0) {

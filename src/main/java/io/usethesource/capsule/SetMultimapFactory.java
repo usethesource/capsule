@@ -51,18 +51,18 @@ public class SetMultimapFactory {
   }
 
   @SuppressWarnings("unchecked")
-  public final <K, V> TransientMap<K, V> transientOf() {
+  public final <K, V> TransientSetMultimap<K, V> transientOf() {
     try {
-      return (TransientMap<K, V>) transientMapOfEmpty.invoke(null);
+      return (TransientSetMultimap<K, V>) transientMapOfEmpty.invoke(null);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public final <K, V> TransientMap<K, V> transientOf(K key, V ... values) {
+  public final <K, V> TransientSetMultimap<K, V> transientOf(K key, V ... values) {
     try {
-      return (TransientMap<K, V>) transientMapOfKeyValuePairs.invoke(null, key, values);
+      return (TransientSetMultimap<K, V>) transientMapOfKeyValuePairs.invoke(null, key, values);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       e.printStackTrace();
       throw new RuntimeException(e);
