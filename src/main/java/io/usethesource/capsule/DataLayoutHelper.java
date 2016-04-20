@@ -1,11 +1,15 @@
 package io.usethesource.capsule;
 
+import static io.usethesource.capsule.DataLayoutHelper.addressSize;
 import static io.usethesource.capsule.DataLayoutHelper.fieldOffset;
+import static io.usethesource.capsule.DataLayoutHelper.unsafe;
 
 import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
+
+import io.usethesource.capsule.DataLayoutHelper.DataLayoutHelperChild;
 
 public class DataLayoutHelper {
 
@@ -85,6 +89,20 @@ public class DataLayoutHelper {
   }
 
   static final long addressSize = initializeAddressSize();
+    
+  @SuppressWarnings("restriction")
+  static final boolean isCopyMemorySupported() {
+    DataLayoutHelperChild src = new DataLayoutHelperChild(new Object(), new Object());
+    DataLayoutHelperChild dst = new DataLayoutHelperChild();
+
+    try {
+      unsafe.copyMemory(src, DataLayoutHelperChild.arrayOffsets[0], dst,
+          DataLayoutHelperChild.arrayOffsets[0], 2 * addressSize);
+      return src.slot0 == dst.slot0 && src.slot1 == dst.slot1;
+    } catch (IllegalArgumentException e) {
+      return false;
+    }
+  }  
   
   abstract static class DataLayoutHelperBase {
     

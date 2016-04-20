@@ -9,16 +9,9 @@
  *******************************************************************************/
 package io.usethesource.capsule;
 
-import static io.usethesource.capsule.DataLayoutHelper.unsafe;
-
-import java.util.Objects;
-
 import static io.usethesource.capsule.DataLayoutHelper.addressSize;
-
-import org.openjdk.jol.info.ClassLayout;
-import org.openjdk.jol.util.VMSupport;
-
-import io.usethesource.capsule.DataLayoutHelper.DataLayoutHelperChild;
+import static io.usethesource.capsule.DataLayoutHelper.isCopyMemorySupported;
+import static io.usethesource.capsule.DataLayoutHelper.unsafe;
 
 @SuppressWarnings({"restriction"})
 public final class RangecopyUtils {
@@ -98,8 +91,8 @@ public final class RangecopyUtils {
 
   final static long setInObjectRegionVarArgs(Object dst, long dstOffset, Object value0,
       Object value1) {
-//    System.out.println(VMSupport.vmDetails());
-//    System.out.println(ClassLayout.parseClass(dst.getClass()).toPrintable());
+//    System.out.println(org.openjdk.jol.util.VMSupport.vmDetails());
+//    System.out.println(org.openjdk.jol.info.ClassLayout.parseClass(dst.getClass()).toPrintable());
     
     long strideSizeInBytes = addressSize;
 
@@ -158,19 +151,6 @@ public final class RangecopyUtils {
   }
 
   static final boolean USE_NEXT_CLASS_ARRAY = false;
-  
-  private static final boolean isCopyMemorySupported() {
-    DataLayoutHelperChild src = new DataLayoutHelperChild(new Object(), new Object());
-    DataLayoutHelperChild dst = new DataLayoutHelperChild();
-
-    try {
-      unsafe.copyMemory(src, DataLayoutHelperChild.arrayOffsets[0], dst,
-          DataLayoutHelperChild.arrayOffsets[0], 2 * addressSize);      
-      return src.slot0 == dst.slot0 && src.slot1 == dst.slot1;
-    } catch (IllegalArgumentException e) {          
-      return false;
-    }
-  }
   
   private static final boolean IS_COPY_MEMORY_SUPPORTED;
 
