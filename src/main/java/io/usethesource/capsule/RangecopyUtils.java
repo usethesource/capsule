@@ -160,10 +160,10 @@ public final class RangecopyUtils {
     IS_COPY_MEMORY_SUPPORTED = isCopyMemorySupported();
     
     if (IS_COPY_MEMORY_SUPPORTED) {
-      System.out.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
+      System.err.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
           "isSunMiscUnsafeCopyMemorySupported", "true"));
     } else {
-      System.out.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
+      System.err.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
           "isSunMiscUnsafeCopyMemorySupported", "false"));
     }
     
@@ -171,10 +171,10 @@ public final class RangecopyUtils {
         String.format("%s.%s", RangecopyUtils.class.getName(), "dontUseSunMiscUnsafeCopyMemory"));
     
     if (USE_COPY_MEMORY) {
-      System.out.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
+      System.err.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
           "useSunMiscUnsafeCopyMemory", "true"));
     } else {
-      System.out.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
+      System.err.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
           "useSunMiscUnsafeCopyMemory", "false"));
     }
   }
