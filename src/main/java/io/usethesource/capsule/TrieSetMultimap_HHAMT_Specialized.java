@@ -407,7 +407,8 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
   public Iterator<Map.Entry<K, V>> entryIterator() {
     // return new SetMultimapTupleIterator<>(rootNode, AbstractSpecialisedImmutableMap::entryOf);
 
-    return new FlatteningIterator<>(nativeEntryIterator());
+    return new SetMultimapFlattenedTupleIteratorHistogram<>(rootNode);    
+    // return new FlatteningIterator<>(nativeEntryIterator());
   }
 
   @Override
@@ -2977,8 +2978,11 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       histogramOffsets = offsets;
     }
 
-    private boolean searchNextPayloadCategory() {
-      while (payloadCategoryOffset != (payloadCategoryOffsetEnd = histogramOffsets[2 * ++payloadCategoryCursor + 1]));
+    protected boolean searchNextPayloadCategory() {
+      do {
+        payloadCategoryOffsetEnd = histogramOffsets[2 * ++payloadCategoryCursor + 1];
+      } while (payloadCategoryOffset == payloadCategoryOffsetEnd);
+      
       return true;
     }
     
@@ -3110,6 +3114,63 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       }
     }
 
+  }
+  
+  protected static class SetMultimapFlattenedTupleIteratorHistogram<K, V>
+      extends AbstractSetMultimapIteratorHistogram<K, V>implements Iterator<Map.Entry<K, V>> {
+
+    private K cachedKey = null;
+    private Iterator<V> cachedValueSetIterator = Collections.emptyIterator();
+    
+    SetMultimapFlattenedTupleIteratorHistogram(AbstractSetMultimapNode<K, V> rootNode) {
+      super(rootNode);
+    }
+    
+    @Override
+    public boolean hasNext() {
+      return cachedValueSetIterator.hasNext() || super.hasNext();
+    }
+    
+    @Override
+    public Map.Entry<K, V> next() {
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      }
+
+      switch (payloadCategoryCursor) {
+        case PATTERN_DATA_SINGLETON: {
+          long nextOffset = payloadCategoryOffset;
+
+          K nextKey = getFromObjectRegionAndCast(payloadNode, nextOffset);
+          nextOffset += addressSize;
+          V nextVal = getFromObjectRegionAndCast(payloadNode, nextOffset);
+          nextOffset += addressSize;
+
+          payloadCategoryOffset = nextOffset;
+
+          return entryOf(nextKey, nextVal);
+        }
+        case PATTERN_DATA_COLLECTION: {
+          if (cachedValueSetIterator.hasNext() == false) {
+            long nextOffset = payloadCategoryOffset;
+
+            K nextKey = getFromObjectRegionAndCast(payloadNode, nextOffset);
+            nextOffset += addressSize;
+            ImmutableSet<V> nextValueSet = getFromObjectRegionAndCast(payloadNode, nextOffset);
+            nextOffset += addressSize;
+
+            payloadCategoryOffset = nextOffset;
+
+            cachedKey = nextKey;
+            cachedValueSetIterator = nextValueSet.iterator();
+          }
+
+          return entryOf(cachedKey, cachedValueSetIterator.next());
+        }
+        default:
+          throw new IllegalStateException();
+      }
+    }
   }
 
   private static class FlatteningIterator<K, V> implements Iterator<Map.Entry<K, V>> {
