@@ -395,7 +395,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
   @Override
   public Iterator<K> keyIterator() {
-    return new SetMultimapKeyIteratorHistogram<>(rootNode);
+    return new SetMultimapKeyIteratorOffsetHistogram<>(rootNode);
   }
 
   @Override
@@ -407,13 +407,13 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
   public Iterator<Map.Entry<K, V>> entryIterator() {
     // return new SetMultimapTupleIterator<>(rootNode, AbstractSpecialisedImmutableMap::entryOf);
 
-    return new SetMultimapFlattenedTupleIteratorHistogram<>(rootNode);    
+    return new SetMultimapFlattenedTupleIteratorOffsetHistogram<>(rootNode);    
     // return new FlatteningIterator<>(nativeEntryIterator());
   }
 
   @Override
   public Iterator<Map.Entry<K, Object>> nativeEntryIterator() {
-    return new SetMultimapNativeTupleIteratorHistogram<>(rootNode);
+    return new SetMultimapNativeTupleIteratorOffsetHistogram<>(rootNode);
   }
 
   @Override
@@ -965,6 +965,8 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     abstract int[] arities();
     
     abstract long[] offsetRangeTuples();
+    
+    abstract int[] slotRangeTuples();
 
     int size() {
       final Iterator<K> it = new SetMultimapKeyIterator<>(this);
@@ -1315,6 +1317,11 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       return offsetRangeTuples(bitmap, arrayBase);
     }
     
+    @Override
+    public final int[] slotRangeTuples() {
+      return slotRangeTuples(bitmap, 0);
+    }
+        
     static final int[] arities(final long bitmap) {
       int[] arities = new int[4];     
       
@@ -1375,7 +1382,25 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       offsetRangeTuples[3] = offsetRangeTuples[2] + Long.bitCount(filter01(bitmap)) * addressSize;
 
       return offsetRangeTuples;
-    }    
+    }
+    
+    static final int[] slotRangeTuples(final long bitmap, final int startSlot) {
+      int[] offsetRangeTuples = new int[8];
+
+      offsetRangeTuples[0] = startSlot;
+      offsetRangeTuples[1] = offsetRangeTuples[0];
+
+      offsetRangeTuples[4] = offsetRangeTuples[1];
+      offsetRangeTuples[5] = offsetRangeTuples[4] + Long.bitCount(filter10(bitmap)) * 2;
+
+      offsetRangeTuples[6] = offsetRangeTuples[5];
+      offsetRangeTuples[7] = offsetRangeTuples[6] + Long.bitCount(filter11(bitmap)) * 2;
+
+      offsetRangeTuples[2] = offsetRangeTuples[7];
+      offsetRangeTuples[3] = offsetRangeTuples[2] + Long.bitCount(filter01(bitmap));
+
+      return offsetRangeTuples;
+    }   
 
 //    static final long[] offsetRangeTuples(final int[] arities, final long startOffset) {
 //      int[] sizes = sizes();
@@ -2932,7 +2957,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
    * Iterator skeleton that uses a fixed stack in depth.
    */
   @SuppressWarnings("unchecked")
-  private static abstract class AbstractSetMultimapIteratorHistogram<K, V> {
+  private static abstract class AbstractSetMultimapIteratorOffsetHistogram<K, V> {
 
     private static final int MAX_DEPTH = 7;    
             
@@ -2951,7 +2976,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     private final AbstractSetMultimapNode<K, V>[] stackOfNodes =
         new AbstractSetMultimapNode[MAX_DEPTH];
 
-    AbstractSetMultimapIteratorHistogram(AbstractSetMultimapNode<K, V> rootNode) {
+    AbstractSetMultimapIteratorOffsetHistogram(AbstractSetMultimapNode<K, V> rootNode) {
       long[] offsets = rootNode.offsetRangeTuples();
       
       long offsetNodes = offsets[2];
@@ -3056,10 +3081,10 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     }
   }  
   
-  protected static class SetMultimapKeyIteratorHistogram<K, V> extends AbstractSetMultimapIteratorHistogram<K, V>
+  protected static class SetMultimapKeyIteratorOffsetHistogram<K, V> extends AbstractSetMultimapIteratorOffsetHistogram<K, V>
       implements Iterator<K> {
 
-    SetMultimapKeyIteratorHistogram(AbstractSetMultimapNode<K, V> rootNode) {
+    SetMultimapKeyIteratorOffsetHistogram(AbstractSetMultimapNode<K, V> rootNode) {
       super(rootNode);
     }
 
@@ -3083,10 +3108,10 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
   }
  
-  protected static class SetMultimapNativeTupleIteratorHistogram<K, V>
-      extends AbstractSetMultimapIteratorHistogram<K, V>implements Iterator<Map.Entry<K, Object>> {
+  protected static class SetMultimapNativeTupleIteratorOffsetHistogram<K, V>
+      extends AbstractSetMultimapIteratorOffsetHistogram<K, V>implements Iterator<Map.Entry<K, Object>> {
 
-    SetMultimapNativeTupleIteratorHistogram(AbstractSetMultimapNode<K, V> rootNode) {
+    SetMultimapNativeTupleIteratorOffsetHistogram(AbstractSetMultimapNode<K, V> rootNode) {
       super(rootNode);
     }
 
@@ -3116,13 +3141,13 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
   }
   
-  protected static class SetMultimapFlattenedTupleIteratorHistogram<K, V>
-      extends AbstractSetMultimapIteratorHistogram<K, V>implements Iterator<Map.Entry<K, V>> {
+  protected static class SetMultimapFlattenedTupleIteratorOffsetHistogram<K, V>
+      extends AbstractSetMultimapIteratorOffsetHistogram<K, V>implements Iterator<Map.Entry<K, V>> {
 
     private K cachedKey = null;
     private Iterator<V> cachedValueSetIterator = Collections.emptyIterator();
     
-    SetMultimapFlattenedTupleIteratorHistogram(AbstractSetMultimapNode<K, V> rootNode) {
+    SetMultimapFlattenedTupleIteratorOffsetHistogram(AbstractSetMultimapNode<K, V> rootNode) {
       super(rootNode);
     }
     
@@ -3173,6 +3198,253 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     }
   }
 
+  /**
+   * Iterator skeleton that uses a fixed stack in depth.
+   */
+  @SuppressWarnings("unchecked")
+  private static abstract class AbstractSetMultimapIteratorSlotHistogram<K, V> {
+
+    private static final int MAX_DEPTH = 7;    
+            
+    protected AbstractSetMultimapNode<K, V> payloadNode;    
+    protected int payloadCategoryCursor;
+    
+    protected int payloadCategoryOffset;
+    protected int payloadCategoryOffsetEnd; 
+    
+    protected int payloadTotalOffsetEnd;
+    
+    protected int[] histogramOffsets;
+    
+    private int stackLevel = -1;
+    private final int[] stackOfOffsetsAndOutOfBounds = new int[MAX_DEPTH * 2];
+    private final AbstractSetMultimapNode<K, V>[] stackOfNodes =
+        new AbstractSetMultimapNode[MAX_DEPTH];
+
+    AbstractSetMultimapIteratorSlotHistogram(AbstractSetMultimapNode<K, V> rootNode) {
+      int[] offsets = rootNode.slotRangeTuples();
+      
+      int offsetNodes = offsets[2];
+      int offsetNodesEnd = offsets[3];
+      int offsetCategory1 = offsets[4];
+      int offsetCategory1End = offsets[5];
+  
+      if (offsetNodes != offsetNodesEnd) {
+        stackLevel = 0;
+
+        stackOfNodes[0] = rootNode;
+        stackOfOffsetsAndOutOfBounds[0] = offsetNodes;
+        stackOfOffsetsAndOutOfBounds[1] = offsetNodesEnd;
+      }      
+      
+      if (offsetCategory1 != offsetNodes) {
+        payloadNode = rootNode;
+        payloadCategoryCursor = PATTERN_DATA_SINGLETON;
+        payloadCategoryOffset = offsetCategory1;
+        payloadCategoryOffsetEnd = offsetCategory1End;
+        payloadTotalOffsetEnd = offsetNodes;
+      }
+           
+      histogramOffsets = offsets;
+    }
+
+    protected boolean searchNextPayloadCategory() {
+      do {
+        payloadCategoryOffsetEnd = histogramOffsets[2 * ++payloadCategoryCursor + 1];
+      } while (payloadCategoryOffset == payloadCategoryOffsetEnd);
+      
+      return true;
+    }
+    
+    /*
+     * search for next node that contains values
+     */
+    private boolean searchNextValueNode() {
+      while (stackLevel >= 0) {
+        final int currentCursorIndex = stackLevel * 2;
+        final int currentLengthIndex = currentCursorIndex + 1;
+
+        final int nodeCursorAddress = stackOfOffsetsAndOutOfBounds[currentCursorIndex];
+        final int nodeLengthAddress = stackOfOffsetsAndOutOfBounds[currentLengthIndex];
+
+        if (nodeCursorAddress < nodeLengthAddress) {
+          final AbstractSetMultimapNode<K, V> nextNode =
+              (AbstractSetMultimapNode<K, V>) stackOfNodes[stackLevel].getSlot(nodeCursorAddress);
+          stackOfOffsetsAndOutOfBounds[currentCursorIndex] += 1;
+          
+          int[] offsets = nextNode.slotRangeTuples();
+          
+          int offsetNodes = offsets[2];
+          int offsetNodesEnd = offsets[3];
+          int offsetCategory1 = offsets[4];
+          int offsetCategory1End = offsets[5];
+      
+          if (offsetNodes != offsetNodesEnd) {
+            /*
+             * put node on next stack level for depth-first traversal
+             */
+            final int nextStackLevel = ++stackLevel;
+            final int nextCursorIndex = nextStackLevel * 2;
+            final int nextLengthIndex = nextCursorIndex + 1;
+           
+            stackOfNodes[nextStackLevel] = nextNode;
+            stackOfOffsetsAndOutOfBounds[nextCursorIndex] = offsetNodes;
+            stackOfOffsetsAndOutOfBounds[nextLengthIndex] = offsetNodesEnd;
+          }      
+          
+          if (offsetCategory1 != offsetNodes) {
+            payloadNode = nextNode;
+            payloadCategoryCursor = PATTERN_DATA_SINGLETON;
+            payloadCategoryOffset = offsetCategory1;
+            payloadCategoryOffsetEnd = offsetCategory1End;
+            payloadTotalOffsetEnd = offsetNodes;
+
+            histogramOffsets = offsets;
+            return true;
+          }
+   
+        } else {
+          stackLevel--;
+        }
+      }
+
+      return false;
+    }
+
+    protected boolean advanceToNext() {
+      return (payloadCategoryOffset < payloadTotalOffsetEnd && searchNextPayloadCategory())
+          || searchNextValueNode();
+    }
+    
+    public boolean hasNext() {
+      return payloadCategoryOffset < payloadCategoryOffsetEnd || advanceToNext();
+    }
+
+    public void remove() {
+      throw new UnsupportedOperationException();
+    }
+  }    
+
+  protected static class SetMultimapKeyIteratorSlotHistogram<K, V>
+      extends AbstractSetMultimapIteratorSlotHistogram<K, V> implements Iterator<K> {
+
+    SetMultimapKeyIteratorSlotHistogram(AbstractSetMultimapNode<K, V> rootNode) {
+      super(rootNode);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public K next() {
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      } else {
+        switch (payloadCategoryCursor) {
+          case PATTERN_DATA_SINGLETON:
+          case PATTERN_DATA_COLLECTION:
+            int nextSlot = payloadCategoryOffset;
+            payloadCategoryOffset = nextSlot + 2;
+
+            return (K) payloadNode.getSlot(nextSlot);
+          default:
+            throw new IllegalStateException();
+        }
+      }
+    }
+
+  }
+
+  protected static class SetMultimapNativeTupleIteratorSlotHistogram<K, V> extends
+      AbstractSetMultimapIteratorSlotHistogram<K, V> implements Iterator<Map.Entry<K, Object>> {
+
+    SetMultimapNativeTupleIteratorSlotHistogram(AbstractSetMultimapNode<K, V> rootNode) {
+      super(rootNode);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Map.Entry<K, Object> next() {
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      } else {
+        switch (payloadCategoryCursor) {
+          case PATTERN_DATA_SINGLETON:
+          case PATTERN_DATA_COLLECTION:
+            int nextSlot = payloadCategoryOffset;
+
+            K nextKey = (K) payloadNode.getSlot(nextSlot++);
+            // nextSlot += 1;
+            Object nextVal = payloadNode.getSlot(nextSlot++);
+            // nextSlot += 1;
+
+            payloadCategoryOffset = nextSlot;
+
+            return entryOf(nextKey, nextVal);
+          default:
+            throw new IllegalStateException();
+        }
+      }
+    }
+
+  }
+
+  protected static class SetMultimapFlattenedTupleIteratorSlotHistogram<K, V> extends
+      AbstractSetMultimapIteratorSlotHistogram<K, V> implements Iterator<Map.Entry<K, V>> {
+
+    private K cachedKey = null;
+    private Iterator<V> cachedValueSetIterator = Collections.emptyIterator();
+
+    SetMultimapFlattenedTupleIteratorSlotHistogram(AbstractSetMultimapNode<K, V> rootNode) {
+      super(rootNode);
+    }
+
+    @Override
+    public boolean hasNext() {
+      return cachedValueSetIterator.hasNext() || super.hasNext();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Map.Entry<K, V> next() {
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      }
+
+      switch (payloadCategoryCursor) {
+        case PATTERN_DATA_SINGLETON: {
+          int nextSlot = payloadCategoryOffset;
+
+          K nextKey = (K) payloadNode.getSlot(nextSlot++);
+          // nextSlot += 1;
+          V nextVal = (V) payloadNode.getSlot(nextSlot++);
+          // nextSlot += 1;
+
+          payloadCategoryOffset = nextSlot;
+
+          return entryOf(nextKey, nextVal);
+        }
+        case PATTERN_DATA_COLLECTION: {
+          if (cachedValueSetIterator.hasNext() == false) {
+            int nextSlot = payloadCategoryOffset;
+
+            K nextKey = (K) payloadNode.getSlot(nextSlot++);
+            // nextSlot += 1;
+            ImmutableSet<V> nextValueSet = (ImmutableSet<V>) payloadNode.getSlot(nextSlot);
+            // nextSlot += 1;
+
+            payloadCategoryOffset = nextSlot;
+
+            cachedKey = nextKey;
+            cachedValueSetIterator = nextValueSet.iterator();
+          }
+
+          return entryOf(cachedKey, cachedValueSetIterator.next());
+        }
+        default:
+          throw new IllegalStateException();
+      }
+    }
+  }
+    
   private static class FlatteningIterator<K, V> implements Iterator<Map.Entry<K, V>> {
 
     final Iterator<Entry<K, Object>> entryIterator;
