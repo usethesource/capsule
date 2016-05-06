@@ -66,7 +66,6 @@ import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations.SetMultimap
 import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations.SetMultimap1To0Node;
 import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations.SetMultimap1To2Node;
 import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations.SetMultimap2To0Node;
-import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized.AbstractSetMultimapNode;
 import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized.EitherSingletonOrCollection.Type;
 
 @SuppressWarnings({"rawtypes", "restriction"})
@@ -1314,7 +1313,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
     @Override
     public final long[] offsetRangeTuples() {
-      return offsetRangeTuples(bitmap, arrayBase);
+      return offsetRangeTuplesOptimized(bitmap, arrayBase);
     }
     
     @Override
@@ -1380,6 +1379,28 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
       offsetRangeTuples[2] = offsetRangeTuples[7];
       offsetRangeTuples[3] = offsetRangeTuples[2] + Long.bitCount(filter01(bitmap)) * addressSize;
+
+      return offsetRangeTuples;
+    }
+    
+    static final long[] offsetRangeTuplesOptimized(final long bitmap, final long startOffset) {
+      long[] offsetRangeTuples = new long[8];
+
+      long filtered10 = filter10(bitmap);
+      long filtered11 = filter11(bitmap);
+      long filtered01 = filter01(bitmap);
+      
+      offsetRangeTuples[0] = startOffset;
+      offsetRangeTuples[1] = offsetRangeTuples[0];
+
+      offsetRangeTuples[4] = offsetRangeTuples[1];
+      offsetRangeTuples[5] = offsetRangeTuples[4] + ((filtered10 == 0L) ? 0L : (Long.bitCount(filtered10) * addressSize * 2));
+
+      offsetRangeTuples[6] = offsetRangeTuples[5];
+      offsetRangeTuples[7] = offsetRangeTuples[6] + ((filtered11 == 0L) ? 0L : (Long.bitCount(filtered11) * addressSize * 2));
+
+      offsetRangeTuples[2] = offsetRangeTuples[7];
+      offsetRangeTuples[3] = offsetRangeTuples[2] + ((filtered01 == 0L) ? 0L : (Long.bitCount(filtered01) * addressSize));
 
       return offsetRangeTuples;
     }

@@ -962,6 +962,10 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
   protected static abstract class CompactSetMultimapNode<K, V>
       extends AbstractSetMultimapNode<K, V> {
 
+    CompactSetMultimapNode(final AtomicReference<Thread> mutator, final long bitmap) {
+      this.bitmap = bitmap;
+    }
+    
     static final int HASH_CODE_LENGTH = 32;
 
     static final int BIT_PARTITION_SIZE = 5;
@@ -997,8 +1001,12 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     // @Deprecated
     // abstract int nodeMap();
 
-    abstract long bitmap();
-
+    private long bitmap;
+    
+    final long bitmap() {
+      return bitmap;
+    }
+    
     @Deprecated
     @Override
     int arity() {
@@ -1037,7 +1045,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     
     @Override
     public final int[] slotRangeTuples() {
-      return slotRangeTuples(bitmap(), 0);
+      return slotRangeTuplesOptimized(bitmap, 0);
     }
     
     static final int[] slotRangeTuples(final long bitmap, final int startSlot) {
@@ -1056,7 +1064,29 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       offsetRangeTuples[3] = offsetRangeTuples[2] + Long.bitCount(filter01(bitmap));
 
       return offsetRangeTuples;
-    }       
+    }   
+    
+    static final int[] slotRangeTuplesOptimized(final long bitmap, final int startSlot) {
+      int[] offsetRangeTuples = new int[8];
+            
+      long filtered10 = filter10(bitmap);
+      long filtered11 = filter11(bitmap);
+      long filtered01 = filter01(bitmap);
+      
+      offsetRangeTuples[0] = startSlot;
+      offsetRangeTuples[1] = offsetRangeTuples[0];
+
+      offsetRangeTuples[4] = offsetRangeTuples[1];
+      offsetRangeTuples[5] = offsetRangeTuples[4] + ((filtered10 == 0L) ? 0 : (Long.bitCount(filtered10) * 2));
+
+      offsetRangeTuples[6] = offsetRangeTuples[5];
+      offsetRangeTuples[7] = offsetRangeTuples[6] + ((filtered11 == 0L) ? 0 : (Long.bitCount(filtered11) * 2));
+
+      offsetRangeTuples[2] = offsetRangeTuples[7];
+      offsetRangeTuples[3] = offsetRangeTuples[2] + ((filtered01 == 0L) ? 0 : (Long.bitCount(filtered01)));
+
+      return offsetRangeTuples;
+    }
     
     static final byte SIZE_EMPTY = 0b00;
     static final byte SIZE_ONE = 0b01;
@@ -2033,40 +2063,9 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     }
 
   }
-
-  protected static abstract class CompactMixedSetMultimapNode<K, V>
-      extends CompactSetMultimapNode<K, V> {
-
-    private final long bitmap;
-
-    CompactMixedSetMultimapNode(final AtomicReference<Thread> mutator, final long bitmap) {
-      this.bitmap = bitmap;
-    }
-
-    @Override
-    public long bitmap() {
-      return bitmap;
-    }
-
-    // @Override
-    // int dataMap() {
-    // return rawMap2() ^ collMap();
-    // }
-    //
-    // @Override
-    // int collMap() {
-    // return rawMap1() & rawMap2();
-    // }
-    //
-    // @Override
-    // int nodeMap() {
-    // return rawMap1() ^ collMap();
-    // }
-
-  }
-
+  
   private static final class BitmapIndexedSetMultimapNode<K, V>
-      extends CompactMixedSetMultimapNode<K, V> {
+      extends CompactSetMultimapNode<K, V> {
 
     final AtomicReference<Thread> mutator;
     final Object[] nodes;
@@ -2198,17 +2197,17 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     }
 
     @Override
-    Object getSlot(final int index) {
+    final Object getSlot(final int index) {
       return nodes[index];
     }
 
     @Override
-    boolean hasSlots() {
+    final boolean hasSlots() {
       return nodes.length != 0;
     }
 
     @Override
-    int slotArity() {
+    final int slotArity() {
       return nodes.length;
     }
 
