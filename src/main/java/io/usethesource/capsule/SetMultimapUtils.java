@@ -3,9 +3,9 @@ package io.usethesource.capsule;
 public class SetMultimapUtils {
 
   final static int PATTERN_EMPTY = 0b00;
-  final static int PATTERN_NODE = 0b01;
-  final static int PATTERN_DATA_SINGLETON = 0b10;
-  final static int PATTERN_DATA_COLLECTION = 0b11;  
+  final static int PATTERN_DATA_SINGLETON = 0b01;
+  final static int PATTERN_DATA_COLLECTION = 0b10;  
+  final static int PATTERN_NODE = 0b11;
   
   static final long setBitPattern00(final long bitmap, final long doubledBitpos) {
     // generally: from xx to 00
@@ -50,11 +50,11 @@ public class SetMultimapUtils {
   static final long setBitPattern(final long bitmap, final long doubledBitpos,
       final int pattern) {
     switch (pattern) {
-      case PATTERN_NODE:
-        return setBitPattern01(bitmap, doubledBitpos);
       case PATTERN_DATA_SINGLETON:
-        return setBitPattern10(bitmap, doubledBitpos);
+        return setBitPattern01(bitmap, doubledBitpos);
       case PATTERN_DATA_COLLECTION:
+        return setBitPattern10(bitmap, doubledBitpos);
+      case PATTERN_NODE:
         return setBitPattern11(bitmap, doubledBitpos);
       default:
         return setBitPattern00(bitmap, doubledBitpos);
@@ -95,11 +95,11 @@ public class SetMultimapUtils {
   
   static final long setBitPattern(final long doubledBitpos, final int pattern) {
     switch (pattern) {
-      case PATTERN_NODE:
-        return setBitPattern01(doubledBitpos);
       case PATTERN_DATA_SINGLETON:
-        return setBitPattern10(doubledBitpos);
+        return setBitPattern01(doubledBitpos);
       case PATTERN_DATA_COLLECTION:
+        return setBitPattern10(doubledBitpos);
+      case PATTERN_NODE:
         return setBitPattern11(doubledBitpos);
       default:
         return setBitPattern00(doubledBitpos);

@@ -49,7 +49,7 @@ public final class BitmapUtils {
   }
 
   static final int index(long bitmap, int pattern, long bitpos) {
-    return -1;
+    return java.lang.Long.bitCount(filter(bitmap, pattern) & (bitpos - 1));
   }
 
   static final int index01(final long bitmap, final long bitpos) {

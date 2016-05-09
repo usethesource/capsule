@@ -11,13 +11,7 @@ package io.usethesource.capsule;
 
 import static io.usethesource.capsule.AbstractSpecialisedImmutableMap.entryOf;
 import static io.usethesource.capsule.BitmapUtils.filter;
-import static io.usethesource.capsule.BitmapUtils.filter00;
-import static io.usethesource.capsule.BitmapUtils.filter01;
-import static io.usethesource.capsule.BitmapUtils.filter10;
-import static io.usethesource.capsule.BitmapUtils.filter11;
-import static io.usethesource.capsule.BitmapUtils.index01;
-import static io.usethesource.capsule.BitmapUtils.index10;
-import static io.usethesource.capsule.BitmapUtils.index11;
+import static io.usethesource.capsule.BitmapUtils.index;
 import static io.usethesource.capsule.DataLayoutHelper.addressSize;
 import static io.usethesource.capsule.DataLayoutHelper.arrayOffsets;
 import static io.usethesource.capsule.DataLayoutHelper.fieldOffset;
@@ -127,19 +121,30 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
   }
 
   private boolean checkHashCodeAndSize(final int targetHash, final int targetSize) {
-    int hash = 0;
+//    int hash = 0;
+//    int size = 0;
+//
+//    for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
+//      final Map.Entry<K, V> entry = it.next();
+//      final K key = entry.getKey();
+//      final V val = entry.getValue();
+//
+//      hash += key.hashCode() ^ val.hashCode();
+//      size += 1;
+//    }
+//
+//    return hash == targetHash && size == targetSize;
+    
     int size = 0;
 
-    for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
-      final Map.Entry<K, V> entry = it.next();
-      final K key = entry.getKey();
-      final V val = entry.getValue();
-
-      hash += key.hashCode() ^ val.hashCode();
+    for (Iterator<K> it = keyIterator(); it.hasNext();) {
+      final K key = it.next();
       size += 1;
     }
 
-    return hash == targetHash && size == targetSize;
+    if (size != targetSize) System.out.println(String.format("size (%d) != targetSize (%d)", size, targetSize));
+    
+    return size == targetSize;        
   }
 
   public static final int transformHashCode(final int hash) {
@@ -961,6 +966,8 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
      */
     abstract int arity();
     
+    abstract int arity(final int pattern);
+    
     abstract int[] arities();
     
     abstract long[] offsetRangeTuples();
@@ -994,8 +1001,8 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       // NOTE: temporariliy used to test caching of attributes; will be removed soon again
       
 //      cachedSlotArity = (int) staticSlotArity();
-//      cachedNodeArity = (int) Long.bitCount(filter01(bitmap));
-//      cachedEmptyArity = (int) Long.bitCount(filter00(bitmap));
+//      cachedNodeArity = (int) Long.bitCount(filter(bitmap, PATTERN_NODE));
+//      cachedEmptyArity = (int) Long.bitCount(filter(bitmap, PATTERN_EMPTY));
     }
 
     CompactSetMultimapNode(final AtomicReference<Thread> mutator, final long bitmap) {
@@ -1175,6 +1182,10 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     private final long staticRareBase() {
       return unsafe.getLong(this.getClass(), globalRareBaseOffset);
     }
+    
+    private final long staticNodeBase() {
+      return unsafe.getLong(this.getClass(), globalNodeBaseOffset);
+    }    
 
     private final int staticSlotArity() {
       return unsafe.getInt(this.getClass(), globalSlotArityOffset);
@@ -1265,7 +1276,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     }
 
     final int emptyArity() {
-       return Long.bitCount(filter00(bitmap));
+       return Long.bitCount(filter(bitmap, PATTERN_EMPTY));
 //       return arity(bitmap, PATTERN_EMPTY);
       
 //      return cachedEmptyArity;
@@ -1282,6 +1293,11 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       return Arrays.stream(arities).skip(1).sum();
     }
 
+    @Override
+    int arity(final int pattern) {
+      return arity(bitmap, pattern);
+    }
+    
     static final int arity(long bitmap, int pattern) {
 //      if (bitmap == 0) {
 //        if (pattern == PATTERN_EMPTY) {
@@ -1324,10 +1340,10 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     static final int[] arities(final long bitmap) {
       int[] arities = new int[4];     
       
-      arities[0] = Long.bitCount(filter00(bitmap));
-      arities[1] = Long.bitCount(filter01(bitmap));
-      arities[2] = Long.bitCount(filter10(bitmap));
-      arities[3] = Long.bitCount(filter11(bitmap));
+      arities[0] = Long.bitCount(filter(bitmap, PATTERN_EMPTY));
+      arities[1] = Long.bitCount(filter(bitmap, PATTERN_DATA_SINGLETON));
+      arities[2] = Long.bitCount(filter(bitmap, PATTERN_DATA_COLLECTION));
+      arities[3] = Long.bitCount(filter(bitmap, PATTERN_NODE));
       
       return arities;
     }
@@ -1365,20 +1381,49 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 //      return bytes;      
 //    }
     
+//    static final int arity(long bitmap, int pattern) {
+
+    final long offsetEnd(final int pattern, final long startOffset) {
+      return startOffset + lengthInBytes(bitmap, pattern);
+    }
+    
+    final long lengthInBytes(final int pattern) {
+      return lengthInBytes(bitmap, pattern);
+    }
+    
+    static final long lengthInBytes(final long bitmap, final int pattern) {
+      final int arity = arity(bitmap, pattern);
+      final int length;
+
+      switch (pattern) {
+        case PATTERN_NODE:
+          length = 1;
+          break;
+        case PATTERN_DATA_SINGLETON:
+        case PATTERN_DATA_COLLECTION:
+          length = 2;
+          break;
+        default:
+          length = 0;
+      }
+
+      return arity * length * addressSize;
+    }
+    
     static final long[] offsetRangeTuples(final long bitmap, final long startOffset) {
       long[] offsetRangeTuples = new long[8];
 
       offsetRangeTuples[0] = startOffset;
       offsetRangeTuples[1] = offsetRangeTuples[0];
 
-      offsetRangeTuples[4] = offsetRangeTuples[1];
-      offsetRangeTuples[5] = offsetRangeTuples[4] + Long.bitCount(filter10(bitmap)) * addressSize * 2;
+      offsetRangeTuples[2] = offsetRangeTuples[1];
+      offsetRangeTuples[3] = offsetRangeTuples[2] + Long.bitCount(filter(bitmap, PATTERN_NODE)) * addressSize;
+      
+      offsetRangeTuples[4] = offsetRangeTuples[3];
+      offsetRangeTuples[5] = offsetRangeTuples[4] + Long.bitCount(filter(bitmap, PATTERN_DATA_SINGLETON)) * addressSize * 2;
 
       offsetRangeTuples[6] = offsetRangeTuples[5];
-      offsetRangeTuples[7] = offsetRangeTuples[6] + Long.bitCount(filter11(bitmap)) * addressSize * 2;
-
-      offsetRangeTuples[2] = offsetRangeTuples[7];
-      offsetRangeTuples[3] = offsetRangeTuples[2] + Long.bitCount(filter01(bitmap)) * addressSize;
+      offsetRangeTuples[7] = offsetRangeTuples[6] + Long.bitCount(filter(bitmap, PATTERN_DATA_COLLECTION)) * addressSize * 2;
 
       return offsetRangeTuples;
     }
@@ -1386,21 +1431,25 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     static final long[] offsetRangeTuplesOptimized(final long bitmap, final long startOffset) {
       long[] offsetRangeTuples = new long[8];
 
-      long filtered10 = filter10(bitmap);
-      long filtered11 = filter11(bitmap);
-      long filtered01 = filter01(bitmap);
+      long filteredData = filter(bitmap, PATTERN_DATA_SINGLETON);
+      long filteredColl = filter(bitmap, PATTERN_DATA_COLLECTION);
+      long filteredNode = filter(bitmap, PATTERN_NODE);
       
+      // PATTERN_EMPTY
       offsetRangeTuples[0] = startOffset;
       offsetRangeTuples[1] = offsetRangeTuples[0];
 
-      offsetRangeTuples[4] = offsetRangeTuples[1];
-      offsetRangeTuples[5] = offsetRangeTuples[4] + ((filtered10 == 0L) ? 0L : (Long.bitCount(filtered10) * addressSize * 2));
+      // PATTERN_DATA_SINGLETON
+      offsetRangeTuples[2] = offsetRangeTuples[1];
+      offsetRangeTuples[3] = offsetRangeTuples[2] + ((filteredData == 0L) ? 0L : (Long.bitCount(filteredData) * addressSize * 2));
 
+      // PATTERN_DATA_COLLECTION
+      offsetRangeTuples[4] = offsetRangeTuples[3];
+      offsetRangeTuples[5] = offsetRangeTuples[4] + ((filteredColl == 0L) ? 0L : (Long.bitCount(filteredColl) * addressSize * 2));
+
+      // PATTERN_NODE
       offsetRangeTuples[6] = offsetRangeTuples[5];
-      offsetRangeTuples[7] = offsetRangeTuples[6] + ((filtered11 == 0L) ? 0L : (Long.bitCount(filtered11) * addressSize * 2));
-
-      offsetRangeTuples[2] = offsetRangeTuples[7];
-      offsetRangeTuples[3] = offsetRangeTuples[2] + ((filtered01 == 0L) ? 0L : (Long.bitCount(filtered01) * addressSize));
+      offsetRangeTuples[7] = offsetRangeTuples[6] + ((filteredNode == 0L) ? 0L : (Long.bitCount(filteredNode) * addressSize));
 
       return offsetRangeTuples;
     }
@@ -1411,14 +1460,14 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       offsetRangeTuples[0] = startSlot;
       offsetRangeTuples[1] = offsetRangeTuples[0];
 
-      offsetRangeTuples[4] = offsetRangeTuples[1];
-      offsetRangeTuples[5] = offsetRangeTuples[4] + Long.bitCount(filter10(bitmap)) * 2;
+      offsetRangeTuples[2] = offsetRangeTuples[1];
+      offsetRangeTuples[3] = offsetRangeTuples[2] + Long.bitCount(filter(bitmap, PATTERN_DATA_SINGLETON)) * 2;
+
+      offsetRangeTuples[4] = offsetRangeTuples[3];
+      offsetRangeTuples[5] = offsetRangeTuples[4] + Long.bitCount(filter(bitmap, PATTERN_DATA_COLLECTION)) * 2;
 
       offsetRangeTuples[6] = offsetRangeTuples[5];
-      offsetRangeTuples[7] = offsetRangeTuples[6] + Long.bitCount(filter11(bitmap)) * 2;
-
-      offsetRangeTuples[2] = offsetRangeTuples[7];
-      offsetRangeTuples[3] = offsetRangeTuples[2] + Long.bitCount(filter01(bitmap));
+      offsetRangeTuples[7] = offsetRangeTuples[6] + Long.bitCount(filter(bitmap, PATTERN_NODE));
 
       return offsetRangeTuples;
     }   
@@ -1513,7 +1562,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
     @Override
     final int nodeArity() {
-      return Long.bitCount(filter01(bitmap));
+      return Long.bitCount(filter(bitmap, PATTERN_NODE));
 //      return arity(bitmap, PATTERN_NODE);
 
 //      return cachedNodeArity;
@@ -2111,17 +2160,17 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
     @Deprecated
     int dataIndex(final long doubledBitpos) {
-      return index10(bitmap(), doubledBitpos);
+      return index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
     }
 
     @Deprecated
     int collIndex(final long doubledBitpos) {
-      return index11(bitmap(), doubledBitpos);
+      return index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
     }
 
     @Deprecated
     int nodeIndex(final long doubledBitpos) {
-      return index01(bitmap(), doubledBitpos);
+      return index(bitmap, PATTERN_NODE, doubledBitpos);
     }
 
     @Override
@@ -2135,15 +2184,15 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int index = index01(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_NODE, doubledBitpos);
           return getNode(index).containsKey(key, keyHash, shift + BIT_PARTITION_SIZE);
         }
         case PATTERN_DATA_SINGLETON: {
-          int index = index10(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
           return getSingletonKey(index).equals(key);
         }
         case PATTERN_DATA_COLLECTION: {
-          int index = index11(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
           return getCollectionKey(index).equals(key);
         }
         default:
@@ -2167,13 +2216,13 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int index = index01(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final AbstractSetMultimapNode<K, V> subNode = getNode(index);
           return subNode.containsTuple(key, val, keyHash, shift + BIT_PARTITION_SIZE);
         }
         case PATTERN_DATA_SINGLETON: {
-          int index = index10(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(index);
           if (currentKey.equals(key)) {
@@ -2185,7 +2234,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
           return false;
         }
         case PATTERN_DATA_COLLECTION: {
-          int index = index11(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(index);
           if (currentKey.equals(key)) {
@@ -2212,13 +2261,13 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int index = index01(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final AbstractSetMultimapNode<K, V> subNode = getNode(index);
           return subNode.findByKey(key, keyHash, shift + BIT_PARTITION_SIZE);
         }
         case PATTERN_DATA_SINGLETON: {
-          int index = index10(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(index);
           if (currentKey.equals(key)) {
@@ -2230,7 +2279,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
           return Optional.empty();
         }
         case PATTERN_DATA_COLLECTION: {
-          int index = index11(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(index);
           if (currentKey.equals(key)) {
@@ -2263,7 +2312,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
               subNode.inserted(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details);
@@ -2275,7 +2324,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
           final K currentKey = getSingletonKey(dataIndex);
 
           if (currentKey.equals(key)) {
@@ -2304,7 +2353,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
           final K currentCollKey = getCollectionKey(collIndex);
 
           if (currentCollKey.equals(key)) {
@@ -2350,7 +2399,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
               subNode.updated(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details);
@@ -2362,7 +2411,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
           final K currentKey = getSingletonKey(dataIndex);
 
           if (currentKey.equals(key)) {
@@ -2384,7 +2433,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
           final K currentCollKey = getCollectionKey(collIndex);
 
           if (currentCollKey.equals(key)) {
@@ -2425,7 +2474,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
@@ -2472,7 +2521,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(dataIndex);
           if (currentKey.equals(key)) {
@@ -2491,7 +2540,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(collIndex);
           if (currentKey.equals(key)) {
@@ -2564,7 +2613,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
@@ -2646,7 +2695,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(dataIndex);
           if (currentKey.equals(key)) {
@@ -2660,7 +2709,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(collIndex);
           if (currentKey.equals(key)) {
@@ -2981,8 +3030,9 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
   private static abstract class AbstractSetMultimapIteratorOffsetHistogram<K, V> {
 
     private static final int MAX_DEPTH = 7;    
+    private static final int START_CATEGORY = PATTERN_DATA_SINGLETON;
             
-    protected AbstractSetMultimapNode<K, V> payloadNode;    
+    protected AbstractSetMultimapNode<K, V> payloadNode;
     protected int payloadCategoryCursor;
     
     protected long payloadCategoryOffset;
@@ -2990,45 +3040,42 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     
     protected long payloadTotalOffsetEnd;
     
-    protected long[] histogramOffsets;
-    
     private int stackLevel = -1;
     private final long[] stackOfOffsetsAndOutOfBounds = new long[MAX_DEPTH * 2];
     private final AbstractSetMultimapNode<K, V>[] stackOfNodes =
         new AbstractSetMultimapNode[MAX_DEPTH];
 
     AbstractSetMultimapIteratorOffsetHistogram(AbstractSetMultimapNode<K, V> rootNode) {
-      long[] offsets = rootNode.offsetRangeTuples();
+      long offsetNodesEnd = ((CompactSetMultimapNode) rootNode).staticNodeBase();
+      long offsetNodes = offsetNodesEnd - ((CompactSetMultimapNode) rootNode).lengthInBytes(PATTERN_NODE);
+      long offsetPayload = CompactSetMultimapNode.arrayBase;
       
-      long offsetNodes = offsets[2];
-      long offsetNodesEnd = offsets[3];
-      long offsetCategory1 = offsets[4];
-      long offsetCategory1End = offsets[5];
-  
-      if (offsetNodes != offsetNodesEnd) {
-        stackLevel = 0;
+      if (offsetNodes < offsetNodesEnd) {
+        final int nextStackLevel = ++stackLevel;
+        final int nextCursorIndex = nextStackLevel * 2;
+        final int nextLengthIndex = nextCursorIndex + 1;
 
-        stackOfNodes[0] = rootNode;
-        stackOfOffsetsAndOutOfBounds[0] = offsetNodes;
-        stackOfOffsetsAndOutOfBounds[1] = offsetNodesEnd;
-      }      
+        stackOfNodes[nextStackLevel] = rootNode;
+        stackOfOffsetsAndOutOfBounds[nextCursorIndex] = offsetNodes;
+        stackOfOffsetsAndOutOfBounds[nextLengthIndex] = offsetNodesEnd;
+      }
       
-      if (offsetCategory1 != offsetNodes) {
+      if (offsetPayload < offsetNodes) {
         payloadNode = rootNode;
-        payloadCategoryCursor = PATTERN_DATA_SINGLETON;
-        payloadCategoryOffset = offsetCategory1;
-        payloadCategoryOffsetEnd = offsetCategory1End;
+        payloadCategoryCursor = START_CATEGORY;
+
+        payloadCategoryOffset = offsetPayload;
+        payloadCategoryOffsetEnd = offsetPayload + ((CompactSetMultimapNode) rootNode).lengthInBytes(START_CATEGORY);
+
         payloadTotalOffsetEnd = offsetNodes;
       }
-           
-      histogramOffsets = offsets;
     }
 
     protected boolean searchNextPayloadCategory() {
       do {
-        payloadCategoryOffsetEnd = histogramOffsets[2 * ++payloadCategoryCursor + 1];
+        payloadCategoryOffsetEnd = ((CompactSetMultimapNode) payloadNode).offsetEnd(++payloadCategoryCursor, payloadCategoryOffsetEnd);
       } while (payloadCategoryOffset == payloadCategoryOffsetEnd);
-      
+    
       return true;
     }
     
@@ -3047,39 +3094,32 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
           final AbstractSetMultimapNode<K, V> nextNode =
               getFromObjectRegionAndCast(stackOfNodes[stackLevel], nodeCursorAddress);
           stackOfOffsetsAndOutOfBounds[currentCursorIndex] += addressSize;
+                    
+          long offsetNodesEnd = ((CompactSetMultimapNode) nextNode).staticNodeBase();
+          long offsetNodes = offsetNodesEnd - ((CompactSetMultimapNode) nextNode).lengthInBytes(PATTERN_NODE);
+          long offsetPayload = CompactSetMultimapNode.arrayBase;
 
-          
-          long[] offsets = nextNode.offsetRangeTuples();
-          
-          long offsetNodes = offsets[2];
-          long offsetNodesEnd = offsets[3];     
-          long offsetCategory1 = offsets[4];
-          long offsetCategory1End = offsets[5];
-      
-          if (offsetNodes != offsetNodesEnd) {
-            /*
-             * put node on next stack level for depth-first traversal
-             */
+          if (offsetNodes < offsetNodesEnd) {
             final int nextStackLevel = ++stackLevel;
             final int nextCursorIndex = nextStackLevel * 2;
             final int nextLengthIndex = nextCursorIndex + 1;
-           
+
             stackOfNodes[nextStackLevel] = nextNode;
             stackOfOffsetsAndOutOfBounds[nextCursorIndex] = offsetNodes;
             stackOfOffsetsAndOutOfBounds[nextLengthIndex] = offsetNodesEnd;
-          }      
+          }  
           
-          if (offsetCategory1 != offsetNodes) {
+          if (offsetPayload < offsetNodes) {
             payloadNode = nextNode;
-            payloadCategoryCursor = PATTERN_DATA_SINGLETON;
-            payloadCategoryOffset = offsetCategory1;
-            payloadCategoryOffsetEnd = offsetCategory1End;
+            payloadCategoryCursor = START_CATEGORY;
+
+            payloadCategoryOffset = offsetPayload;
+            payloadCategoryOffsetEnd = offsetPayload + ((CompactSetMultimapNode) nextNode).lengthInBytes(START_CATEGORY);
+            
             payloadTotalOffsetEnd = offsetNodes;
 
-            histogramOffsets = offsets;
             return true;
           }
-   
         } else {
           stackLevel--;
         }
@@ -3088,7 +3128,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       return false;
     }
 
-    protected boolean advanceToNext() {
+    protected boolean advanceToNext() {      
       return (payloadCategoryOffset < payloadTotalOffsetEnd && searchNextPayloadCategory())
           || searchNextValueNode();
     }

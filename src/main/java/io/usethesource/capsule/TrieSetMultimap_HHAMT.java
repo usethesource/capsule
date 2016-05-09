@@ -11,12 +11,7 @@ package io.usethesource.capsule;
 
 import static io.usethesource.capsule.AbstractSpecialisedImmutableMap.entryOf;
 import static io.usethesource.capsule.BitmapUtils.filter;
-import static io.usethesource.capsule.BitmapUtils.filter01;
-import static io.usethesource.capsule.BitmapUtils.filter10;
-import static io.usethesource.capsule.BitmapUtils.filter11;
-import static io.usethesource.capsule.BitmapUtils.index01;
-import static io.usethesource.capsule.BitmapUtils.index10;
-import static io.usethesource.capsule.BitmapUtils.index11;
+import static io.usethesource.capsule.BitmapUtils.index;
 import static io.usethesource.capsule.SetMultimapUtils.PATTERN_DATA_COLLECTION;
 import static io.usethesource.capsule.SetMultimapUtils.PATTERN_DATA_SINGLETON;
 import static io.usethesource.capsule.SetMultimapUtils.PATTERN_EMPTY;
@@ -943,6 +938,8 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
      * @return sum of nodes and values stored within
      */
     abstract int arity();
+    
+    abstract int arity(int pattern);
 
     abstract int[] slotRangeTuples();    
     
@@ -1001,7 +998,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     // @Deprecated
     // abstract int nodeMap();
 
-    private long bitmap;
+    protected final long bitmap;
     
     final long bitmap() {
       return bitmap;
@@ -1018,6 +1015,11 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       return Arrays.stream(arities).skip(1).sum();
     }
 
+    @Override
+    final int arity(int pattern) {
+      return arity(bitmap, pattern);
+    }
+    
     static final int arity(long bitmap, int pattern) {
       if (bitmap == 0) {
         if (pattern == PATTERN_EMPTY) {
@@ -1054,14 +1056,14 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       offsetRangeTuples[0] = startSlot;
       offsetRangeTuples[1] = offsetRangeTuples[0];
 
-      offsetRangeTuples[4] = offsetRangeTuples[1];
-      offsetRangeTuples[5] = offsetRangeTuples[4] + Long.bitCount(filter10(bitmap)) * 2;
+      offsetRangeTuples[2] = offsetRangeTuples[1];
+      offsetRangeTuples[3] = offsetRangeTuples[2] + Long.bitCount(filter(bitmap, PATTERN_DATA_SINGLETON)) * 2;
+
+      offsetRangeTuples[4] = offsetRangeTuples[3];
+      offsetRangeTuples[5] = offsetRangeTuples[4] + Long.bitCount(filter(bitmap, PATTERN_DATA_COLLECTION)) * 2;
 
       offsetRangeTuples[6] = offsetRangeTuples[5];
-      offsetRangeTuples[7] = offsetRangeTuples[6] + Long.bitCount(filter11(bitmap)) * 2;
-
-      offsetRangeTuples[2] = offsetRangeTuples[7];
-      offsetRangeTuples[3] = offsetRangeTuples[2] + Long.bitCount(filter01(bitmap));
+      offsetRangeTuples[7] = offsetRangeTuples[6] + Long.bitCount(filter(bitmap, PATTERN_NODE));
 
       return offsetRangeTuples;
     }   
@@ -1069,21 +1071,21 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     static final int[] slotRangeTuplesOptimized(final long bitmap, final int startSlot) {
       int[] offsetRangeTuples = new int[8];
             
-      long filtered10 = filter10(bitmap);
-      long filtered11 = filter11(bitmap);
-      long filtered01 = filter01(bitmap);
+      long filteredData = filter(bitmap, PATTERN_DATA_SINGLETON);
+      long filteredColl = filter(bitmap, PATTERN_DATA_COLLECTION);
+      long filteredNode = filter(bitmap, PATTERN_NODE);
       
       offsetRangeTuples[0] = startSlot;
       offsetRangeTuples[1] = offsetRangeTuples[0];
 
-      offsetRangeTuples[4] = offsetRangeTuples[1];
-      offsetRangeTuples[5] = offsetRangeTuples[4] + ((filtered10 == 0L) ? 0 : (Long.bitCount(filtered10) * 2));
+      offsetRangeTuples[2] = offsetRangeTuples[1];
+      offsetRangeTuples[3] = offsetRangeTuples[2] + ((filteredData == 0L) ? 0 : (Long.bitCount(filteredData) * 2));
+
+      offsetRangeTuples[4] = offsetRangeTuples[3];
+      offsetRangeTuples[5] = offsetRangeTuples[4] + ((filteredColl == 0L) ? 0 : (Long.bitCount(filteredColl) * 2));
 
       offsetRangeTuples[6] = offsetRangeTuples[5];
-      offsetRangeTuples[7] = offsetRangeTuples[6] + ((filtered11 == 0L) ? 0 : (Long.bitCount(filtered11) * 2));
-
-      offsetRangeTuples[2] = offsetRangeTuples[7];
-      offsetRangeTuples[3] = offsetRangeTuples[2] + ((filtered01 == 0L) ? 0 : (Long.bitCount(filtered01)));
+      offsetRangeTuples[7] = offsetRangeTuples[6] + ((filteredNode == 0L) ? 0 : (Long.bitCount(filteredNode)));
 
       return offsetRangeTuples;
     }
@@ -1310,17 +1312,17 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
     @Deprecated
     int dataIndex(final long doubledBitpos) {
-      return index10(bitmap(), doubledBitpos);
+      return index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
     }
 
     @Deprecated
     int collIndex(final long doubledBitpos) {
-      return index11(bitmap(), doubledBitpos);
+      return index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
     }
 
     @Deprecated
     int nodeIndex(final long doubledBitpos) {
-      return index01(bitmap(), doubledBitpos);
+      return index(bitmap, PATTERN_NODE, doubledBitpos);
     }    
 
     @Override
@@ -1334,15 +1336,15 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       
       switch (pattern) {
         case PATTERN_NODE: {
-          int index = index01(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_NODE, doubledBitpos);
           return getNode(index).containsKey(key, keyHash, shift + BIT_PARTITION_SIZE);
         }
         case PATTERN_DATA_SINGLETON: {
-          int index = index10(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
           return getSingletonKey(index).equals(key);
         }
         case PATTERN_DATA_COLLECTION: {
-          int index = index11(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
           return getCollectionKey(index).equals(key);
         }
         default:
@@ -1366,13 +1368,13 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int index = index01(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final AbstractSetMultimapNode<K, V> subNode = getNode(index);
           return subNode.containsTuple(key, val, keyHash, shift + BIT_PARTITION_SIZE);
         }
         case PATTERN_DATA_SINGLETON: {
-          int index = index10(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(index);
           if (currentKey.equals(key)) {
@@ -1384,7 +1386,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
           return false;
         }
         case PATTERN_DATA_COLLECTION: {
-          int index = index11(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(index);
           if (currentKey.equals(key)) {
@@ -1411,13 +1413,13 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int index = index01(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final AbstractSetMultimapNode<K, V> subNode = getNode(index);
           return subNode.findByKey(key, keyHash, shift + BIT_PARTITION_SIZE);
         }
         case PATTERN_DATA_SINGLETON: {
-          int index = index10(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(index);
           if (currentKey.equals(key)) {
@@ -1429,7 +1431,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
           return Optional.empty();
         }
         case PATTERN_DATA_COLLECTION: {
-          int index = index11(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(index);
           if (currentKey.equals(key)) {
@@ -1462,7 +1464,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
               subNode.inserted(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details);
@@ -1474,7 +1476,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
           final K currentKey = getSingletonKey(dataIndex);
 
           if (currentKey.equals(key)) {
@@ -1503,7 +1505,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
           final K currentCollKey = getCollectionKey(collIndex);
 
           if (currentCollKey.equals(key)) {
@@ -1548,7 +1550,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
               subNode.updated(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details);
@@ -1560,7 +1562,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
           final K currentKey = getSingletonKey(dataIndex);
 
           if (currentKey.equals(key)) {
@@ -1582,7 +1584,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
           final K currentCollKey = getCollectionKey(collIndex);
 
           if (currentCollKey.equals(key)) {
@@ -1622,7 +1624,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
               subNode.updated(mutator, key, valColl, keyHash, shift + BIT_PARTITION_SIZE, details);
@@ -1634,7 +1636,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
           final K currentKey = getSingletonKey(dataIndex);
 
           if (currentKey.equals(key)) {
@@ -1672,7 +1674,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
           final K currentCollKey = getCollectionKey(collIndex);
 
           if (currentCollKey.equals(key)) {
@@ -1725,7 +1727,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
@@ -1772,7 +1774,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(dataIndex);
           if (currentKey.equals(key)) {
@@ -1791,7 +1793,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(collIndex);
           if (currentKey.equals(key)) {
@@ -1864,7 +1866,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
@@ -1946,7 +1948,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(dataIndex);
           if (currentKey.equals(key)) {
@@ -1960,7 +1962,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(collIndex);
           if (currentKey.equals(key)) {
@@ -2191,9 +2193,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
     @Override
     int nodeArity() {
-//      int[] arities = arities(bitmap());
-//      return arities[PATTERN_NODE];
-        return arity(bitmap(), PATTERN_NODE);
+      return arity(bitmap, PATTERN_NODE);
     }
 
     @Override
@@ -2387,13 +2387,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       dst[idx + 1] = val;
       System.arraycopy(src, idx, dst, idx + 2, src.length - idx);
 
-      // generally: from 00 to 10
-      // here: set both bits individually
-      long updatedBitmap = bitmap();
-      updatedBitmap |= doubledBitpos; // idempotent
-      updatedBitmap ^= doubledBitpos; // idempotent
-      updatedBitmap |= (doubledBitpos << 1);
-
+      long updatedBitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_DATA_SINGLETON);
       return nodeOf(mutator, updatedBitmap, dst);
     }
     
@@ -2411,12 +2405,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       dst[idx + 1] = valColl;
       System.arraycopy(src, idx, dst, idx + 2, src.length - idx);
 
-      // generally: from 00 to 11
-      // here: set both bits individually
-      long updatedBitmap = bitmap();
-      updatedBitmap |= doubledBitpos;
-      updatedBitmap |= (doubledBitpos << 1);
-
+      long updatedBitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_DATA_COLLECTION);
       return nodeOf(mutator, updatedBitmap, dst);
     }    
 
@@ -2440,12 +2429,6 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       dst[idxNew + 1] = valColl;
       System.arraycopy(src, idxNew + 2, dst, idxNew + 2, src.length - idxNew - 2);
 
-//      // generally: from 10 to 11
-//      // here: set both bits individually
-//      long updatedBitmap = bitmap();
-//      updatedBitmap |= (doubledBitpos);
-//      updatedBitmap |= (doubledBitpos << 1);
-      
       long updatedBitmap = setBitPattern(bitmap(), doubledBitpos, PATTERN_DATA_COLLECTION);
       return nodeOf(mutator, updatedBitmap, dst);
     }
@@ -2472,12 +2455,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       System.arraycopy(src, idxNew, dst, idxNew + 2, idxOld - idxNew);
       System.arraycopy(src, idxOld + 2, dst, idxOld + 2, src.length - idxOld - 2);
 
-      // generally: from 11 to 10
-      // here: set both bits individually
-      long updatedBitmap = bitmap();
-      updatedBitmap ^= (doubledBitpos);
-      updatedBitmap |= (doubledBitpos << 1);
-
+      long updatedBitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_DATA_SINGLETON);
       return nodeOf(mutator, updatedBitmap, dst);
     }
 
@@ -2493,13 +2471,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       System.arraycopy(src, 0, dst, 0, idx);
       System.arraycopy(src, idx + 2, dst, idx, src.length - idx - 2);
 
-      // generally: from 10 to 00
-      // here: set both bits individually
-      long updatedBitmap = bitmap();
-      updatedBitmap |= doubledBitpos; // idempotent
-      updatedBitmap ^= doubledBitpos; // idempotent
-      updatedBitmap ^= (doubledBitpos << 1);
-
+      long updatedBitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_EMPTY);
       return nodeOf(mutator, updatedBitmap, dst);
     }
     
@@ -2532,12 +2504,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       System.arraycopy(src, 0, dst, 0, idx);
       System.arraycopy(src, idx + 2, dst, idx, src.length - idx - 2);
 
-      // generally: from 11 to 00
-      // here: set both bits individually
-      long updatedBitmap = bitmap();
-      updatedBitmap ^= (doubledBitpos);
-      updatedBitmap ^= (doubledBitpos << 1);
-
+      long updatedBitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_EMPTY);
       return nodeOf(mutator, updatedBitmap, dst);
     }
 
@@ -2551,12 +2518,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
       final Object[] dst = copyAndMigrateFromXxxToNode(idxOld, idxNew, node);
 
-      // generally: from 10 to 01
-      // here: set both bits individually
-      long updatedBitmap = bitmap();
-      updatedBitmap |= (doubledBitpos);
-      updatedBitmap ^= (doubledBitpos << 1);
-
+      long updatedBitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_NODE);
       return nodeOf(mutator, updatedBitmap, dst);
     }
 
@@ -2570,12 +2532,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
       final Object[] dst = copyAndMigrateFromXxxToNode(idxOld, idxNew, node);
 
-      // generally: from 11 to 01
-      // here: set both bits individually
-      long updatedBitmap = bitmap();
-      updatedBitmap |= (doubledBitpos);
-      updatedBitmap ^= (doubledBitpos << 1);
-
+      long updatedBitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_NODE);
       return nodeOf(mutator, updatedBitmap, dst);
     }
 
@@ -2609,12 +2566,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
       final Object[] dst = copyAndMigrateFromNodeToXxx(idxOld, idxNew, keyToInline, valToInline);
 
-      // generally: from 01 to 10
-      // here: set both bits individually
-      long updatedBitmap = bitmap();
-      updatedBitmap ^= (doubledBitpos);
-      updatedBitmap |= (doubledBitpos << 1);
-
+      long updatedBitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_DATA_SINGLETON);
       return nodeOf(mutator, updatedBitmap, dst);
     }
 
@@ -2631,12 +2583,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
       final Object[] dst = copyAndMigrateFromNodeToXxx(idxOld, idxNew, keyToInline, valToInline);
 
-      // generally: from 01 to 11
-      // here: set both bits individually
-      long updatedBitmap = bitmap();
-      updatedBitmap |= (doubledBitpos);
-      updatedBitmap |= (doubledBitpos << 1);
-
+      long updatedBitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_DATA_COLLECTION);
       return nodeOf(mutator, updatedBitmap, dst);
     }
 
@@ -3144,6 +3091,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
   private static abstract class AbstractSetMultimapIteratorSlotHistogram<K, V> {
 
     private static final int MAX_DEPTH = 7;    
+    private static final int START_CATEGORY = PATTERN_DATA_SINGLETON;
             
     protected AbstractSetMultimapNode<K, V> payloadNode;    
     protected int payloadCategoryCursor;
@@ -3153,43 +3101,40 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     
     protected int payloadTotalOffsetEnd;
     
-    protected int[] histogramOffsets;
-    
     private int stackLevel = -1;
     private final int[] stackOfOffsetsAndOutOfBounds = new int[MAX_DEPTH * 2];
     private final AbstractSetMultimapNode<K, V>[] stackOfNodes =
         new AbstractSetMultimapNode[MAX_DEPTH];
 
     AbstractSetMultimapIteratorSlotHistogram(AbstractSetMultimapNode<K, V> rootNode) {
-      int[] offsets = rootNode.slotRangeTuples();
+      int offsetNodesEnd = rootNode.slotArity();
+      int offsetNodes = offsetNodesEnd - rootNode.arity(PATTERN_NODE);
+      int offsetPayload = 0;
       
-      int offsetNodes = offsets[2];
-      int offsetNodesEnd = offsets[3];
-      int offsetCategory1 = offsets[4];
-      int offsetCategory1End = offsets[5];
-  
-      if (offsetNodes != offsetNodesEnd) {
-        stackLevel = 0;
+      if (offsetNodes < offsetNodesEnd) {
+        final int nextStackLevel = ++stackLevel;
+        final int nextCursorIndex = nextStackLevel * 2;
+        final int nextLengthIndex = nextCursorIndex + 1;
 
-        stackOfNodes[0] = rootNode;
-        stackOfOffsetsAndOutOfBounds[0] = offsetNodes;
-        stackOfOffsetsAndOutOfBounds[1] = offsetNodesEnd;
+        stackOfNodes[nextStackLevel] = rootNode;
+        stackOfOffsetsAndOutOfBounds[nextCursorIndex] = offsetNodes;
+        stackOfOffsetsAndOutOfBounds[nextLengthIndex] = offsetNodesEnd;
       }      
-      
-      if (offsetCategory1 != offsetNodes) {
+            
+      if (offsetPayload < offsetNodes) {
         payloadNode = rootNode;
-        payloadCategoryCursor = PATTERN_DATA_SINGLETON;
-        payloadCategoryOffset = offsetCategory1;
-        payloadCategoryOffsetEnd = offsetCategory1End;
+        payloadCategoryCursor = START_CATEGORY;
+
+        payloadCategoryOffset = offsetPayload;
+        payloadCategoryOffsetEnd = offsetPayload + (rootNode.arity(START_CATEGORY) * AbstractSetMultimapNode.TUPLE_LENGTH);
+
         payloadTotalOffsetEnd = offsetNodes;
       }
-           
-      histogramOffsets = offsets;
     }
 
     protected boolean searchNextPayloadCategory() {
       do {
-        payloadCategoryOffsetEnd = histogramOffsets[2 * ++payloadCategoryCursor + 1];
+        payloadCategoryOffsetEnd += (payloadNode.arity(++payloadCategoryCursor) * AbstractSetMultimapNode.TUPLE_LENGTH);
       } while (payloadCategoryOffset == payloadCategoryOffsetEnd);
       
       return true;
@@ -3211,17 +3156,11 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
               (AbstractSetMultimapNode<K, V>) stackOfNodes[stackLevel].getSlot(nodeCursorAddress);
           stackOfOffsetsAndOutOfBounds[currentCursorIndex] += 1;
           
-          int[] offsets = nextNode.slotRangeTuples();
-          
-          int offsetNodes = offsets[2];
-          int offsetNodesEnd = offsets[3];
-          int offsetCategory1 = offsets[4];
-          int offsetCategory1End = offsets[5];
+          int offsetNodesEnd = nextNode.slotArity();
+          int offsetNodes = offsetNodesEnd - nextNode.arity(PATTERN_NODE);
+          int offsetPayload = 0;
       
-          if (offsetNodes != offsetNodesEnd) {
-            /*
-             * put node on next stack level for depth-first traversal
-             */
+          if (offsetNodes < offsetNodesEnd) {
             final int nextStackLevel = ++stackLevel;
             final int nextCursorIndex = nextStackLevel * 2;
             final int nextLengthIndex = nextCursorIndex + 1;
@@ -3231,14 +3170,14 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
             stackOfOffsetsAndOutOfBounds[nextLengthIndex] = offsetNodesEnd;
           }      
           
-          if (offsetCategory1 != offsetNodes) {
+          if (offsetPayload < offsetNodes) {
             payloadNode = nextNode;
-            payloadCategoryCursor = PATTERN_DATA_SINGLETON;
-            payloadCategoryOffset = offsetCategory1;
-            payloadCategoryOffsetEnd = offsetCategory1End;
-            payloadTotalOffsetEnd = offsetNodes;
+            payloadCategoryCursor = START_CATEGORY;
 
-            histogramOffsets = offsets;
+            payloadCategoryOffset = offsetPayload;
+            payloadCategoryOffsetEnd = offsetPayload + (nextNode.arity(START_CATEGORY) * AbstractSetMultimapNode.TUPLE_LENGTH);
+            
+            payloadTotalOffsetEnd = offsetNodes;
             return true;
           }
    
