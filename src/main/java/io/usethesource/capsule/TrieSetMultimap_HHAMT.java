@@ -1021,15 +1021,15 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     }
     
     static final int arity(long bitmap, int pattern) {
-      if (bitmap == 0) {
-        if (pattern == PATTERN_EMPTY) {
-          return 32;
-        } else {
-          return 0;
-        }
-      } else {
+//      if (bitmap == 0) {
+//        if (pattern == PATTERN_EMPTY) {
+//          return 32;
+//        } else {
+//          return 0;
+//        }
+//      } else {
         return Long.bitCount(filter(bitmap, pattern));
-      }
+//      }
     }
 
     // TODO: Implement arity histogram over bitmap (with single for loop) that calculates offsets
@@ -3090,110 +3090,137 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
   @SuppressWarnings("unchecked")
   private static abstract class AbstractSetMultimapIteratorSlotHistogram<K, V> {
 
-    private static final int MAX_DEPTH = 7;    
+    private static final int MAX_DEPTH = 7;
     private static final int START_CATEGORY = PATTERN_DATA_SINGLETON;
-            
-    protected AbstractSetMultimapNode<K, V> payloadNode;    
+
+    protected AbstractSetMultimapNode<K, V> payloadNode;
     protected int payloadCategoryCursor;
-    
+
     protected int payloadCategoryOffset;
-    protected int payloadCategoryOffsetEnd; 
-    
+    protected int payloadCategoryOffsetEnd;
+
     protected int payloadTotalOffsetEnd;
-    
+
     private int stackLevel = -1;
     private final int[] stackOfOffsetsAndOutOfBounds = new int[MAX_DEPTH * 2];
     private final AbstractSetMultimapNode<K, V>[] stackOfNodes =
         new AbstractSetMultimapNode[MAX_DEPTH];
 
+    AbstractSetMultimapNode<K, V> topOfStackNode;
+    int nodeCursorAddress;
+    int nodeLengthAddress;
+
     AbstractSetMultimapIteratorSlotHistogram(AbstractSetMultimapNode<K, V> rootNode) {
-      int offsetNodesEnd = rootNode.slotArity();
-      int offsetNodes = offsetNodesEnd - rootNode.arity(PATTERN_NODE);
-      int offsetPayload = 0;
-      
+      final int offsetNodesEnd = rootNode.slotArity();
+      final int offsetNodes = offsetNodesEnd - rootNode.nodeArity();
+      final int offsetPayload = 0;
+
       if (offsetNodes < offsetNodesEnd) {
-        final int nextStackLevel = ++stackLevel;
-        final int nextCursorIndex = nextStackLevel * 2;
-        final int nextLengthIndex = nextCursorIndex + 1;
-
-        stackOfNodes[nextStackLevel] = rootNode;
-        stackOfOffsetsAndOutOfBounds[nextCursorIndex] = offsetNodes;
-        stackOfOffsetsAndOutOfBounds[nextLengthIndex] = offsetNodesEnd;
-      }      
-            
-      if (offsetPayload < offsetNodes) {
-        payloadNode = rootNode;
-        payloadCategoryCursor = START_CATEGORY;
-
-        payloadCategoryOffset = offsetPayload;
-        payloadCategoryOffsetEnd = offsetPayload + (rootNode.arity(START_CATEGORY) * AbstractSetMultimapNode.TUPLE_LENGTH);
-
-        payloadTotalOffsetEnd = offsetNodes;
+        pushNode(rootNode, offsetNodes, offsetNodesEnd);
       }
+
+      if (offsetPayload < offsetNodes) {
+        setPayloadNode(rootNode, offsetPayload, offsetNodes);
+      }
+    }
+
+    private void pushNode(AbstractSetMultimapNode<K, V> node, int offsetStart, int offsetEnd) {
+      if (stackLevel >= 0) {
+        // save current cursor
+        stackOfOffsetsAndOutOfBounds[stackLevel * 2] = nodeCursorAddress;
+      }
+
+      final int nextStackLevel = ++stackLevel;
+      final int nextCursorIndex = nextStackLevel * 2;
+      final int nextLengthIndex = nextCursorIndex + 1;
+
+      stackOfNodes[nextStackLevel] = node;
+      stackOfOffsetsAndOutOfBounds[nextCursorIndex] = offsetStart;
+      stackOfOffsetsAndOutOfBounds[nextLengthIndex] = offsetEnd;
+
+      // load next cursor
+      topOfStackNode = node;
+      nodeCursorAddress = offsetStart;
+      nodeLengthAddress = offsetEnd;
+    }
+
+    private final void popNode() {
+      stackOfNodes[stackLevel--] = null;
+
+      if (stackLevel >= 0) {
+        // load prevous cursor
+        final int previousStackLevel = stackLevel;
+        final int previousCursorIndex = previousStackLevel * 2;
+        final int previousLengthIndex = previousCursorIndex + 1;
+
+        topOfStackNode = stackOfNodes[previousStackLevel];
+        nodeCursorAddress = stackOfOffsetsAndOutOfBounds[previousCursorIndex];
+        nodeLengthAddress = stackOfOffsetsAndOutOfBounds[previousLengthIndex];
+      }
+    }
+
+    private final AbstractSetMultimapNode<K, V> consumeNode() {
+      AbstractSetMultimapNode<K, V> nextNode =
+          (AbstractSetMultimapNode<K, V>) topOfStackNode.getSlot(nodeCursorAddress++);
+
+      if (nodeCursorAddress == nodeLengthAddress) {
+        popNode();
+      }
+
+      return nextNode;
+    }
+
+    private void setPayloadNode(final AbstractSetMultimapNode<K, V> node, int categoryOffsetStart,
+        int overallOffsetEnd) {
+      payloadNode = node;
+      payloadCategoryCursor = START_CATEGORY;
+
+      payloadCategoryOffset = categoryOffsetStart;
+      payloadCategoryOffsetEnd =
+          categoryOffsetStart + (node.arity(START_CATEGORY) * AbstractSetMultimapNode.TUPLE_LENGTH);
+
+      payloadTotalOffsetEnd = overallOffsetEnd;
     }
 
     protected boolean searchNextPayloadCategory() {
       do {
-        payloadCategoryOffsetEnd += (payloadNode.arity(++payloadCategoryCursor) * AbstractSetMultimapNode.TUPLE_LENGTH);
+        payloadCategoryOffsetEnd +=
+            (payloadNode.arity(++payloadCategoryCursor) * AbstractSetMultimapNode.TUPLE_LENGTH);
       } while (payloadCategoryOffset == payloadCategoryOffsetEnd);
-      
+
       return true;
     }
-    
+
     /*
      * search for next node that contains values
      */
     private boolean searchNextValueNode() {
-      while (stackLevel >= 0) {
-        final int currentCursorIndex = stackLevel * 2;
-        final int currentLengthIndex = currentCursorIndex + 1;
+      boolean found = false;
+      while (!found && stackLevel >= 0) {
+        final AbstractSetMultimapNode<K, V> nextNode = consumeNode();
 
-        final int nodeCursorAddress = stackOfOffsetsAndOutOfBounds[currentCursorIndex];
-        final int nodeLengthAddress = stackOfOffsetsAndOutOfBounds[currentLengthIndex];
+        final int offsetNodesEnd = nextNode.slotArity();
+        final int offsetNodes = offsetNodesEnd - nextNode.nodeArity();
+        final int offsetPayload = 0;
 
-        if (nodeCursorAddress < nodeLengthAddress) {
-          final AbstractSetMultimapNode<K, V> nextNode =
-              (AbstractSetMultimapNode<K, V>) stackOfNodes[stackLevel].getSlot(nodeCursorAddress);
-          stackOfOffsetsAndOutOfBounds[currentCursorIndex] += 1;
-          
-          int offsetNodesEnd = nextNode.slotArity();
-          int offsetNodes = offsetNodesEnd - nextNode.arity(PATTERN_NODE);
-          int offsetPayload = 0;
-      
-          if (offsetNodes < offsetNodesEnd) {
-            final int nextStackLevel = ++stackLevel;
-            final int nextCursorIndex = nextStackLevel * 2;
-            final int nextLengthIndex = nextCursorIndex + 1;
-           
-            stackOfNodes[nextStackLevel] = nextNode;
-            stackOfOffsetsAndOutOfBounds[nextCursorIndex] = offsetNodes;
-            stackOfOffsetsAndOutOfBounds[nextLengthIndex] = offsetNodesEnd;
-          }      
-          
-          if (offsetPayload < offsetNodes) {
-            payloadNode = nextNode;
-            payloadCategoryCursor = START_CATEGORY;
+        if (offsetNodes < offsetNodesEnd) {
+          pushNode(nextNode, offsetNodes, offsetNodesEnd);
+        }
 
-            payloadCategoryOffset = offsetPayload;
-            payloadCategoryOffsetEnd = offsetPayload + (nextNode.arity(START_CATEGORY) * AbstractSetMultimapNode.TUPLE_LENGTH);
-            
-            payloadTotalOffsetEnd = offsetNodes;
-            return true;
-          }
-   
-        } else {
-          stackLevel--;
+        if (offsetPayload < offsetNodes) {
+          setPayloadNode(nextNode, offsetPayload, offsetNodes);
+          found = true;
         }
       }
 
-      return false;
+      return found;
     }
 
     protected boolean advanceToNext() {
       return (payloadCategoryOffset < payloadTotalOffsetEnd && searchNextPayloadCategory())
           || searchNextValueNode();
     }
-    
+
     public boolean hasNext() {
       return payloadCategoryOffset < payloadCategoryOffsetEnd || advanceToNext();
     }
@@ -3201,7 +3228,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     public void remove() {
       throw new UnsupportedOperationException();
     }
-  }    
+  }
 
   protected static class SetMultimapKeyIteratorSlotHistogram<K, V>
       extends AbstractSetMultimapIteratorSlotHistogram<K, V> implements Iterator<K> {

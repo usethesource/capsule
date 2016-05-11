@@ -53,6 +53,7 @@ import java.util.function.BiFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import io.usethesource.capsule.TrieSetMultimap_HHAMT.AbstractSetMultimapNode;
 import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations.SetMultimap0To0Node;
 import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations.SetMultimap0To1Node;
 import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specializations.SetMultimap0To2Node;
@@ -3045,32 +3046,83 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     private final AbstractSetMultimapNode<K, V>[] stackOfNodes =
         new AbstractSetMultimapNode[MAX_DEPTH];
 
+    AbstractSetMultimapNode<K, V> topOfStackNode;
+    long nodeCursorAddress;
+    long nodeLengthAddress;
+    
     AbstractSetMultimapIteratorOffsetHistogram(AbstractSetMultimapNode<K, V> rootNode) {
       long offsetNodesEnd = ((CompactSetMultimapNode) rootNode).staticNodeBase();
       long offsetNodes = offsetNodesEnd - ((CompactSetMultimapNode) rootNode).lengthInBytes(PATTERN_NODE);
       long offsetPayload = CompactSetMultimapNode.arrayBase;
       
       if (offsetNodes < offsetNodesEnd) {
-        final int nextStackLevel = ++stackLevel;
-        final int nextCursorIndex = nextStackLevel * 2;
-        final int nextLengthIndex = nextCursorIndex + 1;
-
-        stackOfNodes[nextStackLevel] = rootNode;
-        stackOfOffsetsAndOutOfBounds[nextCursorIndex] = offsetNodes;
-        stackOfOffsetsAndOutOfBounds[nextLengthIndex] = offsetNodesEnd;
+        pushNode(rootNode, offsetNodes, offsetNodesEnd);
       }
-      
+
       if (offsetPayload < offsetNodes) {
-        payloadNode = rootNode;
-        payloadCategoryCursor = START_CATEGORY;
-
-        payloadCategoryOffset = offsetPayload;
-        payloadCategoryOffsetEnd = offsetPayload + ((CompactSetMultimapNode) rootNode).lengthInBytes(START_CATEGORY);
-
-        payloadTotalOffsetEnd = offsetNodes;
+        setPayloadNode(rootNode, offsetPayload, offsetNodes);
       }
     }
 
+    private void pushNode(AbstractSetMultimapNode<K, V> node, long offsetStart, long offsetEnd) {
+      if (stackLevel >= 0) {
+        // save current cursor
+        stackOfOffsetsAndOutOfBounds[stackLevel * 2] = nodeCursorAddress;
+      }
+
+      final int nextStackLevel = ++stackLevel;
+      final int nextCursorIndex = nextStackLevel * 2;
+      final int nextLengthIndex = nextCursorIndex + 1;
+
+      stackOfNodes[nextStackLevel] = node;
+      stackOfOffsetsAndOutOfBounds[nextCursorIndex] = offsetStart;
+      stackOfOffsetsAndOutOfBounds[nextLengthIndex] = offsetEnd;
+
+      // load next cursor
+      topOfStackNode = node;
+      nodeCursorAddress = offsetStart;
+      nodeLengthAddress = offsetEnd;
+    }    
+    
+    private final void popNode() {
+      stackOfNodes[stackLevel--] = null;
+
+      if (stackLevel >= 0) {
+        // load prevous cursor
+        final int previousStackLevel = stackLevel;
+        final int previousCursorIndex = previousStackLevel * 2;
+        final int previousLengthIndex = previousCursorIndex + 1;
+
+        topOfStackNode = stackOfNodes[previousStackLevel];
+        nodeCursorAddress = stackOfOffsetsAndOutOfBounds[previousCursorIndex];
+        nodeLengthAddress = stackOfOffsetsAndOutOfBounds[previousLengthIndex];
+      }
+    }    
+
+    private final AbstractSetMultimapNode<K, V> consumeNode() {
+      AbstractSetMultimapNode<K, V> nextNode =
+          getFromObjectRegionAndCast(topOfStackNode, nodeCursorAddress);
+      nodeCursorAddress += addressSize;
+
+      if (nodeCursorAddress == nodeLengthAddress) {
+        popNode();
+      }
+
+      return nextNode;
+    }
+    
+    private void setPayloadNode(final AbstractSetMultimapNode<K, V> node, long categoryOffsetStart,
+        long overallOffsetEnd) {
+      payloadNode = node;
+      payloadCategoryCursor = START_CATEGORY;
+
+      payloadCategoryOffset = categoryOffsetStart;
+      payloadCategoryOffsetEnd =
+          categoryOffsetStart + ((CompactSetMultimapNode) node).lengthInBytes(START_CATEGORY);
+
+      payloadTotalOffsetEnd = overallOffsetEnd;
+    }    
+    
     protected boolean searchNextPayloadCategory() {
       do {
         payloadCategoryOffsetEnd = ((CompactSetMultimapNode) payloadNode).offsetEnd(++payloadCategoryCursor, payloadCategoryOffsetEnd);
@@ -3083,49 +3135,26 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
      * search for next node that contains values
      */
     private boolean searchNextValueNode() {
-      while (stackLevel >= 0) {
-        final int currentCursorIndex = stackLevel * 2;
-        final int currentLengthIndex = currentCursorIndex + 1;
+      boolean found = false;
+      while (!found && stackLevel >= 0) {
+        final AbstractSetMultimapNode<K, V> nextNode = consumeNode();
 
-        final long nodeCursorAddress = stackOfOffsetsAndOutOfBounds[currentCursorIndex];
-        final long nodeLengthAddress = stackOfOffsetsAndOutOfBounds[currentLengthIndex];
+        long offsetNodesEnd = ((CompactSetMultimapNode) nextNode).staticNodeBase();
+        long offsetNodes =
+            offsetNodesEnd - ((CompactSetMultimapNode) nextNode).lengthInBytes(PATTERN_NODE);
+        long offsetPayload = CompactSetMultimapNode.arrayBase;
 
-        if (nodeCursorAddress < nodeLengthAddress) {
-          final AbstractSetMultimapNode<K, V> nextNode =
-              getFromObjectRegionAndCast(stackOfNodes[stackLevel], nodeCursorAddress);
-          stackOfOffsetsAndOutOfBounds[currentCursorIndex] += addressSize;
-                    
-          long offsetNodesEnd = ((CompactSetMultimapNode) nextNode).staticNodeBase();
-          long offsetNodes = offsetNodesEnd - ((CompactSetMultimapNode) nextNode).lengthInBytes(PATTERN_NODE);
-          long offsetPayload = CompactSetMultimapNode.arrayBase;
+        if (offsetNodes < offsetNodesEnd) {
+          pushNode(nextNode, offsetNodes, offsetNodesEnd);
+        }
 
-          if (offsetNodes < offsetNodesEnd) {
-            final int nextStackLevel = ++stackLevel;
-            final int nextCursorIndex = nextStackLevel * 2;
-            final int nextLengthIndex = nextCursorIndex + 1;
-
-            stackOfNodes[nextStackLevel] = nextNode;
-            stackOfOffsetsAndOutOfBounds[nextCursorIndex] = offsetNodes;
-            stackOfOffsetsAndOutOfBounds[nextLengthIndex] = offsetNodesEnd;
-          }  
-          
-          if (offsetPayload < offsetNodes) {
-            payloadNode = nextNode;
-            payloadCategoryCursor = START_CATEGORY;
-
-            payloadCategoryOffset = offsetPayload;
-            payloadCategoryOffsetEnd = offsetPayload + ((CompactSetMultimapNode) nextNode).lengthInBytes(START_CATEGORY);
-            
-            payloadTotalOffsetEnd = offsetNodes;
-
-            return true;
-          }
-        } else {
-          stackLevel--;
+        if (offsetPayload < offsetNodes) {
+          setPayloadNode(nextNode, offsetPayload, offsetNodes);
+          found = true;
         }
       }
 
-      return false;
+      return found;
     }
 
     protected boolean advanceToNext() {      
