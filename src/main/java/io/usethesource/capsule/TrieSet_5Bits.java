@@ -21,7 +21,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @SuppressWarnings("rawtypes")
 public class TrieSet_5Bits<K> implements ImmutableSet<K> {
@@ -609,7 +613,8 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
   protected static interface INode<K, V> {
   }
 
-  protected static abstract class AbstractSetNode<K> implements INode<K, java.lang.Void> {
+  protected static abstract class AbstractSetNode<K>
+      implements INode<K, java.lang.Void>, Iterable<K> {
 
     static final int TUPLE_LENGTH = 1;
 
@@ -706,6 +711,20 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
       }
 
       return size;
+    }
+    
+    @Override
+    public Iterator<K> iterator() {
+      return new SetKeyIterator<>(this);
+    }
+    
+    @Override
+    public Spliterator<K> spliterator() {
+      return Spliterators.spliteratorUnknownSize(iterator(), Spliterator.DISTINCT);
+    }
+    
+    public Stream<K> stream() {
+      return StreamSupport.stream(spliterator(), false);
     }
   }
 

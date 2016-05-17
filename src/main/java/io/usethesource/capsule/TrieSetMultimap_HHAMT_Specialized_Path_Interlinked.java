@@ -11,13 +11,7 @@ package io.usethesource.capsule;
 
 import static io.usethesource.capsule.AbstractSpecialisedImmutableMap.entryOf;
 import static io.usethesource.capsule.BitmapUtils.filter;
-import static io.usethesource.capsule.BitmapUtils.filter00;
-import static io.usethesource.capsule.BitmapUtils.filter01;
-import static io.usethesource.capsule.BitmapUtils.filter10;
-import static io.usethesource.capsule.BitmapUtils.filter11;
-import static io.usethesource.capsule.BitmapUtils.index01;
-import static io.usethesource.capsule.BitmapUtils.index10;
-import static io.usethesource.capsule.BitmapUtils.index11;
+import static io.usethesource.capsule.BitmapUtils.index;
 import static io.usethesource.capsule.DataLayoutHelper.addressSize;
 import static io.usethesource.capsule.DataLayoutHelper.arrayOffsets;
 import static io.usethesource.capsule.DataLayoutHelper.fieldOffset;
@@ -33,8 +27,8 @@ import static io.usethesource.capsule.SetMultimapUtils.PATTERN_DATA_SINGLETON;
 import static io.usethesource.capsule.SetMultimapUtils.PATTERN_EMPTY;
 import static io.usethesource.capsule.SetMultimapUtils.PATTERN_NODE;
 import static io.usethesource.capsule.SetMultimapUtils.setBitPattern;
-import static io.usethesource.capsule.SetMultimapUtils.setOf;
-import static io.usethesource.capsule.SetMultimapUtils.*;
+import static io.usethesource.capsule.SetMultimapUtils.setFromNode;
+import static io.usethesource.capsule.SetMultimapUtils.specSetNodeOf;
 import static io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EitherSingletonOrCollection.Type.COLLECTION;
 import static io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EitherSingletonOrCollection.Type.SINGLETON;
 
@@ -71,6 +65,12 @@ import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized_Path_Interlinke
 import io.usethesource.capsule.TrieSet_5Bits_Spec0To8.AbstractSetNode;
 import io.usethesource.capsule.TrieSet_5Bits_Spec0To8.SetResult;
 
+/**
+ * NOTE: only difference to {@link TrieSetMultimap_HHAMT_Specialized_Interlinked} is the use of
+ * {@link SetMultimapUtils#specSetNodeOf} instead of of {@link SetMultimapUtils#setNodeOf}.
+ * 
+ * TODO: unify by injecting factory method.
+ */
 @SuppressWarnings({"rawtypes", "restriction"})
 public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements ImmutableSetMultimap<K, V> {
 
@@ -246,7 +246,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
         } else {
           int sumOfReplacedHashes = 0;
 
-          for (V replaceValue : setFromNode(details.getReplacedCollection())) {
+          for (V replaceValue : details.getReplacedCollection()) {
             sumOfReplacedHashes += (keyHash ^ replaceValue.hashCode());
           }
 
@@ -348,7 +348,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
       } else {
         int sumOfReplacedHashes = 0;
 
-        for (V replaceValue : setFromNode(details.getReplacedCollection())) {
+        for (V replaceValue : details.getReplacedCollection()) {
           sumOfReplacedHashes += (keyHash ^ replaceValue.hashCode());
         }
 
@@ -403,7 +403,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
   @Override
   public Iterator<V> valueIterator() {
-    return valueCollectionsStream().flatMap(node -> setFromNode(node).stream()).iterator();
+    return valueCollectionsStream().flatMap(AbstractSetNode::stream).iterator();
   }
 
   @Override
@@ -993,8 +993,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
       // NOTE: temporariliy used to test caching of attributes; will be removed soon again
       
 //      cachedSlotArity = (int) staticSlotArity();
-//      cachedNodeArity = (int) Long.bitCount(filter01(bitmap));
-//      cachedEmptyArity = (int) Long.bitCount(filter00(bitmap));
+//      cachedNodeArity = (int) Long.bitCount(filter(bitmap, PATTERN_NODE));
+//      cachedEmptyArity = (int) Long.bitCount(filter(bitmap, PATTERN_EMPTY));
     }
 
     CompactSetMultimapNode(final AtomicReference<Thread> mutator, final long bitmap) {
@@ -1264,7 +1264,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
     }
 
     final int emptyArity() {
-       return Long.bitCount(filter00(bitmap));
+       return Long.bitCount(filter(bitmap, PATTERN_EMPTY));
 //       return arity(bitmap, PATTERN_EMPTY);
       
 //      return cachedEmptyArity;
@@ -1313,10 +1313,10 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
     static final int[] arities(final long bitmap) {
       int[] arities = new int[4];     
       
-      arities[0] = Long.bitCount(filter00(bitmap));
-      arities[1] = Long.bitCount(filter01(bitmap));
-      arities[2] = Long.bitCount(filter10(bitmap));
-      arities[3] = Long.bitCount(filter11(bitmap));
+      arities[0] = Long.bitCount(filter(bitmap, PATTERN_EMPTY));
+      arities[1] = Long.bitCount(filter(bitmap, PATTERN_DATA_SINGLETON));
+      arities[2] = Long.bitCount(filter(bitmap, PATTERN_DATA_COLLECTION));
+      arities[3] = Long.bitCount(filter(bitmap, PATTERN_NODE));
       
       return arities;
     }
@@ -1389,7 +1389,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
     @Override
     final int nodeArity() {
-      return Long.bitCount(filter01(bitmap));
+      return Long.bitCount(filter(bitmap, PATTERN_NODE));
 //      return arity(bitmap, PATTERN_NODE);
 
 //      return cachedNodeArity;
@@ -1987,17 +1987,17 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
     @Deprecated
     int dataIndex(final long doubledBitpos) {
-      return index10(bitmap(), doubledBitpos);
+      return index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
     }
 
     @Deprecated
     int collIndex(final long doubledBitpos) {
-      return index11(bitmap(), doubledBitpos);
+      return index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
     }
 
     @Deprecated
     int nodeIndex(final long doubledBitpos) {
-      return index01(bitmap(), doubledBitpos);
+      return index(bitmap, PATTERN_NODE, doubledBitpos);
     }
 
     @Override
@@ -2011,15 +2011,15 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int index = index01(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_NODE, doubledBitpos);
           return getNode(index).containsKey(key, keyHash, shift + BIT_PARTITION_SIZE);
         }
         case PATTERN_DATA_SINGLETON: {
-          int index = index10(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
           return getSingletonKey(index).equals(key);
         }
         case PATTERN_DATA_COLLECTION: {
-          int index = index11(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
           return getCollectionKey(index).equals(key);
         }
         default:
@@ -2043,13 +2043,13 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int index = index01(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final AbstractSetMultimapNode<K, V> subNode = getNode(index);
           return subNode.containsTuple(key, val, keyHash, shift + BIT_PARTITION_SIZE);
         }
         case PATTERN_DATA_SINGLETON: {
-          int index = index10(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(index);
           if (currentKey.equals(key)) {
@@ -2061,7 +2061,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
           return false;
         }
         case PATTERN_DATA_COLLECTION: {
-          int index = index11(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(index);
           if (currentKey.equals(key)) {
@@ -2088,13 +2088,13 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int index = index01(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final AbstractSetMultimapNode<K, V> subNode = getNode(index);
           return subNode.findByKey(key, keyHash, shift + BIT_PARTITION_SIZE);
         }
         case PATTERN_DATA_SINGLETON: {
-          int index = index10(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(index);
           if (currentKey.equals(key)) {
@@ -2106,7 +2106,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
           return Optional.empty();
         }
         case PATTERN_DATA_COLLECTION: {
-          int index = index11(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(index);
           if (currentKey.equals(key)) {
@@ -2139,7 +2139,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
               subNode.inserted(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details);
@@ -2151,7 +2151,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
           final K currentKey = getSingletonKey(dataIndex);
 
           if (currentKey.equals(key)) {
@@ -2180,7 +2180,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
           final K currentCollKey = getCollectionKey(collIndex);
 
           if (currentCollKey.equals(key)) {
@@ -2226,7 +2226,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
               subNode.updated(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details);
@@ -2238,7 +2238,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
           final K currentKey = getSingletonKey(dataIndex);
 
           if (currentKey.equals(key)) {
@@ -2260,7 +2260,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
           final K currentCollKey = getCollectionKey(collIndex);
 
           if (currentCollKey.equals(key)) {
@@ -2301,7 +2301,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
@@ -2348,7 +2348,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(dataIndex);
           if (currentKey.equals(key)) {
@@ -2367,7 +2367,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(collIndex);
           if (currentKey.equals(key)) {
@@ -2382,7 +2382,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
               if (newValColl.size() == 1) {
                 // TODO: investigate options for unboxing singleton collections
-                V remainingVal = setFromNode(newValColl).iterator().next();
+                V remainingVal = newValColl.iterator().next();
                 return copyAndMigrateFromCollectionToSingleton(mutator, doubledBitpos, key,
                     remainingVal);
               } else {
@@ -2440,7 +2440,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
@@ -2522,7 +2522,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(dataIndex);
           if (currentKey.equals(key)) {
@@ -2536,7 +2536,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(collIndex);
           if (currentKey.equals(key)) {
@@ -3228,11 +3228,11 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
         Object singletonOrSet = nextEntry.getValue();
 
-        if (singletonOrSet instanceof io.usethesource.capsule.Set) {
-          io.usethesource.capsule.Set set = (io.usethesource.capsule.Set) singletonOrSet;
+        if (singletonOrSet instanceof AbstractSetNode) {
+          AbstractSetNode set = (AbstractSetNode) singletonOrSet;
 
           lastKey = nextEntry.getKey();
-          lastIterator = ((Iterable<V>) set).iterator();
+          lastIterator = set.iterator();
 
           return entryOf(lastKey, lastIterator.next());
         } else {
@@ -3330,7 +3330,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
           } else {
             currentKey = currentValueNode.getCollectionKey(currentValueCollectionCursor);
             currentSetIterator =
-                setFromNode(currentValueNode.getCollectionValue(currentValueCollectionCursor)).iterator();
+                currentValueNode.getCollectionValue(currentValueCollectionCursor).iterator();
             currentValueCollectionCursor++;
           }
 
@@ -3647,7 +3647,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
     @Override
     public Iterator<V> valueIterator() {
-      return valueCollectionsStream().flatMap(node -> setFromNode(node).stream()).iterator();
+      return valueCollectionsStream().flatMap(AbstractSetNode::stream).iterator();
     }
 
     @Override

@@ -10,15 +10,12 @@
 package io.usethesource.capsule;
 
 import static io.usethesource.capsule.BitmapUtils.filter;
-import static io.usethesource.capsule.BitmapUtils.index01;
-import static io.usethesource.capsule.BitmapUtils.index10;
-import static io.usethesource.capsule.BitmapUtils.index11;
+import static io.usethesource.capsule.BitmapUtils.index;
 import static io.usethesource.capsule.SetMultimapUtils.PATTERN_DATA_COLLECTION;
 import static io.usethesource.capsule.SetMultimapUtils.PATTERN_DATA_SINGLETON;
 import static io.usethesource.capsule.SetMultimapUtils.PATTERN_EMPTY;
 import static io.usethesource.capsule.SetMultimapUtils.PATTERN_NODE;
 import static io.usethesource.capsule.SetMultimapUtils.setBitPattern;
-import static io.usethesource.capsule.SetMultimapUtils.setOf;
 import static io.usethesource.capsule.SetMultimapUtils.setFromNode;
 import static io.usethesource.capsule.SetMultimapUtils.setNodeOf;
 import static io.usethesource.capsule.SetMultimapUtils.setToNode;
@@ -221,7 +218,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
         } else {
           int sumOfReplacedHashes = 0;
 
-          for (V replaceValue : setFromNode(details.getReplacedCollection())) {
+          for (V replaceValue : details.getReplacedCollection()) {
             sumOfReplacedHashes += (keyHash ^ replaceValue.hashCode());
           }
 
@@ -322,7 +319,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
       } else {
         int sumOfReplacedHashes = 0;
 
-        for (V replaceValue : setFromNode(details.getReplacedCollection())) {
+        for (V replaceValue : details.getReplacedCollection()) {
           sumOfReplacedHashes += (keyHash ^ replaceValue.hashCode());
         }
 
@@ -376,7 +373,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
   @Override
   public Iterator<V> valueIterator() {
-    return valueCollectionsStream().flatMap(node -> setFromNode(node).stream()).iterator();
+    return valueCollectionsStream().flatMap(AbstractSetNode::stream).iterator();
   }
 
   @Override
@@ -1253,17 +1250,17 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
     @Deprecated
     int dataIndex(final long doubledBitpos) {
-      return index10(bitmap(), doubledBitpos);
+      return index(bitmap(), PATTERN_DATA_SINGLETON, doubledBitpos);
     }
 
     @Deprecated
     int collIndex(final long doubledBitpos) {
-      return index11(bitmap(), doubledBitpos);
+      return index(bitmap(), PATTERN_DATA_COLLECTION, doubledBitpos);
     }
 
     @Deprecated
     int nodeIndex(final long doubledBitpos) {
-      return index01(bitmap(), doubledBitpos);
+      return index(bitmap(), PATTERN_NODE, doubledBitpos);
     }    
 
     @Override
@@ -1277,15 +1274,15 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
       
       switch (pattern) {
         case PATTERN_NODE: {
-          int index = index01(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_NODE, doubledBitpos);
           return getNode(index).containsKey(key, keyHash, shift + BIT_PARTITION_SIZE);
         }
         case PATTERN_DATA_SINGLETON: {
-          int index = index10(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
           return getSingletonKey(index).equals(key);
         }
         case PATTERN_DATA_COLLECTION: {
-          int index = index11(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
           return getCollectionKey(index).equals(key);
         }
         default:
@@ -1309,13 +1306,13 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int index = index01(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final AbstractSetMultimapNode<K, V> subNode = getNode(index);
           return subNode.containsTuple(key, val, keyHash, shift + BIT_PARTITION_SIZE);
         }
         case PATTERN_DATA_SINGLETON: {
-          int index = index10(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(index);
           if (currentKey.equals(key)) {
@@ -1327,7 +1324,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           return false;
         }
         case PATTERN_DATA_COLLECTION: {
-          int index = index11(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(index);
           if (currentKey.equals(key)) {
@@ -1354,25 +1351,25 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int index = index01(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final AbstractSetMultimapNode<K, V> subNode = getNode(index);
           return subNode.findByKey(key, keyHash, shift + BIT_PARTITION_SIZE);
         }
         case PATTERN_DATA_SINGLETON: {
-          int index = index10(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(index);
           if (currentKey.equals(key)) {
 
             final V currentVal = getSingletonValue(index);
-            return Optional.of(((TrieSet_5Bits)setOf(currentVal)).getRootNode());
+            return Optional.of(setNodeOf(currentVal));
           }
 
           return Optional.empty();
         }
         case PATTERN_DATA_COLLECTION: {
-          int index = index11(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(index);
           if (currentKey.equals(key)) {
@@ -1405,7 +1402,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
               subNode.inserted(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details);
@@ -1417,7 +1414,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
           final K currentKey = getSingletonKey(dataIndex);
 
           if (currentKey.equals(key)) {
@@ -1427,7 +1424,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
               return this;
             } else {
               // migrate from singleton to collection
-              final AbstractSetNode<V> valColl = ((TrieSet_5Bits)setOf(currentVal, val)).getRootNode();
+              final AbstractSetNode<V> valColl = setNodeOf(currentVal, val);
               
               details.modified();
               return copyAndMigrateFromSingletonToCollection(mutator, doubledBitpos, currentKey,
@@ -1446,7 +1443,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
           final K currentCollKey = getCollectionKey(collIndex);
 
           if (currentCollKey.equals(key)) {
@@ -1491,7 +1488,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
               subNode.updated(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details);
@@ -1503,7 +1500,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
           final K currentKey = getSingletonKey(dataIndex);
 
           if (currentKey.equals(key)) {
@@ -1525,7 +1522,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
           final K currentCollKey = getCollectionKey(collIndex);
 
           if (currentCollKey.equals(key)) {
@@ -1565,7 +1562,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
               subNode.updated(mutator, key, valColl, keyHash, shift + BIT_PARTITION_SIZE, details);
@@ -1577,7 +1574,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
           final K currentKey = getSingletonKey(dataIndex);
 
           if (currentKey.equals(key)) {
@@ -1615,7 +1612,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
           final K currentCollKey = getCollectionKey(collIndex);
 
           if (currentCollKey.equals(key)) {
@@ -1668,7 +1665,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
@@ -1715,7 +1712,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(dataIndex);
           if (currentKey.equals(key)) {
@@ -1734,7 +1731,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(collIndex);
           if (currentKey.equals(key)) {
@@ -1749,7 +1746,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
               if (newValColl.size() == 1) {
                 // TODO: investigate options for unboxing singleton collections
-                V remainingVal = setFromNode(newValColl).iterator().next();
+                V remainingVal = newValColl.iterator().next();
                 return copyAndMigrateFromCollectionToSingleton(mutator, doubledBitpos, key,
                     remainingVal);
               } else {
@@ -1807,7 +1804,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
@@ -1889,7 +1886,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(dataIndex);
           if (currentKey.equals(key)) {
@@ -1903,7 +1900,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(collIndex);
           if (currentKey.equals(key)) {
@@ -3327,7 +3324,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           } else {
             currentKey = currentValueNode.getCollectionKey(currentValueCollectionCursor);
             currentSetIterator =
-                setFromNode(currentValueNode.getCollectionValue(currentValueCollectionCursor)).iterator();
+                currentValueNode.getCollectionValue(currentValueCollectionCursor).iterator();
             currentValueCollectionCursor++;
           }
 
@@ -3569,7 +3566,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
           } else {
             int sumOfReplacedHashes = 0;
 
-            for (V replaceValue : setFromNode(details.getReplacedCollection())) {
+            for (V replaceValue : details.getReplacedCollection()) {
               sumOfReplacedHashes += (keyHash ^ replaceValue.hashCode());
             }
 
@@ -3721,7 +3718,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements ImmutableSetMult
 
     @Override
     public Iterator<V> valueIterator() {
-      return valueCollectionsStream().flatMap(node -> setFromNode(node).stream()).iterator();
+      return valueCollectionsStream().flatMap(AbstractSetNode::stream).iterator();
     }
 
     @Override
