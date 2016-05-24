@@ -10,9 +10,7 @@
 package io.usethesource.capsule;
 
 import static io.usethesource.capsule.BitmapUtils.filter;
-import static io.usethesource.capsule.BitmapUtils.index01;
-import static io.usethesource.capsule.BitmapUtils.index10;
-import static io.usethesource.capsule.BitmapUtils.index11;
+import static io.usethesource.capsule.BitmapUtils.index;
 import static io.usethesource.capsule.SetMultimapUtils.PATTERN_DATA_COLLECTION;
 import static io.usethesource.capsule.SetMultimapUtils.PATTERN_DATA_SINGLETON;
 import static io.usethesource.capsule.SetMultimapUtils.PATTERN_EMPTY;
@@ -1226,17 +1224,17 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
     @Deprecated
     int dataIndex(final long doubledBitpos) {
-      return index10(bitmap(), doubledBitpos);
+      return index(bitmap(), PATTERN_DATA_SINGLETON, doubledBitpos);
     }
 
     @Deprecated
     int collIndex(final long doubledBitpos) {
-      return index11(bitmap(), doubledBitpos);
+      return index(bitmap(), PATTERN_DATA_COLLECTION, doubledBitpos);
     }
 
     @Deprecated
     int nodeIndex(final long doubledBitpos) {
-      return index01(bitmap(), doubledBitpos);
+      return index(bitmap(), PATTERN_NODE, doubledBitpos);
     }
 
     @Override
@@ -1250,15 +1248,15 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int index = index01(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_NODE, doubledBitpos);
           return getNode(index).containsKey(key, keyHash, shift + BIT_PARTITION_SIZE);
         }
         case PATTERN_DATA_SINGLETON: {
-          int index = index10(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
           return getSingletonKey(index).equals(key);
         }
         case PATTERN_DATA_COLLECTION: {
-          int index = index11(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
           return getCollectionKey(index).equals(key);
         }
         default:
@@ -1282,13 +1280,13 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int index = index01(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final AbstractSetMultimapNode<K, V> subNode = getNode(index);
           return subNode.containsTuple(key, val, keyHash, shift + BIT_PARTITION_SIZE);
         }
         case PATTERN_DATA_SINGLETON: {
-          int index = index10(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(index);
           if (currentKey.equals(key)) {
@@ -1300,7 +1298,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
           return false;
         }
         case PATTERN_DATA_COLLECTION: {
-          int index = index11(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(index);
           if (currentKey.equals(key)) {
@@ -1327,13 +1325,13 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int index = index01(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final AbstractSetMultimapNode<K, V> subNode = getNode(index);
           return subNode.findByKey(key, keyHash, shift + BIT_PARTITION_SIZE);
         }
         case PATTERN_DATA_SINGLETON: {
-          int index = index10(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(index);
           if (currentKey.equals(key)) {
@@ -1345,7 +1343,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
           return Optional.empty();
         }
         case PATTERN_DATA_COLLECTION: {
-          int index = index11(bitmap, doubledBitpos);
+          int index = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(index);
           if (currentKey.equals(key)) {
@@ -1378,7 +1376,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
               subNode.inserted(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details);
@@ -1390,7 +1388,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
           final K currentKey = getSingletonKey(dataIndex);
 
           if (currentKey.equals(key)) {
@@ -1419,7 +1417,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
           final K currentCollKey = getCollectionKey(collIndex);
 
           if (currentCollKey.equals(key)) {
@@ -1464,7 +1462,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
               subNode.updated(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details);
@@ -1476,7 +1474,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
           final K currentKey = getSingletonKey(dataIndex);
 
           if (currentKey.equals(key)) {
@@ -1498,7 +1496,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
           final K currentCollKey = getCollectionKey(collIndex);
 
           if (currentCollKey.equals(key)) {
@@ -1539,7 +1537,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
               subNode.updated(mutator, key, valColl, keyHash, shift + BIT_PARTITION_SIZE, details);
@@ -1551,7 +1549,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
           final K currentKey = getSingletonKey(dataIndex);
 
           if (currentKey.equals(key)) {
@@ -1589,7 +1587,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
           final K currentCollKey = getCollectionKey(collIndex);
 
           if (currentCollKey.equals(key)) {
@@ -1643,7 +1641,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
@@ -1690,7 +1688,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(dataIndex);
           if (currentKey.equals(key)) {
@@ -1709,7 +1707,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(collIndex);
           if (currentKey.equals(key)) {
@@ -1782,7 +1780,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
       switch (pattern) {
         case PATTERN_NODE: {
-          int nodeIndex = index01(bitmap, doubledBitpos);
+          int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
@@ -1864,7 +1862,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
           }
         }
         case PATTERN_DATA_SINGLETON: {
-          int dataIndex = index10(bitmap, doubledBitpos);
+          int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(dataIndex);
           if (currentKey.equals(key)) {
@@ -1878,7 +1876,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
           }
         }
         case PATTERN_DATA_COLLECTION: {
-          int collIndex = index11(bitmap, doubledBitpos);
+          int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(collIndex);
           if (currentKey.equals(key)) {
@@ -2335,13 +2333,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
       dst[idx + 1] = val;
       System.arraycopy(src, idx, dst, idx + 2, src.length - idx);
 
-      // generally: from 00 to 10
-      // here: set both bits individually
-      long updatedBitmap = bitmap();
-      updatedBitmap |= doubledBitpos; // idempotent
-      updatedBitmap ^= doubledBitpos; // idempotent
-      updatedBitmap |= (doubledBitpos << 1);
-
+      long updatedBitmap = setBitPattern(bitmap(), doubledBitpos, PATTERN_DATA_SINGLETON);
       return nodeOf(mutator, updatedBitmap, dst);
     }
 
@@ -2360,12 +2352,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
       dst[idx + 1] = valColl;
       System.arraycopy(src, idx, dst, idx + 2, src.length - idx);
 
-      // generally: from 00 to 11
-      // here: set both bits individually
-      long updatedBitmap = bitmap();
-      updatedBitmap |= doubledBitpos;
-      updatedBitmap |= (doubledBitpos << 1);
-
+      long updatedBitmap = setBitPattern(bitmap(), doubledBitpos, PATTERN_DATA_COLLECTION);
       return nodeOf(mutator, updatedBitmap, dst);
     }
 
@@ -2388,12 +2375,6 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
       dst[idxNew + 0] = key;
       dst[idxNew + 1] = valColl;
       System.arraycopy(src, idxNew + 2, dst, idxNew + 2, src.length - idxNew - 2);
-
-      // // generally: from 10 to 11
-      // // here: set both bits individually
-      // long updatedBitmap = bitmap();
-      // updatedBitmap |= (doubledBitpos);
-      // updatedBitmap |= (doubledBitpos << 1);
 
       long updatedBitmap = setBitPattern(bitmap(), doubledBitpos, PATTERN_DATA_COLLECTION);
       return nodeOf(mutator, updatedBitmap, dst);
@@ -2421,12 +2402,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
       System.arraycopy(src, idxNew, dst, idxNew + 2, idxOld - idxNew);
       System.arraycopy(src, idxOld + 2, dst, idxOld + 2, src.length - idxOld - 2);
 
-      // generally: from 11 to 10
-      // here: set both bits individually
-      long updatedBitmap = bitmap();
-      updatedBitmap ^= (doubledBitpos);
-      updatedBitmap |= (doubledBitpos << 1);
-
+      long updatedBitmap = setBitPattern(bitmap(), doubledBitpos, PATTERN_DATA_SINGLETON);
       return nodeOf(mutator, updatedBitmap, dst);
     }
 
@@ -2442,13 +2418,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
       System.arraycopy(src, 0, dst, 0, idx);
       System.arraycopy(src, idx + 2, dst, idx, src.length - idx - 2);
 
-      // generally: from 10 to 00
-      // here: set both bits individually
-      long updatedBitmap = bitmap();
-      updatedBitmap |= doubledBitpos; // idempotent
-      updatedBitmap ^= doubledBitpos; // idempotent
-      updatedBitmap ^= (doubledBitpos << 1);
-
+      long updatedBitmap = setBitPattern(bitmap(), doubledBitpos, PATTERN_EMPTY);
       return nodeOf(mutator, updatedBitmap, dst);
     }
 
@@ -2481,12 +2451,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
       System.arraycopy(src, 0, dst, 0, idx);
       System.arraycopy(src, idx + 2, dst, idx, src.length - idx - 2);
 
-      // generally: from 11 to 00
-      // here: set both bits individually
-      long updatedBitmap = bitmap();
-      updatedBitmap ^= (doubledBitpos);
-      updatedBitmap ^= (doubledBitpos << 1);
-
+      long updatedBitmap = setBitPattern(bitmap(), doubledBitpos, PATTERN_EMPTY);
       return nodeOf(mutator, updatedBitmap, dst);
     }
 
@@ -2500,12 +2465,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
       final Object[] dst = copyAndMigrateFromXxxToNode(idxOld, idxNew, node);
 
-      // generally: from 10 to 01
-      // here: set both bits individually
-      long updatedBitmap = bitmap();
-      updatedBitmap |= (doubledBitpos);
-      updatedBitmap ^= (doubledBitpos << 1);
-
+      long updatedBitmap = setBitPattern(bitmap(), doubledBitpos, PATTERN_NODE);
       return nodeOf(mutator, updatedBitmap, dst);
     }
 
@@ -2519,12 +2479,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
       final Object[] dst = copyAndMigrateFromXxxToNode(idxOld, idxNew, node);
 
-      // generally: from 11 to 01
-      // here: set both bits individually
-      long updatedBitmap = bitmap();
-      updatedBitmap |= (doubledBitpos);
-      updatedBitmap ^= (doubledBitpos << 1);
-
+      long updatedBitmap = setBitPattern(bitmap(), doubledBitpos, PATTERN_NODE);
       return nodeOf(mutator, updatedBitmap, dst);
     }
 
@@ -2558,12 +2513,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
       final Object[] dst = copyAndMigrateFromNodeToXxx(idxOld, idxNew, keyToInline, valToInline);
 
-      // generally: from 01 to 10
-      // here: set both bits individually
-      long updatedBitmap = bitmap();
-      updatedBitmap ^= (doubledBitpos);
-      updatedBitmap |= (doubledBitpos << 1);
-
+      long updatedBitmap = setBitPattern(bitmap(), doubledBitpos, PATTERN_DATA_COLLECTION);
       return nodeOf(mutator, updatedBitmap, dst);
     }
 
@@ -2580,12 +2530,7 @@ public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
       final Object[] dst = copyAndMigrateFromNodeToXxx(idxOld, idxNew, keyToInline, valToInline);
 
-      // generally: from 01 to 11
-      // here: set both bits individually
-      long updatedBitmap = bitmap();
-      updatedBitmap |= (doubledBitpos);
-      updatedBitmap |= (doubledBitpos << 1);
-
+      long updatedBitmap = setBitPattern(bitmap(), doubledBitpos, PATTERN_DATA_COLLECTION);
       return nodeOf(mutator, updatedBitmap, dst);
     }
 
