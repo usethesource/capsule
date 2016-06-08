@@ -25,7 +25,7 @@ import io.usethesource.capsule.ImmutableMap;
 import io.usethesource.capsule.TransientMap;
 import io.usethesource.capsule.TrieMap_5Bits;
 
-public class TrieMapTests {
+public class BasicTrieMapTest {
 
 	/*
 	 * UTILS

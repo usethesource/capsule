@@ -28,7 +28,7 @@ import org.junit.Test;
 import io.usethesource.capsule.ImmutableSet;
 import io.usethesource.capsule.TrieSet_5Bits;
 
-public class TrieSetTests {
+public class BasicTrieSetTest {
 
 	private class DummyValue {
 		public final int value;
