@@ -11,6 +11,26 @@
 		<tag>HEAD</tag>
 	</scm>
 
+	<!-- deployment configuration (usethesource) -->
+	<distributionManagement>
+		<repository>
+			<id>releases</id>
+			<url>http://nexus.rascal-mpl.org/repository/maven-releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<url>http://nexus.rascal-mpl.org/repository/maven-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<!-- dependency resolution configuration (usethesource) -->
+	<repositories>
+		<repository>
+			<id>usethesource</id>
+			<url>http://nexus.rascal-mpl.org/repository/maven-public/</url>
+		</repository>
+	</repositories>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.target>1.8</maven.compiler.target>
