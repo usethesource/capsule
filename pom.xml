@@ -14,11 +14,11 @@
 	<!-- deployment configuration (usethesource) -->
 	<distributionManagement>
 		<repository>
-			<id>releases</id>
+			<id>usethesource-releases</id>
 			<url>http://nexus.rascal-mpl.org/repository/maven-releases/</url>
 		</repository>
 		<snapshotRepository>
-			<id>snapshots</id>
+			<id>usethesource-snapshots</id>
 			<url>http://nexus.rascal-mpl.org/repository/maven-snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
