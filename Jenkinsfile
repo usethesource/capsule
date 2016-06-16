@@ -4,7 +4,7 @@ node {
 
   stage 'Build, Test and Deploy'
   try {
-    wrap([$class: 'ConfigFileBuildWrapper', managedFiles: [[fileId: 'org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig:usethesource-maven-settings-global', targetLocation: 'globalSettings.xml', variable: '']]]) {
+    wrap([$class: 'ConfigFileBuildWrapper', managedFiles: [[fileId: 'org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig', targetLocation: 'globalSettings.xml', variable: '']]]) {
       def mvnHome = tool 'M3'
       sh "${mvnHome}/bin/mvn -gs globalSettings.xml -Dmaven.repo.local=/var/jenkins_home/repo -B clean install deploy"
     }
