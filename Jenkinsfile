@@ -9,7 +9,7 @@ node {
       sh "${mvnHome}/bin/mvn -s settings.xml -Dmaven.repo.local=/var/jenkins_home/repo -B clean install deploy"
     }
   } finally {
-    sh 'rm f settings.xml'
+    sh 'rm -f settings.xml'
   }
 
   stage 'Archive'
