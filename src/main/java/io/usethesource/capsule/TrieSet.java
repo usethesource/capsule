@@ -59,7 +59,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
   }
 
   public static final <K> Set.Immutable<K> of(K key0, K key1) {
-    assert!Objects.equals(key0, key1);
+    assert !Objects.equals(key0, key1);
 
     final int keyHash0 = key0.hashCode();
     final int keyHash1 = key1.hashCode();
@@ -111,7 +111,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
     return hash == targetHash && size == targetSize;
   }
 
-  public static final int transformHashCode(final int hash) {
+  private static final int transformHashCode(final int hash) {
     return hash;
   }
 
@@ -125,7 +125,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return false;
     }
   }
-  
+
   @Override
   public Optional<K> apply(K key) {
     return rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
@@ -157,13 +157,6 @@ public class TrieSet<K> implements Set.Immutable<K> {
   }
 
   @Override
-  public Set.Immutable<K> insertAll(final Set<? extends K> set) {
-    final Set.Transient<K> tmpTransient = this.asTransient();
-    tmpTransient.insertAll(set);
-    return tmpTransient.asImmutable();
-  }
-
-  @Override
   public Set.Immutable<K> remove(final K key) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
@@ -176,6 +169,13 @@ public class TrieSet<K> implements Set.Immutable<K> {
     }
 
     return this;
+  }
+
+  @Override
+  public Set.Immutable<K> insertAll(final Set<? extends K> set) {
+    final Set.Transient<K> tmpTransient = this.asTransient();
+    tmpTransient.insertAll(set);
+    return tmpTransient.asImmutable();
   }
 
   @Override
@@ -207,7 +207,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
     return keyIterator();
   }
 
-  public Iterator<K> keyIterator() {
+  private Iterator<K> keyIterator() {
     return new SetKeyIterator<>(rootNode);
   }
 
@@ -248,12 +248,12 @@ public class TrieSet<K> implements Set.Immutable<K> {
   public int hashCode() {
     return cachedHashCode;
   }
-  
+
   @Override
   public java.util.Set<K> asJdkCollection() {
     return new TrieSetAsImmutableJdkCollection<>(this);
   }
-  
+
   @Override
   public boolean isTransientSupported() {
     return true;
@@ -268,7 +268,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
   public Set.Immutable<K> asImmutable() {
     return this;
   }
-  
+
   /*
    * For analysis purposes only.
    */
@@ -576,7 +576,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
 
     static final <K> CompactSetNode<K> mergeTwoKeyValPairs(final K key0, final int keyHash0,
         final K key1, final int keyHash1, final int shift) {
-      assert!(key0.equals(key1));
+      assert !(key0.equals(key1));
 
       if (shift >= HASH_CODE_LENGTH) {
         return new HashCollisionSetNode<>(keyHash0, (K[]) new Object[] {key0, key1});
@@ -1030,14 +1030,14 @@ public class TrieSet<K> implements Set.Immutable<K> {
 
       if (DEBUG) {
 
-        assert(TUPLE_LENGTH * java.lang.Integer.bitCount(dataMap)
+        assert (TUPLE_LENGTH * java.lang.Integer.bitCount(dataMap)
             + java.lang.Integer.bitCount(nodeMap) == nodes.length);
 
         for (int i = 0; i < TUPLE_LENGTH * payloadArity(); i++) {
-          assert((nodes[i] instanceof CompactSetNode) == false);
+          assert ((nodes[i] instanceof CompactSetNode) == false);
         }
         for (int i = TUPLE_LENGTH * payloadArity(); i < nodes.length; i++) {
-          assert((nodes[i] instanceof CompactSetNode) == true);
+          assert ((nodes[i] instanceof CompactSetNode) == true);
         }
       }
 
@@ -1654,7 +1654,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
     }
   }
 
-  protected static class SetKeyIterator<K> extends AbstractSetIterator<K>implements Iterator<K> {
+  protected static class SetKeyIterator<K> extends AbstractSetIterator<K> implements Iterator<K> {
 
     SetKeyIterator(AbstractSetNode<K> rootNode) {
       super(rootNode);
@@ -1764,8 +1764,8 @@ public class TrieSet<K> implements Set.Immutable<K> {
     @Override
     public Optional<K> apply(K key) {
       return rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
-    }    
-          
+    }
+
     public K get(final Object o) {
       try {
         @SuppressWarnings("unchecked")
@@ -1808,17 +1808,6 @@ public class TrieSet<K> implements Set.Immutable<K> {
     }
 
     @Override
-    public boolean insertAll(final Set<? extends K> set) {
-      boolean modified = false;
-
-      for (final K key : set) {
-        modified |= this.insert(key);
-      }
-
-      return modified;
-    }
-
-    @Override
     public boolean remove(final K key) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -1846,6 +1835,17 @@ public class TrieSet<K> implements Set.Immutable<K> {
       }
 
       return false;
+    }
+
+    @Override
+    public boolean insertAll(final Set<? extends K> set) {
+      boolean modified = false;
+
+      for (final K key : set) {
+        modified |= this.insert(key);
+      }
+
+      return modified;
     }
 
     @Override
@@ -1889,7 +1889,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return keyIterator();
     }
 
-    public Iterator<K> keyIterator() {
+    private Iterator<K> keyIterator() {
       return new TransientSetKeyIterator<>(this);
     }
 
@@ -1956,7 +1956,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
     // public java.util.Set<K> asJdkCollection() {
     // throw new UnsupportedOperationException("Not yet implemented.");
     // }
-    
+
     @Override
     public Set.Immutable<K> asImmutable() {
       if (mutator.get() == null) {
@@ -1967,7 +1967,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return new TrieSet<K>(rootNode, cachedHashCode, cachedSize);
     }
   }
-    
+
   private static class TrieSetAsImmutableJdkCollection<K> extends java.util.AbstractSet<K> {
     private final AbstractSetNode<K> rootNode;
     private final int cachedSize;
@@ -1981,7 +1981,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       this.rootNode = original.rootNode;
       this.cachedSize = original.cachedSize;
     }
-    
+
     @Override
     public Iterator<K> iterator() {
       return new SetKeyIterator<>(rootNode);
@@ -1991,6 +1991,6 @@ public class TrieSet<K> implements Set.Immutable<K> {
     public int size() {
       return cachedSize;
     }
-  }  
-  
+  }
+
 }
