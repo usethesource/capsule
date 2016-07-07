@@ -115,6 +115,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
     return hash;
   }
 
+  @Override
   public boolean contains(final Object o) {
     try {
       @SuppressWarnings("unchecked")
@@ -140,6 +141,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
     }
   }
 
+  @Override
   public Set.Immutable<K> insert(final K key) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
@@ -154,12 +156,14 @@ public class TrieSet<K> implements Set.Immutable<K> {
     return this;
   }
 
+  @Override
   public Set.Immutable<K> insertAll(final Set<? extends K> set) {
     final Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.insertAll(set);
     return tmpTransient.asImmutable();
   }
 
+  @Override
   public Set.Immutable<K> remove(final K key) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
@@ -174,26 +178,31 @@ public class TrieSet<K> implements Set.Immutable<K> {
     return this;
   }
 
+  @Override
   public Set.Immutable<K> removeAll(final Set<? extends K> set) {
     final Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.removeAll(set);
     return tmpTransient.asImmutable();
   }
 
+  @Override
   public Set.Immutable<K> retainAll(final Set<? extends K> set) {
     final Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.retainAll(set);
     return tmpTransient.asImmutable();
   }
 
+  @Override
   public long size() {
     return cachedSize;
   }
 
+  @Override
   public boolean isEmpty() {
     return cachedSize == 0;
   }
 
+  @Override
   public Iterator<K> iterator() {
     return keyIterator();
   }
@@ -515,7 +524,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
     }
 
     static final int bitpos(final int mask) {
-      return (int) (1 << mask);
+      return 1 << mask;
     }
 
     abstract int nodeMap();
@@ -578,12 +587,12 @@ public class TrieSet<K> implements Set.Immutable<K> {
 
       if (mask0 != mask1) {
         // both nodes fit on same level
-        final int dataMap = (int) (bitpos(mask0) | bitpos(mask1));
+        final int dataMap = bitpos(mask0) | bitpos(mask1);
 
         if (mask0 < mask1) {
-          return nodeOf(null, (int) (0), dataMap, new Object[] {key0, key1});
+          return nodeOf(null, (0), dataMap, new Object[] {key0, key1});
         } else {
-          return nodeOf(null, (int) (0), dataMap, new Object[] {key1, key0});
+          return nodeOf(null, (0), dataMap, new Object[] {key1, key0});
         }
       } else {
         final CompactSetNode<K> node =
@@ -591,7 +600,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
         // values fit on next level
 
         final int nodeMap = bitpos(mask0);
-        return nodeOf(null, nodeMap, (int) (0), new Object[] {node});
+        return nodeOf(null, nodeMap, (0), new Object[] {node});
       }
     }
 
@@ -599,7 +608,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
 
     static {
 
-      EMPTY_NODE = new BitmapIndexedSetNode<>(null, (int) (0), (int) (0), new Object[] {});
+      EMPTY_NODE = new BitmapIndexedSetNode<>(null, (0), (0), new Object[] {});
 
     };
 
@@ -616,7 +625,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
     static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator, final int nodeMap,
         final int dataMap, final K key) {
       assert nodeMap == 0;
-      return nodeOf(mutator, (int) (0), dataMap, new Object[] {key});
+      return nodeOf(mutator, (0), dataMap, new Object[] {key});
     }
 
     static final int index(final int bitmap, final int bitpos) {
@@ -639,6 +648,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return getNode(nodeIndex(bitpos));
     }
 
+    @Override
     boolean contains(final K key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -658,6 +668,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return false;
     }
 
+    @Override
     boolean contains(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -678,6 +689,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return false;
     }
 
+    @Override
     Optional<K> findByKey(final K key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -700,6 +712,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return Optional.empty();
     }
 
+    @Override
     Optional<K> findByKey(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -723,6 +736,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return Optional.empty();
     }
 
+    @Override
     CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key, final int keyHash,
         final int shift, final SetResult<K> details) {
       final int mask = mask(keyHash, shift);
@@ -758,6 +772,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       }
     }
 
+    @Override
     CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key, final int keyHash,
         final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -793,6 +808,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       }
     }
 
+    @Override
     CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key, final int keyHash,
         final int shift, final SetResult<K> details) {
       final int mask = mask(keyHash, shift);
@@ -813,9 +829,9 @@ public class TrieSet<K> implements Set.Immutable<K> {
                 (shift == 0) ? (int) (dataMap() ^ bitpos) : bitpos(mask(keyHash, 0));
 
             if (dataIndex == 0) {
-              return CompactSetNode.<K>nodeOf(mutator, (int) 0, newDataMap, getKey(1));
+              return CompactSetNode.<K>nodeOf(mutator, 0, newDataMap, getKey(1));
             } else {
-              return CompactSetNode.<K>nodeOf(mutator, (int) 0, newDataMap, getKey(0));
+              return CompactSetNode.<K>nodeOf(mutator, 0, newDataMap, getKey(0));
             }
           } else {
             return copyAndRemoveValue(mutator, bitpos);
@@ -855,6 +871,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return this;
     }
 
+    @Override
     CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key, final int keyHash,
         final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -875,9 +892,9 @@ public class TrieSet<K> implements Set.Immutable<K> {
                 (shift == 0) ? (int) (dataMap() ^ bitpos) : bitpos(mask(keyHash, 0));
 
             if (dataIndex == 0) {
-              return CompactSetNode.<K>nodeOf(mutator, (int) 0, newDataMap, getKey(1));
+              return CompactSetNode.<K>nodeOf(mutator, 0, newDataMap, getKey(1));
             } else {
-              return CompactSetNode.<K>nodeOf(mutator, (int) 0, newDataMap, getKey(0));
+              return CompactSetNode.<K>nodeOf(mutator, 0, newDataMap, getKey(0));
             }
           } else {
             return copyAndRemoveValue(mutator, bitpos);
@@ -935,7 +952,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
           }
         }
 
-        map = (int) (map >> 1);
+        map = map >> 1;
         mask += 1;
       }
 
@@ -1078,8 +1095,8 @@ public class TrieSet<K> implements Set.Immutable<K> {
     public int hashCode() {
       final int prime = 31;
       int result = 0;
-      result = prime * result + ((int) dataMap());
-      result = prime * result + ((int) dataMap());
+      result = prime * result + (dataMap());
+      result = prime * result + (dataMap());
       result = prime * result + Arrays.hashCode(nodes);
       return result;
     }
@@ -1136,7 +1153,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
         return this;
       } else {
         final Object[] src = this.nodes;
-        final Object[] dst = (Object[]) new Object[src.length];
+        final Object[] dst = new Object[src.length];
 
         // copy 'src' and set 1 element(s) at position 'idx'
         System.arraycopy(src, 0, dst, 0, src.length);
@@ -1152,14 +1169,14 @@ public class TrieSet<K> implements Set.Immutable<K> {
       final int idx = TUPLE_LENGTH * dataIndex(bitpos);
 
       final Object[] src = this.nodes;
-      final Object[] dst = (Object[]) new Object[src.length + 1];
+      final Object[] dst = new Object[src.length + 1];
 
       // copy 'src' and insert 1 element(s) at position 'idx'
       System.arraycopy(src, 0, dst, 0, idx);
       dst[idx + 0] = key;
       System.arraycopy(src, idx, dst, idx + 1, src.length - idx);
 
-      return nodeOf(mutator, nodeMap(), (int) (dataMap() | bitpos), dst);
+      return nodeOf(mutator, nodeMap(), dataMap() | bitpos, dst);
     }
 
     @Override
@@ -1167,13 +1184,13 @@ public class TrieSet<K> implements Set.Immutable<K> {
       final int idx = TUPLE_LENGTH * dataIndex(bitpos);
 
       final Object[] src = this.nodes;
-      final Object[] dst = (Object[]) new Object[src.length - 1];
+      final Object[] dst = new Object[src.length - 1];
 
       // copy 'src' and remove 1 element(s) at position 'idx'
       System.arraycopy(src, 0, dst, 0, idx);
       System.arraycopy(src, idx + 1, dst, idx, src.length - idx - 1);
 
-      return nodeOf(mutator, nodeMap(), (int) (dataMap() ^ bitpos), dst);
+      return nodeOf(mutator, nodeMap(), dataMap() ^ bitpos, dst);
     }
 
     @Override
@@ -1194,7 +1211,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       dst[idxNew + 0] = node;
       System.arraycopy(src, idxNew + 1, dst, idxNew + 1, src.length - idxNew - 1);
 
-      return nodeOf(mutator, (int) (nodeMap() | bitpos), (int) (dataMap() ^ bitpos), dst);
+      return nodeOf(mutator, nodeMap() | bitpos, dataMap() ^ bitpos, dst);
     }
 
     @Override
@@ -1215,7 +1232,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       System.arraycopy(src, idxNew, dst, idxNew + 1, idxOld - idxNew);
       System.arraycopy(src, idxOld + 1, dst, idxOld + 1, src.length - idxOld - 1);
 
-      return nodeOf(mutator, (int) (nodeMap() ^ bitpos), (int) (dataMap() | bitpos), dst);
+      return nodeOf(mutator, nodeMap() ^ bitpos, dataMap() | bitpos, dst);
     }
 
   }
@@ -1233,6 +1250,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       assert payloadArity() >= 2;
     }
 
+    @Override
     boolean contains(final K key, final int keyHash, final int shift) {
       if (this.hash == keyHash) {
         for (K k : keys) {
@@ -1244,6 +1262,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return false;
     }
 
+    @Override
     boolean contains(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       if (this.hash == keyHash) {
@@ -1256,6 +1275,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return false;
     }
 
+    @Override
     Optional<K> findByKey(final K key, final int keyHash, final int shift) {
       for (int i = 0; i < keys.length; i++) {
         final K _key = keys[i];
@@ -1266,6 +1286,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return Optional.empty();
     }
 
+    @Override
     Optional<K> findByKey(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       for (int i = 0; i < keys.length; i++) {
@@ -1277,6 +1298,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return Optional.empty();
     }
 
+    @Override
     CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key, final int keyHash,
         final int shift, final SetResult<K> details) {
       assert this.hash == keyHash;
@@ -1301,6 +1323,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return new HashCollisionSetNode<>(keyHash, keysNew);
     }
 
+    @Override
     CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key, final int keyHash,
         final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
       assert this.hash == keyHash;
@@ -1325,6 +1348,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return new HashCollisionSetNode<>(keyHash, keysNew);
     }
 
+    @Override
     CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key, final int keyHash,
         final int shift, final SetResult<K> details) {
       for (int idx = 0; idx < keys.length; idx++) {
@@ -1358,6 +1382,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return this;
     }
 
+    @Override
     CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key, final int keyHash,
         final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
       for (int idx = 0; idx < keys.length; idx++) {
@@ -1725,6 +1750,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return hash == targetHash && size == targetSize;
     }
 
+    @Override
     public boolean contains(final Object o) {
       try {
         @SuppressWarnings("unchecked")
@@ -1750,6 +1776,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       }
     }
 
+    @Override
     public boolean insert(final K key) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -1780,6 +1807,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return false;
     }
 
+    @Override
     public boolean insertAll(final Set<? extends K> set) {
       boolean modified = false;
 
@@ -1790,6 +1818,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return modified;
     }
 
+    @Override
     public boolean remove(final K key) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -1819,6 +1848,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return false;
     }
 
+    @Override
     public boolean removeAll(final Set<? extends K> set) {
       boolean modified = false;
 
@@ -1829,6 +1859,7 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return modified;
     }
 
+    @Override
     public boolean retainAll(final Set<? extends K> set) {
       boolean modified = false;
 
@@ -1843,14 +1874,17 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return modified;
     }
 
+    @Override
     public long size() {
       return cachedSize;
     }
 
+    @Override
     public boolean isEmpty() {
       return cachedSize == 0;
     }
 
+    @Override
     public Iterator<K> iterator() {
       return keyIterator();
     }
@@ -1868,10 +1902,12 @@ public class TrieSet<K> implements Set.Immutable<K> {
         this.collection = collection;
       }
 
+      @Override
       public K next() {
         return lastKey = super.next();
       }
 
+      @Override
       public void remove() {
         // TODO: test removal at iteration rigorously
         collection.remove(lastKey);

@@ -114,6 +114,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
     return hash;
   }
 
+  @Override
   public boolean contains(final Object o) {
     try {
       @SuppressWarnings("unchecked")
@@ -124,6 +125,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
     }
   }
 
+  @Override
   public boolean containsValue(final Object o) {
     for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
       if (iterator.next().equals(o)) {
@@ -148,6 +150,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
     }
   }
 
+  @Override
   public Map.Immutable<K, V> insert(final K key, final V val) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
@@ -171,12 +174,14 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
     return this;
   }
 
+  @Override
   public Map.Immutable<K, V> insertAll(final Map<? extends K, ? extends V> map) {
     final Map.Transient<K, V> tmpTransient = this.asTransient();
     tmpTransient.insertAll(map);
     return tmpTransient.asImmutable();
   }
 
+  @Override
   public Map.Immutable<K, V> remove(final K key) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
@@ -193,14 +198,17 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
     return this;
   }
 
+  @Override
   public long size() {
     return cachedSize;
   }
 
+  @Override
   public boolean isEmpty() {
     return cachedSize == 0;
   }
 
+  @Override
   public SupplierIterator<K, V> iterator() {
     return new MapSupplierIterator<>(rootNode);
   }
@@ -213,6 +221,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
     return new MapValueIterator<>(rootNode);
   }
 
+  @Override
   public Iterator<java.util.Map.Entry<K, V>> entryIterator() {
     return new MapEntryIterator<>(rootNode);
   }
@@ -683,7 +692,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
     }
 
     static final int bitpos(final int mask) {
-      return (int) (1 << mask);
+      return 1 << mask;
     }
 
     abstract int nodeMap();
@@ -750,12 +759,12 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
 
       if (mask0 != mask1) {
         // both nodes fit on same level
-        final int dataMap = (int) (bitpos(mask0) | bitpos(mask1));
+        final int dataMap = bitpos(mask0) | bitpos(mask1);
 
         if (mask0 < mask1) {
-          return nodeOf(null, (int) (0), dataMap, new Object[] {key0, val0, key1, val1});
+          return nodeOf(null, (0), dataMap, new Object[] {key0, val0, key1, val1});
         } else {
-          return nodeOf(null, (int) (0), dataMap, new Object[] {key1, val1, key0, val0});
+          return nodeOf(null, (0), dataMap, new Object[] {key1, val1, key0, val0});
         }
       } else {
         final CompactMapNode<K, V> node = mergeTwoKeyValPairs(key0, val0, keyHash0, key1, val1,
@@ -763,7 +772,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
         // values fit on next level
 
         final int nodeMap = bitpos(mask0);
-        return nodeOf(null, nodeMap, (int) (0), new Object[] {node});
+        return nodeOf(null, nodeMap, (0), new Object[] {node});
       }
     }
 
@@ -771,7 +780,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
 
     static {
 
-      EMPTY_NODE = new BitmapIndexedMapNode<>(null, (int) (0), (int) (0), new Object[] {});
+      EMPTY_NODE = new BitmapIndexedMapNode<>(null, (0), (0), new Object[] {});
 
     };
 
@@ -788,7 +797,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
     static final <K, V> CompactMapNode<K, V> nodeOf(AtomicReference<Thread> mutator,
         final int nodeMap, final int dataMap, final K key, final V val) {
       assert nodeMap == 0;
-      return nodeOf(mutator, (int) (0), dataMap, new Object[] {key, val});
+      return nodeOf(mutator, (0), dataMap, new Object[] {key, val});
     }
 
     static final int index(final int bitmap, final int bitpos) {
@@ -811,6 +820,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       return getNode(nodeIndex(bitpos));
     }
 
+    @Override
     boolean containsKey(final K key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -830,6 +840,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       return false;
     }
 
+    @Override
     boolean containsKey(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -850,6 +861,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       return false;
     }
 
+    @Override
     Optional<V> findByKey(final K key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -874,6 +886,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       return Optional.empty();
     }
 
+    @Override
     Optional<V> findByKey(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -899,6 +912,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       return Optional.empty();
     }
 
+    @Override
     CompactMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
         final int keyHash, final int shift, final MapResult<K, V> details) {
       final int mask = mask(keyHash, shift);
@@ -940,6 +954,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       }
     }
 
+    @Override
     CompactMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
         final int keyHash, final int shift, final MapResult<K, V> details,
         final Comparator<Object> cmp) {
@@ -982,6 +997,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       }
     }
 
+    @Override
     CompactMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final MapResult<K, V> details) {
       final int mask = mask(keyHash, shift);
@@ -1003,10 +1019,10 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
                 (shift == 0) ? (int) (dataMap() ^ bitpos) : bitpos(mask(keyHash, 0));
 
             if (dataIndex == 0) {
-              return CompactMapNode.<K, V>nodeOf(mutator, (int) 0, newDataMap, getKey(1),
+              return CompactMapNode.<K, V>nodeOf(mutator, 0, newDataMap, getKey(1),
                   getValue(1));
             } else {
-              return CompactMapNode.<K, V>nodeOf(mutator, (int) 0, newDataMap, getKey(0),
+              return CompactMapNode.<K, V>nodeOf(mutator, 0, newDataMap, getKey(0),
                   getValue(0));
             }
           } else {
@@ -1047,6 +1063,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       return this;
     }
 
+    @Override
     CompactMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final MapResult<K, V> details,
         final Comparator<Object> cmp) {
@@ -1069,10 +1086,10 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
                 (shift == 0) ? (int) (dataMap() ^ bitpos) : bitpos(mask(keyHash, 0));
 
             if (dataIndex == 0) {
-              return CompactMapNode.<K, V>nodeOf(mutator, (int) 0, newDataMap, getKey(1),
+              return CompactMapNode.<K, V>nodeOf(mutator, 0, newDataMap, getKey(1),
                   getValue(1));
             } else {
-              return CompactMapNode.<K, V>nodeOf(mutator, (int) 0, newDataMap, getKey(0),
+              return CompactMapNode.<K, V>nodeOf(mutator, 0, newDataMap, getKey(0),
                   getValue(0));
             }
           } else {
@@ -1131,7 +1148,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
           }
         }
 
-        map = (int) (map >> 1);
+        map = map >> 1;
         mask += 1;
       }
 
@@ -1236,6 +1253,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       return (V) nodes[TUPLE_LENGTH * index + 1];
     }
 
+    @Override
     java.util.Map.Entry<K, V> getKeyValueEntry(final int index) {
       return entryOf((K) nodes[TUPLE_LENGTH * index], (V) nodes[TUPLE_LENGTH * index + 1]);
     }
@@ -1285,8 +1303,8 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
     public int hashCode() {
       final int prime = 31;
       int result = 0;
-      result = prime * result + ((int) dataMap());
-      result = prime * result + ((int) dataMap());
+      result = prime * result + (dataMap());
+      result = prime * result + (dataMap());
       result = prime * result + Arrays.hashCode(nodes);
       return result;
     }
@@ -1342,7 +1360,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
         return this;
       } else {
         final Object[] src = this.nodes;
-        final Object[] dst = (Object[]) new Object[src.length];
+        final Object[] dst = new Object[src.length];
 
         // copy 'src' and set 1 element(s) at position 'idx'
         System.arraycopy(src, 0, dst, 0, src.length);
@@ -1364,7 +1382,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
         return this;
       } else {
         final Object[] src = this.nodes;
-        final Object[] dst = (Object[]) new Object[src.length];
+        final Object[] dst = new Object[src.length];
 
         // copy 'src' and set 1 element(s) at position 'idx'
         System.arraycopy(src, 0, dst, 0, src.length);
@@ -1380,7 +1398,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       final int idx = TUPLE_LENGTH * dataIndex(bitpos);
 
       final Object[] src = this.nodes;
-      final Object[] dst = (Object[]) new Object[src.length + 2];
+      final Object[] dst = new Object[src.length + 2];
 
       // copy 'src' and insert 2 element(s) at position 'idx'
       System.arraycopy(src, 0, dst, 0, idx);
@@ -1388,7 +1406,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       dst[idx + 1] = val;
       System.arraycopy(src, idx, dst, idx + 2, src.length - idx);
 
-      return nodeOf(mutator, nodeMap(), (int) (dataMap() | bitpos), dst);
+      return nodeOf(mutator, nodeMap(), dataMap() | bitpos, dst);
     }
 
     @Override
@@ -1397,13 +1415,13 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       final int idx = TUPLE_LENGTH * dataIndex(bitpos);
 
       final Object[] src = this.nodes;
-      final Object[] dst = (Object[]) new Object[src.length - 2];
+      final Object[] dst = new Object[src.length - 2];
 
       // copy 'src' and remove 2 element(s) at position 'idx'
       System.arraycopy(src, 0, dst, 0, idx);
       System.arraycopy(src, idx + 2, dst, idx, src.length - idx - 2);
 
-      return nodeOf(mutator, nodeMap(), (int) (dataMap() ^ bitpos), dst);
+      return nodeOf(mutator, nodeMap(), dataMap() ^ bitpos, dst);
     }
 
     @Override
@@ -1424,7 +1442,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       dst[idxNew + 0] = node;
       System.arraycopy(src, idxNew + 2, dst, idxNew + 1, src.length - idxNew - 2);
 
-      return nodeOf(mutator, (int) (nodeMap() | bitpos), (int) (dataMap() ^ bitpos), dst);
+      return nodeOf(mutator, nodeMap() | bitpos, dataMap() ^ bitpos, dst);
     }
 
     @Override
@@ -1446,7 +1464,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       System.arraycopy(src, idxNew, dst, idxNew + 2, idxOld - idxNew);
       System.arraycopy(src, idxOld + 1, dst, idxOld + 2, src.length - idxOld - 1);
 
-      return nodeOf(mutator, (int) (nodeMap() ^ bitpos), (int) (dataMap() | bitpos), dst);
+      return nodeOf(mutator, nodeMap() ^ bitpos, dataMap() | bitpos, dst);
     }
 
   }
@@ -1464,6 +1482,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       assert payloadArity() >= 2;
     }
 
+    @Override
     boolean containsKey(final K key, final int keyHash, final int shift) {
       if (this.hash == keyHash) {
         for (K k : keys) {
@@ -1475,6 +1494,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       return false;
     }
 
+    @Override
     boolean containsKey(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       if (this.hash == keyHash) {
@@ -1487,6 +1507,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       return false;
     }
 
+    @Override
     Optional<V> findByKey(final K key, final int keyHash, final int shift) {
       for (int i = 0; i < keys.length; i++) {
         final K _key = keys[i];
@@ -1498,6 +1519,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       return Optional.empty();
     }
 
+    @Override
     Optional<V> findByKey(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       for (int i = 0; i < keys.length; i++) {
@@ -1510,6 +1532,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       return Optional.empty();
     }
 
+    @Override
     CompactMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
         final int keyHash, final int shift, final MapResult<K, V> details) {
       assert this.hash == keyHash;
@@ -1563,6 +1586,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       return new HashCollisionMapNode<>(keyHash, keysNew, valsNew);
     }
 
+    @Override
     CompactMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
         final int keyHash, final int shift, final MapResult<K, V> details,
         final Comparator<Object> cmp) {
@@ -1617,6 +1641,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       return new HashCollisionMapNode<>(keyHash, keysNew, valsNew);
     }
 
+    @Override
     CompactMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final MapResult<K, V> details) {
       for (int idx = 0; idx < keys.length; idx++) {
@@ -1659,6 +1684,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       return this;
     }
 
+    @Override
     CompactMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final MapResult<K, V> details,
         final Comparator<Object> cmp) {
@@ -1742,6 +1768,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       return vals[index];
     }
 
+    @Override
     java.util.Map.Entry<K, V> getKeyValueEntry(final int index) {
       return entryOf(keys[index], vals[index]);
     }
@@ -2116,6 +2143,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       return hash == targetHash && size == targetSize;
     }
 
+    @Override
     public boolean contains(final Object o) {
       try {
         @SuppressWarnings("unchecked")
@@ -2126,6 +2154,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       }
     }
 
+    @Override
     public boolean containsValue(final Object o) {
       for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
         if (iterator.next().equals(o)) {
@@ -2150,6 +2179,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       }
     }
 
+    @Override
     public V insert(final K key, final V val) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -2194,6 +2224,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       return null;
     }
 
+    @Override
     public boolean insertAll(final Map<? extends K, ? extends V> map) {
       boolean modified = false;
 
@@ -2213,6 +2244,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       return modified;
     }
 
+    @Override
     public V remove(final K key) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -2245,14 +2277,17 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       return null;
     }
 
+    @Override
     public long size() {
       return cachedSize;
     }
 
+    @Override
     public boolean isEmpty() {
       return cachedSize == 0;
     }
 
+    @Override
     public SupplierIterator<K, V> iterator() {
       return new TransientSupplierIterator<>(this);
     }
@@ -2265,6 +2300,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
       return new TransientMapValueIterator<>(this);
     }
 
+    @Override
     public Iterator<java.util.Map.Entry<K, V>> entryIterator() {
       return new TransientMapEntryIterator<>(this);
     }
@@ -2278,10 +2314,12 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
         this.collection = collection;
       }
 
+      @Override
       public K next() {
         return lastKey = super.next();
       }
 
+      @Override
       public void remove() {
         // TODO: test removal at iteration rigorously
         collection.remove(lastKey);
@@ -2297,10 +2335,12 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
         this.collection = collection;
       }
 
+      @Override
       public K next() {
         return lastKey = super.next();
       }
 
+      @Override
       public void remove() {
         // TODO: test removal at iteration rigorously
         collection.remove(lastKey);
@@ -2315,10 +2355,12 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
         this.collection = collection;
       }
 
+      @Override
       public V next() {
         return super.next();
       }
 
+      @Override
       public void remove() {
         throw new UnsupportedOperationException();
       }
@@ -2332,10 +2374,12 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
         this.collection = collection;
       }
 
+      @Override
       public java.util.Map.Entry<K, V> next() {
         return super.next();
       }
 
+      @Override
       public void remove() {
         throw new UnsupportedOperationException();
       }
@@ -2496,7 +2540,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
         for (SupplierIterator<K, V> it = that.iterator(); it.hasNext();) {
           try {
             @SuppressWarnings("unchecked")
-            final K key = (K) it.next();
+            final K key = it.next();
             final Optional<V> result =
                 rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
@@ -2504,7 +2548,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
               return false;
             } else {
               @SuppressWarnings("unchecked")
-              final V val = (V) it.get();
+              final V val = it.get();
 
               if (!result.get().equals(val)) {
                 return false;
@@ -2562,10 +2606,12 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
             return new MapEntryIterator<>(rootNode);
           }
 
+          @Override
           public int size() {
             return cachedSize;
           }
 
+          @Override
           public boolean isEmpty() {
             return cachedSize == 0;
           }
@@ -2575,6 +2621,7 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
             throw new UnsupportedOperationException();
           }
 
+          @Override
           public boolean contains(final Object o) {
             try {
               @SuppressWarnings("unchecked")
