@@ -26,6 +26,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+/* 
+ * TODO: fix hash code implementation
+ */
 @SuppressWarnings("rawtypes")
 public class TrieMap<K, V> implements ImmutableMap<K, V> {
 
@@ -519,7 +522,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
    * For analysis purposes only.
    */
   protected Iterator<AbstractMapNode<K, V>> nodeIterator() {
-    return new TrieMap_5BitsNodeIterator<>(rootNode);
+    return new TrieMapNodeIterator<>(rootNode);
   }
 
   /*
@@ -872,7 +875,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
       if (shift >= HASH_CODE_LENGTH) {
         // throw new
         // IllegalStateException("Hash collision not yet fixed.");
-        return new HashCollisionMapNode_5Bits<>(keyHash0, (K[]) new Object[] {key0, key1},
+        return new HashCollisionMapNode<>(keyHash0, (K[]) new Object[] {key0, key1},
             (V[]) new Object[] {val0, val1});
       }
 
@@ -1582,12 +1585,12 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
 
   }
 
-  private static final class HashCollisionMapNode_5Bits<K, V> extends CompactMapNode<K, V> {
+  private static final class HashCollisionMapNode<K, V> extends CompactMapNode<K, V> {
     private final K[] keys;
     private final V[] vals;
     private final int hash;
 
-    HashCollisionMapNode_5Bits(final int hash, final K[] keys, final V[] vals) {
+    HashCollisionMapNode(final int hash, final K[] keys, final V[] vals) {
       this.keys = keys;
       this.vals = vals;
       this.hash = hash;
@@ -1662,7 +1665,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
             dst[idx + 0] = val;
 
             final CompactMapNode<K, V> thisNew =
-                new HashCollisionMapNode_5Bits<>(this.hash, this.keys, dst);
+                new HashCollisionMapNode<>(this.hash, this.keys, dst);
 
             details.updated(currentVal);
             return thisNew;
@@ -1691,7 +1694,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
           this.vals.length - vals.length);
 
       details.modified();
-      return new HashCollisionMapNode_5Bits<>(keyHash, keysNew, valsNew);
+      return new HashCollisionMapNode<>(keyHash, keysNew, valsNew);
     }
 
     CompactMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
@@ -1716,7 +1719,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
             dst[idx + 0] = val;
 
             final CompactMapNode<K, V> thisNew =
-                new HashCollisionMapNode_5Bits<>(this.hash, this.keys, dst);
+                new HashCollisionMapNode<>(this.hash, this.keys, dst);
 
             details.updated(currentVal);
             return thisNew;
@@ -1745,7 +1748,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
           this.vals.length - vals.length);
 
       details.modified();
-      return new HashCollisionMapNode_5Bits<>(keyHash, keysNew, valsNew);
+      return new HashCollisionMapNode<>(keyHash, keysNew, valsNew);
     }
 
     CompactMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
@@ -1783,7 +1786,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
             System.arraycopy(this.vals, 0, valsNew, 0, idx);
             System.arraycopy(this.vals, idx + 1, valsNew, idx, this.vals.length - idx - 1);
 
-            return new HashCollisionMapNode_5Bits<>(keyHash, keysNew, valsNew);
+            return new HashCollisionMapNode<>(keyHash, keysNew, valsNew);
           }
         }
       }
@@ -1826,7 +1829,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
             System.arraycopy(this.vals, 0, valsNew, 0, idx);
             System.arraycopy(this.vals, idx + 1, valsNew, idx, this.vals.length - idx - 1);
 
-            return new HashCollisionMapNode_5Bits<>(keyHash, keysNew, valsNew);
+            return new HashCollisionMapNode<>(keyHash, keysNew, valsNew);
           }
         }
       }
@@ -1919,7 +1922,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
         return false;
       }
 
-      HashCollisionMapNode_5Bits<?, ?> that = (HashCollisionMapNode_5Bits<?, ?>) other;
+      HashCollisionMapNode<?, ?> that = (HashCollisionMapNode<?, ?>) other;
 
       if (hash != that.hash) {
         return false;
@@ -2146,11 +2149,11 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
   /**
    * Iterator that first iterates over inlined-values and then continues depth first recursively.
    */
-  private static class TrieMap_5BitsNodeIterator<K, V> implements Iterator<AbstractMapNode<K, V>> {
+  private static class TrieMapNodeIterator<K, V> implements Iterator<AbstractMapNode<K, V>> {
 
     final Deque<Iterator<? extends AbstractMapNode<K, V>>> nodeIteratorStack;
 
-    TrieMap_5BitsNodeIterator(AbstractMapNode<K, V> rootNode) {
+    TrieMapNodeIterator(AbstractMapNode<K, V> rootNode) {
       nodeIteratorStack = new ArrayDeque<>();
       nodeIteratorStack.push(Collections.singleton(rootNode).iterator());
     }
@@ -2198,11 +2201,11 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
     private int hashCode;
     private int cachedSize;
 
-    TransientTrieMap(TrieMap<K, V> trieMap_5Bits) {
+    TransientTrieMap(TrieMap<K, V> trieMap) {
       this.mutator = new AtomicReference<Thread>(Thread.currentThread());
-      this.rootNode = trieMap_5Bits.rootNode;
-      this.hashCode = trieMap_5Bits.hashCode;
-      this.cachedSize = trieMap_5Bits.cachedSize;
+      this.rootNode = trieMap.rootNode;
+      this.hashCode = trieMap.hashCode;
+      this.cachedSize = trieMap.cachedSize;
       if (DEBUG) {
         assert checkHashCodeAndSize(hashCode, cachedSize);
       }

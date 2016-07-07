@@ -1876,11 +1876,11 @@ public class TrieSet<K> implements Set.Immutable<K> {
     private int cachedHashCode;
     private int cachedSize;
 
-    TransientTrieSet(TrieSet<K> trieSet_5Bits) {
+    TransientTrieSet(TrieSet<K> trieSet) {
       this.mutator = new AtomicReference<Thread>(Thread.currentThread());
-      this.rootNode = trieSet_5Bits.rootNode;
-      this.cachedHashCode = trieSet_5Bits.cachedHashCode;
-      this.cachedSize = trieSet_5Bits.cachedSize;
+      this.rootNode = trieSet.rootNode;
+      this.cachedHashCode = trieSet.cachedHashCode;
+      this.cachedSize = trieSet.cachedSize;
       if (DEBUG) {
         assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
