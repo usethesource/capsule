@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013-2015 CWI All rights reserved. This program and the accompanying materials are
+ * Copyright (c) 2013-2016 CWI All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which accompanies this
  * distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
  *
@@ -38,9 +38,9 @@ public interface Set<K> extends Iterable<K>, Function<K, Optional<K>> {
 
   /**
    * The hash code of a set is order independent by combining the hashes of the elements via a
-   * bitwise xor operation.
+   * bitwise XOR operation.
    * 
-   * @return xor reduction of all hashes of elements
+   * @return XOR reduction of all hashes of elements
    */
   @Override
   int hashCode();
@@ -66,6 +66,8 @@ public interface Set<K> extends Iterable<K>, Function<K, Optional<K>> {
 
     Set.Transient<K> asTransient();
 
+    java.util.Set<K> asJdkCollection();
+    
   }
 
   public static interface Transient<K> extends Set<K> {
@@ -81,5 +83,5 @@ public interface Set<K> extends Iterable<K>, Function<K, Optional<K>> {
     boolean retainAll(final Set<? extends K> set);
 
   }
-
+  
 }

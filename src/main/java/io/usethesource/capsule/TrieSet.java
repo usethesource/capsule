@@ -12,7 +12,6 @@ package io.usethesource.capsule;
 import java.text.DecimalFormat;
 import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
@@ -368,7 +367,12 @@ public class TrieSet<K> implements Set.Immutable<K> {
   public int hashCode() {
     return cachedHashCode;
   }
-
+  
+  @Override
+  public java.util.Set<K> asJdkCollection() {
+    return new TrieSetAsImmutableJdkCollection<>(this);
+  }
+  
   @Override
   public boolean isTransientSupported() {
     return true;
@@ -2263,6 +2267,11 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return cachedHashCode;
     }
 
+    // @Override
+    // public java.util.Set<K> asJdkCollection() {
+    // throw new UnsupportedOperationException("Not yet implemented.");
+    // }
+    
     @Override
     public Set.Immutable<K> asImmutable() {
       if (mutator.get() == null) {
@@ -2273,5 +2282,30 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return new TrieSet<K>(rootNode, cachedHashCode, cachedSize);
     }
   }
+    
+  private static class TrieSetAsImmutableJdkCollection<K> extends java.util.AbstractSet<K> {
+    private final AbstractSetNode<K> rootNode;
+    private final int cachedSize;
 
+    private TrieSetAsImmutableJdkCollection(TrieSet<K> original) {
+      this.rootNode = original.rootNode;
+      this.cachedSize = original.cachedSize;
+    }
+
+    private TrieSetAsImmutableJdkCollection(TransientTrieSet<K> original) {
+      this.rootNode = original.rootNode;
+      this.cachedSize = original.cachedSize;
+    }
+    
+    @Override
+    public Iterator<K> iterator() {
+      return new SetKeyIterator<>(rootNode);
+    }
+
+    @Override
+    public int size() {
+      return cachedSize;
+    }
+  }  
+  
 }

@@ -14,46 +14,25 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+/*
+ * TODO: remove dependency of java.util.Map
+ */
 public interface SetMultimap<K, V>
     extends Iterable<Map.Entry<K, V>>, Function<K, Optional<Set.Immutable<V>>> {
 
   long size();
 
+  // default int sizeDistinct() {
+  // return (int) entrySet().stream().map(Entry::getKey).distinct().count();
+  // }
+  
   boolean isEmpty();
 
   boolean contains(final K key);
 
   boolean contains(final K key, V val);
 
-  // boolean containsKey(final Object o);
-  //
   // boolean containsValue(final Object o);
-  //
-  // boolean containsEntry(final Object o0, final Object o1);
-
-  // Set<V> get(final java.lang.Object o);
-
-  // Set<K> keySet();
-  //
-  // Collection<V> values();
-  //
-  // java.util.Set<Map.Entry<K, V>> entrySet();
-  //
-  // Iterator<K> keyIterator();
-  //
-  // Iterator<V> valueIterator();
-
-  // TODO: Iterator<Map.Entry<K, Set<V>>> groupByKeyIterator();
-
-  // Iterator<Map.Entry<K, V>> entryIterator();
-  //
-  // <T> Iterator<T> tupleIterator(final BiFunction<K, V, T> tupleOf);
-
-  // default int sizeDistinct() {
-  // return (int) entrySet().stream().map(Entry::getKey).distinct().count();
-  // }
-  //
-  // boolean isEmpty();
 
   @Override
   Iterator<Map.Entry<K, V>> iterator();
@@ -61,10 +40,10 @@ public interface SetMultimap<K, V>
   Iterator<Map.Entry<K, Object>> nativeEntryIterator();
 
   /**
-   * The hash code of a multimap is order independent by combining the hashes of the elements (both
-   * keys and values) via a bitwise xor operation.
+   * The hash code of a mult-imap is order independent by combining the hashes of the elements (both
+   * keys and values) via a bitwise XOR operation.
    * 
-   * @return xor reduction of all hashes of elements
+   * @return XOR reduction of all hashes of elements
    */
   @Override
   int hashCode();
