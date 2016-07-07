@@ -12,17 +12,16 @@ package io.usethesource.capsule;
 import static io.usethesource.capsule.AbstractSpecialisedImmutableMap.entryOf;
 
 import java.text.DecimalFormat;
-import java.util.AbstractCollection;
 import java.util.AbstractSet;
 import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -30,7 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * TODO: fix hash code implementation
  */
 @SuppressWarnings("rawtypes")
-public class TrieMap<K, V> implements ImmutableMap<K, V> {
+public class TrieMap<K, V> implements Map.Immutable<K, V> {
 
   @SuppressWarnings("unchecked")
   private static final TrieMap EMPTY_MAP = new TrieMap(CompactMapNode.EMPTY_NODE, 0, 0);
@@ -51,46 +50,46 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> ImmutableMap<K, V> of() {
+  public static final <K, V> Map.Immutable<K, V> of() {
     return TrieMap.EMPTY_MAP;
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> ImmutableMap<K, V> of(Object... keyValuePairs) {
+  public static final <K, V> Map.Immutable<K, V> of(Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
       throw new IllegalArgumentException("Length of argument list is uneven: no key/value pairs.");
     }
 
-    ImmutableMap<K, V> result = TrieMap.EMPTY_MAP;
+    Map.Immutable<K, V> result = TrieMap.EMPTY_MAP;
 
     for (int i = 0; i < keyValuePairs.length; i += 2) {
       final K key = (K) keyValuePairs[i];
       final V val = (V) keyValuePairs[i + 1];
 
-      result = result.__put(key, val);
+      result = result.insert(key, val);
     }
 
     return result;
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> TransientMap<K, V> transientOf() {
+  public static final <K, V> Map.Transient<K, V> transientOf() {
     return TrieMap.EMPTY_MAP.asTransient();
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> TransientMap<K, V> transientOf(Object... keyValuePairs) {
+  public static final <K, V> Map.Transient<K, V> transientOf(Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
       throw new IllegalArgumentException("Length of argument list is uneven: no key/value pairs.");
     }
 
-    final TransientMap<K, V> result = TrieMap.EMPTY_MAP.asTransient();
+    final Map.Transient<K, V> result = TrieMap.EMPTY_MAP.asTransient();
 
     for (int i = 0; i < keyValuePairs.length; i += 2) {
       final K key = (K) keyValuePairs[i];
       final V val = (V) keyValuePairs[i + 1];
 
-      result.__put(key, val);
+      result.insert(key, val);
     }
 
     return result;
@@ -116,21 +115,11 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
     return hash;
   }
 
-  public boolean containsKey(final Object o) {
+  public boolean contains(final Object o) {
     try {
       @SuppressWarnings("unchecked")
       final K key = (K) o;
       return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0);
-    } catch (ClassCastException unused) {
-      return false;
-    }
-  }
-
-  public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
-    try {
-      @SuppressWarnings("unchecked")
-      final K key = (K) o;
-      return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0, cmp);
     } catch (ClassCastException unused) {
       return false;
     }
@@ -145,48 +134,22 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
     return false;
   }
 
-  public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
-    for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
-      if (cmp.compare(iterator.next(), o) == 0) {
-        return true;
-      }
-    }
-    return false;
+  @Override
+  public Optional<V> apply(K key) {
+    return rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
   }
 
   public V get(final Object o) {
     try {
       @SuppressWarnings("unchecked")
       final K key = (K) o;
-      final Optional<V> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
-
-      if (result.isPresent()) {
-        return result.get();
-      } else {
-        return null;
-      }
+      return apply(key).orElse(null);
     } catch (ClassCastException unused) {
       return null;
     }
   }
 
-  public V getEquivalent(final Object o, final Comparator<Object> cmp) {
-    try {
-      @SuppressWarnings("unchecked")
-      final K key = (K) o;
-      final Optional<V> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
-
-      if (result.isPresent()) {
-        return result.get();
-      } else {
-        return null;
-      }
-    } catch (ClassCastException unused) {
-      return null;
-    }
-  }
-
-  public ImmutableMap<K, V> __put(final K key, final V val) {
+  public Map.Immutable<K, V> insert(final K key, final V val) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -209,44 +172,13 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
     return this;
   }
 
-  public ImmutableMap<K, V> __putEquivalent(final K key, final V val,
-      final Comparator<Object> cmp) {
-    final int keyHash = key.hashCode();
-    final MapResult<K, V> details = MapResult.unchanged();
-
-    final CompactMapNode<K, V> newRootNode =
-        rootNode.updated(null, key, val, transformHashCode(keyHash), 0, details, cmp);
-
-    if (details.isModified()) {
-      if (details.hasReplacedValue()) {
-        final int valHashOld = details.getReplacedValue().hashCode();
-        final int valHashNew = val.hashCode();
-
-        return new TrieMap<K, V>(newRootNode,
-            hashCode + ((keyHash ^ valHashNew)) - ((keyHash ^ valHashOld)), cachedSize);
-      }
-
-      final int valHash = val.hashCode();
-      return new TrieMap<K, V>(newRootNode, hashCode + ((keyHash ^ valHash)), cachedSize + 1);
-    }
-
-    return this;
+  public Map.Immutable<K, V> insertAll(final Map<? extends K, ? extends V> map) {
+    final Map.Transient<K, V> tmpTransient = this.asTransient();
+    tmpTransient.insertAll(map);
+    return tmpTransient.asImmutable();
   }
 
-  public ImmutableMap<K, V> __putAll(final java.util.Map<? extends K, ? extends V> map) {
-    final TransientMap<K, V> tmpTransient = this.asTransient();
-    tmpTransient.__putAll(map);
-    return tmpTransient.freeze();
-  }
-
-  public ImmutableMap<K, V> __putAllEquivalent(final java.util.Map<? extends K, ? extends V> map,
-      final Comparator<Object> cmp) {
-    final TransientMap<K, V> tmpTransient = this.asTransient();
-    tmpTransient.__putAllEquivalent(map, cmp);
-    return tmpTransient.freeze();
-  }
-
-  public ImmutableMap<K, V> __remove(final K key) {
+  public Map.Immutable<K, V> remove(final K key) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -262,39 +194,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
     return this;
   }
 
-  public ImmutableMap<K, V> __removeEquivalent(final K key, final Comparator<Object> cmp) {
-    final int keyHash = key.hashCode();
-    final MapResult<K, V> details = MapResult.unchanged();
-
-    final CompactMapNode<K, V> newRootNode =
-        rootNode.removed(null, key, transformHashCode(keyHash), 0, details, cmp);
-
-    if (details.isModified()) {
-      assert details.hasReplacedValue();
-      final int valHash = details.getReplacedValue().hashCode();
-      return new TrieMap<K, V>(newRootNode, hashCode - ((keyHash ^ valHash)), cachedSize - 1);
-    }
-
-    return this;
-  }
-
-  public V put(final K key, final V val) {
-    throw new UnsupportedOperationException();
-  }
-
-  public void putAll(final java.util.Map<? extends K, ? extends V> m) {
-    throw new UnsupportedOperationException();
-  }
-
-  public void clear() {
-    throw new UnsupportedOperationException();
-  }
-
-  public V remove(final Object key) {
-    throw new UnsupportedOperationException();
-  }
-
-  public int size() {
+  public long size() {
     return cachedSize;
   }
 
@@ -302,6 +202,10 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
     return cachedSize == 0;
   }
 
+  public SupplierIterator<K, V> iterator() {
+    return new MapSupplierIterator<>(rootNode);
+  }
+ 
   public Iterator<K> keyIterator() {
     return new MapKeyIterator<>(rootNode);
   }
@@ -314,130 +218,130 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
     return new MapEntryIterator<>(rootNode);
   }
 
-  @Override
-  public Set<K> keySet() {
-    Set<K> keySet = null;
-
-    if (keySet == null) {
-      keySet = new AbstractSet<K>() {
-        @Override
-        public Iterator<K> iterator() {
-          return TrieMap.this.keyIterator();
-        }
-
-        @Override
-        public int size() {
-          return TrieMap.this.size();
-        }
-
-        @Override
-        public boolean isEmpty() {
-          return TrieMap.this.isEmpty();
-        }
-
-        @Override
-        public void clear() {
-          TrieMap.this.clear();
-        }
-
-        @Override
-        public boolean contains(Object k) {
-          return TrieMap.this.containsKey(k);
-        }
-      };
-    }
-
-    return keySet;
-  }
-
-  @Override
-  public Collection<V> values() {
-    Collection<V> values = null;
-
-    if (values == null) {
-      values = new AbstractCollection<V>() {
-        @Override
-        public Iterator<V> iterator() {
-          return TrieMap.this.valueIterator();
-        }
-
-        @Override
-        public int size() {
-          return TrieMap.this.size();
-        }
-
-        @Override
-        public boolean isEmpty() {
-          return TrieMap.this.isEmpty();
-        }
-
-        @Override
-        public void clear() {
-          TrieMap.this.clear();
-        }
-
-        @Override
-        public boolean contains(Object v) {
-          return TrieMap.this.containsValue(v);
-        }
-      };
-    }
-
-    return values;
-  }
-
-  @Override
-  public Set<java.util.Map.Entry<K, V>> entrySet() {
-    Set<java.util.Map.Entry<K, V>> entrySet = null;
-
-    if (entrySet == null) {
-      entrySet = new AbstractSet<java.util.Map.Entry<K, V>>() {
-        @Override
-        public Iterator<java.util.Map.Entry<K, V>> iterator() {
-          return new Iterator<java.util.Map.Entry<K, V>>() {
-            private final Iterator<java.util.Map.Entry<K, V>> i = entryIterator();
-
-            @Override
-            public boolean hasNext() {
-              return i.hasNext();
-            }
-
-            @Override
-            public java.util.Map.Entry<K, V> next() {
-              return i.next();
-            }
-
-            @Override
-            public void remove() {
-              i.remove();
-            }
-          };
-        }
-
-        @Override
-        public int size() {
-          return TrieMap.this.size();
-        }
-
-        @Override
-        public boolean isEmpty() {
-          return TrieMap.this.isEmpty();
-        }
-
-        @Override
-        public void clear() {
-          TrieMap.this.clear();
-        }
-
-        @Override
-        public boolean contains(Object k) {
-          return TrieMap.this.containsKey(k);
-        }
-      };
-    }
-
-    return entrySet;
-  }
+//  @Override
+//  public Set<K> keySet() {
+//    Set<K> keySet = null;
+//
+//    if (keySet == null) {
+//      keySet = new AbstractSet<K>() {
+//        @Override
+//        public Iterator<K> iterator() {
+//          return TrieMap.this.keyIterator();
+//        }
+//
+//        @Override
+//        public int size() {
+//          return TrieMap.this.size();
+//        }
+//
+//        @Override
+//        public boolean isEmpty() {
+//          return TrieMap.this.isEmpty();
+//        }
+//
+//        @Override
+//        public void clear() {
+//          TrieMap.this.clear();
+//        }
+//
+//        @Override
+//        public boolean contains(Object k) {
+//          return TrieMap.this.contains(k);
+//        }
+//      };
+//    }
+//
+//    return keySet;
+//  }
+//
+//  @Override
+//  public Collection<V> values() {
+//    Collection<V> values = null;
+//
+//    if (values == null) {
+//      values = new AbstractCollection<V>() {
+//        @Override
+//        public Iterator<V> iterator() {
+//          return TrieMap.this.valueIterator();
+//        }
+//
+//        @Override
+//        public int size() {
+//          return TrieMap.this.size();
+//        }
+//
+//        @Override
+//        public boolean isEmpty() {
+//          return TrieMap.this.isEmpty();
+//        }
+//
+//        @Override
+//        public void clear() {
+//          TrieMap.this.clear();
+//        }
+//
+//        @Override
+//        public boolean contains(Object v) {
+//          return TrieMap.this.containsValue(v);
+//        }
+//      };
+//    }
+//
+//    return values;
+//  }
+//
+//  @Override
+//  public Set<java.util.Map.Entry<K, V>> entrySet() {
+//    Set<java.util.Map.Entry<K, V>> entrySet = null;
+//
+//    if (entrySet == null) {
+//      entrySet = new AbstractSet<java.util.Map.Entry<K, V>>() {
+//        @Override
+//        public Iterator<java.util.Map.Entry<K, V>> iterator() {
+//          return new Iterator<java.util.Map.Entry<K, V>>() {
+//            private final Iterator<java.util.Map.Entry<K, V>> i = entryIterator();
+//
+//            @Override
+//            public boolean hasNext() {
+//              return i.hasNext();
+//            }
+//
+//            @Override
+//            public java.util.Map.Entry<K, V> next() {
+//              return i.next();
+//            }
+//
+//            @Override
+//            public void remove() {
+//              i.remove();
+//            }
+//          };
+//        }
+//
+//        @Override
+//        public int size() {
+//          return TrieMap.this.size();
+//        }
+//
+//        @Override
+//        public boolean isEmpty() {
+//          return TrieMap.this.isEmpty();
+//        }
+//
+//        @Override
+//        public void clear() {
+//          TrieMap.this.clear();
+//        }
+//
+//        @Override
+//        public boolean contains(Object k) {
+//          return TrieMap.this.contains(k);
+//        }
+//      };
+//    }
+//
+//    return entrySet;
+//  }
 
   @Override
   public boolean equals(final Object other) {
@@ -467,7 +371,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
         return false;
 
       for (@SuppressWarnings("unchecked")
-      Iterator<java.util.Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
+      Iterator<java.util.Map.Entry> it = that.entryIterator(); it.hasNext();) {
         java.util.Map.Entry entry = it.next();
 
         try {
@@ -502,15 +406,25 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
   }
 
   @Override
+  public java.util.Map<K, V> asJdkCollection() {
+    return new TrieMapAsImmutableJdkCollection<>(this);
+  }
+  
+  @Override
   public boolean isTransientSupported() {
     return true;
   }
 
   @Override
-  public TransientMap<K, V> asTransient() {
+  public Map.Transient<K, V> asTransient() {
     return new TransientTrieMap<K, V>(this);
   }
 
+  @Override
+  public Map.Immutable<K, V> asImmutable() {
+    return this;
+  }  
+  
   /*
    * For analysis purposes only.
    */
@@ -611,51 +525,6 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
         System.out.println(String.format("%2d: %s\t[cumsum = %s]\t%s", i,
             new DecimalFormat("0.00%").format(arityPercentage),
             new DecimalFormat("0.00%").format(cumsumArityPercentage), detailPercentages));
-      }
-    }
-  }
-
-  abstract static class Optional<T> {
-    private static final Optional EMPTY = new Optional() {
-      @Override
-      boolean isPresent() {
-        return false;
-      }
-
-      @Override
-      Object get() {
-        return null;
-      }
-    };
-
-    @SuppressWarnings("unchecked")
-    static <T> Optional<T> empty() {
-      return EMPTY;
-    }
-
-    static <T> Optional<T> of(T value) {
-      return new Value<T>(value);
-    }
-
-    abstract boolean isPresent();
-
-    abstract T get();
-
-    private static final class Value<T> extends Optional<T> {
-      private final T value;
-
-      private Value(T value) {
-        this.value = value;
-      }
-
-      @Override
-      boolean isPresent() {
-        return true;
-      }
-
-      @Override
-      T get() {
-        return value;
       }
     }
   }
@@ -873,8 +742,6 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
       assert!(key0.equals(key1));
 
       if (shift >= HASH_CODE_LENGTH) {
-        // throw new
-        // IllegalStateException("Hash collision not yet fixed.");
         return new HashCollisionMapNode<>(keyHash0, (K[]) new Object[] {key0, key1},
             (V[]) new Object[] {val0, val1});
       }
@@ -2092,6 +1959,29 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
     }
   }
 
+  protected static class MapSupplierIterator<K, V> extends AbstractMapIterator<K, V>
+      implements SupplierIterator<K, V> {
+
+    MapSupplierIterator(AbstractMapNode<K, V> rootNode) {
+      super(rootNode);
+    }
+
+    @Override
+    public K next() {
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      } else {
+        return currentValueNode.getKey(currentValueCursor++);
+      }
+    }
+
+    @Override
+    public V get() {
+      return currentValueNode.getValue(currentValueCursor);
+    }
+
+  }
+  
   protected static class MapKeyIterator<K, V> extends AbstractMapIterator<K, V>
       implements Iterator<K> {
 
@@ -2195,7 +2085,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
     }
   }
 
-  static final class TransientTrieMap<K, V> implements TransientMap<K, V> {
+  static final class TransientTrieMap<K, V> implements Map.Transient<K, V> {
     final private AtomicReference<Thread> mutator;
     private AbstractMapNode<K, V> rootNode;
     private int hashCode;
@@ -2227,37 +2117,11 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
       return hash == targetHash && size == targetSize;
     }
 
-    public V put(final K key, final V val) {
-      throw new UnsupportedOperationException();
-    }
-
-    public void putAll(final java.util.Map<? extends K, ? extends V> m) {
-      throw new UnsupportedOperationException();
-    }
-
-    public void clear() {
-      throw new UnsupportedOperationException();
-    }
-
-    public V remove(final Object key) {
-      throw new UnsupportedOperationException();
-    }
-
-    public boolean containsKey(final Object o) {
+    public boolean contains(final Object o) {
       try {
         @SuppressWarnings("unchecked")
         final K key = (K) o;
         return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0);
-      } catch (ClassCastException unused) {
-        return false;
-      }
-    }
-
-    public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
-      try {
-        @SuppressWarnings("unchecked")
-        final K key = (K) o;
-        return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0, cmp);
       } catch (ClassCastException unused) {
         return false;
       }
@@ -2272,49 +2136,22 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
       return false;
     }
 
-    public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
-      for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
-        if (cmp.compare(iterator.next(), o) == 0) {
-          return true;
-        }
-      }
-      return false;
+    @Override
+    public Optional<V> apply(K key) {
+      return rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
     }
-
+    
     public V get(final Object o) {
       try {
         @SuppressWarnings("unchecked")
         final K key = (K) o;
-        final Optional<V> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
-
-        if (result.isPresent()) {
-          return result.get();
-        } else {
-          return null;
-        }
+        return apply(key).orElse(null);        
       } catch (ClassCastException unused) {
         return null;
       }
     }
 
-    public V getEquivalent(final Object o, final Comparator<Object> cmp) {
-      try {
-        @SuppressWarnings("unchecked")
-        final K key = (K) o;
-        final Optional<V> result =
-            rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
-
-        if (result.isPresent()) {
-          return result.get();
-        } else {
-          return null;
-        }
-      } catch (ClassCastException unused) {
-        return null;
-      }
-    }
-
-    public V __put(final K key, final V val) {
+    public V insert(final K key, final V val) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -2358,82 +2195,26 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
       return null;
     }
 
-    public V __putEquivalent(final K key, final V val, final Comparator<Object> cmp) {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
-      final int keyHash = key.hashCode();
-      final MapResult<K, V> details = MapResult.unchanged();
-
-      final CompactMapNode<K, V> newRootNode =
-          rootNode.updated(mutator, key, val, transformHashCode(keyHash), 0, details, cmp);
-
-      if (details.isModified()) {
-        if (details.hasReplacedValue()) {
-          final V old = details.getReplacedValue();
-
-          final int valHashOld = old.hashCode();
-          final int valHashNew = val.hashCode();
-
-          rootNode = newRootNode;
-          hashCode = hashCode + (keyHash ^ valHashNew) - (keyHash ^ valHashOld);
-
-          if (DEBUG) {
-            assert checkHashCodeAndSize(hashCode, cachedSize);
-          }
-          return details.getReplacedValue();
-        } else {
-          final int valHashNew = val.hashCode();
-          rootNode = newRootNode;
-          hashCode += (keyHash ^ valHashNew);
-          cachedSize += 1;
-
-          if (DEBUG) {
-            assert checkHashCodeAndSize(hashCode, cachedSize);
-          }
-          return null;
-        }
-      }
-
-      if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
-      }
-      return null;
-    }
-
-    public boolean __putAll(final java.util.Map<? extends K, ? extends V> map) {
+    public boolean insertAll(final Map<? extends K, ? extends V> map) {
       boolean modified = false;
 
-      for (java.util.Map.Entry<? extends K, ? extends V> entry : map.entrySet()) {
-        final boolean isPresent = this.containsKey(entry.getKey());
-        final V replaced = this.__put(entry.getKey(), entry.getValue());
+      for (SupplierIterator<? extends K, ? extends V> it = map.iterator(); it.hasNext();) {
+        K key = it.next();
+        V val = it.get();
+
+        final boolean isPresent = this.contains(key);
+        final V replaced = this.insert(key, val);
 
         if (!isPresent || replaced != null) {
           modified = true;
         }
+
       }
 
       return modified;
     }
 
-    public boolean __putAllEquivalent(final java.util.Map<? extends K, ? extends V> map,
-        final Comparator<Object> cmp) {
-      boolean modified = false;
-
-      for (java.util.Map.Entry<? extends K, ? extends V> entry : map.entrySet()) {
-        final boolean isPresent = this.containsKeyEquivalent(entry.getKey(), cmp);
-        final V replaced = this.__putEquivalent(entry.getKey(), entry.getValue(), cmp);
-
-        if (!isPresent || replaced != null) {
-          modified = true;
-        }
-      }
-
-      return modified;
-    }
-
-    public V __remove(final K key) {
+    public V remove(final K key) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -2465,39 +2246,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
       return null;
     }
 
-    public V __removeEquivalent(final K key, final Comparator<Object> cmp) {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
-      final int keyHash = key.hashCode();
-      final MapResult<K, V> details = MapResult.unchanged();
-
-      final CompactMapNode<K, V> newRootNode =
-          rootNode.removed(mutator, key, transformHashCode(keyHash), 0, details, cmp);
-
-      if (details.isModified()) {
-        assert details.hasReplacedValue();
-        final int valHash = details.getReplacedValue().hashCode();
-
-        rootNode = newRootNode;
-        hashCode = hashCode - (keyHash ^ valHash);
-        cachedSize = cachedSize - 1;
-
-        if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
-        }
-        return details.getReplacedValue();
-      }
-
-      if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
-      }
-
-      return null;
-    }
-
-    public int size() {
+    public long size() {
       return cachedSize;
     }
 
@@ -2505,6 +2254,10 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
       return cachedSize == 0;
     }
 
+    public SupplierIterator<K, V> iterator() {
+      return new TransientSupplierIterator<>(this);
+    }
+    
     public Iterator<K> keyIterator() {
       return new TransientMapKeyIterator<>(this);
     }
@@ -2517,6 +2270,25 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
       return new TransientMapEntryIterator<>(this);
     }
 
+    public static class TransientSupplierIterator<K, V> extends MapSupplierIterator<K, V> {
+      final TransientTrieMap<K, V> collection;
+      K lastKey;
+
+      public TransientSupplierIterator(final TransientTrieMap<K, V> collection) {
+        super(collection.rootNode);
+        this.collection = collection;
+      }
+
+      public K next() {
+        return lastKey = super.next();
+      }
+
+      public void remove() {
+        // TODO: test removal at iteration rigorously
+        collection.remove(lastKey);
+      }
+    }
+    
     public static class TransientMapKeyIterator<K, V> extends MapKeyIterator<K, V> {
       final TransientTrieMap<K, V> collection;
       K lastKey;
@@ -2532,7 +2304,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
 
       public void remove() {
         // TODO: test removal at iteration rigorously
-        collection.__remove(lastKey);
+        collection.remove(lastKey);
       }
     }
 
@@ -2570,130 +2342,130 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
       }
     }
 
-    @Override
-    public Set<K> keySet() {
-      Set<K> keySet = null;
-
-      if (keySet == null) {
-        keySet = new AbstractSet<K>() {
-          @Override
-          public Iterator<K> iterator() {
-            return TransientTrieMap.this.keyIterator();
-          }
-
-          @Override
-          public int size() {
-            return TransientTrieMap.this.size();
-          }
-
-          @Override
-          public boolean isEmpty() {
-            return TransientTrieMap.this.isEmpty();
-          }
-
-          @Override
-          public void clear() {
-            TransientTrieMap.this.clear();
-          }
-
-          @Override
-          public boolean contains(Object k) {
-            return TransientTrieMap.this.containsKey(k);
-          }
-        };
-      }
-
-      return keySet;
-    }
-
-    @Override
-    public Collection<V> values() {
-      Collection<V> values = null;
-
-      if (values == null) {
-        values = new AbstractCollection<V>() {
-          @Override
-          public Iterator<V> iterator() {
-            return TransientTrieMap.this.valueIterator();
-          }
-
-          @Override
-          public int size() {
-            return TransientTrieMap.this.size();
-          }
-
-          @Override
-          public boolean isEmpty() {
-            return TransientTrieMap.this.isEmpty();
-          }
-
-          @Override
-          public void clear() {
-            TransientTrieMap.this.clear();
-          }
-
-          @Override
-          public boolean contains(Object v) {
-            return TransientTrieMap.this.containsValue(v);
-          }
-        };
-      }
-
-      return values;
-    }
-
-    @Override
-    public Set<java.util.Map.Entry<K, V>> entrySet() {
-      Set<java.util.Map.Entry<K, V>> entrySet = null;
-
-      if (entrySet == null) {
-        entrySet = new AbstractSet<java.util.Map.Entry<K, V>>() {
-          @Override
-          public Iterator<java.util.Map.Entry<K, V>> iterator() {
-            return new Iterator<java.util.Map.Entry<K, V>>() {
-              private final Iterator<java.util.Map.Entry<K, V>> i = entryIterator();
-
-              @Override
-              public boolean hasNext() {
-                return i.hasNext();
-              }
-
-              @Override
-              public java.util.Map.Entry<K, V> next() {
-                return i.next();
-              }
-
-              @Override
-              public void remove() {
-                i.remove();
-              }
-            };
-          }
-
-          @Override
-          public int size() {
-            return TransientTrieMap.this.size();
-          }
-
-          @Override
-          public boolean isEmpty() {
-            return TransientTrieMap.this.isEmpty();
-          }
-
-          @Override
-          public void clear() {
-            TransientTrieMap.this.clear();
-          }
-
-          @Override
-          public boolean contains(Object k) {
-            return TransientTrieMap.this.containsKey(k);
-          }
-        };
-      }
-
-      return entrySet;
-    }
+//    @Override
+//    public Set<K> keySet() {
+//      Set<K> keySet = null;
+//
+//      if (keySet == null) {
+//        keySet = new AbstractSet<K>() {
+//          @Override
+//          public Iterator<K> iterator() {
+//            return TransientTrieMap.this.keyIterator();
+//          }
+//
+//          @Override
+//          public int size() {
+//            return TransientTrieMap.this.size();
+//          }
+//
+//          @Override
+//          public boolean isEmpty() {
+//            return TransientTrieMap.this.isEmpty();
+//          }
+//
+//          @Override
+//          public void clear() {
+//            TransientTrieMap.this.clear();
+//          }
+//
+//          @Override
+//          public boolean contains(Object k) {
+//            return TransientTrieMap.this.contains(k);
+//          }
+//        };
+//      }
+//
+//      return keySet;
+//    }
+//
+//    @Override
+//    public Collection<V> values() {
+//      Collection<V> values = null;
+//
+//      if (values == null) {
+//        values = new AbstractCollection<V>() {
+//          @Override
+//          public Iterator<V> iterator() {
+//            return TransientTrieMap.this.valueIterator();
+//          }
+//
+//          @Override
+//          public int size() {
+//            return TransientTrieMap.this.size();
+//          }
+//
+//          @Override
+//          public boolean isEmpty() {
+//            return TransientTrieMap.this.isEmpty();
+//          }
+//
+//          @Override
+//          public void clear() {
+//            TransientTrieMap.this.clear();
+//          }
+//
+//          @Override
+//          public boolean contains(Object v) {
+//            return TransientTrieMap.this.containsValue(v);
+//          }
+//        };
+//      }
+//
+//      return values;
+//    }
+//
+//    @Override
+//    public Set<java.util.Map.Entry<K, V>> entrySet() {
+//      Set<java.util.Map.Entry<K, V>> entrySet = null;
+//
+//      if (entrySet == null) {
+//        entrySet = new AbstractSet<java.util.Map.Entry<K, V>>() {
+//          @Override
+//          public Iterator<java.util.Map.Entry<K, V>> iterator() {
+//            return new Iterator<java.util.Map.Entry<K, V>>() {
+//              private final Iterator<java.util.Map.Entry<K, V>> i = entryIterator();
+//
+//              @Override
+//              public boolean hasNext() {
+//                return i.hasNext();
+//              }
+//
+//              @Override
+//              public java.util.Map.Entry<K, V> next() {
+//                return i.next();
+//              }
+//
+//              @Override
+//              public void remove() {
+//                i.remove();
+//              }
+//            };
+//          }
+//
+//          @Override
+//          public int size() {
+//            return TransientTrieMap.this.size();
+//          }
+//
+//          @Override
+//          public boolean isEmpty() {
+//            return TransientTrieMap.this.isEmpty();
+//          }
+//
+//          @Override
+//          public void clear() {
+//            TransientTrieMap.this.clear();
+//          }
+//
+//          @Override
+//          public boolean contains(Object k) {
+//            return TransientTrieMap.this.contains(k);
+//          }
+//        };
+//      }
+//
+//      return entrySet;
+//    }
 
     @Override
     public boolean equals(final Object other) {
@@ -2722,13 +2494,10 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
         if (this.size() != that.size())
           return false;
 
-        for (@SuppressWarnings("unchecked")
-        Iterator<java.util.Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
-          java.util.Map.Entry entry = it.next();
-
+        for (SupplierIterator<K, V> it = that.iterator(); it.hasNext(); ) {
           try {
             @SuppressWarnings("unchecked")
-            final K key = (K) entry.getKey();
+            final K key = (K) it.next();
             final Optional<V> result =
                 rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
@@ -2736,7 +2505,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
               return false;
             } else {
               @SuppressWarnings("unchecked")
-              final V val = (V) entry.getValue();
+              final V val = (V) it.get();
 
               if (!result.get().equals(val)) {
                 return false;
@@ -2744,9 +2513,9 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
             }
           } catch (ClassCastException unused) {
             return false;
-          }
+          }          
         }
-
+        
         return true;
       }
 
@@ -2759,7 +2528,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
     }
 
     @Override
-    public ImmutableMap<K, V> freeze() {
+    public Map.Immutable<K, V> asImmutable() {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -2769,4 +2538,64 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
     }
   }
 
+  private static class TrieMapAsImmutableJdkCollection<K, V> extends java.util.AbstractMap<K, V> {
+    private final AbstractMapNode<K, V> rootNode;
+    private final int cachedSize;
+
+    private TrieMapAsImmutableJdkCollection(TrieMap<K, V> original) {
+      this.rootNode = original.rootNode;
+      this.cachedSize = original.cachedSize;
+    }
+
+    private TrieMapAsImmutableJdkCollection(TransientTrieMap<K, V> original) {
+      this.rootNode = original.rootNode;
+      this.cachedSize = original.cachedSize;
+    }
+    
+    @Override
+    public Set<java.util.Map.Entry<K, V>> entrySet() {
+      Set<java.util.Map.Entry<K, V>> entrySet = null;
+
+      if (entrySet == null) {
+        entrySet = new AbstractSet<java.util.Map.Entry<K, V>>() {
+          @Override
+          public Iterator<java.util.Map.Entry<K, V>> iterator() {
+            return new MapEntryIterator<>(rootNode);
+          }
+
+          public int size() {
+            return cachedSize;
+          }
+
+          public boolean isEmpty() {
+            return cachedSize == 0;
+          }
+
+          @Override
+          public void clear() {
+            throw new UnsupportedOperationException();
+          }
+
+          public boolean contains(final Object o) {
+            try {
+              @SuppressWarnings("unchecked")
+              final K key = (K) o;
+              return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0);
+            } catch (ClassCastException unused) {
+              return false;
+            }
+          }
+        };
+      }
+
+      return entrySet;
+    }
+
+    @Override
+    public int size() {
+      return cachedSize;
+    }
+
+  }  
+  
 }

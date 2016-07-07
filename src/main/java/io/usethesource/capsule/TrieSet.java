@@ -124,53 +124,21 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return false;
     }
   }
-
-  public boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
-    try {
-      @SuppressWarnings("unchecked")
-      final K key = (K) o;
-      return rootNode.contains(key, transformHashCode(key.hashCode()), 0, cmp);
-    } catch (ClassCastException unused) {
-      return false;
-    }
-  }
-
+  
   @Override
   public Optional<K> apply(K key) {
     return rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
   }
-  
-//  public K get(final Object o) {
-//    try {
-//      @SuppressWarnings("unchecked")
-//      final K key = (K) o;
-//      final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
-//
-//      if (result.isPresent()) {
-//        return result.get();
-//      } else {
-//        return null;
-//      }
-//    } catch (ClassCastException unused) {
-//      return null;
-//    }
-//  }
-//
-//  public K getEquivalent(final Object o, final Comparator<Object> cmp) {
-//    try {
-//      @SuppressWarnings("unchecked")
-//      final K key = (K) o;
-//      final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
-//
-//      if (result.isPresent()) {
-//        return result.get();
-//      } else {
-//        return null;
-//      }
-//    } catch (ClassCastException unused) {
-//      return null;
-//    }
-//  }
+
+  public K get(final Object o) {
+    try {
+      @SuppressWarnings("unchecked")
+      final K key = (K) o;
+      return apply(key).orElse(null);
+    } catch (ClassCastException unused) {
+      return null;
+    }
+  }
 
   public Set.Immutable<K> insert(final K key) {
     final int keyHash = key.hashCode();
@@ -186,32 +154,11 @@ public class TrieSet<K> implements Set.Immutable<K> {
     return this;
   }
 
-  public Set.Immutable<K> insertEquivalent(final K key, final Comparator<Object> cmp) {
-    final int keyHash = key.hashCode();
-    final SetResult<K> details = SetResult.unchanged();
-
-    final CompactSetNode<K> newRootNode =
-        rootNode.updated(null, key, transformHashCode(keyHash), 0, details, cmp);
-
-    if (details.isModified()) {
-      return new TrieSet<K>(newRootNode, cachedHashCode ^ keyHash, cachedSize + 1);
-    }
-
-    return this;
-  }
-
   public Set.Immutable<K> insertAll(final Set<? extends K> set) {
     final Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.insertAll(set);
     return tmpTransient.asImmutable();
   }
-
-  // public Set.Immutable<K> insertAllEquivalent(final Set<? extends K> set,
-  // final Comparator<Object> cmp) {
-  // final Set.Transient<K> tmpTransient = this.asTransient();
-  // tmpTransient.insertAllEquivalent(set, cmp);
-  // return tmpTransient.asImmutable();
-  // }
 
   public Set.Immutable<K> remove(final K key) {
     final int keyHash = key.hashCode();
@@ -227,69 +174,17 @@ public class TrieSet<K> implements Set.Immutable<K> {
     return this;
   }
 
-  public Set.Immutable<K> removeEquivalent(final K key, final Comparator<Object> cmp) {
-    final int keyHash = key.hashCode();
-    final SetResult<K> details = SetResult.unchanged();
-
-    final CompactSetNode<K> newRootNode =
-        rootNode.removed(null, key, transformHashCode(keyHash), 0, details, cmp);
-
-    if (details.isModified()) {
-      return new TrieSet<K>(newRootNode, cachedHashCode ^ keyHash, cachedSize - 1);
-    }
-
-    return this;
-  }
-
   public Set.Immutable<K> removeAll(final Set<? extends K> set) {
     final Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.removeAll(set);
     return tmpTransient.asImmutable();
   }
 
-  // public Set.Immutable<K> removeAllEquivalent(final Set<? extends K> set,
-  // final Comparator<Object> cmp) {
-  // final Set.Transient<K> tmpTransient = this.asTransient();
-  // tmpTransient.removeAllEquivalent(set, cmp);
-  // return tmpTransient.asImmutable();
-  // }
-
   public Set.Immutable<K> retainAll(final Set<? extends K> set) {
     final Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.retainAll(set);
     return tmpTransient.asImmutable();
   }
-
-  // public Set.Immutable<K> retainAllEquivalent(final Set.Transient<? extends K> transientSet,
-  // final Comparator<Object> cmp) {
-  // final Set.Transient<K> tmpTransient = this.asTransient();
-  // tmpTransient.retainAllEquivalent(transientSet, cmp);
-  // return tmpTransient.asImmutable();
-  // }
-
-  // public boolean add(final K key) {
-  // throw new UnsupportedOperationException();
-  // }
-  //
-  // public boolean addAll(final Collection<? extends K> c) {
-  // throw new UnsupportedOperationException();
-  // }
-  //
-  // public void clear() {
-  // throw new UnsupportedOperationException();
-  // }
-  //
-  // public boolean remove(final Object key) {
-  // throw new UnsupportedOperationException();
-  // }
-  //
-  // public boolean removeAll(final Collection<?> c) {
-  // throw new UnsupportedOperationException();
-  // }
-  //
-  // public boolean retainAll(final Collection<?> c) {
-  // throw new UnsupportedOperationException();
-  // }
 
   public long size() {
     return cachedSize;
@@ -306,29 +201,6 @@ public class TrieSet<K> implements Set.Immutable<K> {
   public Iterator<K> keyIterator() {
     return new SetKeyIterator<>(rootNode);
   }
-
-  // @Override
-  // public Object[] toArray() {
-  // Object[] array = new Object[cachedSize];
-  //
-  // int idx = 0;
-  // for (K key : this) {
-  // array[idx++] = key;
-  // }
-  //
-  // return array;
-  // }
-  //
-  // @Override
-  // public <T> T[] toArray(final T[] a) {
-  // List<K> list = new ArrayList<K>(cachedSize);
-  //
-  // for (K key : this) {
-  // list.add(key);
-  // }
-  //
-  // return list.toArray(a);
-  // }
 
   @Override
   public boolean equals(final Object other) {
@@ -491,51 +363,6 @@ public class TrieSet<K> implements Set.Immutable<K> {
       }
     }
   }
-
-  // abstract static class Optional<T> {
-  // private static final Optional EMPTY = new Optional() {
-  // @Override
-  // boolean isPresent() {
-  // return false;
-  // }
-  //
-  // @Override
-  // Object get() {
-  // return null;
-  // }
-  // };
-  //
-  // @SuppressWarnings("unchecked")
-  // static <T> Optional<T> empty() {
-  // return EMPTY;
-  // }
-  //
-  // static <T> Optional<T> of(T value) {
-  // return new Value<T>(value);
-  // }
-  //
-  // abstract boolean isPresent();
-  //
-  // abstract T get();
-  //
-  // private static final class Value<T> extends Optional<T> {
-  // private final T value;
-  //
-  // private Value(T value) {
-  // this.value = value;
-  // }
-  //
-  // @Override
-  // boolean isPresent() {
-  // return true;
-  // }
-  //
-  // @Override
-  // T get() {
-  // return value;
-  // }
-  // }
-  // }
 
   static final class SetResult<K> {
     private K replacedValue;
@@ -743,8 +570,6 @@ public class TrieSet<K> implements Set.Immutable<K> {
       assert!(key0.equals(key1));
 
       if (shift >= HASH_CODE_LENGTH) {
-        // throw new
-        // IllegalStateException("Hash collision not yet fixed.");
         return new HashCollisionSetNode<>(keyHash0, (K[]) new Object[] {key0, key1});
       }
 
@@ -1900,30 +1725,6 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return hash == targetHash && size == targetSize;
     }
 
-    // public boolean add(final K key) {
-    // throw new UnsupportedOperationException();
-    // }
-    //
-    // public boolean addAll(final Collection<? extends K> c) {
-    // throw new UnsupportedOperationException();
-    // }
-    //
-    // public void clear() {
-    // throw new UnsupportedOperationException();
-    // }
-    //
-    // public boolean remove(final Object key) {
-    // throw new UnsupportedOperationException();
-    // }
-    //
-    // public boolean removeAll(final Collection<?> c) {
-    // throw new UnsupportedOperationException();
-    // }
-    //
-    // public boolean retainAll(final Collection<?> c) {
-    // throw new UnsupportedOperationException();
-    // }
-
     public boolean contains(final Object o) {
       try {
         @SuppressWarnings("unchecked")
@@ -1934,53 +1735,20 @@ public class TrieSet<K> implements Set.Immutable<K> {
       }
     }
 
-    public boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
-      try {
-        @SuppressWarnings("unchecked")
-        final K key = (K) o;
-        return rootNode.contains(key, transformHashCode(key.hashCode()), 0, cmp);
-      } catch (ClassCastException unused) {
-        return false;
-      }
-    }
-
     @Override
     public Optional<K> apply(K key) {
       return rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
     }    
-    
-//    public K get(final Object o) {
-//      try {
-//        @SuppressWarnings("unchecked")
-//        final K key = (K) o;
-//        final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
-//
-//        if (result.isPresent()) {
-//          return result.get();
-//        } else {
-//          return null;
-//        }
-//      } catch (ClassCastException unused) {
-//        return null;
-//      }
-//    }
-//
-//    public K getEquivalent(final Object o, final Comparator<Object> cmp) {
-//      try {
-//        @SuppressWarnings("unchecked")
-//        final K key = (K) o;
-//        final Optional<K> result =
-//            rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
-//
-//        if (result.isPresent()) {
-//          return result.get();
-//        } else {
-//          return null;
-//        }
-//      } catch (ClassCastException unused) {
-//        return null;
-//      }
-//    }
+          
+    public K get(final Object o) {
+      try {
+        @SuppressWarnings("unchecked")
+        final K key = (K) o;
+        return apply(key).orElse(null);
+      } catch (ClassCastException unused) {
+        return null;
+      }
+    }
 
     public boolean insert(final K key) {
       if (mutator.get() == null) {
@@ -2012,52 +1780,11 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return false;
     }
 
-    public boolean insertEquivalent(final K key, final Comparator<Object> cmp) {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
-      final int keyHash = key.hashCode();
-      final SetResult<K> details = SetResult.unchanged();
-
-      final CompactSetNode<K> newRootNode =
-          rootNode.updated(mutator, key, transformHashCode(keyHash), 0, details, cmp);
-
-      if (details.isModified()) {
-
-        rootNode = newRootNode;
-        cachedHashCode ^= keyHash;
-        cachedSize += 1;
-
-        if (DEBUG) {
-          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
-        }
-        return true;
-
-      }
-
-      if (DEBUG) {
-        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
-      }
-      return false;
-    }
-
     public boolean insertAll(final Set<? extends K> set) {
       boolean modified = false;
 
       for (final K key : set) {
         modified |= this.insert(key);
-      }
-
-      return modified;
-    }
-
-    public boolean insertAllEquivalent(final Set<? extends K> set,
-        final Comparator<Object> cmp) {
-      boolean modified = false;
-
-      for (final K key : set) {
-        modified |= this.insertEquivalent(key, cmp);
       }
 
       return modified;
@@ -2092,51 +1819,11 @@ public class TrieSet<K> implements Set.Immutable<K> {
       return false;
     }
 
-    public boolean removeEquivalent(final K key, final Comparator<Object> cmp) {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
-      final int keyHash = key.hashCode();
-      final SetResult<K> details = SetResult.unchanged();
-
-      final CompactSetNode<K> newRootNode =
-          rootNode.removed(mutator, key, transformHashCode(keyHash), 0, details, cmp);
-
-      if (details.isModified()) {
-        rootNode = newRootNode;
-        cachedHashCode = cachedHashCode ^ keyHash;
-        cachedSize = cachedSize - 1;
-
-        if (DEBUG) {
-          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
-        }
-        return true;
-      }
-
-      if (DEBUG) {
-        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
-      }
-
-      return false;
-    }
-
     public boolean removeAll(final Set<? extends K> set) {
       boolean modified = false;
 
       for (final K key : set) {
         modified |= this.remove(key);
-      }
-
-      return modified;
-    }
-
-    public boolean removeAllEquivalent(final Set<? extends K> set,
-        final Comparator<Object> cmp) {
-      boolean modified = false;
-
-      for (final K key : set) {
-        modified |= this.removeEquivalent(key, cmp);
       }
 
       return modified;
@@ -2155,21 +1842,6 @@ public class TrieSet<K> implements Set.Immutable<K> {
 
       return modified;
     }
-
-    // public boolean retainAllEquivalent(final Set.Transient<? extends K> transientSet,
-    // final Comparator<Object> cmp) {
-    // boolean modified = false;
-    //
-    // Iterator<K> thisIterator = iterator();
-    // while (thisIterator.hasNext()) {
-    // if (!transientSet.containsEquivalent(thisIterator.next(), cmp)) {
-    // thisIterator.remove();
-    // modified = true;
-    // }
-    // }
-    //
-    // return modified;
-    // }
 
     public long size() {
       return cachedSize;
@@ -2205,29 +1877,6 @@ public class TrieSet<K> implements Set.Immutable<K> {
         collection.remove(lastKey);
       }
     }
-
-    // @Override
-    // public Object[] toArray() {
-    // Object[] array = new Object[cachedSize];
-    //
-    // int idx = 0;
-    // for (K key : this) {
-    // array[idx++] = key;
-    // }
-    //
-    // return array;
-    // }
-    //
-    // @Override
-    // public <T> T[] toArray(final T[] a) {
-    // List<K> list = new ArrayList<K>(cachedSize);
-    //
-    // for (K key : this) {
-    // list.add(key);
-    // }
-    //
-    // return list.toArray(a);
-    // }
 
     @Override
     public boolean equals(final Object other) {

@@ -11,7 +11,6 @@ package io.usethesource.capsule;
 
 import java.util.Iterator;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 
 public interface Map<K, V> extends Iterable<K>, Function<K, Optional<V>> {
@@ -37,14 +36,15 @@ public interface Map<K, V> extends Iterable<K>, Function<K, Optional<V>> {
   // K get(final Object o);  
       
   @Override
-  Iterator<K> iterator();
+  SupplierIterator<K, V> iterator();
 
 //  public Iterator<V> valueIterator();
-//
-//  public Iterator<java.util.Map.Entry<K, V>> entryIterator();  
 
-  @Deprecated // TODO: replace with SupplierIterator interface
-  Set<java.util.Map.Entry<K, V>> entrySet();
+  // @Deprecated // TODO: replace with SupplierIterator interface
+  public Iterator<java.util.Map.Entry<K, V>> entryIterator(); 
+
+//  @Deprecated // TODO: replace with SupplierIterator interface
+//  Set<java.util.Map.Entry<K, V>> entrySet();
   
   /**
    * The hash code of a map is order independent by combining the hashes of the elements (both keys
