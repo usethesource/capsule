@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013-2015 CWI All rights reserved. This program and the accompanying materials are
+ * Copyright (c) 2013-2016 CWI All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which accompanies this
  * distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
  *
@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
@@ -98,8 +97,8 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
     int hash = 0;
     int size = 0;
 
-    for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
-      final Map.Entry<K, V> entry = it.next();
+    for (Iterator<java.util.Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
+      final java.util.Map.Entry<K, V> entry = it.next();
       final K key = entry.getKey();
       final V val = entry.getValue();
 
@@ -231,13 +230,13 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
     return this;
   }
 
-  public ImmutableMap<K, V> __putAll(final Map<? extends K, ? extends V> map) {
+  public ImmutableMap<K, V> __putAll(final java.util.Map<? extends K, ? extends V> map) {
     final TransientMap<K, V> tmpTransient = this.asTransient();
     tmpTransient.__putAll(map);
     return tmpTransient.freeze();
   }
 
-  public ImmutableMap<K, V> __putAllEquivalent(final Map<? extends K, ? extends V> map,
+  public ImmutableMap<K, V> __putAllEquivalent(final java.util.Map<? extends K, ? extends V> map,
       final Comparator<Object> cmp) {
     final TransientMap<K, V> tmpTransient = this.asTransient();
     tmpTransient.__putAllEquivalent(map, cmp);
@@ -280,7 +279,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
     throw new UnsupportedOperationException();
   }
 
-  public void putAll(final Map<? extends K, ? extends V> m) {
+  public void putAll(final java.util.Map<? extends K, ? extends V> m) {
     throw new UnsupportedOperationException();
   }
 
@@ -308,7 +307,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
     return new MapValueIterator<>(rootNode);
   }
 
-  public Iterator<Map.Entry<K, V>> entryIterator() {
+  public Iterator<java.util.Map.Entry<K, V>> entryIterator() {
     return new MapEntryIterator<>(rootNode);
   }
 
@@ -392,8 +391,8 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
       entrySet = new AbstractSet<java.util.Map.Entry<K, V>>() {
         @Override
         public Iterator<java.util.Map.Entry<K, V>> iterator() {
-          return new Iterator<Map.Entry<K, V>>() {
-            private final Iterator<Map.Entry<K, V>> i = entryIterator();
+          return new Iterator<java.util.Map.Entry<K, V>>() {
+            private final Iterator<java.util.Map.Entry<K, V>> i = entryIterator();
 
             @Override
             public boolean hasNext() {
@@ -401,7 +400,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
             }
 
             @Override
-            public Map.Entry<K, V> next() {
+            public java.util.Map.Entry<K, V> next() {
               return i.next();
             }
 
@@ -465,8 +464,8 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
         return false;
 
       for (@SuppressWarnings("unchecked")
-      Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
-        Map.Entry entry = it.next();
+      Iterator<java.util.Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
+        java.util.Map.Entry entry = it.next();
 
         try {
           @SuppressWarnings("unchecked")
@@ -506,7 +505,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
 
   @Override
   public TransientMap<K, V> asTransient() {
-    return new TransientTrieMap_5Bits<K, V>(this);
+    return new TransientTrieMap<K, V>(this);
   }
 
   /*
@@ -769,7 +768,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
 
     abstract V getValue(final int index);
 
-    abstract Map.Entry<K, V> getKeyValueEntry(final int index);
+    abstract java.util.Map.Entry<K, V> getKeyValueEntry(final int index);
 
     @Deprecated
     abstract boolean hasSlots();
@@ -1368,7 +1367,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
       return (V) nodes[TUPLE_LENGTH * index + 1];
     }
 
-    Map.Entry<K, V> getKeyValueEntry(final int index) {
+    java.util.Map.Entry<K, V> getKeyValueEntry(final int index) {
       return entryOf((K) nodes[TUPLE_LENGTH * index], (V) nodes[TUPLE_LENGTH * index + 1]);
     }
 
@@ -1874,7 +1873,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
       return vals[index];
     }
 
-    Map.Entry<K, V> getKeyValueEntry(final int index) {
+    java.util.Map.Entry<K, V> getKeyValueEntry(final int index) {
       return entryOf(keys[index], vals[index]);
     }
 
@@ -2127,14 +2126,14 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
   }
 
   protected static class MapEntryIterator<K, V> extends AbstractMapIterator<K, V>
-      implements Iterator<Map.Entry<K, V>> {
+      implements Iterator<java.util.Map.Entry<K, V>> {
 
     MapEntryIterator(AbstractMapNode<K, V> rootNode) {
       super(rootNode);
     }
 
     @Override
-    public Map.Entry<K, V> next() {
+    public java.util.Map.Entry<K, V> next() {
       if (!hasNext()) {
         throw new NoSuchElementException();
       } else {
@@ -2193,13 +2192,13 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
     }
   }
 
-  static final class TransientTrieMap_5Bits<K, V> implements TransientMap<K, V> {
+  static final class TransientTrieMap<K, V> implements TransientMap<K, V> {
     final private AtomicReference<Thread> mutator;
     private AbstractMapNode<K, V> rootNode;
     private int hashCode;
     private int cachedSize;
 
-    TransientTrieMap_5Bits(TrieMap<K, V> trieMap_5Bits) {
+    TransientTrieMap(TrieMap<K, V> trieMap_5Bits) {
       this.mutator = new AtomicReference<Thread>(Thread.currentThread());
       this.rootNode = trieMap_5Bits.rootNode;
       this.hashCode = trieMap_5Bits.hashCode;
@@ -2213,8 +2212,8 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
       int hash = 0;
       int size = 0;
 
-      for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
-        final Map.Entry<K, V> entry = it.next();
+      for (Iterator<java.util.Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
+        final java.util.Map.Entry<K, V> entry = it.next();
         final K key = entry.getKey();
         final V val = entry.getValue();
 
@@ -2229,7 +2228,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
       throw new UnsupportedOperationException();
     }
 
-    public void putAll(final Map<? extends K, ? extends V> m) {
+    public void putAll(final java.util.Map<? extends K, ? extends V> m) {
       throw new UnsupportedOperationException();
     }
 
@@ -2400,10 +2399,10 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
       return null;
     }
 
-    public boolean __putAll(final Map<? extends K, ? extends V> map) {
+    public boolean __putAll(final java.util.Map<? extends K, ? extends V> map) {
       boolean modified = false;
 
-      for (Map.Entry<? extends K, ? extends V> entry : map.entrySet()) {
+      for (java.util.Map.Entry<? extends K, ? extends V> entry : map.entrySet()) {
         final boolean isPresent = this.containsKey(entry.getKey());
         final V replaced = this.__put(entry.getKey(), entry.getValue());
 
@@ -2415,11 +2414,11 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
       return modified;
     }
 
-    public boolean __putAllEquivalent(final Map<? extends K, ? extends V> map,
+    public boolean __putAllEquivalent(final java.util.Map<? extends K, ? extends V> map,
         final Comparator<Object> cmp) {
       boolean modified = false;
 
-      for (Map.Entry<? extends K, ? extends V> entry : map.entrySet()) {
+      for (java.util.Map.Entry<? extends K, ? extends V> entry : map.entrySet()) {
         final boolean isPresent = this.containsKeyEquivalent(entry.getKey(), cmp);
         final V replaced = this.__putEquivalent(entry.getKey(), entry.getValue(), cmp);
 
@@ -2511,15 +2510,15 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
       return new TransientMapValueIterator<>(this);
     }
 
-    public Iterator<Map.Entry<K, V>> entryIterator() {
+    public Iterator<java.util.Map.Entry<K, V>> entryIterator() {
       return new TransientMapEntryIterator<>(this);
     }
 
     public static class TransientMapKeyIterator<K, V> extends MapKeyIterator<K, V> {
-      final TransientTrieMap_5Bits<K, V> collection;
+      final TransientTrieMap<K, V> collection;
       K lastKey;
 
-      public TransientMapKeyIterator(final TransientTrieMap_5Bits<K, V> collection) {
+      public TransientMapKeyIterator(final TransientTrieMap<K, V> collection) {
         super(collection.rootNode);
         this.collection = collection;
       }
@@ -2535,9 +2534,9 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
     }
 
     public static class TransientMapValueIterator<K, V> extends MapValueIterator<K, V> {
-      final TransientTrieMap_5Bits<K, V> collection;
+      final TransientTrieMap<K, V> collection;
 
-      public TransientMapValueIterator(final TransientTrieMap_5Bits<K, V> collection) {
+      public TransientMapValueIterator(final TransientTrieMap<K, V> collection) {
         super(collection.rootNode);
         this.collection = collection;
       }
@@ -2552,14 +2551,14 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
     }
 
     public static class TransientMapEntryIterator<K, V> extends MapEntryIterator<K, V> {
-      final TransientTrieMap_5Bits<K, V> collection;
+      final TransientTrieMap<K, V> collection;
 
-      public TransientMapEntryIterator(final TransientTrieMap_5Bits<K, V> collection) {
+      public TransientMapEntryIterator(final TransientTrieMap<K, V> collection) {
         super(collection.rootNode);
         this.collection = collection;
       }
 
-      public Map.Entry<K, V> next() {
+      public java.util.Map.Entry<K, V> next() {
         return super.next();
       }
 
@@ -2576,27 +2575,27 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
         keySet = new AbstractSet<K>() {
           @Override
           public Iterator<K> iterator() {
-            return TransientTrieMap_5Bits.this.keyIterator();
+            return TransientTrieMap.this.keyIterator();
           }
 
           @Override
           public int size() {
-            return TransientTrieMap_5Bits.this.size();
+            return TransientTrieMap.this.size();
           }
 
           @Override
           public boolean isEmpty() {
-            return TransientTrieMap_5Bits.this.isEmpty();
+            return TransientTrieMap.this.isEmpty();
           }
 
           @Override
           public void clear() {
-            TransientTrieMap_5Bits.this.clear();
+            TransientTrieMap.this.clear();
           }
 
           @Override
           public boolean contains(Object k) {
-            return TransientTrieMap_5Bits.this.containsKey(k);
+            return TransientTrieMap.this.containsKey(k);
           }
         };
       }
@@ -2612,27 +2611,27 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
         values = new AbstractCollection<V>() {
           @Override
           public Iterator<V> iterator() {
-            return TransientTrieMap_5Bits.this.valueIterator();
+            return TransientTrieMap.this.valueIterator();
           }
 
           @Override
           public int size() {
-            return TransientTrieMap_5Bits.this.size();
+            return TransientTrieMap.this.size();
           }
 
           @Override
           public boolean isEmpty() {
-            return TransientTrieMap_5Bits.this.isEmpty();
+            return TransientTrieMap.this.isEmpty();
           }
 
           @Override
           public void clear() {
-            TransientTrieMap_5Bits.this.clear();
+            TransientTrieMap.this.clear();
           }
 
           @Override
           public boolean contains(Object v) {
-            return TransientTrieMap_5Bits.this.containsValue(v);
+            return TransientTrieMap.this.containsValue(v);
           }
         };
       }
@@ -2648,8 +2647,8 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
         entrySet = new AbstractSet<java.util.Map.Entry<K, V>>() {
           @Override
           public Iterator<java.util.Map.Entry<K, V>> iterator() {
-            return new Iterator<Map.Entry<K, V>>() {
-              private final Iterator<Map.Entry<K, V>> i = entryIterator();
+            return new Iterator<java.util.Map.Entry<K, V>>() {
+              private final Iterator<java.util.Map.Entry<K, V>> i = entryIterator();
 
               @Override
               public boolean hasNext() {
@@ -2657,7 +2656,7 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
               }
 
               @Override
-              public Map.Entry<K, V> next() {
+              public java.util.Map.Entry<K, V> next() {
                 return i.next();
               }
 
@@ -2670,22 +2669,22 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
 
           @Override
           public int size() {
-            return TransientTrieMap_5Bits.this.size();
+            return TransientTrieMap.this.size();
           }
 
           @Override
           public boolean isEmpty() {
-            return TransientTrieMap_5Bits.this.isEmpty();
+            return TransientTrieMap.this.isEmpty();
           }
 
           @Override
           public void clear() {
-            TransientTrieMap_5Bits.this.clear();
+            TransientTrieMap.this.clear();
           }
 
           @Override
           public boolean contains(Object k) {
-            return TransientTrieMap_5Bits.this.containsKey(k);
+            return TransientTrieMap.this.containsKey(k);
           }
         };
       }
@@ -2702,8 +2701,8 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
         return false;
       }
 
-      if (other instanceof TransientTrieMap_5Bits) {
-        TransientTrieMap_5Bits<?, ?> that = (TransientTrieMap_5Bits<?, ?>) other;
+      if (other instanceof TransientTrieMap) {
+        TransientTrieMap<?, ?> that = (TransientTrieMap<?, ?>) other;
 
         if (this.cachedSize != that.cachedSize) {
           return false;
@@ -2721,8 +2720,8 @@ public class TrieMap<K, V> implements ImmutableMap<K, V> {
           return false;
 
         for (@SuppressWarnings("unchecked")
-        Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
-          Map.Entry entry = it.next();
+        Iterator<java.util.Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
+          java.util.Map.Entry entry = it.next();
 
           try {
             @SuppressWarnings("unchecked")
