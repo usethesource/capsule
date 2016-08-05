@@ -1983,6 +1983,17 @@ public class TrieSet<K> implements Set.Immutable<K> {
     }
 
     @Override
+    public boolean contains(final Object o) {
+      try {
+        @SuppressWarnings("unchecked")
+        final K key = (K) o;
+        return rootNode.contains(key, transformHashCode(key.hashCode()), 0);
+      } catch (ClassCastException unused) {
+        return false;
+      }
+    }
+
+    @Override
     public Iterator<K> iterator() {
       return new SetKeyIterator<>(rootNode);
     }
