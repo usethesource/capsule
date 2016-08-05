@@ -14,6 +14,8 @@ package io.usethesource.capsule;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import static java.lang.System.*;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -397,5 +399,26 @@ public class TrieSetTests {
 
 		assertEquals(xs, ys);
 	}	
-	
+
+    @Test
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public void containsOtherTypeThanGeneric() {
+        DummyValue hash98304_obj1 = new DummyValue(1, 98304);     
+        ImmutableSet<DummyValue> xs = TrieSet_5Bits.of(hash98304_obj1);
+        
+        Object objectInstance = new Object();
+//        ImmutableSet<?> ys = TrieSet_5Bits.of(objectInstance);
+                
+//        assertEquals(xs, ys);
+//        assertEquals(ys, xs);
+        
+        ImmutableSet zs = xs;
+        
+        zs.contains(objectInstance);
+        
+        ImmutableSet<DummyValue> xyz = zs.__insert(objectInstance);
+        
+        xyz.forEach(out::println);
+    }
+		
 }
