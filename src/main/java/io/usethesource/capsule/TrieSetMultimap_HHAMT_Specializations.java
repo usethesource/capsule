@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import io.usethesource.capsule.TrieSetMultimap_HHAMT_Specialized.CompactSetMultimapNode;
 
-@SuppressWarnings({"rawtypes", "restriction"})
+@SuppressWarnings({"unused", "rawtypes", "restriction"})
 public class TrieSetMultimap_HHAMT_Specializations {
 
   protected static class SetMultimap12To1Node<K, V> extends CompactSetMultimapNode<K, V> {
