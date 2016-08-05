@@ -12,4 +12,5 @@ We introduce CHAMP (Compressed Hash-Array Mapped Prefix-tree), an evolutionary i
 
 # References and Further Readings
 * [Paper: Optimizing Hash-Array Mapped Tries for Fast and Lean Immutable JVM Collections (OOPSLA 2015)](http://michael.steindorfer.name/publications/oopsla15.pdf)
+* [Paper: Fast and Lean Immutable Multi-Maps on the JVM based on Heterogeneous Hash-Array Mapped Tries (Draft, 2016)](https://arxiv.org/abs/1608.01036)
 * [Paper: Code Specialization for Memory Efficient Hash Tries (Short Paper, GPCE 2014)](http://michael.steindorfer.name/publications/gpce14.pdf)
