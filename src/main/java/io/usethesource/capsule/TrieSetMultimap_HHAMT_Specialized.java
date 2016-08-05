@@ -1109,6 +1109,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       return next;
     }
 
+    // @Stable
     static final Class<? extends CompactSetMultimapNode>[] specializationsByContentAndNodes =
         initializeSpecializationsByContentAndNodes();
 
