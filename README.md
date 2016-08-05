@@ -5,6 +5,31 @@ Capsule was recently extracted from the [usethesource/rascal-value](https://gith
 
 More extensive tests and performance benchmarks will be added soon. The preliminary API for the immutable interfaces will be reworked as soon as possible as well.
 
+# Getting Started
+
+Binary builds of capsule are deployed in the usethesource repository. In case you use Maven for dependency management, you have to add another repository location to your pom.xml file:
+
+```
+<repositories>
+	<repository>
+		<id>usethesource</id>
+		<url>http://nexus.rascal-mpl.org/repository/maven-public/</url>
+	</repository>
+</repositories>
+```
+
+Furthermore, you have to declare capsule as a dependency. To obtain the latest stable version insert the following snippet in your pom.xml file:
+
+```
+<dependency>
+	<groupId>io.usethesource</groupId>
+	<artifactId>capsule</artifactId>
+	<version>0.2.0</version>
+</dependency>
+```
+
+Snippets for other build tools and dependency management systems may vary slightly.
+
 # Background: Efficient Immutable Data Structures on the JVM
 The standard libraries of recent Java Virtual Machine languages, such as Clojure or Scala, contain scalable and well-performing immutable collection data structures that are implemented as Hash-Array Mapped Tries (HAMTs). HAMTs already feature efficient lookup, insert, and delete operations, however due to their tree-based nature their memory footprints and the runtime performance of iteration and equality checking lag behind array-based counterparts.
 
