@@ -11,7 +11,7 @@ package io.usethesource.capsule;
 
 public class ArrayUtilsInt {
 
-  static int[] arraycopyAndInsertInt(final int[] src, final int idx, final int value) {
+  public static int[] arraycopyAndInsertInt(final int[] src, final int idx, final int value) {
     final int[] dst = new int[src.length + 1];
 
     // copy 'src' and insert 1 element(s) at position 'idx'
@@ -22,7 +22,7 @@ public class ArrayUtilsInt {
     return dst;
   }
 
-  static int[] arraycopyAndRemoveInt(final int[] src, final int idx) {
+  public static int[] arraycopyAndRemoveInt(final int[] src, final int idx) {
     final int[] dst = new int[src.length - 1];
 
     // copy 'src' and remove 1 element(s) at position 'idx'

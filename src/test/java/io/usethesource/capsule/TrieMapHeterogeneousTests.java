@@ -17,6 +17,8 @@ import java.util.Random;
 
 import org.junit.Test;
 
+import io.usethesource.capsule.experimental.heterogeneous.TrieMap_Heterogeneous_BleedingEdge;
+
 public class TrieMapHeterogeneousTests {
 
   final static int size = 2097152;

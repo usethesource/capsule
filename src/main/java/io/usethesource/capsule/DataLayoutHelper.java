@@ -1,15 +1,9 @@
 package io.usethesource.capsule;
 
-import static io.usethesource.capsule.DataLayoutHelper.addressSize;
-import static io.usethesource.capsule.DataLayoutHelper.fieldOffset;
-import static io.usethesource.capsule.DataLayoutHelper.unsafe;
-
 import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
-
-import io.usethesource.capsule.DataLayoutHelper.DataLayoutHelperChild;
 
 public class DataLayoutHelper {
 
@@ -66,7 +60,7 @@ public class DataLayoutHelper {
     }
   }
 
-  protected static final sun.misc.Unsafe unsafe = initializeUnsafe();
+  public static final sun.misc.Unsafe unsafe = initializeUnsafe();
   
   static final long initializeArrayBase() {
     try {
@@ -77,7 +71,7 @@ public class DataLayoutHelper {
     }
   }
 
-  static final long arrayBase = initializeArrayBase();
+  public static final long arrayBase = initializeArrayBase();
 
   static final long initializeAddressSize() {
     try {
@@ -88,7 +82,7 @@ public class DataLayoutHelper {
     }
   }
 
-  static final long addressSize = initializeAddressSize();
+  public static final long addressSize = initializeAddressSize();
     
   @SuppressWarnings("restriction")
   static final boolean isCopyMemorySupported() {

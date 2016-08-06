@@ -15,25 +15,25 @@ public final class BitmapUtils {
   private static final boolean USE_SELF_WRITTEN_POPULATION_COUNT_CHECK =
       !USE_SELF_WRITTEN_POPULATION_COUNT && false;
 
-  static final long filter00(long bitmap) {
+  public static final long filter00(long bitmap) {
     return ((bitmap & 0x5555555555555555L) ^ 0x5555555555555555L) & (((bitmap >> 1) & 0x5555555555555555L) ^ 0x5555555555555555L);        
   }
 
-  static final long filter01(long bitmap) {
+  public static final long filter01(long bitmap) {
     return (bitmap & 0x5555555555555555L)
         & (((bitmap >> 1) & 0x5555555555555555L) ^ 0x5555555555555555L);
   }
 
-  static final long filter10(long bitmap) {
+  public static final long filter10(long bitmap) {
     return ((bitmap & 0x5555555555555555L) ^ 0x5555555555555555L)
         & ((bitmap >> 1) & 0x5555555555555555L);
   }
 
-  static final long filter11(long bitmap) {
+  public static final long filter11(long bitmap) {
     return (bitmap & 0x5555555555555555L) & ((bitmap >> 1) & 0x5555555555555555L);
   }
   
-  static final long filter(long bitmap, int pattern) {
+  public static final long filter(long bitmap, int pattern) {
     switch (pattern) {
       case 0b00:
         return filter00(bitmap);
@@ -48,11 +48,11 @@ public final class BitmapUtils {
     }
   }
 
-  static final int index(long bitmap, int pattern, long bitpos) {
+  public static final int index(long bitmap, int pattern, long bitpos) {
     return java.lang.Long.bitCount(filter(bitmap, pattern) & (bitpos - 1));
   }
 
-  static final int index01(final long bitmap, final long bitpos) {
+  public static final int index01(final long bitmap, final long bitpos) {
     if (USE_SELF_WRITTEN_POPULATION_COUNT) {
       return (int) populationCountPattern01(bitmap & (bitpos - 1));
     } else {
@@ -72,7 +72,7 @@ public final class BitmapUtils {
     }
   }
 
-  static final int index10(final long bitmap, final long bitpos) {
+  public static final int index10(final long bitmap, final long bitpos) {
     if (USE_SELF_WRITTEN_POPULATION_COUNT) {
       return (int) populationCountPattern10(bitmap & (bitpos - 1));
     } else {
@@ -92,7 +92,7 @@ public final class BitmapUtils {
     }
   }
 
-  static final int index11(final long bitmap, final long bitpos) {
+  public static final int index11(final long bitmap, final long bitpos) {
     if (USE_SELF_WRITTEN_POPULATION_COUNT) {
       return (int) populationCountPattern11(bitmap & (bitpos - 1));
     } else {
@@ -112,7 +112,7 @@ public final class BitmapUtils {
     }
   }
   
-  static final long populationCountPattern00(long v) {
+  public static final long populationCountPattern00(long v) {
     long c = ((v & 0x5555555555555555L) ^ 0x5555555555555555L) & (((v >> 1) & 0x5555555555555555L) ^ 0x5555555555555555L);
     c = (c & 0x3333333333333333L) + ((c >> 2) & 0x3333333333333333L);
     c = (c & 0x0F0F0F0F0F0F0F0FL) + ((c >> 4) & 0x0F0F0F0F0F0F0F0FL);
@@ -121,7 +121,7 @@ public final class BitmapUtils {
     return c;
   }
 
-  static final long populationCountPattern01(long v) {
+  public static final long populationCountPattern01(long v) {
     long c = (v & 0x5555555555555555L) & (((v >> 1) & 0x5555555555555555L) ^ 0x5555555555555555L);
     c = (c & 0x3333333333333333L) + ((c >> 2) & 0x3333333333333333L);
     c = (c & 0x0F0F0F0F0F0F0F0FL) + ((c >> 4) & 0x0F0F0F0F0F0F0F0FL);
@@ -130,7 +130,7 @@ public final class BitmapUtils {
     return c;
   }
 
-  static final long populationCountPattern10(long v) {
+  public static final long populationCountPattern10(long v) {
     long c = ((v & 0x5555555555555555L) ^ 0x5555555555555555L) & ((v >> 1) & 0x5555555555555555L);
     c = (c & 0x3333333333333333L) + ((c >> 2) & 0x3333333333333333L);
     c = (c & 0x0F0F0F0F0F0F0F0FL) + ((c >> 4) & 0x0F0F0F0F0F0F0F0FL);
@@ -139,7 +139,7 @@ public final class BitmapUtils {
     return c;
   }
 
-  static final long populationCountPattern11(long v) {
+  public static final long populationCountPattern11(long v) {
     long c = (v & 0x5555555555555555L) & ((v >> 1) & 0x5555555555555555L);
     c = (c & 0x3333333333333333L) + ((c >> 2) & 0x3333333333333333L);
     c = (c & 0x0F0F0F0F0F0F0F0FL) + ((c >> 4) & 0x0F0F0F0F0F0F0F0FL);
