@@ -16,41 +16,41 @@ import java.util.Map;
 public interface ImmutableMap<K, V> extends Map<K, V> {
 
   @Override
-  public V get(final Object o);
+  V get(final Object o);
 
-  public V getEquivalent(final Object o, final Comparator<Object> cmp);
-
-  @Override
-  public boolean containsKey(final Object o);
-
-  public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp);
+  V getEquivalent(final Object o, final Comparator<Object> cmp);
 
   @Override
-  public boolean containsValue(final Object o);
+  boolean containsKey(final Object o);
 
-  public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp);
+  boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp);
 
-  public ImmutableMap<K, V> __put(final K key, final V val);
+  @Override
+  boolean containsValue(final Object o);
 
-  public ImmutableMap<K, V> __putEquivalent(final K key, final V val, final Comparator<Object> cmp);
+  boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp);
 
-  public ImmutableMap<K, V> __putAll(final Map<? extends K, ? extends V> map);
+  ImmutableMap<K, V> __put(final K key, final V val);
 
-  public ImmutableMap<K, V> __putAllEquivalent(final Map<? extends K, ? extends V> map,
-      final Comparator<Object> cmp);
+  ImmutableMap<K, V> __putEquivalent(final K key, final V val, final Comparator<Object> cmp);
 
-  public ImmutableMap<K, V> __remove(final K key);
+  ImmutableMap<K, V> __putAll(final Map<? extends K, ? extends V> map);
 
-  public ImmutableMap<K, V> __removeEquivalent(final K key, final Comparator<Object> cmp);
+  ImmutableMap<K, V> __putAllEquivalent(final Map<? extends K, ? extends V> map,
+                                        final Comparator<Object> cmp);
 
-  public Iterator<K> keyIterator();
+  ImmutableMap<K, V> __remove(final K key);
 
-  public Iterator<V> valueIterator();
+  ImmutableMap<K, V> __removeEquivalent(final K key, final Comparator<Object> cmp);
 
-  public Iterator<Map.Entry<K, V>> entryIterator();
+  Iterator<K> keyIterator();
 
-  public boolean isTransientSupported();
+  Iterator<V> valueIterator();
 
-  public TransientMap<K, V> asTransient();
+  Iterator<Map.Entry<K, V>> entryIterator();
+
+  boolean isTransientSupported();
+
+  TransientMap<K, V> asTransient();
 
 }
