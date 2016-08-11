@@ -36,6 +36,11 @@ The standard libraries of recent Java Virtual Machine languages, such as Clojure
 We introduce CHAMP (Compressed Hash-Array Mapped Prefix-tree), an evolutionary improvement over HAMTs. The new design increases the overall performance of immutable sets and maps. Furthermore, its resulting general purpose design increases cache locality and features a canonical representation. 
 
 # References and Further Readings
+
+## Talks
+* [Video: JVM Language Summit 2016 - Efficient and Expressive Immutable Collections](https://www.youtube.com/watch?v=pUXeNAeyY34)
+
+## Papers
 * [Paper: Optimizing Hash-Array Mapped Tries for Fast and Lean Immutable JVM Collections (OOPSLA 2015)](http://michael.steindorfer.name/publications/oopsla15.pdf)
 * [Paper: Fast and Lean Immutable Multi-Maps on the JVM based on Heterogeneous Hash-Array Mapped Tries (Draft, 2016)](https://arxiv.org/abs/1608.01036)
 * [Paper: Towards a Software Product Line of Trie-Based Collections (Draft, 2016)](http://michael.steindorfer.name/drafts/gpce16.pdf)
