@@ -1,5 +1,7 @@
 node {
   def mvnHome = tool 'M3'
+  env.JAVA_HOME="${tool 'jdk-oracle-8'}"
+  env.PATH="${env.JAVA_HOME}/bin:${mvnHome}/bin:${env.PATH}"
 
   stage 'Clone'
   checkout scm
@@ -12,10 +14,10 @@ node {
   // sh "${mvnHome}/bin/mvn -s /var/jenkins_home/usethesource-maven-settings.xml -Dmaven.repo.local=/var/jenkins_home/repo -B clean install deploy"
 
   stage 'Build and Test'
-  sh "${mvnHome}/bin/mvn -B clean install"
+  sh "mvn -B clean install"
 
   stage 'Deploy'
-  sh "${mvnHome}/bin/mvn -s /var/jenkins_home/usethesource-maven-settings.xml -B deploy"
+  sh "mvn -s ${env.HOME}/usethesource-maven-settings.xml -B deploy"
 
   stage 'Archive'
   step([$class: 'ArtifactArchiver', artifacts: '**/target/*.jar', fingerprint: true])
