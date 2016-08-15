@@ -38,7 +38,8 @@ We introduce CHAMP (Compressed Hash-Array Mapped Prefix-tree), an evolutionary i
 # References and Further Readings
 
 ## Talks
-* [Video: JVM Language Summit 2016 - Efficient and Expressive Immutable Collections](https://www.youtube.com/watch?v=pUXeNAeyY34)
+* [JVM Language Summit 2016 - Efficient and Expressive Immutable Collections (Speaker: Michael Steindorfer)](https://www.youtube.com/watch?v=pUXeNAeyY34)
+* [Clojure/west 2016 - Hash Maps: More Room on the Bottom (Speaker: Peter Schuck)](https://www.youtube.com/watch?v=GibNOQVelFY)
 
 ## Papers
 * [Paper: Optimizing Hash-Array Mapped Tries for Fast and Lean Immutable JVM Collections (OOPSLA 2015)](http://michael.steindorfer.name/publications/oopsla15.pdf)
