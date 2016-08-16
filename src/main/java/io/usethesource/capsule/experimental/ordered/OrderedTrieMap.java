@@ -76,9 +76,8 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
     return size == targetSize;
   }
 
-  @SuppressWarnings("deprecation")
   @Deprecated
-  public java.util.Map.Entry<K, V> getLastProperty() {
+  public java.util.Map.Entry<K, V> getLastEntry() {
     ImmutableMapEntry<K, V>[] sortedEntries = getAndCacheSortedEntryArray();
     return sortedEntries[cachedSize - 1];
   }
@@ -197,33 +196,38 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
     return new ValueIterator<>(rootNode);
   }
 
+  @SuppressWarnings({"rawtypes", "unchecked"})
   @Override
   public Iterator<java.util.Map.Entry<K, V>> entryIterator() {
-    return new EntryIterator<>(rootNode);
+    return (Iterator) new EntryIterator<>(rootNode);
   }
 
   public Iterator<K> orderedKeyIterator() {
-    return new ForwardKeyIterator(getAndCacheSortedEntryArray());
+    return new ForwardKeyIterator<>(getAndCacheSortedEntryArray());
   }
 
   public Iterator<V> orderedValueIterator() {
-    return new ForwardElementIterator(getAndCacheSortedEntryArray());
+    return new ForwardElementIterator<>(getAndCacheSortedEntryArray());
+  }
+
+  public Iterator<ImmutableMapEntry<K, V>> unorderedTupleIterator() {
+    return new EntryIterator<>(rootNode);
   }
 
   public Iterator<? super ImmutableMapEntry<K, V>> orderedEntryIterator() {
-    return new ForwardEntryIterator(getAndCacheSortedEntryArray());
+    return new ForwardEntryIterator<>(getAndCacheSortedEntryArray());
   }
 
   public Iterator<K> reverseOrderedKeyIterator() {
-    return new ReverseKeyIterator(getAndCacheSortedEntryArray());
+    return new ReverseKeyIterator<>(getAndCacheSortedEntryArray());
   }
 
   public Iterator<V> reverseOrderedValueIterator() {
-    return new ReverseElementIterator(getAndCacheSortedEntryArray());
+    return new ReverseValueIterator<>(getAndCacheSortedEntryArray());
   }
 
   public Iterator<? super ImmutableMapEntry<K, V>> reverseOrderedEntryIterator() {
-    return new ReverseEntryIterator(getAndCacheSortedEntryArray());
+    return new ReverseEntryIterator<>(getAndCacheSortedEntryArray());
   }
 
   // @Override
@@ -358,6 +362,7 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
       return false;
     }
 
+    @SuppressWarnings("rawtypes")
     OrderedTrieMap that = (OrderedTrieMap) other;
 
     if (this.cachedSize != that.cachedSize) {
@@ -390,10 +395,10 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
   }
 
   private ImmutableMapEntry<K, V>[] toSortedEntryArray() {
+    @SuppressWarnings("unchecked")
     final ImmutableMapEntry<K, V>[] arr = new ImmutableMapEntry[cachedSize];
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    Iterator<ImmutableMapEntry<K, V>> it = (Iterator) entryIterator();
+    Iterator<ImmutableMapEntry<K, V>> it = unorderedTupleIterator();
 
     for (int i = 0; i < cachedSize; i++) {
       assert it.hasNext();
@@ -405,7 +410,6 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
     return arr;
   }
 
-  @SuppressWarnings("unused")
   private ImmutableMapEntry<K, V>[] getAndCacheSortedEntryArray() {
     ImmutableMapEntry<K, V>[] arr =
         cachedInsertionOrderSequence == null ? null : cachedInsertionOrderSequence.get();
@@ -556,7 +560,7 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
     @Deprecated
     // Only used in nodeInvariant()
     int size() {
-      final Iterator<?> it = new ValueIterator(this);
+      final Iterator<?> it = new ValueIterator<>(this);
 
       int size = 0;
       while (it.hasNext()) {
@@ -580,6 +584,7 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
       return inv1 && inv2 && inv3 && inv4 && inv5;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public ImmutableMapEntry<K, V> getElement(final int index) {
       return (ImmutableMapEntry<K, V>) nodes[index];
@@ -595,6 +600,7 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
       return indices[index];
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Node<K, V> getNode(final int index) {
       return (Node<K, V>) nodes[nodes.length - 1 - index];
@@ -641,6 +647,7 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
       if (getClass() != other.getClass()) {
         return false;
       }
+      @SuppressWarnings("rawtypes")
       BitmapIndexedNode that = (BitmapIndexedNode) other;
       if (nodeMap != that.nodeMap) {
         return false;
@@ -1092,11 +1099,12 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
     private HashCollisionNode(final int hash, final ImmutableMapEntry<K, V> element0,
         int sequenceId0, final ImmutableMapEntry<K, V> element1, int sequenceId1) {
       this.hash = hash;
-      this.elements = new ImmutableMapEntry[] {element0, element1};
+
+      this.elements = newElementArray(element0, element1);
       this.indices = new int[] {sequenceId0, sequenceId1};
     }
 
-    private HashCollisionNode(final int hash, final ImmutableMapEntry[] elements,
+    private HashCollisionNode(final int hash, final ImmutableMapEntry<K, V>[] elements,
         final int[] indices) {
       if (elements.length <= 2) {
         throw new IllegalArgumentException("At least two elements are required.");
@@ -1104,6 +1112,23 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
       this.hash = hash;
       this.elements = elements;
       this.indices = indices;
+    }
+
+    /*
+     * TODO: find a right place for this utility method.
+     */
+    @SafeVarargs
+    private static final <K, V> ImmutableMapEntry<K, V>[] newElementArray(
+        ImmutableMapEntry<K, V>... elements) {
+      return elements;
+    }
+
+    /*
+     * TODO: find a right place for this utility method.
+     */
+    @SuppressWarnings("unchecked")
+    private static final <K, V> ImmutableMapEntry<K, V>[] newElementArray(int size) {
+      return new ImmutableMapEntry[size];
     }
 
     @Override
@@ -1155,8 +1180,7 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
 
       if (indexOfKey == -1) {
         // insert
-        final ImmutableMapEntry<K, V>[] extendedElements =
-            new ImmutableMapEntry[elements.length + 1];
+        final ImmutableMapEntry<K, V>[] extendedElements = newElementArray(elements.length + 1);
         arraycopy(elements, 0, extendedElements, 0, elements.length);
         extendedElements[elements.length] = element;
 
@@ -1168,7 +1192,7 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
         return new HashCollisionNode<>(keyHash, extendedElements, extendedIndices);
       } else {
         // replace
-        final ImmutableMapEntry<K, V>[] extendedElements = new ImmutableMapEntry[elements.length];
+        final ImmutableMapEntry<K, V>[] extendedElements = newElementArray(elements.length);
         arraycopy(elements, 0, extendedElements, 0, elements.length);
         extendedElements[indexOfKey] = element;
 
@@ -1212,8 +1236,7 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
           return BitmapIndexedNode.newElementSingleton(dataMap, elements[1 - indexOfKey],
               indices[1 - indexOfKey]);
         } else {
-          final ImmutableMapEntry<K, V>[] reducedElements =
-              new ImmutableMapEntry[elements.length - 1];
+          final ImmutableMapEntry<K, V>[] reducedElements = newElementArray(elements.length - 1);
           arraycopy(elements, 0, reducedElements, 0, indexOfKey);
           arraycopy(elements, indexOfKey + 1, reducedElements, indexOfKey,
               elements.length - indexOfKey - 1);
@@ -1297,6 +1320,7 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
         return false;
       }
 
+      @SuppressWarnings("rawtypes")
       HashCollisionNode that = (HashCollisionNode) other;
 
       if (hash != that.hash) {
@@ -1336,6 +1360,7 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
     private int currentStackLevel = -1;
     private final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
 
+    @SuppressWarnings("unchecked")
     Node<K, V>[] nodes = new Node[MAX_DEPTH];
 
     AbstractIterator(Node<K, V> rootNode) {
@@ -1447,14 +1472,14 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
   }
 
   private static final class EntryIterator<K, V> extends AbstractIterator<K, V>
-      implements Iterator<java.util.Map.Entry<K, V>> {
+      implements Iterator<ImmutableMapEntry<K, V>> {
 
     EntryIterator(Node<K, V> rootNode) {
       super(rootNode);
     }
 
     @Override
-    public java.util.Map.Entry<K, V> next() {
+    public ImmutableMapEntry<K, V> next() {
       if (!hasNext()) {
         throw new NoSuchElementException();
       } else {
@@ -1525,6 +1550,7 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
         return false;
       }
 
+      @SuppressWarnings("rawtypes")
       ImmutableMapEntry that = (ImmutableMapEntry) other;
 
       return Objects.equals(key, that.key) && Objects.equals(val, that.val);
@@ -1643,18 +1669,35 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
   }
 
   private static final class ReverseKeyIterator<K, V>
-      extends AbstractReversedOrderArrayIterator<ImmutableMapEntry<K, V>, Object> {
+      extends AbstractReversedOrderArrayIterator<ImmutableMapEntry<K, V>, K> {
 
     ReverseKeyIterator(ImmutableMapEntry<K, V>[] arr) {
       super(arr, arr.length - 1, 0);
     }
 
     @Override
-    public Object next() {
+    public K next() {
       if (!hasNext()) {
         throw new NoSuchElementException();
       } else {
         return values[currentIndex--].getKey();
+      }
+    }
+  }
+
+  private static final class ReverseValueIterator<K, V>
+      extends AbstractReversedOrderArrayIterator<ImmutableMapEntry<K, V>, V> {
+
+    ReverseValueIterator(ImmutableMapEntry<K, V>[] arr) {
+      super(arr, arr.length - 1, 0);
+    }
+
+    @Override
+    public V next() {
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      } else {
+        return values[currentIndex--].getValue();
       }
     }
   }
