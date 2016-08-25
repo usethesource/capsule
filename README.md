@@ -1,5 +1,6 @@
 # The Capsule Hash Trie Collections Library
-Capsule aims to become a full-fledged (immutable) collections library that is solely built around persistent tries.
+
+Capsule aims to become a full-fledged (immutable) collections library for Java 8+ (with backport to Java 7) that is solely built around persistent tries.
 
 Capsule was recently extracted from the [usethesource/rascal-value](https://github.com/usethesource/rascal-value) project and still has to undergo some incubation before it can ship as a well-rounded collection library. Nevertheless, the code is stable and performance is already solid. Feel free to use it and let us about your experiences!
 
@@ -18,13 +19,23 @@ Binary builds of capsule are deployed in the usethesource repository. In case yo
 </repositories>
 ```
 
-Furthermore, you have to declare capsule as a dependency. To obtain the latest stable version insert the following snippet in your pom.xml file:
+Furthermore, you have to declare capsule as a dependency. To obtain the latest stable version for Java 8+, insert the following snippet in your pom.xml file:
 
 ```
 <dependency>
 	<groupId>io.usethesource</groupId>
 	<artifactId>capsule</artifactId>
-	<version>0.2.0</version>
+	<version>0.2.1</version>
+</dependency>
+```
+
+To obtain the latest stable backport for Java 7, insert the following snippet in your pom.xml file:
+
+```
+<dependency>
+	<groupId>io.usethesource</groupId>
+	<artifactId>capsule-jdk7</artifactId>
+	<version>0.2.1</version>
 </dependency>
 ```
 
