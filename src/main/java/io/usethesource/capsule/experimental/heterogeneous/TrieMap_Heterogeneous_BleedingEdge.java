@@ -961,7 +961,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements ImmutableMap<Object, 
       while (it.hasNext()) {
         size += 1;
         it.next();
-      };
+      } ;
       return size;
     }
 
@@ -2131,8 +2131,8 @@ public class TrieMap_Heterogeneous_BleedingEdge implements ImmutableMap<Object, 
           return this;
         }
       } else
-        // check for inplace (rare) value
-        if (isBitInBitmap(rareMap, bitpos)) {
+      // check for inplace (rare) value
+      if (isBitInBitmap(rareMap, bitpos)) {
         final int rareIndex = index(rareMap, mask, bitpos);
         final Object currentKey = getRareKey(rareIndex);
 
@@ -2147,8 +2147,8 @@ public class TrieMap_Heterogeneous_BleedingEdge implements ImmutableMap<Object, 
             subNodeNew);
 
       } else
-          // check for inplace value
-          if (isBitInBitmap(dataMap, bitpos)) {
+      // check for inplace value
+      if (isBitInBitmap(dataMap, bitpos)) {
         final int dataIndex = index(dataMap, mask, bitpos);
         final int currentKey = getKey(dataIndex);
 
@@ -2203,8 +2203,8 @@ public class TrieMap_Heterogeneous_BleedingEdge implements ImmutableMap<Object, 
           return this;
         }
       } else
-        // check for inplace (rare) value
-        if (isBitInBitmap(rareMap, bitpos)) {
+      // check for inplace (rare) value
+      if (isBitInBitmap(rareMap, bitpos)) {
         final int rareIndex = index(rareMap, mask, bitpos);
         final Object currentKey = getRareKey(rareIndex);
 
@@ -2219,8 +2219,8 @@ public class TrieMap_Heterogeneous_BleedingEdge implements ImmutableMap<Object, 
             subNodeNew);
 
       } else
-          // check for inplace value
-          if (isBitInBitmap(dataMap, bitpos)) {
+      // check for inplace value
+      if (isBitInBitmap(dataMap, bitpos)) {
         final int dataIndex = index(dataMap, mask, bitpos);
         final int currentKey = getKey(dataIndex);
 
@@ -2281,8 +2281,8 @@ public class TrieMap_Heterogeneous_BleedingEdge implements ImmutableMap<Object, 
           return this;
         }
       } else
-        // check for inplace (rare) value
-        if (isBitInBitmap(rareMap, bitpos)) {
+      // check for inplace (rare) value
+      if (isBitInBitmap(rareMap, bitpos)) {
         final int rareIndex = index(rareMap, mask, bitpos);
         final Object currentKey = getRareKey(rareIndex);
 
@@ -2305,8 +2305,8 @@ public class TrieMap_Heterogeneous_BleedingEdge implements ImmutableMap<Object, 
         }
 
       } else
-          // check for inplace value
-          if (isBitInBitmap(dataMap, bitpos)) {
+      // check for inplace value
+      if (isBitInBitmap(dataMap, bitpos)) {
         final int dataIndex = index(dataMap, mask, bitpos);
         final int currentKey = getKey(dataIndex);
 
@@ -2353,8 +2353,8 @@ public class TrieMap_Heterogeneous_BleedingEdge implements ImmutableMap<Object, 
           return this;
         }
       } else
-        // check for inplace (rare) value
-        if (isBitInBitmap(rareMap, bitpos)) {
+      // check for inplace (rare) value
+      if (isBitInBitmap(rareMap, bitpos)) {
         final int rareIndex = index(rareMap, mask, bitpos);
         final Object currentKey = getRareKey(rareIndex);
 
@@ -2377,8 +2377,8 @@ public class TrieMap_Heterogeneous_BleedingEdge implements ImmutableMap<Object, 
         }
 
       } else
-          // check for inplace value
-          if (isBitInBitmap(dataMap, bitpos)) {
+      // check for inplace value
+      if (isBitInBitmap(dataMap, bitpos)) {
         final int dataIndex = index(dataMap, mask, bitpos);
         final int currentKey = getKey(dataIndex);
 
@@ -2651,8 +2651,8 @@ public class TrieMap_Heterogeneous_BleedingEdge implements ImmutableMap<Object, 
 
             return nodeOf0x1(mutator, newRawMap, newRawMap, getKey(1 - dataIndex),
                 getVal(1 - dataIndex));
-          } else
-            if (this.payloadArity() == 1 && this.rarePayloadArity() == 1 && this.nodeArity() == 0) {
+          } else if (this.payloadArity() == 1 && this.rarePayloadArity() == 1
+              && this.nodeArity() == 0) {
             final byte newRawMap =
                 (shift == 0) ? (byte) (rawMap2() ^ bitpos) : bitpos(mask(keyHash, 0));
 
@@ -2770,8 +2770,8 @@ public class TrieMap_Heterogeneous_BleedingEdge implements ImmutableMap<Object, 
 
             return nodeOf2x0(mutator, newRawMap, newRawMap, getRareKey(1 - rareIndex),
                 getRareVal(1 - rareIndex));
-          } else
-            if (this.payloadArity() == 1 && this.rarePayloadArity() == 1 && this.nodeArity() == 0) {
+          } else if (this.payloadArity() == 1 && this.rarePayloadArity() == 1
+              && this.nodeArity() == 0) {
             final byte newRawMap =
                 (shift == 0) ? (byte) (rawMap2() ^ bitpos) : bitpos(mask(keyHash, 0));
 
@@ -2847,8 +2847,8 @@ public class TrieMap_Heterogeneous_BleedingEdge implements ImmutableMap<Object, 
 
             return nodeOf0x1(mutator, newRawMap, newRawMap, getKey(1 - dataIndex),
                 getVal(1 - dataIndex));
-          } else
-            if (this.payloadArity() == 1 && this.rarePayloadArity() == 1 && this.nodeArity() == 0) {
+          } else if (this.payloadArity() == 1 && this.rarePayloadArity() == 1
+              && this.nodeArity() == 0) {
             final byte newRawMap =
                 (shift == 0) ? (byte) (rawMap2() ^ bitpos) : bitpos(mask(keyHash, 0));
 
@@ -2934,8 +2934,8 @@ public class TrieMap_Heterogeneous_BleedingEdge implements ImmutableMap<Object, 
 
             return nodeOf2x0(mutator, newRawMap, newRawMap, getRareKey(1 - rareIndex),
                 getRareVal(1 - rareIndex));
-          } else
-            if (this.payloadArity() == 1 && this.rarePayloadArity() == 1 && this.nodeArity() == 0) {
+          } else if (this.payloadArity() == 1 && this.rarePayloadArity() == 1
+              && this.nodeArity() == 0) {
             final byte newRawMap =
                 (shift == 0) ? (byte) (rawMap2() ^ bitpos) : bitpos(mask(keyHash, 0));
 

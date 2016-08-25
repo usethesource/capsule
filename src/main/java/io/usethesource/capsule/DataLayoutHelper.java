@@ -27,7 +27,7 @@ public class DataLayoutHelper {
       throw new RuntimeException(e);
     }
   }
-  
+
   public static final long fieldOffset(final Class clazz, final String fieldName) {
     try {
       List<Class> bottomUpHierarchy = new LinkedList<>();
@@ -56,7 +56,7 @@ public class DataLayoutHelper {
       throw new RuntimeException(e);
     }
   }
-  
+
   protected static final sun.misc.Unsafe initializeUnsafe() {
     try {
       Field field = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
@@ -68,7 +68,7 @@ public class DataLayoutHelper {
   }
 
   public static final sun.misc.Unsafe unsafe = initializeUnsafe();
-  
+
   static final long initializeArrayBase() {
     try {
       // assuems that both are of type Object and next to each other in memory
@@ -90,7 +90,7 @@ public class DataLayoutHelper {
   }
 
   public static final long addressSize = initializeAddressSize();
-    
+
   @SuppressWarnings("restriction")
   static final boolean isCopyMemorySupported() {
     DataLayoutHelperChild src = new DataLayoutHelperChild(new Object(), new Object());
@@ -103,20 +103,20 @@ public class DataLayoutHelper {
     } catch (IllegalArgumentException e) {
       return false;
     }
-  }  
-  
+  }
+
   abstract static class DataLayoutHelperBase {
-    
+
     final int rawMap1;
     final int rawMap2;
-    
+
     public DataLayoutHelperBase(Object unused, final int rawMap1, final int rawMap2) {
-     this.rawMap1 = rawMap1;
-     this.rawMap2 = rawMap2;
+      this.rawMap1 = rawMap1;
+      this.rawMap2 = rawMap2;
     }
-    
+
   }
-  
+
   static class DataLayoutHelperChild extends DataLayoutHelperBase {
 
     static final long[] arrayOffsets =
@@ -130,8 +130,8 @@ public class DataLayoutHelper {
 
     static final int untypedSlotArity = 2;
 
-    static final long arrayOffsetLast = /* arrayBase + 1 * addressSize */ -1;    
-    
+    static final long arrayOffsetLast = /* arrayBase + 1 * addressSize */ -1;
+
     public final Object slot0;
 
     public final Object slot1;
@@ -139,9 +139,9 @@ public class DataLayoutHelper {
     DataLayoutHelperChild() {
       super(null, (byte) 0, (byte) 0);
       this.slot0 = null;
-      this.slot1 = null;      
+      this.slot1 = null;
     }
-    
+
     DataLayoutHelperChild(final Object slot0, final Object slot1) {
       super(null, (byte) 0, (byte) 0);
       this.slot0 = slot0;
@@ -150,26 +150,26 @@ public class DataLayoutHelper {
 
   }
 
-//  static final long globalRawMap1Offset = fieldOffset(DataLayoutHelperChild.class, "rawMap1");
-//
-//  static final long globalRawMap2Offset = fieldOffset(DataLayoutHelperChild.class, "rawMap2");
-//
-//  static final long globalArrayOffsetsOffset =
-//      fieldOffset(DataLayoutHelperChild.class, "arrayOffsets");
-//
-//  static final long globalNodeArityOffset =
-//      fieldOffset(DataLayoutHelperChild.class, "nodeArity");
-//
-//  static long globalPayloadArityOffset =
-//      fieldOffset(DataLayoutHelperChild.class, "payloadArity");
-//  
-//  static final long globalSlotArityOffset =
-//      fieldOffset(DataLayoutHelperChild.class, "slotArity");
-//
-//  static long globalUntypedSlotArityOffset =
-//      fieldOffset(DataLayoutHelperChild.class, "untypedSlotArity");
-//
-//  static long globalArrayOffsetLastOffset =
-//      fieldOffset(DataLayoutHelperChild.class, "arrayOffsetLast");
-  
+  // static final long globalRawMap1Offset = fieldOffset(DataLayoutHelperChild.class, "rawMap1");
+  //
+  // static final long globalRawMap2Offset = fieldOffset(DataLayoutHelperChild.class, "rawMap2");
+  //
+  // static final long globalArrayOffsetsOffset =
+  // fieldOffset(DataLayoutHelperChild.class, "arrayOffsets");
+  //
+  // static final long globalNodeArityOffset =
+  // fieldOffset(DataLayoutHelperChild.class, "nodeArity");
+  //
+  // static long globalPayloadArityOffset =
+  // fieldOffset(DataLayoutHelperChild.class, "payloadArity");
+  //
+  // static final long globalSlotArityOffset =
+  // fieldOffset(DataLayoutHelperChild.class, "slotArity");
+  //
+  // static long globalUntypedSlotArityOffset =
+  // fieldOffset(DataLayoutHelperChild.class, "untypedSlotArity");
+  //
+  // static long globalArrayOffsetLastOffset =
+  // fieldOffset(DataLayoutHelperChild.class, "arrayOffsetLast");
+
 }

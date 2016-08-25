@@ -1017,11 +1017,9 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
                 (shift == 0) ? (int) (dataMap() ^ bitpos) : bitpos(mask(keyHash, 0));
 
             if (dataIndex == 0) {
-              return CompactMapNode.<K, V>nodeOf(mutator, 0, newDataMap, getKey(1),
-                  getValue(1));
+              return CompactMapNode.<K, V>nodeOf(mutator, 0, newDataMap, getKey(1), getValue(1));
             } else {
-              return CompactMapNode.<K, V>nodeOf(mutator, 0, newDataMap, getKey(0),
-                  getValue(0));
+              return CompactMapNode.<K, V>nodeOf(mutator, 0, newDataMap, getKey(0), getValue(0));
             }
           } else {
             return copyAndRemoveValue(mutator, bitpos);
@@ -1084,11 +1082,9 @@ public class TrieMap<K, V> implements Map.Immutable<K, V> {
                 (shift == 0) ? (int) (dataMap() ^ bitpos) : bitpos(mask(keyHash, 0));
 
             if (dataIndex == 0) {
-              return CompactMapNode.<K, V>nodeOf(mutator, 0, newDataMap, getKey(1),
-                  getValue(1));
+              return CompactMapNode.<K, V>nodeOf(mutator, 0, newDataMap, getKey(1), getValue(1));
             } else {
-              return CompactMapNode.<K, V>nodeOf(mutator, 0, newDataMap, getKey(0),
-                  getValue(0));
+              return CompactMapNode.<K, V>nodeOf(mutator, 0, newDataMap, getKey(0), getValue(0));
             }
           } else {
             return copyAndRemoveValue(mutator, bitpos);

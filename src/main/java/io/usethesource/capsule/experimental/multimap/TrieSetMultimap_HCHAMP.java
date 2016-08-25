@@ -231,7 +231,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
     return this;
   }
-  
+
   @Override
   public ImmutableSetMultimap<K, V> __insert(final K key, final V val) {
     final int keyHash = key.hashCode();
@@ -265,7 +265,8 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
   @Override
   public ImmutableSetMultimap<K, V> __insertAllEquivalent(
-      final SetMultimap_Legacy<? extends K, ? extends V> setMultimap, final Comparator<Object> cmp) {
+      final SetMultimap_Legacy<? extends K, ? extends V> setMultimap,
+      final Comparator<Object> cmp) {
     final TransientSetMultimap<K, V> tmpTransient = this.asTransient();
     tmpTransient.__insertAllEquivalent(setMultimap, cmp);
     return tmpTransient.freeze();
@@ -379,7 +380,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
   public Iterator<Map.Entry<K, Object>> nativeEntryIterator() {
     return new SetMultimapNativeTupleIterator<>(rootNode);
   }
-  
+
   @Override
   public <T> Iterator<T> tupleIterator(final BiFunction<K, V, T> tupleOf) {
     return new SetMultimapTupleIterator<>(rootNode, tupleOf);
@@ -836,7 +837,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     abstract boolean containsKey(final K key, final int keyHash, final int shift);
 
     abstract boolean containsTuple(final K key, final V val, final int keyHash, final int shift);
-    
+
     abstract Optional<ImmutableSet<V>> findByKey(final K key, final int keyHash, final int shift);
 
     abstract CompactSetMultimapNode<K, V> inserted(final AtomicReference<Thread> mutator,
@@ -1057,7 +1058,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     static final <K, V> CompactSetMultimapNode<K, V> mergeTwoSingletonPairs(final K key0,
         final V val0, final int keyHash0, final K key1, final V val1, final int keyHash1,
         final int shift) {
-      assert!(key0.equals(key1));
+      assert !(key0.equals(key1));
 
       if (shift >= HASH_CODE_LENGTH) {
         throw new IllegalStateException("Hash collision not yet fixed.");
@@ -1093,7 +1094,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     static final <K, V> CompactSetMultimapNode<K, V> mergeCollectionAndSingletonPairs(final K key0,
         final ImmutableSet<V> valColl0, final int keyHash0, final K key1, final V val1,
         final int keyHash1, final int shift) {
-      assert!(key0.equals(key1));
+      assert !(key0.equals(key1));
 
       if (shift >= HASH_CODE_LENGTH) {
         throw new IllegalStateException("Hash collision not yet fixed.");
@@ -1232,7 +1233,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
       return false;
     }
-        
+
     @Override
     Optional<ImmutableSet<V>> findByKey(final K key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
@@ -1417,7 +1418,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
         if (currentCollKey.equals(key)) {
           final ImmutableSet<V> currentCollVal = getCollectionValue(collIndex);
 
-          // migrate from collection to singleton 
+          // migrate from collection to singleton
           details.updated(currentCollVal);
           return copyAndMigrateFromCollectionToSingleton(mutator, bitpos, currentCollKey, val);
         } else {
@@ -1802,36 +1803,36 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
         final int dataMap = rawMap2 ^ collMap;
         final int nodeMap = rawMap1 ^ collMap;
 
-        assert(TUPLE_LENGTH * java.lang.Integer.bitCount(dataMap)
+        assert (TUPLE_LENGTH * java.lang.Integer.bitCount(dataMap)
             + TUPLE_LENGTH * java.lang.Integer.bitCount(collMap)
             + java.lang.Integer.bitCount(nodeMap) == nodes.length);
 
         for (int i = 0; i < arity(dataMap); i++) {
           int offset = i * TUPLE_LENGTH;
 
-          assert((nodes[offset + 0] instanceof ImmutableSet) == false);
-          assert((nodes[offset + 1] instanceof ImmutableSet) == false);
+          assert ((nodes[offset + 0] instanceof ImmutableSet) == false);
+          assert ((nodes[offset + 1] instanceof ImmutableSet) == false);
 
-          assert((nodes[offset + 0] instanceof CompactSetMultimapNode) == false);
-          assert((nodes[offset + 1] instanceof CompactSetMultimapNode) == false);
+          assert ((nodes[offset + 0] instanceof CompactSetMultimapNode) == false);
+          assert ((nodes[offset + 1] instanceof CompactSetMultimapNode) == false);
         }
 
         for (int i = 0; i < arity(collMap); i++) {
           int offset = (i + arity(dataMap)) * TUPLE_LENGTH;
 
-          assert((nodes[offset + 0] instanceof ImmutableSet) == false);
-          assert((nodes[offset + 1] instanceof ImmutableSet) == true);
+          assert ((nodes[offset + 0] instanceof ImmutableSet) == false);
+          assert ((nodes[offset + 1] instanceof ImmutableSet) == true);
 
-          assert((nodes[offset + 0] instanceof CompactSetMultimapNode) == false);
-          assert((nodes[offset + 1] instanceof CompactSetMultimapNode) == false);
+          assert ((nodes[offset + 0] instanceof CompactSetMultimapNode) == false);
+          assert ((nodes[offset + 1] instanceof CompactSetMultimapNode) == false);
         }
 
         for (int i = 0; i < arity(nodeMap); i++) {
           int offset = (arity(dataMap) + arity(collMap)) * TUPLE_LENGTH;
 
-          assert((nodes[offset + i] instanceof ImmutableSet) == false);
+          assert ((nodes[offset + i] instanceof ImmutableSet) == false);
 
-          assert((nodes[offset + i] instanceof CompactSetMultimapNode) == true);
+          assert ((nodes[offset + i] instanceof CompactSetMultimapNode) == true);
         }
       }
 
@@ -2848,8 +2849,8 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
   }
 
-  protected static class SetMultimapNativeTupleIterator<K, V> extends AbstractSetMultimapIterator<K, V>
-      implements Iterator<Map.Entry<K, Object>> {
+  protected static class SetMultimapNativeTupleIterator<K, V>
+      extends AbstractSetMultimapIterator<K, V> implements Iterator<Map.Entry<K, Object>> {
 
     SetMultimapNativeTupleIterator(AbstractSetMultimapNode<K, V> rootNode) {
       super(rootNode);
@@ -2863,22 +2864,24 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
         // TODO: check case distinction
         if (currentValueSingletonCursor < currentValueSingletonLength) {
           final K currentKey = currentValueNode.getSingletonKey(currentValueSingletonCursor);
-          final Object currentValue = currentValueNode.getSingletonValue(currentValueSingletonCursor);
+          final Object currentValue =
+              currentValueNode.getSingletonValue(currentValueSingletonCursor);
           currentValueSingletonCursor++;
-              
+
           return AbstractSpecialisedImmutableMap.entryOf(currentKey, currentValue);
         } else {
           final K currentKey = currentValueNode.getCollectionKey(currentValueCollectionCursor);
-          final Object currentValue = currentValueNode.getCollectionValue(currentValueCollectionCursor);
+          final Object currentValue =
+              currentValueNode.getCollectionValue(currentValueCollectionCursor);
           currentValueCollectionCursor++;
-          
+
           return AbstractSpecialisedImmutableMap.entryOf(currentKey, currentValue);
         }
       }
     }
 
   }
-  
+
   protected static class SetMultimapTupleIterator<K, V, T> extends AbstractSetMultimapIterator<K, V>
       implements Iterator<T> {
 
@@ -3166,7 +3169,8 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     }
 
     @Override
-    public boolean __insertAllEquivalent(final SetMultimap_Legacy<? extends K, ? extends V> setMultimap,
+    public boolean __insertAllEquivalent(
+        final SetMultimap_Legacy<? extends K, ? extends V> setMultimap,
         final Comparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented.");
     }

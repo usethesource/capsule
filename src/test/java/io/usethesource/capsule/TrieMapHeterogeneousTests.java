@@ -54,7 +54,7 @@ public class TrieMapHeterogeneousTests {
         // assertTrue(res.containsKey(boxedJ));
         // because of non-overlap constraint
         // assertTrue(res.containsKey(j) || res.containsKey(boxedJ));
-        
+
         map = res;
       } else {
         // System.out.println("SMALL");
@@ -62,11 +62,11 @@ public class TrieMapHeterogeneousTests {
         TrieMap_Heterogeneous_BleedingEdge res =
             (TrieMap_Heterogeneous_BleedingEdge) map.__put(j, j);
         assertTrue(res.containsKey(j));
-        
+
         // assertTrue(res.containsKey(j));
         // because of non-overlap constraint
         // assertTrue(res.containsKey(j) || res.containsKey(boxedJ));
-        
+
         map = res;
       }
     }
@@ -83,16 +83,16 @@ public class TrieMapHeterogeneousTests {
         100. * map.size() / (smallCount + bigCount)));
     System.out.println();
   }
-  
+
   static final int populationCountPattern01(int v) {
     int c = (v & 0x55555555) & (((v >> 1) & 0x55555555) ^ 0x55555555);
     c = (c & 0x33333333) + ((c >> 2) & 0x33333333);
     c = (c & 0x0F0F0F0F) + ((c >> 4) & 0x0F0F0F0F);
     c = (c & 0x00FF00FF) + ((c >> 8) & 0x00FF00FF);
-    c = (c & 0x0000FFFF) + ((c >> 16)& 0x0000FFFF);    
+    c = (c & 0x0000FFFF) + ((c >> 16) & 0x0000FFFF);
     return c;
-  }  
-  
+  }
+
   @Test
   public void testPopulationCountPattern01() {
     assertEquals(2, populationCountPattern01(0b010001));
@@ -100,16 +100,16 @@ public class TrieMapHeterogeneousTests {
     assertEquals(2, populationCountPattern01(0b011001));
     assertEquals(2, populationCountPattern01(0b011101));
   }
-  
+
   static final int populationCountPattern10(int v) {
     int c = ((v & 0x55555555) ^ 0x55555555) & ((v >> 1) & 0x55555555);
     c = (c & 0x33333333) + ((c >> 2) & 0x33333333);
     c = (c & 0x0F0F0F0F) + ((c >> 4) & 0x0F0F0F0F);
     c = (c & 0x00FF00FF) + ((c >> 8) & 0x00FF00FF);
-    c = (c & 0x0000FFFF) + ((c >> 16)& 0x0000FFFF);    
+    c = (c & 0x0000FFFF) + ((c >> 16) & 0x0000FFFF);
     return c;
-  }  
-  
+  }
+
   @Test
   public void testPopulationCountPattern10() {
     assertEquals(2, populationCountPattern10(0b100010));
@@ -123,10 +123,10 @@ public class TrieMapHeterogeneousTests {
     c = (c & 0x33333333) + ((c >> 2) & 0x33333333);
     c = (c & 0x0F0F0F0F) + ((c >> 4) & 0x0F0F0F0F);
     c = (c & 0x00FF00FF) + ((c >> 8) & 0x00FF00FF);
-    c = (c & 0x0000FFFF) + ((c >> 16)& 0x0000FFFF);    
+    c = (c & 0x0000FFFF) + ((c >> 16) & 0x0000FFFF);
     return c;
-  }  
-  
+  }
+
   @Test
   public void testPopulationCountPattern11() {
     assertEquals(2, populationCountPattern11(0b110011));
@@ -134,5 +134,5 @@ public class TrieMapHeterogeneousTests {
     assertEquals(2, populationCountPattern11(0b110111));
     assertEquals(2, populationCountPattern11(0b111011));
   }
-    
+
 }

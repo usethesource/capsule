@@ -23,7 +23,7 @@ public interface SetMultimap<K, V>
   // default int sizeDistinct() {
   // return (int) entrySet().stream().map(Entry::getKey).distinct().count();
   // }
-  
+
   boolean isEmpty();
 
   boolean contains(final K key);

@@ -30,16 +30,8 @@ public interface ImmutableSetMultimap<K, V> extends SetMultimap_Legacy<K, V> {
 
   boolean containsEntryEquivalent(final Object o0, final Object o1, final Comparator<Object> cmp);
 
-  
-
-  
-  
   ImmutableSetMultimap<K, V> __put(final K key, final V val);
-  
-  
-  
-  
-  
+
   // TODO: ImmutableSetMultimap<K, V> __insert(final K key, final Set<V> values);
 
   ImmutableSetMultimap<K, V> __insert(final K key, final V val);
@@ -47,30 +39,23 @@ public interface ImmutableSetMultimap<K, V> extends SetMultimap_Legacy<K, V> {
   ImmutableSetMultimap<K, V> __insertEquivalent(final K key, final V val,
       final Comparator<Object> cmp);
 
-  ImmutableSetMultimap<K, V> __insertAll(final SetMultimap_Legacy<? extends K, ? extends V> setMultimap);
+  ImmutableSetMultimap<K, V> __insertAll(
+      final SetMultimap_Legacy<? extends K, ? extends V> setMultimap);
 
   ImmutableSetMultimap<K, V> __insertAllEquivalent(
       final SetMultimap_Legacy<? extends K, ? extends V> setMultimap, final Comparator<Object> cmp);
 
-  
-  
-  
-  
   // removes all mappings with 'key'
   ImmutableSetMultimap<K, V> __remove(final K key);
 
   // removes all mappings with 'key'
   ImmutableSetMultimap<K, V> __removeEquivalent(final K key, final Comparator<Object> cmp);
-  
+
   ImmutableSetMultimap<K, V> __removeEntry(final K key, final V val);
 
   ImmutableSetMultimap<K, V> __removeEntryEquivalent(final K key, final V val,
       final Comparator<Object> cmp);
 
-  
-  
-  
-  
   Iterator<K> keyIterator();
 
   Iterator<V> valueIterator();
@@ -78,7 +63,7 @@ public interface ImmutableSetMultimap<K, V> extends SetMultimap_Legacy<K, V> {
   // TODO: Iterator<Map.Entry<K, Set<V>>> groupByKeyIterator();
 
   Iterator<Map.Entry<K, V>> entryIterator();
-  
+
   Iterator<Map.Entry<K, Object>> nativeEntryIterator();
 
   <T> Iterator<T> tupleIterator(final BiFunction<K, V, T> tupleOf);

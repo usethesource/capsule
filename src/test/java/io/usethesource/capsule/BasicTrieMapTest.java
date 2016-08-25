@@ -17,10 +17,6 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import io.usethesource.capsule.ImmutableMap;
-import io.usethesource.capsule.TransientMap;
-import io.usethesource.capsule.TrieMap_5Bits;
-
 public class BasicTrieMapTest {
 
   /*
@@ -136,8 +132,8 @@ public class BasicTrieMapTest {
 
     ImmutableMap<Integer, Integer> map = (ImmutableMap) mapOf();
 
-    ImmutableMap<Integer, Integer> res1 = map.__put(63, 63).__put(64, 64)
-        .__put(32768, 32768).__put(2147483647, 2147483647).__put(65536, 65536);
+    ImmutableMap<Integer, Integer> res1 = map.__put(63, 63).__put(64, 64).__put(32768, 32768)
+        .__put(2147483647, 2147483647).__put(65536, 65536);
 
     assert res1.containsKey(63);
     assert res1.containsKey(64);
@@ -145,8 +141,8 @@ public class BasicTrieMapTest {
     assert res1.containsKey(65536);
     assert res1.containsKey(2147483647);
 
-    ImmutableMap<Integer, Integer> res2 = map.__put(2147483647, 2147483647)
-        .__put(32768, 32768).__put(63, 63).__put(64, 64).__put(65536, 65536);
+    ImmutableMap<Integer, Integer> res2 = map.__put(2147483647, 2147483647).__put(32768, 32768)
+        .__put(63, 63).__put(64, 64).__put(65536, 65536);
 
     assert res2.containsKey(63);
     assert res2.containsKey(64);
@@ -179,8 +175,7 @@ public class BasicTrieMapTest {
 
     ImmutableMap<Integer, Integer> map = (ImmutableMap) mapOf();
 
-    ImmutableMap<Integer, Integer> res1 =
-        map.__put(1, 1).__put(2, 2).__put(65, 65).__put(66, 66);
+    ImmutableMap<Integer, Integer> res1 = map.__put(1, 1).__put(2, 2).__put(65, 65).__put(66, 66);
 
     ImmutableMap<Integer, Integer> res2 = res1.__put(32769, 32769).__remove(66);
 
@@ -228,8 +223,8 @@ public class BasicTrieMapTest {
 
     ImmutableMap map = mapOf();
 
-    ImmutableMap res1 = map.__put(p(32769_1, 32769), p(32769_1, 32769))
-        .__put(p(32769_2, 32769), p(32769_2, 32769));
+    ImmutableMap res1 =
+        map.__put(p(32769_1, 32769), p(32769_1, 32769)).__put(p(32769_2, 32769), p(32769_2, 32769));
     assertEquals(2, res1.size());
     assertTrue(res1.containsKey(p(32769_1, 32769)));
     assertTrue(res1.containsKey(p(32769_2, 32769)));
@@ -245,8 +240,7 @@ public class BasicTrieMapTest {
     assertTrue(res3.containsKey(p(1, 1)));
     assertTrue(res3.containsKey(p(32769_1, 32769)));
 
-    ImmutableMap expected =
-        mapOf(p(1, 1), p(1, 1), p(32769_1, 32769), p(32769_1, 32769));
+    ImmutableMap expected = mapOf(p(1, 1), p(1, 1), p(32769_1, 32769), p(32769_1, 32769));
     assertEquals(expected, res3);
   }
 
@@ -256,8 +250,8 @@ public class BasicTrieMapTest {
 
     ImmutableMap map = mapOf();
 
-    ImmutableMap res1 = map.__put(p(32769_1, 32769), p(32769_1, 32769))
-        .__put(p(32769_2, 32769), p(32769_2, 32769));
+    ImmutableMap res1 =
+        map.__put(p(32769_1, 32769), p(32769_1, 32769)).__put(p(32769_2, 32769), p(32769_2, 32769));
     assertEquals(2, res1.size());
     assertTrue(res1.containsKey(p(32769_1, 32769)));
     assertTrue(res1.containsKey(p(32769_2, 32769)));
@@ -282,8 +276,8 @@ public class BasicTrieMapTest {
 
     ImmutableMap map = mapOf();
 
-    ImmutableMap res1 = map.__put(p(32769_1, 32769), p(32769_1, 32769))
-        .__put(p(32769_2, 32769), p(32769_2, 32769));
+    ImmutableMap res1 =
+        map.__put(p(32769_1, 32769), p(32769_1, 32769)).__put(p(32769_2, 32769), p(32769_2, 32769));
     assertEquals(2, res1.size());
     assertTrue(res1.containsKey(p(32769_1, 32769)));
     assertTrue(res1.containsKey(p(32769_2, 32769)));

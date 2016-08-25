@@ -271,7 +271,8 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
   @Override
   public ImmutableSetMultimap<K, V> __insertAllEquivalent(
-      final SetMultimap_Legacy<? extends K, ? extends V> setMultimap, final Comparator<Object> cmp) {
+      final SetMultimap_Legacy<? extends K, ? extends V> setMultimap,
+      final Comparator<Object> cmp) {
     final TransientSetMultimap<K, V> tmpTransient = this.asTransient();
     tmpTransient.__insertAllEquivalent(setMultimap, cmp);
     return tmpTransient.freeze();
@@ -553,9 +554,9 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
        * TODO: Fix __put(K key, ImmutableSet<V> valColl) for batch insertion and re-enabled
        * fast-fail check.
        */
-//      if (this.hashCode != that.hashCode) {
-//        return false;
-//      }
+      // if (this.hashCode != that.hashCode) {
+      // return false;
+      // }
 
       return rootNode.equals(that.rootNode);
     } else if (other instanceof SetMultimap_Legacy) {
@@ -848,8 +849,8 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
     abstract boolean containsKey(final K key, final int keyHash, final int shift);
 
-    abstract boolean containsTuple(final K key, final V val, final int keyHash, final int shift);    
-    
+    abstract boolean containsTuple(final K key, final V val, final int keyHash, final int shift);
+
     abstract Optional<ImmutableSet<V>> findByKey(final K key, final int keyHash, final int shift);
 
     abstract CompactSetMultimapNode<K, V> inserted(final AtomicReference<Thread> mutator,
@@ -859,7 +860,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     abstract CompactSetMultimapNode<K, V> updated(final AtomicReference<Thread> mutator,
         final K key, final V val, final int keyHash, final int shift,
         final SetMultimapResult<K, V> details);
-    
+
     abstract CompactSetMultimapNode<K, V> updated(final AtomicReference<Thread> mutator,
         final K key, final ImmutableSet<V> val, final int keyHash, final int shift,
         final SetMultimapResult<K, V> details);
@@ -908,7 +909,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     }
 
     abstract int emptyArity();
-    
+
     // @Deprecated // split data / coll arity
     // abstract boolean hasPayload();
     //
@@ -918,7 +919,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     abstract boolean hasPayload(EitherSingletonOrCollection.Type type);
 
     // abstract int payloadArity();
-    
+
     abstract int payloadArity(EitherSingletonOrCollection.Type type);
 
     abstract K getSingletonKey(final int index);
@@ -941,11 +942,11 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
      * @return sum of nodes and values stored within
      */
     abstract int arity();
-    
+
     abstract int arity(int pattern);
 
-    abstract int[] slotRangeTuples();    
-    
+    abstract int[] slotRangeTuples();
+
     int size() {
       final Iterator<K> it = new SetMultimapKeyIterator<>(this);
 
@@ -965,7 +966,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     CompactSetMultimapNode(final AtomicReference<Thread> mutator, final long bitmap) {
       this.bitmap = bitmap;
     }
-    
+
     static final int HASH_CODE_LENGTH = 32;
 
     static final int BIT_PARTITION_SIZE = 5;
@@ -1002,11 +1003,11 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     // abstract int nodeMap();
 
     protected final long bitmap;
-    
+
     final long bitmap() {
       return bitmap;
     }
-    
+
     @Deprecated
     @Override
     int arity() {
@@ -1022,17 +1023,17 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     final int arity(int pattern) {
       return arity(bitmap, pattern);
     }
-    
+
     static final int arity(long bitmap, int pattern) {
-//      if (bitmap == 0) {
-//        if (pattern == PATTERN_EMPTY) {
-//          return 32;
-//        } else {
-//          return 0;
-//        }
-//      } else {
-        return Long.bitCount(filter(bitmap, pattern));
-//      }
+      // if (bitmap == 0) {
+      // if (pattern == PATTERN_EMPTY) {
+      // return 32;
+      // } else {
+      // return 0;
+      // }
+      // } else {
+      return Long.bitCount(filter(bitmap, pattern));
+      // }
     }
 
     // TODO: Implement arity histogram over bitmap (with single for loop) that calculates offsets
@@ -1047,12 +1048,12 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
       return arities;
     }
-    
+
     @Override
     public final int[] slotRangeTuples() {
       return slotRangeTuplesOptimized(bitmap, 0);
     }
-    
+
     static final int[] slotRangeTuples(final long bitmap, final int startSlot) {
       int[] offsetRangeTuples = new int[8];
 
@@ -1060,39 +1061,44 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       offsetRangeTuples[1] = offsetRangeTuples[0];
 
       offsetRangeTuples[2] = offsetRangeTuples[1];
-      offsetRangeTuples[3] = offsetRangeTuples[2] + Long.bitCount(filter(bitmap, PATTERN_DATA_SINGLETON)) * 2;
+      offsetRangeTuples[3] =
+          offsetRangeTuples[2] + Long.bitCount(filter(bitmap, PATTERN_DATA_SINGLETON)) * 2;
 
       offsetRangeTuples[4] = offsetRangeTuples[3];
-      offsetRangeTuples[5] = offsetRangeTuples[4] + Long.bitCount(filter(bitmap, PATTERN_DATA_COLLECTION)) * 2;
+      offsetRangeTuples[5] =
+          offsetRangeTuples[4] + Long.bitCount(filter(bitmap, PATTERN_DATA_COLLECTION)) * 2;
 
       offsetRangeTuples[6] = offsetRangeTuples[5];
       offsetRangeTuples[7] = offsetRangeTuples[6] + Long.bitCount(filter(bitmap, PATTERN_NODE));
 
       return offsetRangeTuples;
-    }   
-    
+    }
+
     static final int[] slotRangeTuplesOptimized(final long bitmap, final int startSlot) {
       int[] offsetRangeTuples = new int[8];
-            
+
       long filteredData = filter(bitmap, PATTERN_DATA_SINGLETON);
       long filteredColl = filter(bitmap, PATTERN_DATA_COLLECTION);
       long filteredNode = filter(bitmap, PATTERN_NODE);
-      
+
       offsetRangeTuples[0] = startSlot;
       offsetRangeTuples[1] = offsetRangeTuples[0];
 
       offsetRangeTuples[2] = offsetRangeTuples[1];
-      offsetRangeTuples[3] = offsetRangeTuples[2] + ((filteredData == 0L) ? 0 : (Long.bitCount(filteredData) * 2));
+      offsetRangeTuples[3] =
+          offsetRangeTuples[2] + ((filteredData == 0L) ? 0 : (Long.bitCount(filteredData) * 2));
 
       offsetRangeTuples[4] = offsetRangeTuples[3];
-      offsetRangeTuples[5] = offsetRangeTuples[4] + ((filteredColl == 0L) ? 0 : (Long.bitCount(filteredColl) * 2));
+      offsetRangeTuples[5] =
+          offsetRangeTuples[4] + ((filteredColl == 0L) ? 0 : (Long.bitCount(filteredColl) * 2));
 
       offsetRangeTuples[6] = offsetRangeTuples[5];
-      offsetRangeTuples[7] = offsetRangeTuples[6] + ((filteredNode == 0L) ? 0 : (Long.bitCount(filteredNode)));
+      offsetRangeTuples[7] =
+          offsetRangeTuples[6] + ((filteredNode == 0L) ? 0 : (Long.bitCount(filteredNode)));
 
       return offsetRangeTuples;
     }
-    
+
     static final byte SIZE_EMPTY = 0b00;
     static final byte SIZE_ONE = 0b01;
     static final byte SIZE_MORE_THAN_ONE = 0b10;
@@ -1137,7 +1143,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
     abstract CompactSetMultimapNode<K, V> copyAndInsertSingleton(
         final AtomicReference<Thread> mutator, final long doubledBitpos, final K key, final V val);
-    
+
     abstract CompactSetMultimapNode<K, V> copyAndInsertCollection(
         final AtomicReference<Thread> mutator, final long doubledBitpos, final K key,
         final ImmutableSet<V> valColl);
@@ -1148,7 +1154,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
     abstract CompactSetMultimapNode<K, V> copyAndRemoveSingleton(
         final AtomicReference<Thread> mutator, final long doubledBitpos);
-    
+
     abstract CompactSetMultimapNode<K, V> copyAndRemoveSingleton(
         final AtomicReference<Thread> mutator, final long doubledBitpos, long updatedBitmap);
 
@@ -1216,8 +1222,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     // TODO: fix hash collision support
     static final <K, V> CompactSetMultimapNode<K, V> mergeTwoCollectionPairs(final K key0,
         final ImmutableSet<V> valColl0, final int keyHash0, final K key1,
-        final ImmutableSet<V> valColl1, final int keyHash1,
-        final int shift) {
+        final ImmutableSet<V> valColl1, final int keyHash1, final int shift) {
       assert !(key0.equals(key1));
 
       if (shift >= HASH_CODE_LENGTH) {
@@ -1248,8 +1253,8 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
         return nodeOf(null, bitmap, new Object[] {node});
       }
-    }    
-    
+    }
+
     // TODO: fix hash collision support
     static final <K, V> CompactSetMultimapNode<K, V> mergeCollectionAndSingletonPairs(final K key0,
         final ImmutableSet<V> valColl0, final int keyHash0, final K key1, final V val1,
@@ -1326,7 +1331,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     @Deprecated
     int nodeIndex(final long doubledBitpos) {
       return index(bitmap, PATTERN_NODE, doubledBitpos);
-    }    
+    }
 
     @Override
     boolean containsKey(final K key, final int keyHash, final int shift) {
@@ -1336,7 +1341,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       final int pattern = pattern(bitmap, doubledMask);
 
       final long doubledBitpos = doubledBitpos(doubledMask);
-      
+
       switch (pattern) {
         case PATTERN_NODE: {
           int index = index(bitmap, PATTERN_NODE, doubledBitpos);
@@ -1403,8 +1408,8 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
         default:
           return false;
       }
-    }    
-        
+    }
+
     @Override
     Optional<ImmutableSet<V>> findByKey(final K key, final int keyHash, final int shift) {
       long bitmap = this.bitmap();
@@ -1614,10 +1619,11 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
         }
       }
     }
-    
+
     @Override
     CompactSetMultimapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key,
-        final ImmutableSet<V> valColl, final int keyHash, final int shift, final SetMultimapResult<K, V> details) {
+        final ImmutableSet<V> valColl, final int keyHash, final int shift,
+        final SetMultimapResult<K, V> details) {
       long bitmap = this.bitmap();
 
       final int doubledMask = doubledMask(keyHash, shift);
@@ -1649,31 +1655,31 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
             details.updated(currentVal);
             return copyAndMigrateFromSingletonToCollection(mutator, doubledBitpos, currentKey,
                 valColl);
-//            
-//            
-//            // update singleton value
-//            details.updated(currentVal);
-//            return copyAndSetSingletonValue(mutator, doubledBitpos, valColl);
+            //
+            //
+            // // update singleton value
+            // details.updated(currentVal);
+            // return copyAndSetSingletonValue(mutator, doubledBitpos, valColl);
           } else {
             // prefix-collision (case: collection x singleton)
             final V currentVal = getSingletonValue(dataIndex);
 
-            final CompactSetMultimapNode<K, V> subNodeNew = mergeCollectionAndSingletonPairs(
-                key, valColl, keyHash, currentKey,
-                currentVal, transformHashCode(currentKey.hashCode()), shift + BIT_PARTITION_SIZE);
+            final CompactSetMultimapNode<K, V> subNodeNew =
+                mergeCollectionAndSingletonPairs(key, valColl, keyHash, currentKey, currentVal,
+                    transformHashCode(currentKey.hashCode()), shift + BIT_PARTITION_SIZE);
 
             details.modified();
             return copyAndMigrateFromSingletonToNode(mutator, doubledBitpos, subNodeNew);
-            
-//            // prefix-collision (case: singleton x singleton)
-//            final V currentVal = getSingletonValue(dataIndex);
-//
-//            final CompactSetMultimapNode<K, V> subNodeNew = mergeTwoSingletonPairs(currentKey,
-//                currentVal, transformHashCode(currentKey.hashCode()), key, valColl, keyHash,
-//                shift + BIT_PARTITION_SIZE);
-//
-//            details.modified();
-//            return copyAndMigrateFromSingletonToNode(mutator, doubledBitpos, subNodeNew);
+
+            // // prefix-collision (case: singleton x singleton)
+            // final V currentVal = getSingletonValue(dataIndex);
+            //
+            // final CompactSetMultimapNode<K, V> subNodeNew = mergeTwoSingletonPairs(currentKey,
+            // currentVal, transformHashCode(currentKey.hashCode()), key, valColl, keyHash,
+            // shift + BIT_PARTITION_SIZE);
+            //
+            // details.modified();
+            // return copyAndMigrateFromSingletonToNode(mutator, doubledBitpos, subNodeNew);
           }
         }
         case PATTERN_DATA_COLLECTION: {
@@ -1685,30 +1691,31 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
             // update collection value
             details.updated(currentCollVal);
-            return copyAndSetCollectionValue(mutator, doubledBitpos, valColl);            
-            
-//            // migrate from collection to singleton
-//            details.updated(currentCollVal);
-//            return copyAndMigrateFromCollectionToSingleton(mutator, doubledBitpos, currentCollKey,
-//                valColl);
+            return copyAndSetCollectionValue(mutator, doubledBitpos, valColl);
+
+            // // migrate from collection to singleton
+            // details.updated(currentCollVal);
+            // return copyAndMigrateFromCollectionToSingleton(mutator, doubledBitpos,
+            // currentCollKey,
+            // valColl);
           } else {
             // prefix-collision (case: collection x collection)
             final ImmutableSet<V> currentValNode = getCollectionValue(collIndex);
             final CompactSetMultimapNode<K, V> subNodeNew = mergeTwoCollectionPairs(currentCollKey,
                 currentValNode, transformHashCode(currentCollKey.hashCode()), key, valColl, keyHash,
                 shift + BIT_PARTITION_SIZE);
-            
+
             details.modified();
             return copyAndMigrateFromCollectionToNode(mutator, doubledBitpos, subNodeNew);
-                        
-//            // prefix-collision (case: collection x singleton)
-//            final ImmutableSet<V> currentValNode = getCollectionValue(collIndex);
-//            final CompactSetMultimapNode<K, V> subNodeNew = mergeCollectionAndSingletonPairs(
-//                currentCollKey, currentValNode, transformHashCode(currentCollKey.hashCode()), key,
-//                valColl, keyHash, shift + BIT_PARTITION_SIZE);
-//
-//            details.modified();
-//            return copyAndMigrateFromCollectionToNode(mutator, doubledBitpos, subNodeNew);
+
+            // // prefix-collision (case: collection x singleton)
+            // final ImmutableSet<V> currentValNode = getCollectionValue(collIndex);
+            // final CompactSetMultimapNode<K, V> subNodeNew = mergeCollectionAndSingletonPairs(
+            // currentCollKey, currentValNode, transformHashCode(currentCollKey.hashCode()), key,
+            // valColl, keyHash, shift + BIT_PARTITION_SIZE);
+            //
+            // details.modified();
+            // return copyAndMigrateFromCollectionToNode(mutator, doubledBitpos, subNodeNew);
           }
         }
         default: {
@@ -1717,7 +1724,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
         }
       }
     }
-    
+
     @Override
     CompactSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
         final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details) {
@@ -1747,7 +1754,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
             case 1: {
               if (slotArity() == 0) {
                 if (shift == 0) {
-                  // singleton remaining                 
+                  // singleton remaining
                   final long doubledBitposAtShift0 = doubledBitpos(bitpos(doubledMask(keyHash, 0)));
 
                   final long updatedBitmapAtShift0 =
@@ -1835,16 +1842,16 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
     final static boolean hasTwoPayloads(int[] arities) {
       return arities[PATTERN_EMPTY] == 30 && arities[PATTERN_NODE] == 0;
-    }    
-    
+    }
+
     enum State {
       EMPTY, NODE, PAYLOAD, PAYLOAD_RARE
-    }    
-    
+    }
+
     static final State toState(final int pattern) {
-//      final State[] states = {State.EMPTY, State.NODE, State.PAYLOAD, State.PAYLOAD_RARE};
-//      return states[pattern];
-      
+      // final State[] states = {State.EMPTY, State.NODE, State.PAYLOAD, State.PAYLOAD_RARE};
+      // return states[pattern];
+
       switch (pattern) {
         case PATTERN_EMPTY:
           return State.EMPTY;
@@ -1856,7 +1863,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
           return State.PAYLOAD_RARE;
       }
     }
-    
+
     @Override
     CompactSetMultimapNode<K, V> removedAll(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final SetMultimapResult<K, V> details) {
@@ -1886,7 +1893,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
             case 1: {
               if (slotArity() == 1) {
                 if (shift == 0) {
-                  // singleton remaining                 
+                  // singleton remaining
                   final long doubledBitposAtShift0 = doubledBitpos(bitpos(doubledMask(keyHash, 0)));
 
                   final long updatedBitmapAtShift0 =
@@ -1898,24 +1905,24 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
                   return subNodeNew;
                 }
               } else {
-//                // inline value (move to front)
-//                final State subNodeState = subNodeNew.stateOfSingleton();
-//
-////                switch (subNodeState) {
-////                  case EMPTY:
-////                  case NODE:
-////                  case PAYLOAD:
-////                    return copyAndMigrateFromNodeToSingleton(mutator, doubledBitpos, subNodeNew);
-////                  case PAYLOAD_RARE:
-////                    return copyAndMigrateFromNodeToCollection(mutator, doubledBitpos, subNodeNew);
-////                }
-//                
-//                if (subNodeState == State.PAYLOAD) {
-//                  return copyAndMigrateFromNodeToSingleton(mutator, doubledBitpos, subNodeNew);
-//                } else {
-//                  return copyAndMigrateFromNodeToCollection(mutator, doubledBitpos, subNodeNew);
-//                }         
-                
+                // // inline value (move to front)
+                // final State subNodeState = subNodeNew.stateOfSingleton();
+                //
+                //// switch (subNodeState) {
+                //// case EMPTY:
+                //// case NODE:
+                //// case PAYLOAD:
+                //// return copyAndMigrateFromNodeToSingleton(mutator, doubledBitpos, subNodeNew);
+                //// case PAYLOAD_RARE:
+                //// return copyAndMigrateFromNodeToCollection(mutator, doubledBitpos, subNodeNew);
+                //// }
+                //
+                // if (subNodeState == State.PAYLOAD) {
+                // return copyAndMigrateFromNodeToSingleton(mutator, doubledBitpos, subNodeNew);
+                // } else {
+                // return copyAndMigrateFromNodeToCollection(mutator, doubledBitpos, subNodeNew);
+                // }
+
                 // inline value (move to front)
                 EitherSingletonOrCollection.Type type = subNodeNew.typeOfSingleton();
 
@@ -1925,23 +1932,23 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
                   return copyAndMigrateFromNodeToCollection(mutator, doubledBitpos, subNodeNew);
                 }
 
-//                // inline value (move to front)
-//                final int subNodePattern = subNodeNew.patternOfSingleton();
-//
-//                if (subNodePattern == PATTERN_DATA_SINGLETON) {
-//                  return copyAndMigrateFromNodeToSingleton(mutator, doubledBitpos, subNodeNew);
-//                } else {
-//                  return copyAndMigrateFromNodeToCollection(mutator, doubledBitpos, subNodeNew);
-//                }
-                
-//                switch (subNodePattern) {
-//                  case PATTERN_DATA_SINGLETON:
-//                    return copyAndMigrateFromNodeToSingleton(mutator, doubledBitpos, subNodeNew);
-//                  case PATTERN_DATA_COLLECTION:
-//                    return copyAndMigrateFromNodeToCollection(mutator, doubledBitpos, subNodeNew);
-//                  default:
-//                    return null;
-//                }
+                // // inline value (move to front)
+                // final int subNodePattern = subNodeNew.patternOfSingleton();
+                //
+                // if (subNodePattern == PATTERN_DATA_SINGLETON) {
+                // return copyAndMigrateFromNodeToSingleton(mutator, doubledBitpos, subNodeNew);
+                // } else {
+                // return copyAndMigrateFromNodeToCollection(mutator, doubledBitpos, subNodeNew);
+                // }
+
+                // switch (subNodePattern) {
+                // case PATTERN_DATA_SINGLETON:
+                // return copyAndMigrateFromNodeToSingleton(mutator, doubledBitpos, subNodeNew);
+                // case PATTERN_DATA_COLLECTION:
+                // return copyAndMigrateFromNodeToCollection(mutator, doubledBitpos, subNodeNew);
+                // default:
+                // return null;
+                // }
               }
             }
             default: {
@@ -1984,7 +1991,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     }
 
     abstract int patternOfSingleton();
-    
+
     @Deprecated
     abstract EitherSingletonOrCollection.Type typeOfSingleton();
 
@@ -2068,7 +2075,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     }
 
   }
-  
+
   private static final class BitmapIndexedSetMultimapNode<K, V>
       extends CompactSetMultimapNode<K, V> {
 
@@ -2170,7 +2177,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     int emptyArity() {
       return arity(bitmap(), PATTERN_EMPTY);
     }
-    
+
     boolean hasPayload(EitherSingletonOrCollection.Type type) {
       return payloadArity(type) != 0;
     }
@@ -2247,44 +2254,43 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     @Override
     byte sizePredicate() {
 
-//      switch (slotArity()) {
-//        case 0:
-//          return SIZE_EMPTY;
-//        case 1:
-//          return SIZE_MORE_THAN_ONE; // works for maps only: must be subnode; patternOfSingleton();
-//        case 2:
-//          return arity(bitmap(), PATTERN_NODE) == 0 ? SIZE_ONE : SIZE_MORE_THAN_ONE;
-//        default:
-//          return SIZE_MORE_THAN_ONE;
-//      }
-      
-//      if (this.nodeArity() == 0) {
-//        switch (this.payloadArity()) {
-//          case 0:
-//            return SIZE_EMPTY;
-//          case 1:
-//            return SIZE_ONE;
-//          default:
-//            return SIZE_MORE_THAN_ONE;
-//        }
-//      } else {
-//        return SIZE_MORE_THAN_ONE;
-//      }
-      
-      
-//      int[] arities = arities(bitmap());
-//      
-//      int nodeArity = arities[PATTERN_NODE];
-//      int emptyArity = arities[PATTERN_EMPTY];
-      
+      // switch (slotArity()) {
+      // case 0:
+      // return SIZE_EMPTY;
+      // case 1:
+      // return SIZE_MORE_THAN_ONE; // works for maps only: must be subnode; patternOfSingleton();
+      // case 2:
+      // return arity(bitmap(), PATTERN_NODE) == 0 ? SIZE_ONE : SIZE_MORE_THAN_ONE;
+      // default:
+      // return SIZE_MORE_THAN_ONE;
+      // }
+
+      // if (this.nodeArity() == 0) {
+      // switch (this.payloadArity()) {
+      // case 0:
+      // return SIZE_EMPTY;
+      // case 1:
+      // return SIZE_ONE;
+      // default:
+      // return SIZE_MORE_THAN_ONE;
+      // }
+      // } else {
+      // return SIZE_MORE_THAN_ONE;
+      // }
+
+      // int[] arities = arities(bitmap());
+      //
+      // int nodeArity = arities[PATTERN_NODE];
+      // int emptyArity = arities[PATTERN_EMPTY];
+
       final long bitmap = this.bitmap();
-      
+
       int nodeArity = arity(bitmap, PATTERN_NODE);
       int emptyArity = arity(bitmap, PATTERN_EMPTY);
-      
-//      int aritySingleton = arity(bitmap, PATTERN_DATA_SINGLETON);
-//      int arityCollection = arity(bitmap, PATTERN_DATA_COLLECTION);
-      
+
+      // int aritySingleton = arity(bitmap, PATTERN_DATA_SINGLETON);
+      // int arityCollection = arity(bitmap, PATTERN_DATA_COLLECTION);
+
       if (nodeArity > 0) {
         return SIZE_MORE_THAN_ONE;
       } else {
@@ -2297,20 +2303,20 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
             return SIZE_MORE_THAN_ONE;
         }
       }
-      
-//      if (this.nodeArity() == 0) {
-//        switch (arity(bitmap(), PATTERN_DATA_SINGLETON)
-//            + arity(bitmap(), PATTERN_DATA_COLLECTION)) {
-//          case 0:
-//            return SIZE_EMPTY;
-//          case 1:
-//            return SIZE_ONE;
-//          default:
-//            return SIZE_MORE_THAN_ONE;
-//        }
-//      } else {
-//        return SIZE_MORE_THAN_ONE;
-//      }
+
+      // if (this.nodeArity() == 0) {
+      // switch (arity(bitmap(), PATTERN_DATA_SINGLETON)
+      // + arity(bitmap(), PATTERN_DATA_COLLECTION)) {
+      // case 0:
+      // return SIZE_EMPTY;
+      // case 1:
+      // return SIZE_ONE;
+      // default:
+      // return SIZE_MORE_THAN_ONE;
+      // }
+      // } else {
+      // return SIZE_MORE_THAN_ONE;
+      // }
     }
 
     @Override
@@ -2393,11 +2399,12 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       long updatedBitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_DATA_SINGLETON);
       return nodeOf(mutator, updatedBitmap, dst);
     }
-    
+
     @Override
     CompactSetMultimapNode<K, V> copyAndInsertCollection(final AtomicReference<Thread> mutator,
         final long doubledBitpos, final K key, final ImmutableSet<V> valColl) {
-      final int idx = TUPLE_LENGTH * (arity(bitmap(), PATTERN_DATA_SINGLETON) + collIndex(doubledBitpos));
+      final int idx =
+          TUPLE_LENGTH * (arity(bitmap(), PATTERN_DATA_SINGLETON) + collIndex(doubledBitpos));
 
       final Object[] src = this.nodes;
       final Object[] dst = new Object[src.length + 2];
@@ -2410,7 +2417,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
       long updatedBitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_DATA_COLLECTION);
       return nodeOf(mutator, updatedBitmap, dst);
-    }    
+    }
 
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromSingletonToCollection(
@@ -2477,7 +2484,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       long updatedBitmap = setBitPattern(bitmap, doubledBitpos, PATTERN_EMPTY);
       return nodeOf(mutator, updatedBitmap, dst);
     }
-    
+
     // TODO: remove code duplication and merge with above
     @Override
     CompactSetMultimapNode<K, V> copyAndRemoveSingleton(final AtomicReference<Thread> mutator,
@@ -2493,7 +2500,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
       return nodeOf(mutator, updatedBitmap, dst);
     }
-    
+
     @Override
     CompactSetMultimapNode<K, V> copyAndRemoveCollection(final AtomicReference<Thread> mutator,
         final long doubledBitpos) {
@@ -2625,7 +2632,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
       return pattern;
     }
-    
+
     @Override
     State stateOfSingleton() {
       assert this.sizePredicate() == SIZE_ONE;
@@ -2636,18 +2643,18 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       final int pattern = pattern(bitmap, doubledMask);
 
       return toState(pattern);
-    }    
-    
+    }
+
     @Deprecated
     @Override
     EitherSingletonOrCollection.Type typeOfSingleton() {
       final int pattern = patternOfSingleton();
-      
+
       if (pattern == PATTERN_DATA_SINGLETON) {
         return EitherSingletonOrCollection.Type.SINGLETON;
       } else {
         return EitherSingletonOrCollection.Type.COLLECTION;
-      }      
+      }
     }
 
   }
@@ -3295,8 +3302,8 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
   }
 
-  protected static class SetMultimapFlattenedTupleIteratorSlotHistogram<K, V> extends
-      AbstractSetMultimapIteratorSlotHistogram<K, V> implements Iterator<Map.Entry<K, V>> {
+  protected static class SetMultimapFlattenedTupleIteratorSlotHistogram<K, V>
+      extends AbstractSetMultimapIteratorSlotHistogram<K, V> implements Iterator<Map.Entry<K, V>> {
 
     private K cachedKey = null;
     private Iterator<V> cachedValueSetIterator = Collections.emptyIterator();
@@ -3352,7 +3359,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       }
     }
   }
-  
+
   /**
    * Iterator skeleton that uses a fixed stack in depth.
    */
@@ -3373,7 +3380,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     AbstractSetMultimapNode<K, V>[] nodes = new AbstractSetMultimapNode[MAX_DEPTH];
 
     AbstractSetMultimapIterator(AbstractSetMultimapNode<K, V> rootNode) {
-      int nodeArity = rootNode.nodeArity();       
+      int nodeArity = rootNode.nodeArity();
       if (nodeArity != 0) {
         currentStackLevel = 0;
 
@@ -3422,11 +3429,10 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
             nodeCursorsAndLengths[nextLengthIndex] = nodeArity;
           }
 
-          
-//          int emptyArity = nextNode.emptyArity();
-//          if (emptyArity + nodeArity < 32) {
+          // int emptyArity = nextNode.emptyArity();
+          // if (emptyArity + nodeArity < 32) {
           if (nextNode.hasPayload(SINGLETON) || nextNode.hasPayload(COLLECTION)) {
-//          if (payloadAritySingleton != 0 || payloadArityCollection != 0) {
+            // if (payloadAritySingleton != 0 || payloadArityCollection != 0) {
             /*
              * found next node that contains values
              */
@@ -3781,11 +3787,11 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
-      
-//      if (valColl.size() == 1) {
-//        throw new IllegalStateException();
-//      }
-     
+
+      // if (valColl.size() == 1) {
+      // throw new IllegalStateException();
+      // }
+
       final int keyHash = key.hashCode();
       final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
@@ -3799,15 +3805,15 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
             final int valHashNew = valColl.hashCode();
 
             rootNode = newRootNode;
-//            hashCode += 0;
-//            cachedSize += 0;
-            
-//            return new TrieSetMultimap_HHAMT<K, V>(newRootNode,
-//                hashCode + ((keyHash ^ valHashNew)) - ((keyHash ^ valHashOld)), cachedSize);
+            // hashCode += 0;
+            // cachedSize += 0;
+
+            // return new TrieSetMultimap_HHAMT<K, V>(newRootNode,
+            // hashCode + ((keyHash ^ valHashNew)) - ((keyHash ^ valHashOld)), cachedSize);
 
             throw new IllegalStateException();
-//            
-//            return true;
+            //
+            // return true;
           } else {
             int sumOfReplacedHashes = 0;
 
@@ -3818,39 +3824,39 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
             final int valHashNew = valColl.hashCode();
 
             rootNode = newRootNode;
-//          hashCode += 0;
-//          cachedSize += 0;
-            
-//            return new TrieSetMultimap_HHAMT<K, V>(newRootNode,
-//                hashCode + ((keyHash ^ valHashNew)) - sumOfReplacedHashes,
-//                cachedSize - details.getReplacedCollection().size() + 1);
+            // hashCode += 0;
+            // cachedSize += 0;
 
-            throw new IllegalStateException();            
-//            
-//            return true;         
+            // return new TrieSetMultimap_HHAMT<K, V>(newRootNode,
+            // hashCode + ((keyHash ^ valHashNew)) - sumOfReplacedHashes,
+            // cachedSize - details.getReplacedCollection().size() + 1);
+
+            throw new IllegalStateException();
+            //
+            // return true;
           }
         }
 
         int sumOfNewHashes = 0;
-        
-//        for (V newValue : valColl) {
-//          sumOfNewHashes += (keyHash ^ newValue.hashCode());
-//        }
+
+        // for (V newValue : valColl) {
+        // sumOfNewHashes += (keyHash ^ newValue.hashCode());
+        // }
 
         rootNode = newRootNode;
         hashCode += sumOfNewHashes;
         cachedSize += valColl.size();
-        
-//        final int valHash = valColl.hashCode();
-//        return new TrieSetMultimap_HHAMT<K, V>(newRootNode, hashCode + ((keyHash ^ valHash)),
-//            cachedSize + 1);
-        
+
+        // final int valHash = valColl.hashCode();
+        // return new TrieSetMultimap_HHAMT<K, V>(newRootNode, hashCode + ((keyHash ^ valHash)),
+        // cachedSize + 1);
+
         return true;
       }
 
       return false;
     }
-        
+
     @Override
     public boolean __insert(final K key, final V val) {
       if (mutator.get() == null) {
@@ -3868,9 +3874,9 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
          * TODO: Fix __put(K key, ImmutableSet<V> valColl) for batch insertion and re-enabled
          * fast-fail check.
          */
-//        final int valHashNew = val.hashCode();
+        // final int valHashNew = val.hashCode();
         rootNode = newRootNode;
-//        hashCode += (keyHash ^ valHashNew);
+        // hashCode += (keyHash ^ valHashNew);
         cachedSize += 1;
 
         if (DEBUG) {
@@ -3903,7 +3909,8 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
     }
 
     @Override
-    public boolean __insertAllEquivalent(final SetMultimap_Legacy<? extends K, ? extends V> setMultimap,
+    public boolean __insertAllEquivalent(
+        final SetMultimap_Legacy<? extends K, ? extends V> setMultimap,
         final Comparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented.");
     }
@@ -4202,9 +4209,9 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
          * TODO: Fix __put(K key, ImmutableSet<V> valColl) for batch insertion and re-enabled
          * fast-fail check.
          */
-//        if (this.hashCode != that.hashCode) {
-//          return false;
-//        }
+        // if (this.hashCode != that.hashCode) {
+        // return false;
+        // }
 
         return rootNode.equals(that.rootNode);
       } else if (other instanceof SetMultimap_Legacy) {

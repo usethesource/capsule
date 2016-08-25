@@ -30,14 +30,10 @@ public interface TransientSetMultimap<K, V> extends SetMultimap_Legacy<K, V> {
 
   boolean containsEntryEquivalent(final Object o0, final Object o1, final Comparator<Object> cmp);
 
-  
-  
   default boolean __put(K key, ImmutableSet<V> valColl) {
     throw new UnsupportedOperationException("Not yet implemented.");
   }
-  
-  
-  
+
   boolean __insert(final K key, final V val);
 
   boolean __insertEquivalent(final K key, final V val, final Comparator<Object> cmp);

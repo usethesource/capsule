@@ -46,7 +46,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
     this.hashCode = hashCode(rootNode);
     this.cachedSize = size(rootNode);
   }
-  
+
   TrieSet_5Bits(AbstractSetNode<K> rootNode, int hashCode, int cachedSize) {
     this.rootNode = rootNode;
     this.hashCode = hashCode;
@@ -74,16 +74,16 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
 
   public static final <K> ImmutableSet<K> of(K key0, K key1) {
     assert !Objects.equals(key0, key1);
-    
+
     final int keyHash0 = key0.hashCode();
     final int keyHash1 = key1.hashCode();
-    
+
     CompactSetNode<K> newRootNode =
         CompactSetNode.mergeTwoKeyValPairs(key0, keyHash0, key1, keyHash1, 0);
 
     return new TrieSet_5Bits<K>(newRootNode, keyHash0 + keyHash1, 2);
-  }  
-  
+  }
+
   @SuppressWarnings("unchecked")
   public static final <K> ImmutableSet<K> of(K... keys) {
     ImmutableSet<K> result = TrieSet_5Bits.EMPTY_SET;
@@ -94,7 +94,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
 
     return result;
   }
- 
+
   @SuppressWarnings("unchecked")
   public static final <K> TransientSet<K> transientOf() {
     return TrieSet_5Bits.EMPTY_SET.asTransient();
@@ -127,10 +127,10 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
     for (Iterator<K> it = new SetKeyIterator<>(rootNode); it.hasNext(); it.next()) {
       size += 1;
     }
-    
+
     return size;
   }
-  
+
   private boolean checkHashCodeAndSize(final int targetHash, final int targetSize) {
     int hash = 0;
     int size = 0;
@@ -674,8 +674,8 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
      * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
      * `protected` when experiments are finished.
      */
-    public /* protected */ abstract CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key,
-        final int keyHash, final int shift, final SetResult<K> details);
+    public /* protected */ abstract CompactSetNode<K> updated(final AtomicReference<Thread> mutator,
+        final K key, final int keyHash, final int shift, final SetResult<K> details);
 
     abstract CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final SetResult<K> details,
@@ -685,8 +685,8 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
      * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
      * `protected` when experiments are finished.
      */
-    public /* protected */ abstract CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key,
-        final int keyHash, final int shift, final SetResult<K> details);
+    public /* protected */ abstract CompactSetNode<K> removed(final AtomicReference<Thread> mutator,
+        final K key, final int keyHash, final int shift, final SetResult<K> details);
 
     abstract CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final SetResult<K> details,
@@ -767,17 +767,17 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
 
       return size;
     }
-    
+
     @Override
     public Iterator<K> iterator() {
       return new SetKeyIterator<>(this);
     }
-    
+
     @Override
     public Spliterator<K> spliterator() {
       return Spliterators.spliteratorUnknownSize(iterator(), Spliterator.DISTINCT);
     }
-    
+
     public Stream<K> stream() {
       return StreamSupport.stream(spliterator(), false);
     }
@@ -920,7 +920,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
     CompactSetNode<K> nodeAt(final int bitpos) {
       return getNode(nodeIndex(bitpos));
     }
-  
+
     /*
      * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
      * `protected` when experiments are finished.
@@ -1018,8 +1018,8 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
      * `protected` when experiments are finished.
      */
     @Override
-    public /* protected */ CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key, final int keyHash,
-        final int shift, final SetResult<K> details) {
+    public /* protected */ CompactSetNode<K> updated(final AtomicReference<Thread> mutator,
+        final K key, final int keyHash, final int shift, final SetResult<K> details) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1094,8 +1094,8 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
      * `protected` when experiments are finished.
      */
     @Override
-    public /* protected */ CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key, final int keyHash,
-        final int shift, final SetResult<K> details) {
+    public /* protected */ CompactSetNode<K> removed(final AtomicReference<Thread> mutator,
+        final K key, final int keyHash, final int shift, final SetResult<K> details) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1591,8 +1591,8 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
      * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
      * `protected` when experiments are finished.
      */
-    public /* protected */ CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key, final int keyHash,
-        final int shift, final SetResult<K> details) {
+    public /* protected */ CompactSetNode<K> updated(final AtomicReference<Thread> mutator,
+        final K key, final int keyHash, final int shift, final SetResult<K> details) {
       assert this.hash == keyHash;
 
       for (int idx = 0; idx < keys.length; idx++) {
@@ -1645,8 +1645,8 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
      * `protected` when experiments are finished.
      */
     @Override
-    public /* protected */ CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key, final int keyHash,
-        final int shift, final SetResult<K> details) {
+    public /* protected */ CompactSetNode<K> removed(final AtomicReference<Thread> mutator,
+        final K key, final int keyHash, final int shift, final SetResult<K> details) {
       for (int idx = 0; idx < keys.length; idx++) {
         if (keys[idx].equals(key)) {
           details.modified();
@@ -2207,7 +2207,8 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
     }
 
     @Override
-    public boolean __insertAllEquivalent(final java.util.Set<? extends K> set, final Comparator<Object> cmp) {
+    public boolean __insertAllEquivalent(final java.util.Set<? extends K> set,
+        final Comparator<Object> cmp) {
       boolean modified = false;
 
       for (final K key : set) {
@@ -2289,7 +2290,8 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
     }
 
     @Override
-    public boolean __removeAllEquivalent(final java.util.Set<? extends K> set, final Comparator<Object> cmp) {
+    public boolean __removeAllEquivalent(final java.util.Set<? extends K> set,
+        final Comparator<Object> cmp) {
       boolean modified = false;
 
       for (final K key : set) {

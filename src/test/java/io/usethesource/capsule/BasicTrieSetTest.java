@@ -20,9 +20,6 @@ import java.util.Set;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import io.usethesource.capsule.ImmutableSet;
-import io.usethesource.capsule.TrieSet_5Bits;
-
 public class BasicTrieSetTest {
 
   private class DummyValue {

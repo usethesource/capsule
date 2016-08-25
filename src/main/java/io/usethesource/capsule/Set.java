@@ -16,7 +16,7 @@ public interface Set<K> extends Iterable<K>, Function<K, Optional<K>> {
   long size();
 
   boolean isEmpty();
-  
+
   boolean contains(final Object o);
 
   default boolean containsAll(final Set<?> set) {
@@ -46,7 +46,7 @@ public interface Set<K> extends Iterable<K>, Function<K, Optional<K>> {
   boolean equals(Object other);
 
   Set.Immutable<K> asImmutable();
-  
+
   public static interface Immutable<K> extends Set<K> {
 
     Set.Immutable<K> insert(final K key);
@@ -64,7 +64,7 @@ public interface Set<K> extends Iterable<K>, Function<K, Optional<K>> {
     Set.Transient<K> asTransient();
 
     java.util.Set<K> asJdkCollection();
-    
+
   }
 
   public static interface Transient<K> extends Set<K> {
@@ -80,5 +80,5 @@ public interface Set<K> extends Iterable<K>, Function<K, Optional<K>> {
     boolean retainAll(final Set<? extends K> set);
 
   }
-  
+
 }

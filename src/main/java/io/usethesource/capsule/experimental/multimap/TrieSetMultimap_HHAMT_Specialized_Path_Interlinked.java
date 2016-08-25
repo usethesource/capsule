@@ -76,7 +76,8 @@ import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8.S
  * TODO: unify by injecting factory method.
  */
 @SuppressWarnings({"rawtypes", "restriction"})
-public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements ImmutableSetMultimap<K, V> {
+public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
+    implements ImmutableSetMultimap<K, V> {
 
   protected static final CompactSetMultimapNode EMPTY_NODE = new SetMultimap0To0Node<>(null, 0L);
 
@@ -90,8 +91,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
   private final int hashCode;
   private final int cachedSize;
 
-  TrieSetMultimap_HHAMT_Specialized_Path_Interlinked(AbstractSetMultimapNode<K, V> rootNode, int hashCode,
-      int cachedSize) {
+  TrieSetMultimap_HHAMT_Specialized_Path_Interlinked(AbstractSetMultimapNode<K, V> rootNode,
+      int hashCode, int cachedSize) {
     this.rootNode = rootNode;
     this.hashCode = hashCode;
     this.cachedSize = cachedSize;
@@ -107,7 +108,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
   @SuppressWarnings("unchecked")
   public static final <K, V> ImmutableSetMultimap<K, V> of(K key, V... values) {
-    ImmutableSetMultimap<K, V> result = TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EMPTY_SETMULTIMAP;
+    ImmutableSetMultimap<K, V> result =
+        TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EMPTY_SETMULTIMAP;
 
     for (V value : values) {
       result = result.__insert(key, value);
@@ -880,7 +882,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
     abstract boolean containsTuple(final K key, final V val, final int keyHash, final int shift);
 
-    abstract Optional<AbstractSetNode<V>> findByKey(final K key, final int keyHash, final int shift);
+    abstract Optional<AbstractSetNode<V>> findByKey(final K key, final int keyHash,
+        final int shift);
 
     abstract CompactSetMultimapNode<K, V> inserted(final AtomicReference<Thread> mutator,
         final K key, final V val, final int keyHash, final int shift,
@@ -937,6 +940,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
     // @Deprecated // split data / coll arity
     abstract boolean hasPayload();
+
     //
     // @Deprecated // split data / coll arity
     abstract int payloadArity();
@@ -967,7 +971,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
      * @return sum of nodes and values stored within
      */
     abstract int arity();
-    
+
     abstract int[] arities();
 
     int size() {
@@ -995,10 +999,10 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
     @Deprecated
     final void initializeLazyFields() {
       // NOTE: temporariliy used to test caching of attributes; will be removed soon again
-      
-//      cachedSlotArity = (int) staticSlotArity();
-//      cachedNodeArity = (int) Long.bitCount(filter(bitmap, PATTERN_NODE));
-//      cachedEmptyArity = (int) Long.bitCount(filter(bitmap, PATTERN_EMPTY));
+
+      // cachedSlotArity = (int) staticSlotArity();
+      // cachedNodeArity = (int) Long.bitCount(filter(bitmap, PATTERN_NODE));
+      // cachedEmptyArity = (int) Long.bitCount(filter(bitmap, PATTERN_EMPTY));
     }
 
     CompactSetMultimapNode(final AtomicReference<Thread> mutator, final long bitmap) {
@@ -1210,7 +1214,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
       return 32 - nodeArity() - emptyArity();
     }
 
-    
     @Override
     final boolean hasPayload(EitherSingletonOrCollection.Type type) {
       return payloadArity(type) != 0;
@@ -1258,8 +1261,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
     @Override
     final int slotArity() {
       return staticSlotArity();
-      
-//      return cachedSlotArity;
+
+      // return cachedSlotArity;
     }
 
     @Override
@@ -1268,10 +1271,10 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
     }
 
     final int emptyArity() {
-       return Long.bitCount(filter(bitmap, PATTERN_EMPTY));
-//       return arity(bitmap, PATTERN_EMPTY);
-      
-//      return cachedEmptyArity;
+      return Long.bitCount(filter(bitmap, PATTERN_EMPTY));
+      // return arity(bitmap, PATTERN_EMPTY);
+
+      // return cachedEmptyArity;
     }
 
     @Deprecated
@@ -1286,42 +1289,42 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
     }
 
     static final int arity(long bitmap, int pattern) {
-//      if (bitmap == 0) {
-//        if (pattern == PATTERN_EMPTY) {
-//          return 32;
-//        } else {
-//          return 0;
-//        }
-//      } else {
-//        return Long.bitCount(filter(bitmap, pattern));
-//      }
-            
+      // if (bitmap == 0) {
+      // if (pattern == PATTERN_EMPTY) {
+      // return 32;
+      // } else {
+      // return 0;
+      // }
+      // } else {
+      // return Long.bitCount(filter(bitmap, pattern));
+      // }
+
       long filteredBitmap = filter(bitmap, pattern);
-      
-//      if (filteredBitmap == 0) {
-//        if (pattern == PATTERN_EMPTY) {
-//          return 32;
-//        } else {
-//          return 0;
-//        }
-//      }  
-      
-      return Long.bitCount(filteredBitmap);      
+
+      // if (filteredBitmap == 0) {
+      // if (pattern == PATTERN_EMPTY) {
+      // return 32;
+      // } else {
+      // return 0;
+      // }
+      // }
+
+      return Long.bitCount(filteredBitmap);
     }
 
     @Override
     public final int[] arities() {
       return arities(bitmap);
     }
-    
+
     static final int[] arities(final long bitmap) {
-      int[] arities = new int[4];     
-      
+      int[] arities = new int[4];
+
       arities[0] = Long.bitCount(filter(bitmap, PATTERN_EMPTY));
       arities[1] = Long.bitCount(filter(bitmap, PATTERN_DATA_SINGLETON));
       arities[2] = Long.bitCount(filter(bitmap, PATTERN_DATA_COLLECTION));
       arities[3] = Long.bitCount(filter(bitmap, PATTERN_NODE));
-      
+
       return arities;
     }
 
@@ -1336,7 +1339,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
       return arities;
     }
-    
+
     static final int[] aritiesDoubleLoopOverInt(final long bitmap) {
       int[] arities = new int[4];
 
@@ -1355,7 +1358,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
       return arities;
     }
-    
+
     static final byte SIZE_EMPTY = 0b00;
     static final byte SIZE_ONE = 0b01;
     static final byte SIZE_MORE_THAN_ONE = 0b10;
@@ -1394,9 +1397,9 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
     @Override
     final int nodeArity() {
       return Long.bitCount(filter(bitmap, PATTERN_NODE));
-//      return arity(bitmap, PATTERN_NODE);
+      // return arity(bitmap, PATTERN_NODE);
 
-//      return cachedNodeArity;
+      // return cachedNodeArity;
     }
 
     @SuppressWarnings("unchecked")
@@ -1430,36 +1433,36 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
       // if (DEBUG) {
       int[] arities = arities(bitmap);
 
-      assert(TUPLE_LENGTH * arities[PATTERN_DATA_SINGLETON]
+      assert (TUPLE_LENGTH * arities[PATTERN_DATA_SINGLETON]
           + TUPLE_LENGTH * arities[PATTERN_DATA_COLLECTION] + arities[PATTERN_NODE] == slotArity());
 
       for (int i = 0; i < arities[PATTERN_DATA_SINGLETON]; i++) {
         int offset = i * TUPLE_LENGTH;
 
-        assert((getSlot(offset + 0) instanceof ImmutableSet) == false);
-        assert((getSlot(offset + 1) instanceof ImmutableSet) == false);
+        assert ((getSlot(offset + 0) instanceof ImmutableSet) == false);
+        assert ((getSlot(offset + 1) instanceof ImmutableSet) == false);
 
-        assert((getSlot(offset + 0) instanceof CompactSetMultimapNode) == false);
-        assert((getSlot(offset + 1) instanceof CompactSetMultimapNode) == false);
+        assert ((getSlot(offset + 0) instanceof CompactSetMultimapNode) == false);
+        assert ((getSlot(offset + 1) instanceof CompactSetMultimapNode) == false);
       }
 
       for (int i = 0; i < arities[PATTERN_DATA_COLLECTION]; i++) {
         int offset = (i + arities[PATTERN_DATA_SINGLETON]) * TUPLE_LENGTH;
 
-        assert((getSlot(offset + 0) instanceof ImmutableSet) == false);
-        assert((getSlot(offset + 1) instanceof ImmutableSet) == true);
+        assert ((getSlot(offset + 0) instanceof ImmutableSet) == false);
+        assert ((getSlot(offset + 1) instanceof ImmutableSet) == true);
 
-        assert((getSlot(offset + 0) instanceof CompactSetMultimapNode) == false);
-        assert((getSlot(offset + 1) instanceof CompactSetMultimapNode) == false);
+        assert ((getSlot(offset + 0) instanceof CompactSetMultimapNode) == false);
+        assert ((getSlot(offset + 1) instanceof CompactSetMultimapNode) == false);
       }
 
       for (int i = 0; i < arities[PATTERN_NODE]; i++) {
         int offset =
             (arities[PATTERN_DATA_SINGLETON] + arities[PATTERN_DATA_COLLECTION]) * TUPLE_LENGTH;
 
-        assert((getSlot(offset + i) instanceof ImmutableSet) == false);
+        assert ((getSlot(offset + i) instanceof ImmutableSet) == false);
 
-        assert((getSlot(offset + i) instanceof CompactSetMultimapNode) == true);
+        assert ((getSlot(offset + i) instanceof CompactSetMultimapNode) == true);
       }
     }
     // }
@@ -1915,7 +1918,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
     static final <K, V> CompactSetMultimapNode<K, V> mergeTwoSingletonPairs(final K key0,
         final V val0, final int keyHash0, final K key1, final V val1, final int keyHash1,
         final int shift) {
-      assert!(key0.equals(key1));
+      assert !(key0.equals(key1));
 
       if (shift >= HASH_CODE_LENGTH) {
         throw new IllegalStateException("Hash collision not yet fixed.");
@@ -1951,7 +1954,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
     static final <K, V> CompactSetMultimapNode<K, V> mergeCollectionAndSingletonPairs(final K key0,
         final AbstractSetNode<V> valColl0, final int keyHash0, final K key1, final V val1,
         final int keyHash1, final int shift) {
-      assert!(key0.equals(key1));
+      assert !(key0.equals(key1));
 
       if (shift >= HASH_CODE_LENGTH) {
         throw new IllegalStateException("Hash collision not yet fixed.");
@@ -2194,7 +2197,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
               return this;
             } else {
               // add new mapping
-              final AbstractSetNode<V> newCollVal = currentCollVal.updated(mutator, val, val.hashCode(), 0, SetResult.unchanged());
+              final AbstractSetNode<V> newCollVal =
+                  currentCollVal.updated(mutator, val, val.hashCode(), 0, SetResult.unchanged());
 
               details.modified();
               return copyAndSetCollectionValue(mutator, doubledBitpos, newCollVal);
@@ -2382,7 +2386,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
               // remove mapping
               details.updated(val);
 
-              final AbstractSetNode<V> newValColl = currentValColl.removed(mutator, val, val.hashCode(), 0, SetResult.unchanged());
+              final AbstractSetNode<V> newValColl =
+                  currentValColl.removed(mutator, val, val.hashCode(), 0, SetResult.unchanged());
 
               if (newValColl.size() == 1) {
                 // TODO: investigate options for unboxing singleton collections
@@ -2862,7 +2867,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
     private static final int MAX_DEPTH = 7;
 
-    protected AbstractSetMultimapNode<K, V> payloadNode;    
+    protected AbstractSetMultimapNode<K, V> payloadNode;
     protected long payloadOffset;
     protected long payloadOutOfBounds;
 
@@ -2872,30 +2877,30 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
         new AbstractSetMultimapNode[MAX_DEPTH];
 
     AbstractSetMultimapIteratorLowLevel(AbstractSetMultimapNode<K, V> rootNode) {
-//      int nodeArity = rootNode.nodeArity();
-//      int anyTupleArity = 32 - nodeArity - rootNode.emptyArity();     
-      
+      // int nodeArity = rootNode.nodeArity();
+      // int anyTupleArity = 32 - nodeArity - rootNode.emptyArity();
+
       int[] arities = rootNode.arities();
-      
+
       int nodeArity = arities[PATTERN_NODE];
       int anyTupleArity = 32 - nodeArity - arities[PATTERN_EMPTY];
-      
+
       long offsetPayload = CompactSetMultimapNode.arrayBase;
       long lengthPayload = anyTupleArity * 2 * addressSize;
 
       long offsetNodes = offsetPayload + lengthPayload;
       long lengthNodes = nodeArity * addressSize;
-      
+
       long offsetOutOfBounds = offsetNodes + lengthNodes;
-      
+
       if (nodeArity != 0) {
         stackLevel = 0;
 
         stackOfNodes[0] = rootNode;
         stackOfOffsetsAndOutOfBounds[0] = offsetNodes;
         stackOfOffsetsAndOutOfBounds[1] = offsetOutOfBounds;
-      }      
-      
+      }
+
       if (anyTupleArity != 0) {
         payloadNode = rootNode;
         payloadOffset = offsetPayload;
@@ -2919,22 +2924,22 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
               getFromObjectRegionAndCast(stackOfNodes[stackLevel], nodeCursorAddress);
           stackOfOffsetsAndOutOfBounds[currentCursorIndex] += addressSize;
 
-//          int nodeArity = nextNode.nodeArity();
-//          int anyTupleArity = 32 - nodeArity - nextNode.emptyArity();
+          // int nodeArity = nextNode.nodeArity();
+          // int anyTupleArity = 32 - nodeArity - nextNode.emptyArity();
 
           int[] arities = nextNode.arities();
-          
+
           int nodeArity = arities[PATTERN_NODE];
           int anyTupleArity = 32 - nodeArity - arities[PATTERN_EMPTY];
-          
+
           long offsetPayload = CompactSetMultimapNode.arrayBase;
           long lengthPayload = anyTupleArity * 2 * addressSize;
 
           long offsetNodes = offsetPayload + lengthPayload;
           long lengthNodes = nodeArity * addressSize;
-          
+
           long offsetOutOfBounds = offsetNodes + lengthNodes;
-          
+
           if (nodeArity != 0) {
             /*
              * put node on next stack level for depth-first traversal
@@ -2952,12 +2957,12 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
             /*
              * found next node that contains values
              */
-            payloadNode = nextNode;            
+            payloadNode = nextNode;
             payloadOffset = offsetPayload;
             payloadOutOfBounds = offsetNodes;
-            
+
             return true;
-          }          
+          }
         } else {
           stackLevel--;
         }
@@ -2985,16 +2990,16 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
   @SuppressWarnings("unchecked")
   private static abstract class AbstractSetMultimapIteratorHistogram<K, V> {
 
-    private static final int MAX_DEPTH = 7;    
-            
-    protected AbstractSetMultimapNode<K, V> payloadNode;    
+    private static final int MAX_DEPTH = 7;
+
+    protected AbstractSetMultimapNode<K, V> payloadNode;
     protected int payloadCursorX;
-    protected int payloadCursorY;    
+    protected int payloadCursorY;
     protected long payloadOffset;
-    
+
     protected int[] histogram;
     protected int payloadRemaining;
-    
+
     private int stackLevel = -1;
     private final long[] stackOfOffsetsAndOutOfBounds = new long[MAX_DEPTH * 2];
     private final AbstractSetMultimapNode<K, V>[] stackOfNodes =
@@ -3008,38 +3013,38 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
       long offsetPayload = CompactSetMultimapNode.arrayBase;
       long lengthPayload = anyTupleArity * 2 * addressSize;
-      
+
       if (nodeArity != 0) {
         stackLevel = 0;
 
         long offsetNodes = offsetPayload + lengthPayload;
-        long lengthNodes = nodeArity * addressSize;        
-        
+        long lengthNodes = nodeArity * addressSize;
+
         stackOfNodes[0] = rootNode;
         stackOfOffsetsAndOutOfBounds[0] = offsetNodes;
         stackOfOffsetsAndOutOfBounds[1] = offsetNodes + lengthNodes;
-      }      
-      
+      }
+
       if (anyTupleArity != 0) {
         payloadRemaining = anyTupleArity;
-        
+
         payloadNode = rootNode;
         payloadCursorX = PATTERN_DATA_SINGLETON;
         payloadCursorY = 0;
-                
+
         payloadOffset = offsetPayload;
       }
-      
+
       histogram = arities;
     }
 
     private boolean searchNextPayloadCategory() {
       while (histogram[++payloadCursorX] == 0);
       payloadCursorY = 0;
-      
+
       return true;
     }
-    
+
     /*
      * search for next node that contains values
      */
@@ -3057,13 +3062,13 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
           stackOfOffsetsAndOutOfBounds[currentCursorIndex] += addressSize;
 
           int[] arities = nextNode.arities();
-          
+
           int nodeArity = arities[PATTERN_NODE];
           int anyTupleArity = 32 - nodeArity - arities[PATTERN_EMPTY];
-          
+
           long offsetPayload = CompactSetMultimapNode.arrayBase;
-          long lengthPayload = anyTupleArity * 2 * addressSize;         
-          
+          long lengthPayload = anyTupleArity * 2 * addressSize;
+
           if (nodeArity != 0) {
             /*
              * put node on next stack level for depth-first traversal
@@ -3074,7 +3079,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
 
             long offsetNodes = offsetPayload + lengthPayload;
             long lengthNodes = nodeArity * addressSize;
-            
+
             stackOfNodes[nextStackLevel] = nextNode;
             stackOfOffsetsAndOutOfBounds[nextCursorIndex] = offsetNodes;
             stackOfOffsetsAndOutOfBounds[nextLengthIndex] = offsetNodes + lengthNodes;
@@ -3086,15 +3091,15 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
              */
             histogram = arities;
             payloadRemaining = anyTupleArity;
-            
+
             payloadNode = nextNode;
             payloadCursorX = PATTERN_DATA_SINGLETON;
             payloadCursorY = 0;
-            
+
             payloadOffset = offsetPayload;
-            
+
             return true;
-          }          
+          }
         } else {
           stackLevel--;
         }
@@ -3116,10 +3121,10 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
     public void remove() {
       throw new UnsupportedOperationException();
     }
-  }  
-  
-  protected static class SetMultimapKeyIteratorHistogram<K, V> extends AbstractSetMultimapIteratorHistogram<K, V>
-      implements Iterator<K> {
+  }
+
+  protected static class SetMultimapKeyIteratorHistogram<K, V>
+      extends AbstractSetMultimapIteratorHistogram<K, V> implements Iterator<K> {
 
     SetMultimapKeyIteratorHistogram(AbstractSetMultimapNode<K, V> rootNode) {
       super(rootNode);
@@ -3134,7 +3139,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
           case PATTERN_DATA_SINGLETON:
           case PATTERN_DATA_COLLECTION:
             long nextOffset = payloadOffset;
-            
+
             payloadCursorY += 1;
             payloadRemaining -= 1;
             payloadOffset = nextOffset + 2 * addressSize;
@@ -3149,7 +3154,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
   }
 
   protected static class SetMultimapKeyIteratorLowLevel<K, V>
-      extends AbstractSetMultimapIteratorLowLevel<K, V>implements Iterator<K> {
+      extends AbstractSetMultimapIteratorLowLevel<K, V> implements Iterator<K> {
 
     SetMultimapKeyIteratorLowLevel(AbstractSetMultimapNode<K, V> rootNode) {
       super(rootNode);
@@ -3161,18 +3166,18 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
         throw new NoSuchElementException();
       } else {
         long nextOffset = payloadOffset;
-        
+
         K nextKey = getFromObjectRegionAndCast(payloadNode, nextOffset);
-        payloadOffset =  nextOffset + 2 * addressSize;
+        payloadOffset = nextOffset + 2 * addressSize;
 
         return nextKey;
       }
     }
 
   }
-  
+
   protected static class SetMultimapNativeTupleIteratorLowLevel<K, V>
-      extends AbstractSetMultimapIteratorLowLevel<K, V>implements Iterator<Map.Entry<K, Object>> {
+      extends AbstractSetMultimapIteratorLowLevel<K, V> implements Iterator<Map.Entry<K, Object>> {
 
     SetMultimapNativeTupleIteratorLowLevel(AbstractSetMultimapNode<K, V> rootNode) {
       super(rootNode);
@@ -3184,7 +3189,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
         throw new NoSuchElementException();
       } else {
         long nextOffset = payloadOffset;
-        
+
         K nextKey = getFromObjectRegionAndCast(payloadNode, nextOffset);
         nextOffset += addressSize;
         Object nextVal = getFromObjectRegion(payloadNode, nextOffset);
@@ -3245,8 +3250,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
       }
     }
 
-  }  
-    
+  }
+
   protected static class SetMultimapValueIterator<K, V> extends AbstractSetMultimapIterator<K, V>
       implements Iterator<AbstractSetNode<V>> {
 
@@ -3271,7 +3276,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
   }
 
   protected static class SetMultimapNativeTupleIterator<K, V>
-      extends AbstractSetMultimapIterator<K, V>implements Iterator<Map.Entry<K, Object>> {
+      extends AbstractSetMultimapIterator<K, V> implements Iterator<Map.Entry<K, Object>> {
 
     SetMultimapNativeTupleIterator(AbstractSetMultimapNode<K, V> rootNode) {
       super(rootNode);
@@ -3940,7 +3945,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> implements
       }
 
       mutator.set(null);
-      return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(rootNode, hashCode, cachedSize);
+      return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(rootNode, hashCode,
+          cachedSize);
     }
   }
 

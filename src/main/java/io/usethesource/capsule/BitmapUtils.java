@@ -14,7 +14,8 @@ public final class BitmapUtils {
       !USE_SELF_WRITTEN_POPULATION_COUNT && false;
 
   public static final long filter00(long bitmap) {
-    return ((bitmap & 0x5555555555555555L) ^ 0x5555555555555555L) & (((bitmap >> 1) & 0x5555555555555555L) ^ 0x5555555555555555L);        
+    return ((bitmap & 0x5555555555555555L) ^ 0x5555555555555555L)
+        & (((bitmap >> 1) & 0x5555555555555555L) ^ 0x5555555555555555L);
   }
 
   public static final long filter01(long bitmap) {
@@ -30,7 +31,7 @@ public final class BitmapUtils {
   public static final long filter11(long bitmap) {
     return (bitmap & 0x5555555555555555L) & ((bitmap >> 1) & 0x5555555555555555L);
   }
-  
+
   public static final long filter(long bitmap, int pattern) {
     switch (pattern) {
       case 0b00:
@@ -109,9 +110,10 @@ public final class BitmapUtils {
       return index;
     }
   }
-  
+
   public static final long populationCountPattern00(long v) {
-    long c = ((v & 0x5555555555555555L) ^ 0x5555555555555555L) & (((v >> 1) & 0x5555555555555555L) ^ 0x5555555555555555L);
+    long c = ((v & 0x5555555555555555L) ^ 0x5555555555555555L)
+        & (((v >> 1) & 0x5555555555555555L) ^ 0x5555555555555555L);
     c = (c & 0x3333333333333333L) + ((c >> 2) & 0x3333333333333333L);
     c = (c & 0x0F0F0F0F0F0F0F0FL) + ((c >> 4) & 0x0F0F0F0F0F0F0F0FL);
     c = (c & 0x00FF00FF00FF00FFL) + ((c >> 8) & 0x00FF00FF00FF00FFL);

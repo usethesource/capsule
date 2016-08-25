@@ -60,7 +60,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
     for (V value : values) {
       result = result.__insert(key, value);
     }
-    
+
     return result;
   }
 
@@ -218,7 +218,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
 
     return this;
   }
-  
+
   public ImmutableSetMultimap<K, V> __insert(final K key, final V val) {
     return __put(key, val); // NOTE: semantically incorrect
   }
@@ -228,7 +228,8 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
     throw new UnsupportedOperationException();
   }
 
-  public ImmutableSetMultimap<K, V> __insertAll(final SetMultimap_Legacy<? extends K, ? extends V> map) {
+  public ImmutableSetMultimap<K, V> __insertAll(
+      final SetMultimap_Legacy<? extends K, ? extends V> map) {
     final TransientSetMultimap<K, V> tmpTransient = this.asTransient();
     tmpTransient.__insertAll(map);
     return tmpTransient.freeze();
@@ -320,10 +321,10 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
   public Iterator<Map.Entry<K, V>> entryIterator() {
     return new MapEntryIterator<>(rootNode);
   }
-  
+
   public Iterator<Map.Entry<K, Object>> nativeEntryIterator() {
     return (Iterator<Map.Entry<K, Object>>) (Object) new MapEntryIterator<>(rootNode);
-  }  
+  }
 
   @Override
   public <T> Iterator<T> tupleIterator(BiFunction<K, V, T> tupleOf) {
@@ -886,7 +887,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
 
     static final <K, V> CompactMapNode<K, V> mergeTwoKeyValPairs(final K key0, final V val0,
         final int keyHash0, final K key1, final V val1, final int keyHash1, final int shift) {
-      assert!(key0.equals(key1));
+      assert !(key0.equals(key1));
 
       if (shift >= HASH_CODE_LENGTH) {
         // throw new
@@ -1360,14 +1361,14 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
 
       if (DEBUG) {
 
-        assert(TUPLE_LENGTH * java.lang.Integer.bitCount(dataMap)
+        assert (TUPLE_LENGTH * java.lang.Integer.bitCount(dataMap)
             + java.lang.Integer.bitCount(nodeMap) == nodes.length);
 
         for (int i = 0; i < TUPLE_LENGTH * payloadArity(); i++) {
-          assert((nodes[i] instanceof CompactMapNode) == false);
+          assert ((nodes[i] instanceof CompactMapNode) == false);
         }
         for (int i = TUPLE_LENGTH * payloadArity(); i < nodes.length; i++) {
-          assert((nodes[i] instanceof CompactMapNode) == true);
+          assert ((nodes[i] instanceof CompactMapNode) == true);
         }
       }
 

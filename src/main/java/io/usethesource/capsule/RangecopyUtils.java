@@ -24,14 +24,14 @@ public final class RangecopyUtils {
     }
   }
 
-  public static final <T> T allocateHeapRegion(final Class<? extends T>[][] lookupTable, final int dim1,
-      final int dim2) {
+  public static final <T> T allocateHeapRegion(final Class<? extends T>[][] lookupTable,
+      final int dim1, final int dim2) {
     final Class<? extends T> clazz = lookupTable[dim1][dim2];
     return allocateHeapRegion(clazz);
   }
-  
-  public static final boolean _do_rangecompareObjectRegion(Object src, Object dst,
-      long offset, int length) {
+
+  public static final boolean _do_rangecompareObjectRegion(Object src, Object dst, long offset,
+      int length) {
     long strideSizeInBytes = addressSize;
 
     for (int i = 0; i < length; i++) {
@@ -47,7 +47,7 @@ public final class RangecopyUtils {
 
     return true;
   }
-    
+
   /*
    * final Object[] src = this.nodes; final Object[] dst = (Object[]) new Object[src.length];
    * 
@@ -62,11 +62,13 @@ public final class RangecopyUtils {
    */
 
   @Deprecated
-  public final static void __setInIntRegion(Object dst, long dstRegionOffset, int dstPos, int value) {
+  public final static void __setInIntRegion(Object dst, long dstRegionOffset, int dstPos,
+      int value) {
     unsafe.putInt(dst, dstRegionOffset + dstPos * addressSize, value);
   }
 
-  public final static long setInIntRegionVarArgs(Object dst, long dstOffset, int value0, int value1) {
+  public final static long setInIntRegionVarArgs(Object dst, long dstOffset, int value0,
+      int value1) {
     long strideSizeInBytes = 4;
 
     unsafe.putInt(dst, dstOffset, value0);
@@ -89,9 +91,9 @@ public final class RangecopyUtils {
 
   public final static long setInObjectRegionVarArgs(Object dst, long dstOffset, Object value0,
       Object value1) {
-//    System.out.println(org.openjdk.jol.util.VMSupport.vmDetails());
-//    System.out.println(org.openjdk.jol.info.ClassLayout.parseClass(dst.getClass()).toPrintable());
-    
+    // System.out.println(org.openjdk.jol.util.VMSupport.vmDetails());
+    // System.out.println(org.openjdk.jol.info.ClassLayout.parseClass(dst.getClass()).toPrintable());
+
     long strideSizeInBytes = addressSize;
 
     unsafe.putObject(dst, dstOffset, value0);
@@ -121,42 +123,44 @@ public final class RangecopyUtils {
     unsafe.putObject(dst, dstRegionOffset + dstPos * 4, value);
   }
 
-  public final static void setInObjectRegion(Object dst, long dstRegionOffset, int dstPos, Object value) {
+  public final static void setInObjectRegion(Object dst, long dstRegionOffset, int dstPos,
+      Object value) {
     unsafe.putObject(dst, dstRegionOffset + dstPos * addressSize, value);
   }
 
   public final static Object getFromObjectRegion(Object dst, long dstOffset) {
     return unsafe.getObject(dst, dstOffset);
   }
-  
+
   @SuppressWarnings("unchecked")
   public final static <T> T getFromObjectRegionAndCast(Object dst, long dstOffset) {
     return (T) unsafe.getObject(dst, dstOffset);
   }
-  
+
   public final static Object getFromObjectRegion(Object dst, long dstRegionOffset, int dstPos) {
     return unsafe.getObject(dst, dstRegionOffset + dstPos * addressSize);
   }
-  
+
   @SuppressWarnings("unchecked")
-  public final static <T> T getFromObjectRegionAndCast(Object dst, long dstRegionOffset, int dstPos) {
+  public final static <T> T getFromObjectRegionAndCast(Object dst, long dstRegionOffset,
+      int dstPos) {
     return (T) unsafe.getObject(dst, dstRegionOffset + dstPos * addressSize);
   }
-  
+
   @SuppressWarnings("unchecked")
   public final static <T> T uncheckedCast(Object o) {
     return (T) o;
   }
 
   public static final boolean USE_NEXT_CLASS_ARRAY = false;
-  
+
   private static final boolean IS_COPY_MEMORY_SUPPORTED;
 
   private static final boolean USE_COPY_MEMORY;
-  
+
   static {
     IS_COPY_MEMORY_SUPPORTED = isCopyMemorySupported();
-    
+
     if (IS_COPY_MEMORY_SUPPORTED) {
       System.err.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
           "isSunMiscUnsafeCopyMemorySupported", "true"));
@@ -164,10 +168,10 @@ public final class RangecopyUtils {
       System.err.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
           "isSunMiscUnsafeCopyMemorySupported", "false"));
     }
-    
+
     USE_COPY_MEMORY = IS_COPY_MEMORY_SUPPORTED && !Boolean.getBoolean(
         String.format("%s.%s", RangecopyUtils.class.getName(), "dontUseSunMiscUnsafeCopyMemory"));
-    
+
     if (USE_COPY_MEMORY) {
       System.err.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
           "useSunMiscUnsafeCopyMemory", "true"));
@@ -176,9 +180,9 @@ public final class RangecopyUtils {
           "useSunMiscUnsafeCopyMemory", "false"));
     }
   }
-  
-  public static final long rangecopyPrimitiveRegion(Object src, long srcOffset, Object dst, long dstOffset,
-      long sizeInBytes) {
+
+  public static final long rangecopyPrimitiveRegion(Object src, long srcOffset, Object dst,
+      long dstOffset, long sizeInBytes) {
     if (sizeInBytes != 0) {
       if (USE_COPY_MEMORY) {
         unsafe.copyMemory(src, srcOffset, dst, dstOffset, sizeInBytes);
@@ -197,67 +201,68 @@ public final class RangecopyUtils {
     return sizeInBytes;
   }
 
-//  public static final long rangecopyObjectRegion(Object src, long srcOffset, Object dst, long dstOffset,
-//      int length) {
-////    if (length == 0) {
-////      return 0;
-////    }
-//    
-//    if (USE_COPY_MEMORY) {
-//      long sizeInBytes = length * addressSize;
-//      if (sizeInBytes != 0)
-//        unsafe.copyMemory(src, srcOffset, dst, dstOffset, sizeInBytes);
-//      return sizeInBytes;
-//    } else {
-//      long strideSizeInBytes = addressSize;
-//      long sizeInBytes = length * strideSizeInBytes;
-//
-//      for (int i = 0; i < length; i++) {
-//        unsafe.putObject(dst, dstOffset, unsafe.getObject(src, srcOffset));
-//        srcOffset += strideSizeInBytes;
-//        dstOffset += strideSizeInBytes;
-//      }
-//
-//      return sizeInBytes;
-//    }
-//  }
+  // public static final long rangecopyObjectRegion(Object src, long srcOffset, Object dst, long
+  // dstOffset,
+  // int length) {
+  //// if (length == 0) {
+  //// return 0;
+  //// }
+  //
+  // if (USE_COPY_MEMORY) {
+  // long sizeInBytes = length * addressSize;
+  // if (sizeInBytes != 0)
+  // unsafe.copyMemory(src, srcOffset, dst, dstOffset, sizeInBytes);
+  // return sizeInBytes;
+  // } else {
+  // long strideSizeInBytes = addressSize;
+  // long sizeInBytes = length * strideSizeInBytes;
+  //
+  // for (int i = 0; i < length; i++) {
+  // unsafe.putObject(dst, dstOffset, unsafe.getObject(src, srcOffset));
+  // srcOffset += strideSizeInBytes;
+  // dstOffset += strideSizeInBytes;
+  // }
+  //
+  // return sizeInBytes;
+  // }
+  // }
 
-  public static final long rangecopyObjectRegion(Object src, long srcRegionOffset, int srcPos, Object dst,
-      long dstRegionOffset, int dstPos, int length) {
+  public static final long rangecopyObjectRegion(Object src, long srcRegionOffset, int srcPos,
+      Object dst, long dstRegionOffset, int dstPos, int length) {
     if (length == 0) {
       return 0L;
     }
 
     long strideSizeInBytes = addressSize;
-    return _do_rangecopyObjectRegion(src, srcRegionOffset + srcPos * strideSizeInBytes, dst, dstRegionOffset + dstPos * strideSizeInBytes, length);
+    return _do_rangecopyObjectRegion(src, srcRegionOffset + srcPos * strideSizeInBytes, dst,
+        dstRegionOffset + dstPos * strideSizeInBytes, length);
   }
 
-  public static final long rangecopyObjectRegion(Object src, Object dst, long offset,
-      int length) {
+  public static final long rangecopyObjectRegion(Object src, Object dst, long offset, int length) {
     if (length == 0) {
       return 0L;
     }
-    
+
     return _do_rangecopyObjectRegion(src, dst, offset, length);
-    
-//    _do_rangecopyObjectRegion(src, srcOffset, dst, dstOffset, length);
-//    return length * addressSize;
-  }  
-  
-  public static final long rangecopyObjectRegion(Object src, long srcOffset, Object dst, long dstOffset,
-      int length) {
+
+    // _do_rangecopyObjectRegion(src, srcOffset, dst, dstOffset, length);
+    // return length * addressSize;
+  }
+
+  public static final long rangecopyObjectRegion(Object src, long srcOffset, Object dst,
+      long dstOffset, int length) {
     if (length == 0) {
       return 0L;
     }
-    
+
     return _do_rangecopyObjectRegion(src, srcOffset, dst, dstOffset, length);
-    
-//    _do_rangecopyObjectRegion(src, srcOffset, dst, dstOffset, length);
-//    return length * addressSize;
-  }  
-  
-  public static final long _do_rangecopyObjectRegion(Object src, Object dst,
-      long offset, int length) {
+
+    // _do_rangecopyObjectRegion(src, srcOffset, dst, dstOffset, length);
+    // return length * addressSize;
+  }
+
+  public static final long _do_rangecopyObjectRegion(Object src, Object dst, long offset,
+      int length) {
     if (USE_COPY_MEMORY) {
       long strideSizeInBytes = addressSize;
       long sizeInBytes = length * strideSizeInBytes;
@@ -272,10 +277,10 @@ public final class RangecopyUtils {
       }
       return sizeInBytes;
     }
-    
-//    return sizeInBytes;
+
+    // return sizeInBytes;
   }
-  
+
   public static final long _do_rangecopyObjectRegion(Object src, long srcOffset, Object dst,
       long dstOffset, int length) {
     if (USE_COPY_MEMORY) {
@@ -293,57 +298,59 @@ public final class RangecopyUtils {
       }
       return sizeInBytes;
     }
-    
-//    return sizeInBytes;
-  }
-  
-//  public static final long rangecopyIntRegion(Object src, long srcOffset, Object dst, long dstOffset,
-//      int length) {
-////    if (length == 0) {
-////      return 0;
-////    }
-//
-//    if (USE_COPY_MEMORY) {
-//      long sizeInBytes = length * 4L;
-//      if (sizeInBytes != 0)
-//        unsafe.copyMemory(src, srcOffset, dst, dstOffset, sizeInBytes);
-//      return sizeInBytes;
-//    } else {
-//      long strideSizeInBytes = 4;
-//      long offset = srcOffset;
-//
-//      for (int i = 0; i < length; i++) {
-//        unsafe.putInt(dst, dstOffset, unsafe.getInt(src, srcOffset));
-//        srcOffset += strideSizeInBytes;
-//        dstOffset += strideSizeInBytes;
-//      }
-//
-//      return offset - srcOffset;
-//    }
-//  }
 
-  public static final long rangecopyIntRegion(Object src, long srcRegionOffset, int srcPos, Object dst,
-      long dstRegionOffset, int dstPos, int length) {
+    // return sizeInBytes;
+  }
+
+  // public static final long rangecopyIntRegion(Object src, long srcOffset, Object dst, long
+  // dstOffset,
+  // int length) {
+  //// if (length == 0) {
+  //// return 0;
+  //// }
+  //
+  // if (USE_COPY_MEMORY) {
+  // long sizeInBytes = length * 4L;
+  // if (sizeInBytes != 0)
+  // unsafe.copyMemory(src, srcOffset, dst, dstOffset, sizeInBytes);
+  // return sizeInBytes;
+  // } else {
+  // long strideSizeInBytes = 4;
+  // long offset = srcOffset;
+  //
+  // for (int i = 0; i < length; i++) {
+  // unsafe.putInt(dst, dstOffset, unsafe.getInt(src, srcOffset));
+  // srcOffset += strideSizeInBytes;
+  // dstOffset += strideSizeInBytes;
+  // }
+  //
+  // return offset - srcOffset;
+  // }
+  // }
+
+  public static final long rangecopyIntRegion(Object src, long srcRegionOffset, int srcPos,
+      Object dst, long dstRegionOffset, int dstPos, int length) {
     if (length == 0) {
       return 0L;
     }
 
     long strideSizeInBytes = 4L;
-    return _do_rangecopyIntRegion(src, srcRegionOffset + srcPos * strideSizeInBytes, dst, dstRegionOffset + dstPos * strideSizeInBytes, length);
+    return _do_rangecopyIntRegion(src, srcRegionOffset + srcPos * strideSizeInBytes, dst,
+        dstRegionOffset + dstPos * strideSizeInBytes, length);
   }
-  
+
   public static final long rangecopyIntRegion(Object src, long srcOffset, Object dst,
       long dstOffset, int length) {
     if (length == 0) {
       return 0L;
     }
 
-//    return _do_rangecopyIntRegion(src, srcOffset, dst, dstOffset, length);
-    
+    // return _do_rangecopyIntRegion(src, srcOffset, dst, dstOffset, length);
+
     _do_rangecopyIntRegion(src, srcOffset, dst, dstOffset, length);
     return length * 4L;
-  }  
-  
+  }
+
   public static final long _do_rangecopyIntRegion(Object src, long srcOffset, Object dst,
       long dstOffset, int length) {
     long strideSizeInBytes = 4L;
@@ -358,12 +365,12 @@ public final class RangecopyUtils {
         dstOffset += strideSizeInBytes;
       }
     }
-    
-    return sizeInBytes;    
-  }    
-  
-  public static final long __rangecopyObjectRegion(Object src, long srcOffset, Object dst, long dstOffset,
-      long sizeInBytes) {
+
+    return sizeInBytes;
+  }
+
+  public static final long __rangecopyObjectRegion(Object src, long srcOffset, Object dst,
+      long dstOffset, long sizeInBytes) {
     if (sizeInBytes != 0) {
       if (USE_COPY_MEMORY) {
         unsafe.copyMemory(src, srcOffset, dst, dstOffset, sizeInBytes);
@@ -380,7 +387,8 @@ public final class RangecopyUtils {
     return sizeInBytes;
   }
 
-  public static final void __rangecopyObjectRegion(Object src, Object dst, long offset, long sizeInBytes) {
+  public static final void __rangecopyObjectRegion(Object src, Object dst, long offset,
+      long sizeInBytes) {
     if (USE_COPY_MEMORY) {
       unsafe.copyMemory(src, offset, dst, offset, sizeInBytes);
     } else {
@@ -394,8 +402,8 @@ public final class RangecopyUtils {
   }
 
   @Deprecated
-  public static final void __rangecopyIntRegion(Object src, long srcRegionOffset, int srcPos, Object dst,
-      long dstRegionOffset, int dstPos, int length) {
+  public static final void __rangecopyIntRegion(Object src, long srcRegionOffset, int srcPos,
+      Object dst, long dstRegionOffset, int dstPos, int length) {
     if (length != 0) {
       int strideSizeInBytes = 4;
 
@@ -420,26 +428,27 @@ public final class RangecopyUtils {
     return addressSize;
   }
 
-//  public static final void rangecopyObjectRegion(Object src, long srcRegionOffset, int srcPos, Object dst,
-//      long dstRegionOffset, int dstPos, int length) {
-//    if (length != 0) {
-//      long strideSizeInBytes = addressSize;
-//
-//      if (USE_COPY_MEMORY) {
-//        unsafe.copyMemory(src, srcRegionOffset + srcPos * strideSizeInBytes, dst,
-//            dstRegionOffset + dstPos * strideSizeInBytes, length * strideSizeInBytes);
-//      } else {
-//        long srcOffset = srcRegionOffset + srcPos * strideSizeInBytes;
-//        long dstOffset = dstRegionOffset + dstPos * strideSizeInBytes;
-//
-//        for (int i = 0; i < length; i++) {
-//          unsafe.putObject(dst, dstOffset, unsafe.getObject(src, srcOffset));
-//          srcOffset += strideSizeInBytes;
-//          dstOffset += strideSizeInBytes;
-//        }
-//      }
-//    }
-//  }
+  // public static final void rangecopyObjectRegion(Object src, long srcRegionOffset, int srcPos,
+  // Object dst,
+  // long dstRegionOffset, int dstPos, int length) {
+  // if (length != 0) {
+  // long strideSizeInBytes = addressSize;
+  //
+  // if (USE_COPY_MEMORY) {
+  // unsafe.copyMemory(src, srcRegionOffset + srcPos * strideSizeInBytes, dst,
+  // dstRegionOffset + dstPos * strideSizeInBytes, length * strideSizeInBytes);
+  // } else {
+  // long srcOffset = srcRegionOffset + srcPos * strideSizeInBytes;
+  // long dstOffset = dstRegionOffset + dstPos * strideSizeInBytes;
+  //
+  // for (int i = 0; i < length; i++) {
+  // unsafe.putObject(dst, dstOffset, unsafe.getObject(src, srcOffset));
+  // srcOffset += strideSizeInBytes;
+  // dstOffset += strideSizeInBytes;
+  // }
+  // }
+  // }
+  // }
 
   // static final void __rangecopyObjectRegion(long regionOffset, Object src, int srcPos, Object
   // dst,
@@ -529,7 +538,7 @@ public final class RangecopyUtils {
   public static byte nodeMap(byte rawMap1, byte rawMap2, byte rareMap) {
     return (byte) (Byte.toUnsignedInt(rawMap1) ^ Byte.toUnsignedInt(rareMap));
   }
-  
+
   public static byte dataMap(byte rawMap1, byte rawMap2) {
     return (byte) (Byte.toUnsignedInt(rawMap2) ^ Byte.toUnsignedInt(rareMap(rawMap1, rawMap2)));
   }
@@ -537,7 +546,7 @@ public final class RangecopyUtils {
   public static byte dataMap(byte rawMap1, byte rawMap2, byte rareMap) {
     return (byte) (Byte.toUnsignedInt(rawMap2) ^ Byte.toUnsignedInt(rareMap));
   }
-  
+
   public static byte rareMap(byte rawMap1, byte rawMap2) {
     return (byte) (Byte.toUnsignedInt(rawMap1) & Byte.toUnsignedInt(rawMap2));
   }
@@ -597,19 +606,20 @@ public final class RangecopyUtils {
     final long arrayOffsetLast;
 
     final long nodeBase;
-    
-    public Companion(int nodeArity, int payloadArity, int slotArity, int untypedSlotArity, long rareBase, long arrayOffsetLast, long nodeBase) {
+
+    public Companion(int nodeArity, int payloadArity, int slotArity, int untypedSlotArity,
+        long rareBase, long arrayOffsetLast, long nodeBase) {
       this.nodeArity = nodeArity;
       this.payloadArity = payloadArity;
       this.slotArity = slotArity;
       this.untypedSlotArity = untypedSlotArity;
       this.rareBase = rareBase;
       this.arrayOffsetLast = arrayOffsetLast;
-      this.nodeBase = nodeBase;          
-    }   
-    
+      this.nodeBase = nodeBase;
+    }
+
   }
-  
+
   public abstract static class ArrayView {
 
     public ArrayView(final Object base, final long offset, final int length) {
@@ -621,7 +631,7 @@ public final class RangecopyUtils {
     final Object base;
     final long offset;
     final int length;
-    
+
     abstract Class<?> getElementType();
     // abstract int getElementTypeLength();
 
@@ -648,7 +658,7 @@ public final class RangecopyUtils {
     void set(int idx, Object value) {
       setInObjectRegion(base, offset, idx, value);
     }
-    
+
   }
 
   public static class IntArrayView extends ArrayView {
@@ -666,36 +676,33 @@ public final class RangecopyUtils {
     // int getElementTypeLength() {
     // return ...;
     // }
-    
+
     @Override
     void set(int idx, Object value) {
       if (!(value instanceof Integer)) {
         throw new IllegalArgumentException();
-      } 
-      
+      }
+
       setInIntRegion(base, offset, idx, (Integer) value);
-    }    
+    }
 
   }
 
   /*
-    final ArrayView getIntArrayView() {
-      final Class<?> clazz = this.getClass();
-      final int payloadArity = unsafe.getInt(clazz, globalPayloadArityOffset);
-      
-      return new IntArrayView(this, arrayBase, payloadArity * TUPLE_LENGTH);      
-    }
-    
-    final ArrayView getObjectArrayView() {
-      final Class<?> clazz = this.getClass();
-      final int untypedSlotArity = unsafe.getInt(clazz, globalUntypedSlotArityOffset);
-      final long rareBase = unsafe.getLong(clazz, globalRareBaseOffset);
-
-      return new ObjectArrayView(this, rareBase, untypedSlotArity);
-    }      
+   * final ArrayView getIntArrayView() { final Class<?> clazz = this.getClass(); final int
+   * payloadArity = unsafe.getInt(clazz, globalPayloadArityOffset);
+   * 
+   * return new IntArrayView(this, arrayBase, payloadArity * TUPLE_LENGTH); }
+   * 
+   * final ArrayView getObjectArrayView() { final Class<?> clazz = this.getClass(); final int
+   * untypedSlotArity = unsafe.getInt(clazz, globalUntypedSlotArityOffset); final long rareBase =
+   * unsafe.getLong(clazz, globalRareBaseOffset);
+   * 
+   * return new ObjectArrayView(this, rareBase, untypedSlotArity); }
    */
-  
-  public static final void arrayviewcopyObject(Object src, int srcPos, Object dst, int dstPos, int length) {
+
+  public static final void arrayviewcopyObject(Object src, int srcPos, Object dst, int dstPos,
+      int length) {
     if (length != 0) {
       ArrayView srcView = (ArrayView) src;
       ArrayView dstView = (ArrayView) dst;
@@ -704,8 +711,9 @@ public final class RangecopyUtils {
           dstView.offset + dstPos * addressSize, length);
     }
   }
-  
-  public static final void arrayviewcopyInt(Object src, int srcPos, Object dst, int dstPos, int length) {
+
+  public static final void arrayviewcopyInt(Object src, int srcPos, Object dst, int dstPos,
+      int length) {
     if (length != 0) {
       ArrayView srcView = (ArrayView) src;
       ArrayView dstView = (ArrayView) dst;
@@ -713,19 +721,19 @@ public final class RangecopyUtils {
       _do_rangecopyIntRegion(srcView.base, srcView.offset + srcPos * addressSize, dstView.base,
           dstView.offset + dstPos * addressSize, length);
     }
-  }  
-  
+  }
+
   public static final void arrayviewcopy(Object src, int srcPos, Object dst, int dstPos,
       int length) {
     if (length != 0) {
-//      if (!(src instanceof ArrayView && dst instanceof ArrayView))
-//        throw new IllegalArgumentException();
+      // if (!(src instanceof ArrayView && dst instanceof ArrayView))
+      // throw new IllegalArgumentException();
 
       ArrayView srcView = (ArrayView) src;
       ArrayView dstView = (ArrayView) dst;
 
-//      if (!(srcView.getElementType() == dstView.getElementType()))
-//        throw new IllegalArgumentException();
+      // if (!(srcView.getElementType() == dstView.getElementType()))
+      // throw new IllegalArgumentException();
 
       if (srcView.getElementType() == Object.class) {
         _do_rangecopyObjectRegion(srcView.base, srcView.offset + srcPos * addressSize, dstView.base,
@@ -736,79 +744,79 @@ public final class RangecopyUtils {
       }
     }
   }
-  
-//  public static final long _do_rangecopyObjectRegion(Object src, long srcOffset, Object dst,
-//      long dstOffset, int length) {
-//    if (USE_COPY_MEMORY) {
-//      long strideSizeInBytes = addressSize;
-//      long sizeInBytes = length * strideSizeInBytes;
-//      unsafe.copyMemory(src, srcOffset, dst, dstOffset, sizeInBytes);
-//      return sizeInBytes;
-//    } else {
-//      long strideSizeInBytes = addressSize;
-//      long sizeInBytes = length * strideSizeInBytes;
-//      for (int i = 0; i < length; i++) {
-//        unsafe.putObject(dst, dstOffset, unsafe.getObject(src, srcOffset));
-//        srcOffset += strideSizeInBytes;
-//        dstOffset += strideSizeInBytes;
-//      }
-//      return sizeInBytes;
-//    }
-//    
-////    return sizeInBytes;
-//  }
-    
-  
-//long offset = src1.offset;
-//
-//offset += rangecopyObjectRegion(src2.base, offset, dst2.base, offset, idxOld2);
-//offset += rangecopyObjectRegion(src2.base, offset + sizeOfObject() * TUPLE_LENGTH, dst2.base, offset, idxNew2 - idxOld2);
-//offset += setInObjectRegionVarArgs(dst2.base, offset, node);
-//offset += rangecopyObjectRegion(src2.base, offset + sizeOfObject(), dst2.base, offset, src2.length - idxNew2 - TUPLE_LENGTH);
 
+  // public static final long _do_rangecopyObjectRegion(Object src, long srcOffset, Object dst,
+  // long dstOffset, int length) {
+  // if (USE_COPY_MEMORY) {
+  // long strideSizeInBytes = addressSize;
+  // long sizeInBytes = length * strideSizeInBytes;
+  // unsafe.copyMemory(src, srcOffset, dst, dstOffset, sizeInBytes);
+  // return sizeInBytes;
+  // } else {
+  // long strideSizeInBytes = addressSize;
+  // long sizeInBytes = length * strideSizeInBytes;
+  // for (int i = 0; i < length; i++) {
+  // unsafe.putObject(dst, dstOffset, unsafe.getObject(src, srcOffset));
+  // srcOffset += strideSizeInBytes;
+  // dstOffset += strideSizeInBytes;
+  // }
+  // return sizeInBytes;
+  // }
+  //
+  //// return sizeInBytes;
+  // }
+
+  // long offset = src1.offset;
+  //
+  // offset += rangecopyObjectRegion(src2.base, offset, dst2.base, offset, idxOld2);
+  // offset += rangecopyObjectRegion(src2.base, offset + sizeOfObject() * TUPLE_LENGTH, dst2.base,
+  // offset, idxNew2 - idxOld2);
+  // offset += setInObjectRegionVarArgs(dst2.base, offset, node);
+  // offset += rangecopyObjectRegion(src2.base, offset + sizeOfObject(), dst2.base, offset,
+  // src2.length - idxNew2 - TUPLE_LENGTH);
 
   public static interface StreamingCopy {
-    
+
     public static StreamingCopy streamingCopyTwoOffsets(ObjectArrayView from, ObjectArrayView to) {
       return new StreamingCopyTwoOffsets(from, to);
     }
-    
+
     public static StreamingCopy streamingCopyOneOffset(ObjectArrayView from, ObjectArrayView to) {
       return new StreamingCopyOneOffset(from, to);
-    }     
-    
+    }
+
     public void copy(int count);
-    
+
     public void copyWithSrcForward(int count, int srcForward);
-    
+
     public void copyWithDstForward(int count, int dstForward);
-        
+
     public void copyWithSrcDstForward(int count, int srcForward, int dstForward);
 
     public void skipAtSrc(int count);
-    
+
     public void skipAtDst(int count);
 
     public void insert(Object value);
-   
+
     public void insertWithDstForward(Object value, int dstForward);
-    
+
     public void put(Object value);
-    
-  }  
-  
+
+  }
+
   public static final class StreamingCopyTwoOffsets implements StreamingCopy {
 
     private final ObjectArrayView src;
     private final ObjectArrayView dst;
-    
+
     private long srcOffset;
     private long dstOffset;
 
     private StreamingCopyTwoOffsets(ObjectArrayView src, ObjectArrayView dst) {
       this.src = src;
-      this.dst = dst;     
-      
+      this.dst = dst;
+
       srcOffset = src.offset;
       dstOffset = dst.offset;
     }
@@ -817,58 +825,61 @@ public final class RangecopyUtils {
       srcOffset += bytes;
       dstOffset += bytes;
     }
-    
+
     public final void copy(int count) {
       advance(rangecopyObjectRegion(src.base, srcOffset, dst.base, dstOffset, count));
     }
-    
+
     public final void copyWithSrcForward(int count, int srcForward) {
-      advance(rangecopyObjectRegion(src.base, srcOffset + srcForward * addressSize, dst.base, dstOffset, count));
+      advance(rangecopyObjectRegion(src.base, srcOffset + srcForward * addressSize, dst.base,
+          dstOffset, count));
     }
-    
+
     public final void copyWithDstForward(int count, int dstForward) {
-      advance(rangecopyObjectRegion(src.base, srcOffset, dst.base, dstOffset + dstForward * addressSize, count));
-    }    
-    
+      advance(rangecopyObjectRegion(src.base, srcOffset, dst.base,
+          dstOffset + dstForward * addressSize, count));
+    }
+
     public final void copyWithSrcDstForward(int count, int srcForward, int dstForward) {
-      advance(rangecopyObjectRegion(src.base, srcOffset + srcForward * addressSize, dst.base, dstOffset + dstForward * addressSize, count));
-    }    
-        
+      advance(rangecopyObjectRegion(src.base, srcOffset + srcForward * addressSize, dst.base,
+          dstOffset + dstForward * addressSize, count));
+    }
+
     public final void skipAtSrc(int count) {
       srcOffset += count * addressSize;
     }
-    
+
     public final void skipAtDst(int count) {
       dstOffset += count * addressSize;
     }
 
     public final void insert(Object value) {
       dstOffset += setInObjectRegionVarArgs(dst.base, dstOffset, value);
-    }        
-    
+    }
+
     public final void insertWithDstForward(Object value, int dstForward) {
       dstOffset += setInObjectRegionVarArgs(dst.base, dstOffset + dstForward * addressSize, value);
-    }    
+    }
 
     public final void put(Object value) {
       setInObjectRegionVarArgs(dst.base, dstOffset, value);
-    }        
-    
+    }
+
     // remainder();
 
-  }  
-  
+  }
+
   public static final class StreamingCopyOneOffset implements StreamingCopy {
 
     private final ObjectArrayView src;
-    private final ObjectArrayView dst;    
-    
+    private final ObjectArrayView dst;
+
     private long offset;
 
     StreamingCopyOneOffset(ObjectArrayView src, ObjectArrayView dst) {
       this.src = src;
-      this.dst = dst;   
-      
+      this.dst = dst;
+
       assert src.offset == dst.offset;
       offset = src.offset;
     }
@@ -876,45 +887,48 @@ public final class RangecopyUtils {
     void advance(long bytes) {
       offset += bytes;
     }
-    
+
     public final void copy(int count) {
       advance(rangecopyObjectRegion(src.base, offset, dst.base, offset, count));
     }
-    
+
     public final void copyWithSrcForward(int count, int srcForward) {
-      advance(rangecopyObjectRegion(src.base, offset + srcForward * addressSize, dst.base, offset, count));
+      advance(rangecopyObjectRegion(src.base, offset + srcForward * addressSize, dst.base, offset,
+          count));
     }
-    
+
     public final void copyWithDstForward(int count, int dstForward) {
-      advance(rangecopyObjectRegion(src.base, offset, dst.base, offset + dstForward * addressSize, count));
-    }    
-    
+      advance(rangecopyObjectRegion(src.base, offset, dst.base, offset + dstForward * addressSize,
+          count));
+    }
+
     public final void copyWithSrcDstForward(int count, int srcForward, int dstForward) {
-      advance(rangecopyObjectRegion(src.base, offset + srcForward * addressSize, dst.base, offset + dstForward * addressSize, count));
-    }        
-        
+      advance(rangecopyObjectRegion(src.base, offset + srcForward * addressSize, dst.base,
+          offset + dstForward * addressSize, count));
+    }
+
     public final void skipAtSrc(int count) {
       // throw ...
     }
-    
+
     public final void skipAtDst(int count) {
       // throw ...
     }
 
     public final void insert(Object value) {
       // throw ...
-    }        
-    
+    }
+
     public final void insertWithDstForward(Object value, int dstForward) {
       offset += setInObjectRegionVarArgs(dst.base, offset + dstForward * addressSize, value);
     }
-    
+
     public final void put(Object value) {
       setInObjectRegionVarArgs(dst.base, offset, value);
-    }    
-    
+    }
+
     // remainder();
 
-  }    
-  
+  }
+
 }
