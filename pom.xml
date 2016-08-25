@@ -58,31 +58,29 @@
 				<version>2.5.3</version>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.10</version>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>3.0</version>
 				<configuration>
-					<additionalConfig>
-						<file>
-							<name>.settings/org.eclipse.jdt.core.prefs</name>
-							<location>.eclipse-template-settings/org.eclipse.jdt.core.prefs</location>
-						</file>
-						<file>
-							<name>.settings/org.eclipse.jdt.ui.prefs</name>
-							<location>.eclipse-template-settings/org.eclipse.jdt.ui.prefs</location>
-						</file>
-					</additionalConfig>
+					<header>${basedir}/LICENSE.header-template</header>
+					<mapping>
+						<rsc>SLASHSTAR_STYLE</rsc>
+					</mapping>
+					<includes>
+						<include>src/**</include>
+					</includes>					
+					<excludes>
+						<!-- nothing so far -->
+					</excludes>
 				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
-			<!-- <plugin> -->
-			<!-- <groupId>org.apache.maven.plugins</groupId> -->
-			<!-- <artifactId>maven-eclipse-plugin</artifactId> -->
-			<!-- <version>2.10</version> -->
-			<!-- <configuration> -->
-			<!-- <workspace>${basedir}</workspace> -->
-			<!-- <workspaceCodeStylesURL>https://github.com/google/styleguide/raw/gh-pages/eclipse-java-google-style.xml</workspaceCodeStylesURL> -->
-			<!-- </configuration> -->
-			<!-- </plugin> -->
 		</plugins>
 	</build>
 
