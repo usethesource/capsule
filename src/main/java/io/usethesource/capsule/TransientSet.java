@@ -15,42 +15,42 @@ import java.util.Set;
 public interface TransientSet<K> extends Set<K> {
 
   @Override
-  public boolean containsAll(final Collection<?> c);
+  boolean containsAll(final Collection<?> c);
 
-  public boolean containsAllEquivalent(final Collection<?> c, final Comparator<Object> cmp);
+  boolean containsAllEquivalent(final Collection<?> c, final Comparator<Object> cmp);
 
-  public K get(final Object o);
+  K get(final Object o);
 
-  public K getEquivalent(final Object o, final Comparator<Object> cmp);
+  K getEquivalent(final Object o, final Comparator<Object> cmp);
 
   @Override
-  public boolean contains(final Object o);
+  boolean contains(final Object o);
 
-  public boolean containsEquivalent(final Object o, final Comparator<Object> cmp);
+  boolean containsEquivalent(final Object o, final Comparator<Object> cmp);
 
-  public boolean __insert(final K key);
+  boolean __insert(final K key);
 
-  public boolean __insertEquivalent(final K key, final Comparator<Object> cmp);
+  boolean __insertEquivalent(final K key, final Comparator<Object> cmp);
 
-  public boolean __insertAll(final Set<? extends K> set);
+  boolean __insertAll(final Set<? extends K> set);
 
-  public boolean __insertAllEquivalent(final Set<? extends K> set, final Comparator<Object> cmp);
+  boolean __insertAllEquivalent(final Set<? extends K> set, final Comparator<Object> cmp);
 
-  public boolean __remove(final K key);
+  boolean __remove(final K key);
 
-  public boolean __removeEquivalent(final K key, final Comparator<Object> cmp);
+  boolean __removeEquivalent(final K key, final Comparator<Object> cmp);
 
-  public boolean __removeAll(final Set<? extends K> set);
+  boolean __removeAll(final Set<? extends K> set);
 
-  public boolean __removeAllEquivalent(final Set<? extends K> set, final Comparator<Object> cmp);
+  boolean __removeAllEquivalent(final Set<? extends K> set, final Comparator<Object> cmp);
 
-  public boolean __retainAll(final Set<? extends K> set);
+  boolean __retainAll(final Set<? extends K> set);
 
-  public boolean __retainAllEquivalent(final TransientSet<? extends K> transientSet,
+  boolean __retainAllEquivalent(final TransientSet<? extends K> transientSet,
       final Comparator<Object> cmp);
 
-  public Iterator<K> keyIterator();
+  Iterator<K> keyIterator();
 
-  public ImmutableSet<K> freeze();
+  ImmutableSet<K> freeze();
 
 }
