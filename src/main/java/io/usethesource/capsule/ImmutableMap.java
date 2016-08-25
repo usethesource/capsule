@@ -50,5 +50,5 @@ public interface ImmutableMap<K, V> extends Map<K, V> {
   boolean isTransientSupported();
 
   TransientMap<K, V> asTransient();
-  
+
 }
