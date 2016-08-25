@@ -1,12 +1,10 @@
-/*******************************************************************************
- * Copyright (c) 2015 CWI All rights reserved. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License v1.0 which accompanies this distribution,
- * and is available at http://www.eclipse.org/legal/epl-v10.html
+/**
+ * Copyright (c) Michael Steindorfer <Centrum Wiskunde & Informatica> and Contributors.
+ * All rights reserved.
  *
- * Contributors:
- *
- * * Michael Steindorfer - Michael.Steindorfer@cwi.nl - CWI
- *******************************************************************************/
+ * This file is licensed under the BSD 2-Clause License, which accompanies this project
+ * and is available under https://opensource.org/licenses/BSD-2-Clause.
+ */
 package io.usethesource.capsule;
 
 import static org.junit.Assert.assertEquals;
@@ -19,7 +17,11 @@ import java.util.Random;
 
 import org.junit.Test;
 
-public class TrieMapTests {
+import io.usethesource.capsule.ImmutableMap;
+import io.usethesource.capsule.TransientMap;
+import io.usethesource.capsule.TrieMap_5Bits;
+
+public class BasicTrieMapTest {
 
   /*
    * UTILS
@@ -134,8 +136,8 @@ public class TrieMapTests {
 
     ImmutableMap<Integer, Integer> map = (ImmutableMap) mapOf();
 
-    ImmutableMap<Integer, Integer> res1 = map.__put(63, 63).__put(64, 64).__put(32768, 32768)
-        .__put(2147483647, 2147483647).__put(65536, 65536);
+    ImmutableMap<Integer, Integer> res1 = map.__put(63, 63).__put(64, 64)
+        .__put(32768, 32768).__put(2147483647, 2147483647).__put(65536, 65536);
 
     assert res1.containsKey(63);
     assert res1.containsKey(64);
@@ -143,8 +145,8 @@ public class TrieMapTests {
     assert res1.containsKey(65536);
     assert res1.containsKey(2147483647);
 
-    ImmutableMap<Integer, Integer> res2 = map.__put(2147483647, 2147483647).__put(32768, 32768)
-        .__put(63, 63).__put(64, 64).__put(65536, 65536);
+    ImmutableMap<Integer, Integer> res2 = map.__put(2147483647, 2147483647)
+        .__put(32768, 32768).__put(63, 63).__put(64, 64).__put(65536, 65536);
 
     assert res2.containsKey(63);
     assert res2.containsKey(64);
@@ -177,7 +179,8 @@ public class TrieMapTests {
 
     ImmutableMap<Integer, Integer> map = (ImmutableMap) mapOf();
 
-    ImmutableMap<Integer, Integer> res1 = map.__put(1, 1).__put(2, 2).__put(65, 65).__put(66, 66);
+    ImmutableMap<Integer, Integer> res1 =
+        map.__put(1, 1).__put(2, 2).__put(65, 65).__put(66, 66);
 
     ImmutableMap<Integer, Integer> res2 = res1.__put(32769, 32769).__remove(66);
 
@@ -225,8 +228,8 @@ public class TrieMapTests {
 
     ImmutableMap map = mapOf();
 
-    ImmutableMap res1 =
-        map.__put(p(32769_1, 32769), p(32769_1, 32769)).__put(p(32769_2, 32769), p(32769_2, 32769));
+    ImmutableMap res1 = map.__put(p(32769_1, 32769), p(32769_1, 32769))
+        .__put(p(32769_2, 32769), p(32769_2, 32769));
     assertEquals(2, res1.size());
     assertTrue(res1.containsKey(p(32769_1, 32769)));
     assertTrue(res1.containsKey(p(32769_2, 32769)));
@@ -242,7 +245,8 @@ public class TrieMapTests {
     assertTrue(res3.containsKey(p(1, 1)));
     assertTrue(res3.containsKey(p(32769_1, 32769)));
 
-    ImmutableMap expected = mapOf(p(1, 1), p(1, 1), p(32769_1, 32769), p(32769_1, 32769));
+    ImmutableMap expected =
+        mapOf(p(1, 1), p(1, 1), p(32769_1, 32769), p(32769_1, 32769));
     assertEquals(expected, res3);
   }
 
@@ -252,8 +256,8 @@ public class TrieMapTests {
 
     ImmutableMap map = mapOf();
 
-    ImmutableMap res1 =
-        map.__put(p(32769_1, 32769), p(32769_1, 32769)).__put(p(32769_2, 32769), p(32769_2, 32769));
+    ImmutableMap res1 = map.__put(p(32769_1, 32769), p(32769_1, 32769))
+        .__put(p(32769_2, 32769), p(32769_2, 32769));
     assertEquals(2, res1.size());
     assertTrue(res1.containsKey(p(32769_1, 32769)));
     assertTrue(res1.containsKey(p(32769_2, 32769)));
@@ -278,8 +282,8 @@ public class TrieMapTests {
 
     ImmutableMap map = mapOf();
 
-    ImmutableMap res1 =
-        map.__put(p(32769_1, 32769), p(32769_1, 32769)).__put(p(32769_2, 32769), p(32769_2, 32769));
+    ImmutableMap res1 = map.__put(p(32769_1, 32769), p(32769_1, 32769))
+        .__put(p(32769_2, 32769), p(32769_2, 32769));
     assertEquals(2, res1.size());
     assertTrue(res1.containsKey(p(32769_1, 32769)));
     assertTrue(res1.containsKey(p(32769_2, 32769)));
@@ -326,6 +330,49 @@ public class TrieMapTests {
     throw new RuntimeException("Called with invalid arguments."); // cnt1 !=
                                                                   // i_th
   }
+
+  // @Test
+  // public void testPrintStatsRandomSmallAndBigIntegers() {
+  // TrieMap_Heterogeneous map = (TrieMap_Heterogeneous) TrieMap_Heterogeneous.of();
+  // long smallCount = 0;
+  // long bigCount = 0;
+  //
+  // Random rand = new Random(13);
+  //
+  // for (int i = size; i > 0; i--) {
+  // final int j = rand.nextInt();
+  // // System.out.println(j);
+  //
+  // final BigInteger bigJ = BigInteger.valueOf(j).multiply(BigInteger.valueOf(j));
+  // // System.out.println(bigJ);
+  //
+  // if (i % 20 == 0) { // earlier: bigJ.bitLength() > 31
+  // // System.out.println("BIG");
+  // bigCount++;
+  // TrieMap_Heterogeneous res = (TrieMap_Heterogeneous) map.__put(bigJ, bigJ);
+  // assert res.containsKey(bigJ);
+  // map = res;
+  // } else {
+  // // System.out.println("SMALL");
+  // smallCount++;
+  // TrieMap_Heterogeneous res = (TrieMap_Heterogeneous) map.__put(j, j);
+  // assert res.containsKey(j);
+  // map = res;
+  // }
+  // }
+  //
+  // // map.printStatistics();
+  // // System.out.println(map);
+  //
+  // System.out.println();
+  // System.out.println(String.format("PRIMITIVE: %10d (%.2f percent)", smallCount, 100.
+  // * smallCount / (smallCount + bigCount)));
+  // System.out.println(String.format("BIG_INTEGER: %10d (%.2f percent)", bigCount, 100.
+  // * bigCount / (smallCount + bigCount)));
+  // System.out.println(String.format("UNIQUE: %10d (%.2f percent)", map.size(),
+  // 100. * map.size() / (smallCount + bigCount)));
+  // System.out.println();
+  // }
 
   @Test
   public void testCreateSingletonWithFactoryMethod() {

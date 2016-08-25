@@ -1,12 +1,10 @@
-/*******************************************************************************
- * Copyright (c) 2013-2015 CWI All rights reserved. This program and the accompanying materials are
- * made available under the terms of the Eclipse Public License v1.0 which accompanies this
- * distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+/**
+ * Copyright (c) Michael Steindorfer <Centrum Wiskunde & Informatica> and Contributors.
+ * All rights reserved.
  *
- * Contributors:
- *
- * * Michael Steindorfer - Michael.Steindorfer@cwi.nl - CWI
- *******************************************************************************/
+ * This file is licensed under the BSD 2-Clause License, which accompanies this project
+ * and is available under https://opensource.org/licenses/BSD-2-Clause.
+ */
 package io.usethesource.capsule.experimental.memoized;
 
 import static io.usethesource.capsule.AbstractSpecialisedImmutableMap.entryOf;
@@ -475,8 +473,9 @@ public class TrieMap_5Bits_Memoized_LazyHashCode<K, V> implements ImmutableMap<K
     } else if (other instanceof Map) {
       Map that = (Map) other;
 
-      if (this.size() != that.size())
+      if (this.size() != that.size()) {
         return false;
+      }
 
       for (@SuppressWarnings("unchecked")
       Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
@@ -775,8 +774,9 @@ public class TrieMap_5Bits_Memoized_LazyHashCode<K, V> implements ImmutableMap<K
 
         @Override
         public AbstractMapNode<K, V> next() {
-          if (!hasNext())
+          if (!hasNext()) {
             throw new NoSuchElementException();
+          }
           return AbstractMapNode.this.getNode(nextIndex++);
         }
 
@@ -808,7 +808,7 @@ public class TrieMap_5Bits_Memoized_LazyHashCode<K, V> implements ImmutableMap<K
 
     /**
      * The arity of this trie node (i.e. number of values and nodes stored on this level).
-     * 
+     *
      * @return sum of nodes and values stored within
      */
 
@@ -855,7 +855,7 @@ public class TrieMap_5Bits_Memoized_LazyHashCode<K, V> implements ImmutableMap<K
     /**
      * Abstract predicate over a node's size. Value can be either {@value #SIZE_EMPTY},
      * {@value #SIZE_ONE}, or {@value #SIZE_MORE_THAN_ONE}.
-     * 
+     *
      * @return size predicate
      */
     abstract byte sizePredicate();
@@ -2801,8 +2801,9 @@ public class TrieMap_5Bits_Memoized_LazyHashCode<K, V> implements ImmutableMap<K
       } else if (other instanceof Map) {
         Map that = (Map) other;
 
-        if (this.size() != that.size())
+        if (this.size() != that.size()) {
           return false;
+        }
 
         for (@SuppressWarnings("unchecked")
         Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {

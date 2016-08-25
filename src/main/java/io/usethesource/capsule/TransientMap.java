@@ -1,12 +1,10 @@
-/*******************************************************************************
- * Copyright (c) 2013-2015 CWI All rights reserved. This program and the accompanying materials are
- * made available under the terms of the Eclipse Public License v1.0 which accompanies this
- * distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+/**
+ * Copyright (c) Michael Steindorfer <Centrum Wiskunde & Informatica> and Contributors.
+ * All rights reserved.
  *
- * Contributors:
- *
- * * Michael Steindorfer - Michael.Steindorfer@cwi.nl - CWI
- *******************************************************************************/
+ * This file is licensed under the BSD 2-Clause License, which accompanies this project
+ * and is available under https://opensource.org/licenses/BSD-2-Clause.
+ */
 package io.usethesource.capsule;
 
 import java.util.Comparator;
@@ -16,40 +14,39 @@ import java.util.Map;
 public interface TransientMap<K, V> extends Map<K, V> {
 
   @Override
-  public V get(final Object o);
+  V get(final Object o);
 
-  public V getEquivalent(final Object o, final Comparator<Object> cmp);
-
-  @Override
-  public boolean containsKey(final Object o);
-
-  public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp);
+  V getEquivalent(final Object o, final Comparator<Object> cmp);
 
   @Override
-  public boolean containsValue(final Object o);
+  boolean containsKey(final Object o);
 
-  public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp);
+  boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp);
 
-  public V __put(final K key, final V val);
+  @Override
+  boolean containsValue(final Object o);
 
-  public V __putEquivalent(final K key, final V val, final Comparator<Object> cmp);
+  boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp);
 
-  public boolean __putAll(final Map<? extends K, ? extends V> map);
+  V __put(final K key, final V val);
 
-  public boolean __putAllEquivalent(final Map<? extends K, ? extends V> map,
-      final Comparator<Object> cmp);
+  V __putEquivalent(final K key, final V val, final Comparator<Object> cmp);
 
-  public V __remove(final K key);
+  boolean __putAll(final Map<? extends K, ? extends V> map);
 
-  public V __removeEquivalent(final K key, final Comparator<Object> cmp);
+  boolean __putAllEquivalent(final Map<? extends K, ? extends V> map, final Comparator<Object> cmp);
 
-  public Iterator<K> keyIterator();
+  V __remove(final K key);
 
-  public Iterator<V> valueIterator();
+  V __removeEquivalent(final K key, final Comparator<Object> cmp);
 
-  public Iterator<Map.Entry<K, V>> entryIterator();
+  Iterator<K> keyIterator();
 
-  public ImmutableMap<K, V> freeze();
+  Iterator<V> valueIterator();
+
+  Iterator<Map.Entry<K, V>> entryIterator();
+
+  ImmutableMap<K, V> freeze();
 
   // TODO: return Option[int]
   default public Object __put(final int key, final int val) {
