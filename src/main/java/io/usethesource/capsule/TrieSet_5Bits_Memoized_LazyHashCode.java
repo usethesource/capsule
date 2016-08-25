@@ -367,8 +367,9 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
     } else if (other instanceof Set) {
       Set that = (Set) other;
 
-      if (this.size() != that.size())
+      if (this.size() != that.size()) {
         return false;
+      }
 
       return containsAll(that);
     }
@@ -640,8 +641,9 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
 
         @Override
         public AbstractSetNode<K> next() {
-          if (!hasNext())
+          if (!hasNext()) {
             throw new NoSuchElementException();
+          }
           return AbstractSetNode.this.getNode(nextIndex++);
         }
 
@@ -669,7 +671,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
 
     /**
      * The arity of this trie node (i.e. number of values and nodes stored on this level).
-     * 
+     *
      * @return sum of nodes and values stored within
      */
 
@@ -716,7 +718,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
     /**
      * Abstract predicate over a node's size. Value can be either {@value #SIZE_EMPTY},
      * {@value #SIZE_ONE}, or {@value #SIZE_MORE_THAN_ONE}.
-     * 
+     *
      * @return size predicate
      */
     abstract byte sizePredicate();
@@ -2354,8 +2356,9 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
       } else if (other instanceof Set) {
         Set that = (Set) other;
 
-        if (this.size() != that.size())
+        if (this.size() != that.size()) {
           return false;
+        }
 
         return containsAll(that);
       }

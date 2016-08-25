@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.Comparator;
 
 @Deprecated
-public abstract class AbstractImmutableSet<E> extends AbstractSet<E>implements ImmutableSet<E> {
+public abstract class AbstractImmutableSet<E> extends AbstractSet<E> implements ImmutableSet<E> {
 
   @Override
   public boolean add(E e) {

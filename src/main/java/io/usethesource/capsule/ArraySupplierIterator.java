@@ -32,8 +32,9 @@ public class ArraySupplierIterator<E> implements SupplierIterator<E, E> {
   @SuppressWarnings("unchecked")
   @Override
   public E next() {
-    if (!hasNext())
+    if (!hasNext()) {
       throw new NoSuchElementException();
+    }
 
     currentElement = (E) values[currentIndex++];
     return currentElement;

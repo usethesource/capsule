@@ -97,10 +97,12 @@ public abstract class AbstractSpecialisedImmutableMap<K, V>
 
   @Override
   public boolean equals(Object other) {
-    if (other == this)
+    if (other == this) {
       return true;
-    if (other == null)
+    }
+    if (other == null) {
       return false;
+    }
 
     if (other instanceof Map) {
       try {
@@ -109,10 +111,12 @@ public abstract class AbstractSpecialisedImmutableMap<K, V>
 
         if (this.size() == that.size()) {
           for (Entry<K, V> e : this.entrySet()) {
-            if (!that.containsKey(e.getKey()))
+            if (!that.containsKey(e.getKey())) {
               return false;
-            if (!Objects.equals(e.getValue(), that.get(e.getKey())))
+            }
+            if (!Objects.equals(e.getValue(), that.get(e.getKey()))) {
               return false;
+            }
           }
           return true;
         }

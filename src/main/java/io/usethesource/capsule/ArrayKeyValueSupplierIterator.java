@@ -18,7 +18,7 @@ public class ArrayKeyValueSupplierIterator<K, V> implements SupplierIterator<K, 
 
   public ArrayKeyValueSupplierIterator(final Object[] values, int start, int end) {
     assert start <= end && end <= values.length;
-    assert(end - start) % 2 == 0;
+    assert (end - start) % 2 == 0;
 
     this.values = values;
     this.end = end;
@@ -33,8 +33,9 @@ public class ArrayKeyValueSupplierIterator<K, V> implements SupplierIterator<K, 
   @SuppressWarnings("unchecked")
   @Override
   public K next() {
-    if (!hasNext())
+    if (!hasNext()) {
       throw new NoSuchElementException();
+    }
 
     final K currentKey = (K) values[currentIndex++];
     currentValue = (V) values[currentIndex++];

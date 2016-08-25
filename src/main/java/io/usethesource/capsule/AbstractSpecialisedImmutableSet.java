@@ -105,10 +105,12 @@ public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutab
 
   @Override
   public boolean equals(Object other) {
-    if (other == this)
+    if (other == this) {
       return true;
-    if (other == null)
+    }
+    if (other == null) {
       return false;
+    }
 
     if (other instanceof Set) {
       try {
@@ -116,9 +118,11 @@ public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutab
         Set<K> that = (Set<K>) other;
 
         if (this.size() == that.size()) {
-          for (K e : this)
-            if (!that.contains(e))
+          for (K e : this) {
+            if (!that.contains(e)) {
               return false;
+            }
+          }
           return true;
         }
       } catch (ClassCastException unused) {
