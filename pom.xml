@@ -27,7 +27,7 @@
 	<repositories>
 		<repository>
 			<id>usethesource</id>
-			<url>http://nexus.rascal-mpl.org/repository/maven-public/</url>
+			<url>http://nexus.rascal-mpl.org/content/repositories/public/</url>
 		</repository>
 	</repositories>
 
