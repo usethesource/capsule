@@ -15,11 +15,11 @@
 	<distributionManagement>
 		<repository>
 			<id>usethesource-releases</id>
-			<url>http://nexus.rascal-mpl.org/repository/maven-releases/</url>
+			<url>http://nexus.rascal-mpl.org/content/repositories/releases/</url>
 		</repository>
 		<snapshotRepository>
 			<id>usethesource-snapshots</id>
-			<url>http://nexus.rascal-mpl.org/repository/maven-snapshots/</url>
+			<url>http://nexus.rascal-mpl.org/content/repositories/snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
 
