@@ -98,4 +98,36 @@
 		</dependency>		
 	</dependencies>
 
+	<profiles>
+		<profile>
+			<id>jdk9</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<version>3.5.1</version>
+						<configuration>
+							<!-- <compilerVersion>1.9</compilerVersion> -->
+							<source>1.9</source>
+							<target>1.9</target>
+							<fork>true</fork>
+							<executable>${JAVA_HOME}/bin/javac</executable>
+							<forceJavacCompilerUse>true</forceJavacCompilerUse>
+							<verbose>true</verbose>
+							<optimize>true</optimize>
+							<compilerArgs>
+								<!-- add-exports java.base/jdk.internal.vm.annotation=ALL-UNNAMED -->
+								<arg>-XaddExports:java.base/jdk.internal.vm.annotation=ALL-UNNAMED</arg>
+							</compilerArgs>
+						</configuration>
+					</plugin>		
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 </project>

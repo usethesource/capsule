@@ -967,7 +967,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
     /**
      * The arity of this trie node (i.e. number of values and nodes stored on this level).
-     * 
+     *
      * @return sum of nodes and values stored within
      */
     abstract int arity();
@@ -1114,7 +1114,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       return next;
     }
 
-    // @Stable
+    // @java.lang.invoke.Stable
     static final Class<? extends CompactSetMultimapNode>[] specializationsByContentAndNodes =
         initializeSpecializationsByContentAndNodes();
 
@@ -1281,6 +1281,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       return getFromObjectRegion(this, arrayBase, index);
     }
 
+    @Override
     final int emptyArity() {
       return Long.bitCount(filter(bitmap, PATTERN_EMPTY));
       // return arity(bitmap, PATTERN_EMPTY);
@@ -1546,7 +1547,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     /**
      * Abstract predicate over a node's size. Value can be either {@value #SIZE_EMPTY},
      * {@value #SIZE_ONE}, or {@value #SIZE_MORE_THAN_ONE}.
-     * 
+     *
      * @return size predicate
      */
     byte sizePredicate() {
@@ -3592,7 +3593,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
 
           return entryOf(lastKey, lastIterator.next());
         } else {
-          return (Map.Entry<K, V>) (Object) nextEntry;
+          return (Map.Entry<K, V>) nextEntry;
         }
       }
     }
