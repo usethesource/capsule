@@ -1298,7 +1298,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
     public int hashCode() {
       final int prime = 31;
       int result = 0;
-      result = prime * result + (dataMap());
+      result = prime * result + (nodeMap());
       result = prime * result + (dataMap());
       result = prime * result + Arrays.hashCode(nodes);
       return result;
