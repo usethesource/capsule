@@ -5,7 +5,7 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.capsule.experimental.memoized;
+package io.usethesource.capsule.experimental.lazy;
 
 import java.text.DecimalFormat;
 import java.util.ArrayDeque;
@@ -18,21 +18,19 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.usethesource.capsule.api.deprecated.ImmutableSet;
 import io.usethesource.capsule.api.deprecated.TransientSet;
 import io.usethesource.capsule.util.ArrayUtils;
-import io.usethesource.capsule.util.ArrayUtilsInt;
 
 @SuppressWarnings("rawtypes")
-public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
+public class TrieSet_5Bits_LazyHashCode<K> implements ImmutableSet<K> {
 
   @SuppressWarnings("unchecked")
-  private static final TrieSet_5Bits_Memoized_LazyHashCode EMPTY_SET =
-      new TrieSet_5Bits_Memoized_LazyHashCode(CompactSetNode.EMPTY_NODE, 0);
+  private static final TrieSet_5Bits_LazyHashCode EMPTY_SET =
+      new TrieSet_5Bits_LazyHashCode(CompactSetNode.EMPTY_NODE, 0);
 
   private static final boolean DEBUG = false;
 
@@ -40,22 +38,19 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
   private int hashCode = -1;
   private final int cachedSize;
 
-  TrieSet_5Bits_Memoized_LazyHashCode(AbstractSetNode<K> rootNode, int cachedSize) {
+  TrieSet_5Bits_LazyHashCode(AbstractSetNode<K> rootNode, int cachedSize) {
     this.rootNode = rootNode;
     this.cachedSize = cachedSize;
-    if (DEBUG) {
-      assert checkHashCodeAndSize(hashCode, cachedSize);
-    }
   }
 
   @SuppressWarnings("unchecked")
   public static final <K> ImmutableSet<K> of() {
-    return TrieSet_5Bits_Memoized_LazyHashCode.EMPTY_SET;
+    return TrieSet_5Bits_LazyHashCode.EMPTY_SET;
   }
 
   @SuppressWarnings("unchecked")
   public static final <K> ImmutableSet<K> of(K... keys) {
-    ImmutableSet<K> result = TrieSet_5Bits_Memoized_LazyHashCode.EMPTY_SET;
+    ImmutableSet<K> result = TrieSet_5Bits_LazyHashCode.EMPTY_SET;
 
     for (final K key : keys) {
       result = result.__insert(key);
@@ -66,12 +61,12 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
 
   @SuppressWarnings("unchecked")
   public static final <K> TransientSet<K> transientOf() {
-    return TrieSet_5Bits_Memoized_LazyHashCode.EMPTY_SET.asTransient();
+    return TrieSet_5Bits_LazyHashCode.EMPTY_SET.asTransient();
   }
 
   @SuppressWarnings("unchecked")
   public static final <K> TransientSet<K> transientOf(K... keys) {
-    final TransientSet<K> result = TrieSet_5Bits_Memoized_LazyHashCode.EMPTY_SET.asTransient();
+    final TransientSet<K> result = TrieSet_5Bits_LazyHashCode.EMPTY_SET.asTransient();
 
     for (final K key : keys) {
       result.__insert(key);
@@ -80,30 +75,12 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
     return result;
   }
 
-  private boolean checkHashCodeAndSize(final int targetHash, final int targetSize) {
-    int hash = 0;
-    int size = 0;
-
-    for (Iterator<K> it = keyIterator(); it.hasNext();) {
-      final K key = it.next();
-
-      hash += key.hashCode();
-      size += 1;
-    }
-
-    return hash == targetHash && size == targetSize;
-  }
-
-  public static final int transformHashCode(final int hash) {
-    return hash;
-  }
-
   @Override
   public boolean contains(final Object o) {
     try {
       @SuppressWarnings("unchecked")
       final K key = (K) o;
-      return rootNode.contains(key, transformHashCode(key.hashCode()), 0);
+      return rootNode.contains(key, key.hashCode(), 0);
     } catch (ClassCastException unused) {
       return false;
     }
@@ -114,7 +91,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
     try {
       @SuppressWarnings("unchecked")
       final K key = (K) o;
-      return rootNode.contains(key, transformHashCode(key.hashCode()), 0, cmp);
+      return rootNode.contains(key, key.hashCode(), 0, cmp);
     } catch (ClassCastException unused) {
       return false;
     }
@@ -125,7 +102,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
     try {
       @SuppressWarnings("unchecked")
       final K key = (K) o;
-      final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
+      final Optional<K> result = rootNode.findByKey(key, key.hashCode(), 0);
 
       if (result.isPresent()) {
         return result.get();
@@ -142,7 +119,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
     try {
       @SuppressWarnings("unchecked")
       final K key = (K) o;
-      final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
+      final Optional<K> result = rootNode.findByKey(key, key.hashCode(), 0, cmp);
 
       if (result.isPresent()) {
         return result.get();
@@ -159,11 +136,10 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
-    final CompactSetNode<K> newRootNode =
-        rootNode.updated(null, key, transformHashCode(keyHash), 0, details);
+    final CompactSetNode<K> newRootNode = rootNode.updated(null, key, keyHash, 0, details);
 
     if (details.isModified()) {
-      return new TrieSet_5Bits_Memoized_LazyHashCode<K>(newRootNode, cachedSize + 1);
+      return new TrieSet_5Bits_LazyHashCode<K>(newRootNode, cachedSize + 1);
     }
 
     return this;
@@ -174,11 +150,10 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
-    final CompactSetNode<K> newRootNode =
-        rootNode.updated(null, key, transformHashCode(keyHash), 0, details, cmp);
+    final CompactSetNode<K> newRootNode = rootNode.updated(null, key, keyHash, 0, details, cmp);
 
     if (details.isModified()) {
-      return new TrieSet_5Bits_Memoized_LazyHashCode<K>(newRootNode, cachedSize + 1);
+      return new TrieSet_5Bits_LazyHashCode<K>(newRootNode, cachedSize + 1);
     }
 
     return this;
@@ -204,11 +179,10 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
-    final CompactSetNode<K> newRootNode =
-        rootNode.removed(null, key, transformHashCode(keyHash), 0, details);
+    final CompactSetNode<K> newRootNode = rootNode.removed(null, key, keyHash, 0, details);
 
     if (details.isModified()) {
-      return new TrieSet_5Bits_Memoized_LazyHashCode<K>(newRootNode, cachedSize - 1);
+      return new TrieSet_5Bits_LazyHashCode<K>(newRootNode, cachedSize - 1);
     }
 
     return this;
@@ -219,11 +193,10 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
-    final CompactSetNode<K> newRootNode =
-        rootNode.removed(null, key, transformHashCode(keyHash), 0, details, cmp);
+    final CompactSetNode<K> newRootNode = rootNode.removed(null, key, keyHash, 0, details, cmp);
 
     if (details.isModified()) {
-      return new TrieSet_5Bits_Memoized_LazyHashCode<K>(newRootNode, cachedSize - 1);
+      return new TrieSet_5Bits_LazyHashCode<K>(newRootNode, cachedSize - 1);
     }
 
     return this;
@@ -361,10 +334,14 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
       return false;
     }
 
-    if (other instanceof TrieSet_5Bits_Memoized_LazyHashCode) {
-      TrieSet_5Bits_Memoized_LazyHashCode<?> that = (TrieSet_5Bits_Memoized_LazyHashCode<?>) other;
+    if (other instanceof TrieSet_5Bits_LazyHashCode) {
+      TrieSet_5Bits_LazyHashCode<?> that = (TrieSet_5Bits_LazyHashCode<?>) other;
 
       if (this.cachedSize != that.cachedSize) {
+        return false;
+      }
+
+      if (this.hashCode != that.hashCode) {
         return false;
       }
 
@@ -665,8 +642,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
 
     abstract K getKey(final int index);
 
-    abstract int getKeyHash(final int index);
-
     @Deprecated
     abstract boolean hasSlots();
 
@@ -745,7 +720,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
     }
 
     abstract CompactSetNode<K> copyAndInsertValue(final AtomicReference<Thread> mutator,
-        final int bitpos, final K key, int keyHash);
+        final int bitpos, final K key);
 
     abstract CompactSetNode<K> copyAndRemoveValue(final AtomicReference<Thread> mutator,
         final int bitpos);
@@ -762,7 +737,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
     @SuppressWarnings("unchecked")
     static final <K> CompactSetNode<K> mergeTwoKeyValPairs(final K key0, final int keyHash0,
         final K key1, final int keyHash1, final int shift) {
-      // assert !(key0.equals(key1));
+      assert !(key0.equals(key1));
 
       if (shift >= HASH_CODE_LENGTH) {
         // throw new
@@ -778,11 +753,9 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
         final int dataMap = bitpos(mask0) | bitpos(mask1);
 
         if (mask0 < mask1) {
-          return nodeOf(null, (0), dataMap, new Object[] {key0, key1},
-              new int[] {keyHash0, keyHash1});
+          return nodeOf(null, (0), dataMap, new Object[] {key0, key1});
         } else {
-          return nodeOf(null, (0), dataMap, new Object[] {key1, key0},
-              new int[] {keyHash1, keyHash0});
+          return nodeOf(null, (0), dataMap, new Object[] {key1, key0});
         }
       } else {
         final CompactSetNode<K> node =
@@ -790,24 +763,32 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
         // values fit on next level
 
         final int nodeMap = bitpos(mask0);
-        return nodeOf(null, nodeMap, (0), new Object[] {node}, new int[] {});
+        return nodeOf(null, nodeMap, (0), new Object[] {node});
       }
     }
 
     static final CompactSetNode EMPTY_NODE;
 
     static {
-      EMPTY_NODE = new BitmapIndexedSetNode<>(null, (0), (0), new Object[] {}, new int[] {});
+
+      EMPTY_NODE = new BitmapIndexedSetNode<>(null, (0), (0), new Object[] {});
+
     };
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
-        final int nodeMap, final int dataMap, final Object[] nodes, final int[] keyHashes) {
-      return new BitmapIndexedSetNode<>(mutator, nodeMap, dataMap, nodes, keyHashes);
+        final int nodeMap, final int dataMap, final Object[] nodes) {
+      return new BitmapIndexedSetNode<>(mutator, nodeMap, dataMap, nodes);
     }
 
     @SuppressWarnings("unchecked")
     static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator) {
       return EMPTY_NODE;
+    }
+
+    static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator, final int nodeMap,
+        final int dataMap, final K key) {
+      assert nodeMap == 0;
+      return nodeOf(mutator, (0), dataMap, new Object[] {key});
     }
 
     static final int index(final int bitmap, final int bitpos) {
@@ -838,11 +819,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
       final int dataMap = dataMap();
       if ((dataMap & bitpos) != 0) {
         final int index = index(dataMap, mask, bitpos);
-
-        K currentKey = getKey(index);
-        int currentKeyHash = getKeyHash(index);
-
-        return currentKeyHash == keyHash && currentKey.equals(key);
+        return getKey(index).equals(key);
       }
 
       final int nodeMap = nodeMap();
@@ -863,11 +840,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
       final int dataMap = dataMap();
       if ((dataMap & bitpos) != 0) {
         final int index = index(dataMap, mask, bitpos);
-
-        K currentKey = getKey(index);
-        int currentKeyHash = getKeyHash(index);
-
-        return currentKeyHash == keyHash && cmp.compare(currentKey, key) == 0;
+        return cmp.compare(getKey(index), key) == 0;
       }
 
       final int nodeMap = nodeMap();
@@ -936,13 +909,11 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
         final int dataIndex = dataIndex(bitpos);
         final K currentKey = getKey(dataIndex);
 
-        int currentKeyHash = getKeyHash(dataIndex);
-
-        if (currentKeyHash == keyHash && currentKey.equals(key)) {
+        if (currentKey.equals(key)) {
           return this;
         } else {
-          final CompactSetNode<K> subNodeNew = mergeTwoKeyValPairs(currentKey, currentKeyHash, key,
-              keyHash, shift + BIT_PARTITION_SIZE);
+          final CompactSetNode<K> subNodeNew = mergeTwoKeyValPairs(currentKey,
+              currentKey.hashCode(), key, keyHash, shift + BIT_PARTITION_SIZE);
 
           details.modified();
           return copyAndMigrateFromInlineToNode(mutator, bitpos, subNodeNew);
@@ -960,7 +931,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
       } else {
         // no value
         details.modified();
-        return copyAndInsertValue(mutator, bitpos, key, keyHash);
+        return copyAndInsertValue(mutator, bitpos, key);
       }
     }
 
@@ -974,13 +945,11 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
         final int dataIndex = dataIndex(bitpos);
         final K currentKey = getKey(dataIndex);
 
-        int currentKeyHash = getKeyHash(dataIndex);
-
-        if (currentKeyHash == keyHash && cmp.compare(currentKey, key) == 0) {
+        if (cmp.compare(currentKey, key) == 0) {
           return this;
         } else {
-          final CompactSetNode<K> subNodeNew = mergeTwoKeyValPairs(currentKey, currentKeyHash, key,
-              keyHash, shift + BIT_PARTITION_SIZE);
+          final CompactSetNode<K> subNodeNew = mergeTwoKeyValPairs(currentKey,
+              currentKey.hashCode(), key, keyHash, shift + BIT_PARTITION_SIZE);
 
           details.modified();
           return copyAndMigrateFromInlineToNode(mutator, bitpos, subNodeNew);
@@ -998,7 +967,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
       } else {
         // no value
         details.modified();
-        return copyAndInsertValue(mutator, bitpos, key, keyHash);
+        return copyAndInsertValue(mutator, bitpos, key);
       }
     }
 
@@ -1011,9 +980,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
       if ((dataMap() & bitpos) != 0) { // inplace value
         final int dataIndex = dataIndex(bitpos);
 
-        int currentKeyHash = getKeyHash(dataIndex);
-
-        if (currentKeyHash == keyHash && getKey(dataIndex).equals(key)) {
+        if (getKey(dataIndex).equals(key)) {
           details.modified();
 
           if (this.payloadArity() == 2 && this.nodeArity() == 0) {
@@ -1025,11 +992,9 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
                 (shift == 0) ? (int) (dataMap() ^ bitpos) : bitpos(mask(keyHash, 0));
 
             if (dataIndex == 0) {
-              return CompactSetNode.nodeOf(mutator, (0), newDataMap, new Object[] {getKey(1)},
-                  new int[] {getKeyHash(1)});
+              return CompactSetNode.<K>nodeOf(mutator, 0, newDataMap, getKey(1));
             } else {
-              return CompactSetNode.nodeOf(mutator, (0), newDataMap, new Object[] {getKey(0)},
-                  new int[] {getKeyHash(0)});
+              return CompactSetNode.<K>nodeOf(mutator, 0, newDataMap, getKey(0));
             }
           } else {
             return copyAndRemoveValue(mutator, bitpos);
@@ -1078,9 +1043,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
       if ((dataMap() & bitpos) != 0) { // inplace value
         final int dataIndex = dataIndex(bitpos);
 
-        int currentKeyHash = getKeyHash(dataIndex);
-
-        if (currentKeyHash == keyHash && cmp.compare(getKey(dataIndex), key) == 0) {
+        if (cmp.compare(getKey(dataIndex), key) == 0) {
           details.modified();
 
           if (this.payloadArity() == 2 && this.nodeArity() == 0) {
@@ -1092,11 +1055,9 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
                 (shift == 0) ? (int) (dataMap() ^ bitpos) : bitpos(mask(keyHash, 0));
 
             if (dataIndex == 0) {
-              return CompactSetNode.nodeOf(mutator, (0), newDataMap, new Object[] {getKey(1)},
-                  new int[] {getKeyHash(1)});
+              return CompactSetNode.<K>nodeOf(mutator, 0, newDataMap, getKey(1));
             } else {
-              return CompactSetNode.nodeOf(mutator, (0), newDataMap, new Object[] {getKey(0)},
-                  new int[] {getKeyHash(0)});
+              return CompactSetNode.<K>nodeOf(mutator, 0, newDataMap, getKey(0));
             }
           } else {
             return copyAndRemoveValue(mutator, bitpos);
@@ -1169,7 +1130,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
 
       for (byte i = 0; i < payloadArity(); i++) {
         final byte pos = recoverMask(dataMap(), (byte) (i + 1));
-        bldr.append(String.format("@%d<#%d>", pos, Objects.hashCode(getKey(i))));
+        bldr.append(String.format("@%d: ", pos, getKey(i)));
 
         if (!((i + 1) == payloadArity())) {
           bldr.append(", ");
@@ -1222,15 +1183,13 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
 
     final AtomicReference<Thread> mutator;
     final Object[] nodes;
-    final int[] keyHashes;
 
     private BitmapIndexedSetNode(final AtomicReference<Thread> mutator, final int nodeMap,
-        final int dataMap, final Object[] nodes, final int[] keyHashes) {
+        final int dataMap, final Object[] nodes) {
       super(mutator, nodeMap, dataMap);
 
       this.mutator = mutator;
       this.nodes = nodes;
-      this.keyHashes = keyHashes;
 
       if (DEBUG) {
 
@@ -1252,11 +1211,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
     @Override
     K getKey(final int index) {
       return (K) nodes[TUPLE_LENGTH * index];
-    }
-
-    @Override
-    int getKeyHash(int index) {
-      return keyHashes[index];
     }
 
     @SuppressWarnings("unchecked")
@@ -1304,7 +1258,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
     public int hashCode() {
       final int prime = 31;
       int result = 0;
-      result = prime * result + (dataMap());
+      result = prime * result + (nodeMap());
       result = prime * result + (dataMap());
       result = prime * result + Arrays.hashCode(nodes);
       return result;
@@ -1328,14 +1282,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
       if (dataMap() != that.dataMap()) {
         return false;
       }
-      if (!Arrays.equals(keyHashes, that.keyHashes)) {
-        return false;
-      }
-      // for (int i = nodes.length - 1; i >= 0; i--) {
-      // if (!nodes[i].equals(that.nodes[i])) {
-      // return false;
-      // }
-      // }
       if (!ArrayUtils.equals(nodes, that.nodes)) {
         return false;
       }
@@ -1376,75 +1322,48 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
         System.arraycopy(src, 0, dst, 0, src.length);
         dst[idx + 0] = node;
 
-        return nodeOf(mutator, nodeMap(), dataMap(), dst, keyHashes);
+        return nodeOf(mutator, nodeMap(), dataMap(), dst);
       }
     }
 
     @Override
     CompactSetNode<K> copyAndInsertValue(final AtomicReference<Thread> mutator, final int bitpos,
-        final K key, int keyHash) {
-      final int idx = dataIndex(bitpos);
+        final K key) {
+      final int idx = TUPLE_LENGTH * dataIndex(bitpos);
 
       final Object[] src = this.nodes;
-      final Object[] dst = arraycopyAndInsertValue(src, TUPLE_LENGTH * idx, key);
-
-      final int[] srcKeyHashes = this.keyHashes;
-      final int[] dstKeyHashes = ArrayUtilsInt.arraycopyAndInsertInt(srcKeyHashes, idx, keyHash);
-
-      return nodeOf(mutator, nodeMap(), dataMap() | bitpos, dst, dstKeyHashes);
-    }
-
-    private Object[] arraycopyAndInsertValue(final Object[] src, final int idx, final K key) {
       final Object[] dst = new Object[src.length + 1];
 
       // copy 'src' and insert 1 element(s) at position 'idx'
       System.arraycopy(src, 0, dst, 0, idx);
       dst[idx + 0] = key;
       System.arraycopy(src, idx, dst, idx + 1, src.length - idx);
-      return dst;
+
+      return nodeOf(mutator, nodeMap(), dataMap() | bitpos, dst);
     }
 
     @Override
     CompactSetNode<K> copyAndRemoveValue(final AtomicReference<Thread> mutator, final int bitpos) {
-      final int idx = dataIndex(bitpos);
+      final int idx = TUPLE_LENGTH * dataIndex(bitpos);
 
       final Object[] src = this.nodes;
-      final Object[] dst = arraycopyAndRemoveValue(src, TUPLE_LENGTH * idx);
-
-      final int[] srcKeyHashes = this.keyHashes;
-      final int[] dstKeyHashes = ArrayUtilsInt.arraycopyAndRemoveInt(srcKeyHashes, idx);
-
-      return nodeOf(mutator, nodeMap(), dataMap() ^ bitpos, dst, dstKeyHashes);
-    }
-
-    private Object[] arraycopyAndRemoveValue(final Object[] src, final int idx) {
       final Object[] dst = new Object[src.length - 1];
 
       // copy 'src' and remove 1 element(s) at position 'idx'
       System.arraycopy(src, 0, dst, 0, idx);
       System.arraycopy(src, idx + 1, dst, idx, src.length - idx - 1);
-      return dst;
+
+      return nodeOf(mutator, nodeMap(), dataMap() ^ bitpos, dst);
     }
 
     @Override
     CompactSetNode<K> copyAndMigrateFromInlineToNode(final AtomicReference<Thread> mutator,
         final int bitpos, final CompactSetNode<K> node) {
-      final int idx = dataIndex(bitpos);
 
-      final int idxOld = TUPLE_LENGTH * idx;
+      final int idxOld = TUPLE_LENGTH * dataIndex(bitpos);
       final int idxNew = this.nodes.length - TUPLE_LENGTH - nodeIndex(bitpos);
 
       final Object[] src = this.nodes;
-      final Object[] dst = arraycopyAndMigrateFromInlineToNode(src, idxOld, idxNew, node);
-
-      final int[] srcKeyHashes = this.keyHashes;
-      final int[] dstKeyHashes = ArrayUtilsInt.arraycopyAndRemoveInt(srcKeyHashes, idx);
-
-      return nodeOf(mutator, nodeMap() | bitpos, dataMap() ^ bitpos, dst, dstKeyHashes);
-    }
-
-    private Object[] arraycopyAndMigrateFromInlineToNode(final Object[] src, final int idxOld,
-        final int idxNew, final CompactSetNode<K> node) {
       final Object[] dst = new Object[src.length - 1 + 1];
 
       // copy 'src' and remove 1 element(s) at position 'idxOld' and
@@ -1454,29 +1373,18 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
       System.arraycopy(src, idxOld + 1, dst, idxOld, idxNew - idxOld);
       dst[idxNew + 0] = node;
       System.arraycopy(src, idxNew + 1, dst, idxNew + 1, src.length - idxNew - 1);
-      return dst;
+
+      return nodeOf(mutator, nodeMap() | bitpos, dataMap() ^ bitpos, dst);
     }
 
     @Override
     CompactSetNode<K> copyAndMigrateFromNodeToInline(final AtomicReference<Thread> mutator,
         final int bitpos, final CompactSetNode<K> node) {
-      final int idx = dataIndex(bitpos);
 
       final int idxOld = this.nodes.length - 1 - nodeIndex(bitpos);
-      final int idxNew = TUPLE_LENGTH * idx;
+      final int idxNew = dataIndex(bitpos);
 
       final Object[] src = this.nodes;
-      final Object[] dst = arraycopyAndMigrateFromNodeToInline(src, idxOld, node, idxNew);
-
-      final int[] srcKeyHashes = this.keyHashes;
-      final int[] dstKeyHashes =
-          ArrayUtilsInt.arraycopyAndInsertInt(srcKeyHashes, idx, node.getKeyHash(0));
-
-      return nodeOf(mutator, nodeMap() ^ bitpos, dataMap() | bitpos, dst, dstKeyHashes);
-    }
-
-    private Object[] arraycopyAndMigrateFromNodeToInline(final Object[] src, final int idxOld,
-        final CompactSetNode<K> node, final int idxNew) {
       final Object[] dst = new Object[src.length - 1 + 1];
 
       // copy 'src' and remove 1 element(s) at position 'idxOld' and
@@ -1486,7 +1394,8 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
       dst[idxNew + 0] = node.getKey(0);
       System.arraycopy(src, idxNew, dst, idxNew + 1, idxOld - idxNew);
       System.arraycopy(src, idxOld + 1, dst, idxOld + 1, src.length - idxOld - 1);
-      return dst;
+
+      return nodeOf(mutator, nodeMap() ^ bitpos, dataMap() | bitpos, dst);
     }
 
   }
@@ -1607,7 +1516,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
         final int shift, final SetResult<K> details) {
       for (int idx = 0; idx < keys.length; idx++) {
         if (keys[idx].equals(key)) {
-          details.modified();
 
           if (this.arity() == 1) {
             return nodeOf(mutator);
@@ -1641,7 +1549,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
         final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
       for (int idx = 0; idx < keys.length; idx++) {
         if (cmp.compare(keys[idx], key) == 0) {
-          details.modified();
 
           if (this.arity() == 1) {
             return nodeOf(mutator);
@@ -1703,11 +1610,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
     @Override
     K getKey(final int index) {
       return keys[index];
-    }
-
-    @Override
-    int getKeyHash(int index) {
-      return hash;
     }
 
     @Override
@@ -1783,7 +1685,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
 
     @Override
     CompactSetNode<K> copyAndInsertValue(final AtomicReference<Thread> mutator, final int bitpos,
-        final K key, int keyHash) {
+        final K key) {
       throw new UnsupportedOperationException();
     }
 
@@ -1984,25 +1886,10 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
     private AbstractSetNode<K> rootNode;
     private int cachedSize;
 
-    TransientTrieSet_5Bits(TrieSet_5Bits_Memoized_LazyHashCode<K> trieSet_5Bits) {
+    TransientTrieSet_5Bits(TrieSet_5Bits_LazyHashCode<K> trieSet_5Bits) {
       this.mutator = new AtomicReference<Thread>(Thread.currentThread());
       this.rootNode = trieSet_5Bits.rootNode;
       this.cachedSize = trieSet_5Bits.cachedSize;
-    }
-
-    @SuppressWarnings("unused")
-    private boolean checkHashCodeAndSize(final int targetHash, final int targetSize) {
-      int hash = 0;
-      int size = 0;
-
-      for (Iterator<K> it = keyIterator(); it.hasNext();) {
-        final K key = it.next();
-
-        hash += key.hashCode();
-        size += 1;
-      }
-
-      return hash == targetHash && size == targetSize;
     }
 
     @Override
@@ -2040,7 +1927,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
       try {
         @SuppressWarnings("unchecked")
         final K key = (K) o;
-        return rootNode.contains(key, transformHashCode(key.hashCode()), 0);
+        return rootNode.contains(key, key.hashCode(), 0);
       } catch (ClassCastException unused) {
         return false;
       }
@@ -2051,18 +1938,18 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
       try {
         @SuppressWarnings("unchecked")
         final K key = (K) o;
-        return rootNode.contains(key, transformHashCode(key.hashCode()), 0, cmp);
+        return rootNode.contains(key, key.hashCode(), 0, cmp);
       } catch (ClassCastException unused) {
         return false;
       }
     }
 
     @Override
-    public K get(final Object o) {
+    public K get(Object o) {
       try {
         @SuppressWarnings("unchecked")
         final K key = (K) o;
-        final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
+        final Optional<K> result = rootNode.findByKey(key, key.hashCode(), 0);
 
         if (result.isPresent()) {
           return result.get();
@@ -2075,12 +1962,11 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
     }
 
     @Override
-    public K getEquivalent(final Object o, final Comparator<Object> cmp) {
+    public K getEquivalent(Object o, Comparator<Object> cmp) {
       try {
         @SuppressWarnings("unchecked")
         final K key = (K) o;
-        final Optional<K> result =
-            rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
+        final Optional<K> result = rootNode.findByKey(key, key.hashCode(), 0, cmp);
 
         if (result.isPresent()) {
           return result.get();
@@ -2101,8 +1987,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
       final int keyHash = key.hashCode();
       final SetResult<K> details = SetResult.unchanged();
 
-      final CompactSetNode<K> newRootNode =
-          rootNode.updated(mutator, key, transformHashCode(keyHash), 0, details);
+      final CompactSetNode<K> newRootNode = rootNode.updated(mutator, key, keyHash, 0, details);
 
       if (details.isModified()) {
 
@@ -2126,7 +2011,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
       final SetResult<K> details = SetResult.unchanged();
 
       final CompactSetNode<K> newRootNode =
-          rootNode.updated(mutator, key, transformHashCode(keyHash), 0, details, cmp);
+          rootNode.updated(mutator, key, keyHash, 0, details, cmp);
 
       if (details.isModified()) {
 
@@ -2171,8 +2056,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
       final int keyHash = key.hashCode();
       final SetResult<K> details = SetResult.unchanged();
 
-      final CompactSetNode<K> newRootNode =
-          rootNode.removed(mutator, key, transformHashCode(keyHash), 0, details);
+      final CompactSetNode<K> newRootNode = rootNode.removed(mutator, key, keyHash, 0, details);
 
       if (details.isModified()) {
         rootNode = newRootNode;
@@ -2194,7 +2078,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
       final SetResult<K> details = SetResult.unchanged();
 
       final CompactSetNode<K> newRootNode =
-          rootNode.removed(mutator, key, transformHashCode(keyHash), 0, details, cmp);
+          rootNode.removed(mutator, key, keyHash, 0, details, cmp);
 
       if (details.isModified()) {
         rootNode = newRootNode;
@@ -2355,7 +2239,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
       if (other instanceof TransientTrieSet_5Bits) {
         TransientTrieSet_5Bits<?> that = (TransientTrieSet_5Bits<?>) other;
 
-        if (this.cachedSize != that.cachedSize) {
+        if (this.size() != that.size()) {
           return false;
         }
 
@@ -2390,7 +2274,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {
       }
 
       mutator.set(null);
-      return new TrieSet_5Bits_Memoized_LazyHashCode<K>(rootNode, cachedSize);
+      return new TrieSet_5Bits_LazyHashCode<K>(rootNode, cachedSize);
     }
   }
 
