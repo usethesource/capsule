@@ -10,6 +10,10 @@ package io.usethesource.capsule;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import io.usethesource.capsule.api.deprecated.ImmutableSet;
+import io.usethesource.capsule.api.deprecated.TransientSet;
+import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
+
 public class DefaultTrieSet {
 
   @SuppressWarnings("rawtypes")

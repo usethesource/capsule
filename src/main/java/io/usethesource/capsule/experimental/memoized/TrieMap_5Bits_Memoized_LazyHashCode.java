@@ -7,7 +7,7 @@
  */
 package io.usethesource.capsule.experimental.memoized;
 
-import static io.usethesource.capsule.AbstractSpecialisedImmutableMap.entryOf;
+import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 import java.text.DecimalFormat;
 import java.util.AbstractCollection;
@@ -25,10 +25,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import io.usethesource.capsule.ArrayUtils;
-import io.usethesource.capsule.ArrayUtilsInt;
-import io.usethesource.capsule.ImmutableMap;
-import io.usethesource.capsule.TransientMap;
+import io.usethesource.capsule.api.deprecated.ImmutableMap;
+import io.usethesource.capsule.api.deprecated.TransientMap;
+import io.usethesource.capsule.util.ArrayUtils;
+import io.usethesource.capsule.util.ArrayUtilsInt;
 
 @SuppressWarnings("rawtypes")
 public class TrieMap_5Bits_Memoized_LazyHashCode<K, V> implements ImmutableMap<K, V> {

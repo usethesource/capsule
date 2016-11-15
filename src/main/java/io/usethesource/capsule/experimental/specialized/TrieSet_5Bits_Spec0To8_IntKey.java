@@ -22,8 +22,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import io.usethesource.capsule.ImmutableSet;
-import io.usethesource.capsule.TransientSet;
+import io.usethesource.capsule.api.deprecated.ImmutableSet;
+import io.usethesource.capsule.api.deprecated.TransientSet;
 
 @SuppressWarnings("rawtypes")
 public class TrieSet_5Bits_Spec0To8_IntKey implements ImmutableSet<java.lang.Integer> {

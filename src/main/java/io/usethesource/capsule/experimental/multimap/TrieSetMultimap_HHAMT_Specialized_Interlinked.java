@@ -7,19 +7,6 @@
  */
 package io.usethesource.capsule.experimental.multimap;
 
-import static io.usethesource.capsule.AbstractSpecialisedImmutableMap.entryOf;
-import static io.usethesource.capsule.BitmapUtils.filter;
-import static io.usethesource.capsule.BitmapUtils.index;
-import static io.usethesource.capsule.DataLayoutHelper.addressSize;
-import static io.usethesource.capsule.DataLayoutHelper.arrayOffsets;
-import static io.usethesource.capsule.DataLayoutHelper.fieldOffset;
-import static io.usethesource.capsule.DataLayoutHelper.unsafe;
-import static io.usethesource.capsule.RangecopyUtils._do_rangecompareObjectRegion;
-import static io.usethesource.capsule.RangecopyUtils.getFromObjectRegion;
-import static io.usethesource.capsule.RangecopyUtils.getFromObjectRegionAndCast;
-import static io.usethesource.capsule.RangecopyUtils.rangecopyObjectRegion;
-import static io.usethesource.capsule.RangecopyUtils.setInObjectRegion;
-import static io.usethesource.capsule.RangecopyUtils.setInObjectRegionVarArgs;
 import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_COLLECTION;
 import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_SINGLETON;
 import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_EMPTY;
@@ -29,6 +16,19 @@ import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.set
 import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setNodeOf;
 import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Interlinked.EitherSingletonOrCollection.Type.COLLECTION;
 import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Interlinked.EitherSingletonOrCollection.Type.SINGLETON;
+import static io.usethesource.capsule.util.BitmapUtils.filter;
+import static io.usethesource.capsule.util.BitmapUtils.index;
+import static io.usethesource.capsule.util.DataLayoutHelper.addressSize;
+import static io.usethesource.capsule.util.DataLayoutHelper.arrayOffsets;
+import static io.usethesource.capsule.util.DataLayoutHelper.fieldOffset;
+import static io.usethesource.capsule.util.DataLayoutHelper.unsafe;
+import static io.usethesource.capsule.util.RangecopyUtils._do_rangecompareObjectRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.getFromObjectRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.getFromObjectRegionAndCast;
+import static io.usethesource.capsule.util.RangecopyUtils.rangecopyObjectRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.setInObjectRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.setInObjectRegionVarArgs;
+import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 import java.util.AbstractCollection;
 import java.util.AbstractSet;
@@ -52,14 +52,12 @@ import java.util.function.BiFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import io.usethesource.capsule.AbstractSpecialisedImmutableMap;
-import io.usethesource.capsule.ImmutableSet;
-import io.usethesource.capsule.ImmutableSetMultimap;
-import io.usethesource.capsule.RangecopyUtils;
-import io.usethesource.capsule.SetMultimap_Legacy;
-import io.usethesource.capsule.TransientSetMultimap;
-import io.usethesource.capsule.TrieSet_5Bits.AbstractSetNode;
-import io.usethesource.capsule.TrieSet_5Bits.SetResult;
+import io.usethesource.capsule.api.deprecated.ImmutableSet;
+import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
+import io.usethesource.capsule.api.deprecated.SetMultimap;
+import io.usethesource.capsule.api.deprecated.TransientSetMultimap;
+import io.usethesource.capsule.core.deprecated.TrieSet_5Bits.AbstractSetNode;
+import io.usethesource.capsule.core.deprecated.TrieSet_5Bits.SetResult;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Interlinked.SetMultimap0To0Node;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Interlinked.SetMultimap0To1Node;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Interlinked.SetMultimap0To2Node;
@@ -68,6 +66,8 @@ import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Speci
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Interlinked.SetMultimap1To2Node;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Interlinked.SetMultimap2To0Node;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Interlinked.EitherSingletonOrCollection.Type;
+import io.usethesource.capsule.util.RangecopyUtils;
+import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
 
 @SuppressWarnings({"rawtypes", "restriction"})
 public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
@@ -291,7 +291,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
 
   @Override
   public ImmutableSetMultimap<K, V> __insertAll(
-      final SetMultimap_Legacy<? extends K, ? extends V> setMultimap) {
+      final SetMultimap<? extends K, ? extends V> setMultimap) {
     final TransientSetMultimap<K, V> tmpTransient = this.asTransient();
     tmpTransient.__insertAll(setMultimap);
     return tmpTransient.freeze();
@@ -299,7 +299,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
 
   @Override
   public ImmutableSetMultimap<K, V> __insertAllEquivalent(
-      final SetMultimap_Legacy<? extends K, ? extends V> setMultimap,
+      final SetMultimap<? extends K, ? extends V> setMultimap,
       final Comparator<Object> cmp) {
     final TransientSetMultimap<K, V> tmpTransient = this.asTransient();
     tmpTransient.__insertAllEquivalent(setMultimap, cmp);
@@ -371,7 +371,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
   }
 
   @Override
-  public void putAll(final SetMultimap_Legacy<? extends K, ? extends V> m) {
+  public void putAll(final SetMultimap<? extends K, ? extends V> m) {
     throw new UnsupportedOperationException();
   }
 
@@ -584,8 +584,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
       }
 
       return rootNode.equals(that.rootNode);
-    } else if (other instanceof SetMultimap_Legacy) {
-      SetMultimap_Legacy that = (SetMultimap_Legacy) other;
+    } else if (other instanceof SetMultimap) {
+      SetMultimap that = (SetMultimap) other;
 
       if (this.size() != that.size())
         return false;
@@ -3446,7 +3446,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
     }
 
     @Override
-    public void putAll(final SetMultimap_Legacy<? extends K, ? extends V> m) {
+    public void putAll(final SetMultimap<? extends K, ? extends V> m) {
       throw new UnsupportedOperationException();
     }
 
@@ -3578,7 +3578,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
     }
 
     @Override
-    public boolean __insertAll(final SetMultimap_Legacy<? extends K, ? extends V> setMultimap) {
+    public boolean __insertAll(final SetMultimap<? extends K, ? extends V> setMultimap) {
       boolean modified = false;
 
       for (Map.Entry<? extends K, ? extends V> entry : setMultimap.entrySet()) {
@@ -3590,7 +3590,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
 
     @Override
     public boolean __insertAllEquivalent(
-        final SetMultimap_Legacy<? extends K, ? extends V> setMultimap,
+        final SetMultimap<? extends K, ? extends V> setMultimap,
         final Comparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented.");
     }
@@ -3890,8 +3890,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
         }
 
         return rootNode.equals(that.rootNode);
-      } else if (other instanceof SetMultimap_Legacy) {
-        SetMultimap_Legacy that = (SetMultimap_Legacy) other;
+      } else if (other instanceof SetMultimap) {
+        SetMultimap that = (SetMultimap) other;
 
         if (this.size() != that.size())
           return false;

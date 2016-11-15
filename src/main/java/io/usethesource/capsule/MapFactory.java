@@ -10,6 +10,9 @@ package io.usethesource.capsule;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import io.usethesource.capsule.api.deprecated.ImmutableMap;
+import io.usethesource.capsule.api.deprecated.TransientMap;
+
 public class MapFactory {
 
   // private final Class<? extends ImmutableMap<?, ?>> targetClass;

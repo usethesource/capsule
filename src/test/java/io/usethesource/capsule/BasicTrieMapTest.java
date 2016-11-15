@@ -17,6 +17,10 @@ import java.util.Random;
 
 import org.junit.Test;
 
+import io.usethesource.capsule.api.deprecated.ImmutableMap;
+import io.usethesource.capsule.api.deprecated.TransientMap;
+import io.usethesource.capsule.core.deprecated.TrieMap_5Bits;
+
 public class BasicTrieMapTest {
 
   /*

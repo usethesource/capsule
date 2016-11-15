@@ -7,8 +7,6 @@
  */
 package io.usethesource.capsule.experimental.multimap;
 
-import static io.usethesource.capsule.BitmapUtils.filter;
-import static io.usethesource.capsule.BitmapUtils.index;
 import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_COLLECTION;
 import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_SINGLETON;
 import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_EMPTY;
@@ -17,6 +15,8 @@ import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.set
 import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setOfNew;
 import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap.EitherSingletonOrCollection.Type.COLLECTION;
 import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap.EitherSingletonOrCollection.Type.SINGLETON;
+import static io.usethesource.capsule.util.BitmapUtils.filter;
+import static io.usethesource.capsule.util.BitmapUtils.index;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
@@ -31,10 +31,10 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 
-import io.usethesource.capsule.AbstractSpecialisedImmutableMap;
-import io.usethesource.capsule.Set;
-import io.usethesource.capsule.SetMultimap;
+import io.usethesource.capsule.api.Set;
+import io.usethesource.capsule.api.SetMultimap;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap.EitherSingletonOrCollection.Type;
+import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
 
 @SuppressWarnings("rawtypes")
 public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {

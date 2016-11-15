@@ -22,10 +22,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import io.usethesource.capsule.ArrayUtils;
-import io.usethesource.capsule.ArrayUtilsInt;
-import io.usethesource.capsule.ImmutableSet;
-import io.usethesource.capsule.TransientSet;
+import io.usethesource.capsule.api.deprecated.ImmutableSet;
+import io.usethesource.capsule.api.deprecated.TransientSet;
+import io.usethesource.capsule.util.ArrayUtils;
+import io.usethesource.capsule.util.ArrayUtilsInt;
 
 @SuppressWarnings("rawtypes")
 public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements ImmutableSet<K> {

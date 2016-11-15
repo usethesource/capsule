@@ -10,6 +10,9 @@ package io.usethesource.capsule;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
+import io.usethesource.capsule.api.deprecated.TransientSetMultimap;
+
 public class SetMultimapFactory {
 
   // private final Class<? extends ImmutableSetMultimap<?, ?>> targetClass;

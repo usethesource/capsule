@@ -10,6 +10,9 @@ package io.usethesource.capsule;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import io.usethesource.capsule.api.deprecated.ImmutableSet;
+import io.usethesource.capsule.api.deprecated.TransientSet;
+
 public class SetFactory {
 
   // private final Class<? extends ImmutableSet<?>> targetClass;

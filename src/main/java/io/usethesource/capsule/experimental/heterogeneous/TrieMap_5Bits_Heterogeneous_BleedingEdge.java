@@ -7,16 +7,16 @@
  */
 package io.usethesource.capsule.experimental.heterogeneous;
 
-import static io.usethesource.capsule.AbstractSpecialisedImmutableMap.entryOf;
-import static io.usethesource.capsule.RangecopyUtils.getFromObjectRegion;
-import static io.usethesource.capsule.RangecopyUtils.isBitInBitmap;
-import static io.usethesource.capsule.RangecopyUtils.rangecopyIntRegion;
-import static io.usethesource.capsule.RangecopyUtils.rangecopyObjectRegion;
-import static io.usethesource.capsule.RangecopyUtils.setInIntRegion;
-import static io.usethesource.capsule.RangecopyUtils.setInIntRegionVarArgs;
-import static io.usethesource.capsule.RangecopyUtils.setInObjectRegion;
-import static io.usethesource.capsule.RangecopyUtils.setInObjectRegionVarArgs;
-import static io.usethesource.capsule.RangecopyUtils.sizeOfObject;
+import static io.usethesource.capsule.util.RangecopyUtils.getFromObjectRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.isBitInBitmap;
+import static io.usethesource.capsule.util.RangecopyUtils.rangecopyIntRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.rangecopyObjectRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.setInIntRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.setInIntRegionVarArgs;
+import static io.usethesource.capsule.util.RangecopyUtils.setInObjectRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.setInObjectRegionVarArgs;
+import static io.usethesource.capsule.util.RangecopyUtils.sizeOfObject;
+import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
@@ -37,13 +37,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
-import io.usethesource.capsule.ImmutableMap;
-import io.usethesource.capsule.RangecopyUtils.ArrayView;
-import io.usethesource.capsule.RangecopyUtils.Companion;
-import io.usethesource.capsule.RangecopyUtils.EitherIntOrObject;
-import io.usethesource.capsule.RangecopyUtils.IntArrayView;
-import io.usethesource.capsule.RangecopyUtils.ObjectArrayView;
-import io.usethesource.capsule.TransientMap;
+import io.usethesource.capsule.api.deprecated.ImmutableMap;
+import io.usethesource.capsule.api.deprecated.TransientMap;
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge_IntIntSpecializations.Map0To0Node_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge_IntIntSpecializations.Map0To1Node_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge_IntIntSpecializations.Map0To2Node_5Bits_Heterogeneous_BleedingEdge;
@@ -51,6 +46,11 @@ import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heteroge
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge_IntIntSpecializations.Map1To0Node_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge_IntIntSpecializations.Map1To2Node_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge_IntIntSpecializations.Map2To0Node_5Bits_Heterogeneous_BleedingEdge;
+import io.usethesource.capsule.util.RangecopyUtils.ArrayView;
+import io.usethesource.capsule.util.RangecopyUtils.Companion;
+import io.usethesource.capsule.util.RangecopyUtils.EitherIntOrObject;
+import io.usethesource.capsule.util.RangecopyUtils.IntArrayView;
+import io.usethesource.capsule.util.RangecopyUtils.ObjectArrayView;
 
 @SuppressWarnings({"rawtypes", "restriction"})
 public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Object, Object> {

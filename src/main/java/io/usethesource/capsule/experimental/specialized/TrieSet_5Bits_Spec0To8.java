@@ -26,8 +26,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import io.usethesource.capsule.ImmutableSet;
-import io.usethesource.capsule.TransientSet;
+import io.usethesource.capsule.api.deprecated.ImmutableSet;
+import io.usethesource.capsule.api.deprecated.TransientSet;
 
 @SuppressWarnings("rawtypes")
 public class TrieSet_5Bits_Spec0To8<K> implements ImmutableSet<K> {

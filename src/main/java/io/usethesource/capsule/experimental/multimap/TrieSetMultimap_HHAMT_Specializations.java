@@ -7,7 +7,7 @@
  */
 package io.usethesource.capsule.experimental.multimap;
 
-import static io.usethesource.capsule.DataLayoutHelper.addressSize;
+import static io.usethesource.capsule.util.DataLayoutHelper.addressSize;
 
 import java.util.concurrent.atomic.AtomicReference;
 

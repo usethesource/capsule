@@ -15,6 +15,7 @@ import java.util.Collection;
 
 import org.junit.Test;
 
+import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized;
 
 public class TrieMultimapTests {
