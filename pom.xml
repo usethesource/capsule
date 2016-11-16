@@ -57,6 +57,14 @@
 				<artifactId>maven-release-plugin</artifactId>
 				<version>2.5.3</version>
 			</plugin>
+
+
+			<!--
+				Goals (http://code.mycila.com/license-maven-plugin/#goals): 
+					* license:check: verify if some files miss license header. This goal is attached to the verify phase if declared in your pom.xml like above.
+					* license:format: add the license header when missing. If a header is existing, it is updated to the new one.
+					* license:remove: remove existing license header
+			-->
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
@@ -88,9 +96,21 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.11</version>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.pholser</groupId>
+			<artifactId>junit-quickcheck-core</artifactId>
+			<version>0.6.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.pholser</groupId>
+			<artifactId>junit-quickcheck-generators</artifactId>
+			<version>0.6.1</version>
+			<scope>test</scope>
+		</dependency>		
 		<dependency>
 			<groupId>org.openjdk.jol</groupId>
 			<artifactId>jol-core</artifactId>
