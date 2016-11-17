@@ -17,29 +17,44 @@ import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 
 import io.usethesource.capsule.api.deprecated.ImmutableSet;
-import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
 
 @RunWith(JUnitQuickcheck.class)
 public class BasicSetPropertiesTest {
 
-  @Property
-  public <K> void sizeAfterBatchInsertion(java.util.Set<K> input) {
+  private final int DEFAULT_TRIALS = 1_000;
 
-    if (!input.contains(null)) {
-      ImmutableSet<K> set = DefaultTrieSet.<K>of().__insertAll(input);
-
-      assertEquals(input.size(), set.size());
-    }
+  @Property(trials = DEFAULT_TRIALS)
+  public void sizeAfterBatchInsertion(java.util.Set<Integer> input) {
+    ImmutableSet<Integer> set = DefaultTrieSet.<Integer>of().__insertAll(input);
+    assertEquals(input.size(), set.size());
   }
 
-  @Property
-  public <K> void sizeAfterBatchInsertionCapsule(TrieSet_5Bits<K> input) {
+  @Property(trials = DEFAULT_TRIALS)
+  public <K> void sizeEqualsJavaCollection(ImmutableSet<K> input) {
     assertEquals(input.size(), new HashSet<K>(input).size());
   }
 
-  @Property
-  public <K> void sizeAfterBatchInsertionJavaUtilHashSet(java.util.Set<K> input) {
-    assertEquals(input.size(), new HashSet<K>(input).size());
-  }
+  // @Property(trials = DEFAULT_TRIALS)
+  // public void sizeAfterInsertIncreasesByOne(ImmutableSet<Integer> input, Integer item) {
+  // assertEquals(input.size() + 1, input.__insert(item).size());
+  // }
+  //
+  // @Property(trials = DEFAULT_TRIALS)
+  // public void containsAfterInsert1(ImmutableSet<Integer> input, Integer item) {
+  // assumeFalse(input.contains(item));
+  // assertTrue(input.__insert(item).contains(item));
+  // }
+  //
+  // @Property(trials = DEFAULT_TRIALS)
+  // public void containsAfterInsert2(ImmutableSet<Integer> input, Integer item) {
+  // assumeTrue(input.contains(item));
+  // assertTrue(input.__insert(item).contains(item));
+  // }
+  //
+  // @Property(trials = DEFAULT_TRIALS)
+  // public void notContainedAfterRemove(ImmutableSet<Integer> input, Integer item) {
+  // assumeTrue(input.contains(item));
+  // assertFalse(input.__remove(item).contains(item));
+  // }
 
 }
