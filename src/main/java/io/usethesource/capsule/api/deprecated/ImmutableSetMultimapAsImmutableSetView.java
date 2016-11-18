@@ -16,7 +16,7 @@ import java.util.function.Function;
 
 /*
  * (K, V) -> T
- * 
+ *
  * Wrapping kev-value pair to tuple
  */
 public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements ImmutableSet<T> {
@@ -31,23 +31,6 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
    * Verifies the arity of a tuple (in our case arity should be 2).
    */
   final Function<T, Boolean> tupleChecker;
-
-  // protected ImmutableSetMultimapAsImmutableSetView() {
-  // multimap = TrieSetMultimap_BleedingEdge.<K, V> of();
-  //
-  // tupleOf = AbstractSpecialisedImmutableMap::entryOf;
-  //
-  // tupleElementAt = (tuple, position) -> {
-  // switch (position) {
-  // case 0:
-  // return tuple.getKey();
-  // case 1:
-  // return tuple.getValue();
-  // default:
-  // throw new IllegalStateException();
-  // }
-  // };
-  // }
 
   public ImmutableSetMultimapAsImmutableSetView(ImmutableSetMultimap<K, V> multimap,
       BiFunction<K, V, T> tupleOf, BiFunction<T, Integer, Object> tupleElementAt,
