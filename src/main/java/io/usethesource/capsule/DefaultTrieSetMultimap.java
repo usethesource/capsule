@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 
 import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_ChampBasedPrototype;
+import io.usethesource.capsule.util.EqualityComparator;
 
 public class DefaultTrieSetMultimap {
 
@@ -19,20 +20,23 @@ public class DefaultTrieSetMultimap {
   private static Class<TrieSetMultimap_ChampBasedPrototype> target =
       TrieSetMultimap_ChampBasedPrototype.class;
 
-  private static Method persistentSetMultimapOfEmpty;
-  private static Method persistentSetMultimapOfKeyValuePairs;
-
-  private static Method transientSetMultimapOfEmpty;
-  private static Method transientSetMultimapOfKeyValuePairs;
-
   @SuppressWarnings("rawtypes")
   public static Class<TrieSetMultimap_ChampBasedPrototype> getTargetClass() {
     return target;
   }
 
+  private static Method persistentSetMultimapOfEmpty;
+  private static Method persistentSetMultimapOfEmptyEq;
+  private static Method persistentSetMultimapOfKeyValuePairs;
+
+  private static Method transientSetMultimapOfEmpty;
+  private static Method transientSetMultimapOfKeyValuePairs;
+
   static {
     try {
       persistentSetMultimapOfEmpty = target.getMethod("of");
+      persistentSetMultimapOfEmptyEq = target.getMethod("of", EqualityComparator.class);
+
       // persistentSetMultimapOfKeyValuePairs = target.getMethod("of", Object[].class);
       //
       // transientSetMultimapOfEmpty = target.getMethod("transientOf");
@@ -47,6 +51,15 @@ public class DefaultTrieSetMultimap {
   public static final <K, V> ImmutableSetMultimap<K, V> of() {
     try {
       return (ImmutableSetMultimap<K, V>) persistentSetMultimapOfEmpty.invoke(null);
+    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static final <K, V> ImmutableSetMultimap<K, V> of(EqualityComparator<Object> cmp) {
+    try {
+      return (ImmutableSetMultimap<K, V>) persistentSetMultimapOfEmptyEq.invoke(null, cmp);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }

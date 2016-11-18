@@ -7,28 +7,30 @@
  */
 package io.usethesource.capsule.api.deprecated;
 
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.function.BiFunction;
 
 public interface ImmutableSetMultimap<K, V> extends SetMultimap<K, V> {
 
+  @Override
   ImmutableSet<V> get(final Object o);
 
-  ImmutableSet<V> getEquivalent(final Object o, final Comparator<Object> cmp);
+  // ImmutableSet<V> getEquivalent(final Object o, final Comparator<Object> cmp);
 
   boolean containsKey(final Object o);
 
-  boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp);
+  // boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp);
 
+  @Override
   boolean containsValue(final Object o);
 
-  boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp);
+  // boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp);
 
   boolean containsEntry(final Object o0, final Object o1);
 
-  boolean containsEntryEquivalent(final Object o0, final Object o1, final Comparator<Object> cmp);
+  // boolean containsEntryEquivalent(final Object o0, final Object o1, final Comparator<Object>
+  // cmp);
 
   ImmutableSetMultimap<K, V> __put(final K key, final V val);
 
@@ -36,25 +38,24 @@ public interface ImmutableSetMultimap<K, V> extends SetMultimap<K, V> {
 
   ImmutableSetMultimap<K, V> __insert(final K key, final V val);
 
-  ImmutableSetMultimap<K, V> __insertEquivalent(final K key, final V val,
-      final Comparator<Object> cmp);
+  // ImmutableSetMultimap<K, V> __insertEquivalent(final K key, final V val,
+  // final Comparator<Object> cmp);
 
-  ImmutableSetMultimap<K, V> __insertAll(
-      final SetMultimap<? extends K, ? extends V> setMultimap);
+  ImmutableSetMultimap<K, V> __insertAll(final SetMultimap<? extends K, ? extends V> setMultimap);
 
-  ImmutableSetMultimap<K, V> __insertAllEquivalent(
-      final SetMultimap<? extends K, ? extends V> setMultimap, final Comparator<Object> cmp);
+  // ImmutableSetMultimap<K, V> __insertAllEquivalent(
+  // final SetMultimap<? extends K, ? extends V> setMultimap, final Comparator<Object> cmp);
 
   // removes all mappings with 'key'
   ImmutableSetMultimap<K, V> __remove(final K key);
 
-  // removes all mappings with 'key'
-  ImmutableSetMultimap<K, V> __removeEquivalent(final K key, final Comparator<Object> cmp);
+  // // removes all mappings with 'key'
+  // ImmutableSetMultimap<K, V> __removeEquivalent(final K key, final Comparator<Object> cmp);
 
   ImmutableSetMultimap<K, V> __removeEntry(final K key, final V val);
 
-  ImmutableSetMultimap<K, V> __removeEntryEquivalent(final K key, final V val,
-      final Comparator<Object> cmp);
+  // ImmutableSetMultimap<K, V> __removeEntryEquivalent(final K key, final V val,
+  // final Comparator<Object> cmp);
 
   Iterator<K> keyIterator();
 

@@ -17,37 +17,61 @@ public interface TransientSet<K> extends Set<K> {
   @Override
   boolean containsAll(final Collection<?> c);
 
-  boolean containsAllEquivalent(final Collection<?> c, final Comparator<Object> cmp);
+  @Deprecated
+  default boolean containsAllEquivalent(final Collection<?> c, final Comparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented @ TransientSet.");
+  }
 
   K get(final Object o);
 
-  K getEquivalent(final Object o, final Comparator<Object> cmp);
+  @Deprecated
+  default K getEquivalent(final Object o, final Comparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented @ TransientSet.");
+  }
 
   @Override
   boolean contains(final Object o);
 
-  boolean containsEquivalent(final Object o, final Comparator<Object> cmp);
+  @Deprecated
+  default boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented @ TransientSet.");
+  }
 
   boolean __insert(final K key);
 
-  boolean __insertEquivalent(final K key, final Comparator<Object> cmp);
+  @Deprecated
+  default boolean __insertEquivalent(final K key, final Comparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented @ TransientSet.");
+  }
 
   boolean __insertAll(final Set<? extends K> set);
 
-  boolean __insertAllEquivalent(final Set<? extends K> set, final Comparator<Object> cmp);
+  @Deprecated
+  default boolean __insertAllEquivalent(final Set<? extends K> set, final Comparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented @ TransientSet.");
+  }
 
   boolean __remove(final K key);
 
-  boolean __removeEquivalent(final K key, final Comparator<Object> cmp);
+  @Deprecated
+  default boolean __removeEquivalent(final K key, final Comparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented @ TransientSet.");
+  }
 
   boolean __removeAll(final Set<? extends K> set);
 
-  boolean __removeAllEquivalent(final Set<? extends K> set, final Comparator<Object> cmp);
+  @Deprecated
+  default boolean __removeAllEquivalent(final Set<? extends K> set, final Comparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented @ TransientSet.");
+  }
 
   boolean __retainAll(final Set<? extends K> set);
 
-  boolean __retainAllEquivalent(final TransientSet<? extends K> transientSet,
-      final Comparator<Object> cmp);
+  @Deprecated
+  default boolean __retainAllEquivalent(final TransientSet<? extends K> transientSet,
+      final Comparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented @ TransientSet.");
+  }
 
   Iterator<K> keyIterator();
 

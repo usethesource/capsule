@@ -7,45 +7,47 @@
  */
 package io.usethesource.capsule.api.deprecated;
 
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.function.BiFunction;
 
 public interface TransientSetMultimap<K, V> extends SetMultimap<K, V> {
 
+  @Override
   ImmutableSet<V> get(final Object o);
 
-  ImmutableSet<V> getEquivalent(final Object o, final Comparator<Object> cmp);
+  // ImmutableSet<V> getEquivalent(final Object o, final Comparator<Object> cmp);
 
   boolean containsKey(final Object o);
 
-  boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp);
+  // boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp);
 
+  @Override
   boolean containsValue(final Object o);
 
-  boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp);
+  // boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp);
 
   boolean containsEntry(final Object o0, final Object o1);
 
-  boolean containsEntryEquivalent(final Object o0, final Object o1, final Comparator<Object> cmp);
+  // boolean containsEntryEquivalent(final Object o0, final Object o1, final Comparator<Object>
+  // cmp);
 
   default boolean __put(K key, ImmutableSet<V> valColl) {
-    throw new UnsupportedOperationException("Not yet implemented.");
+    throw new UnsupportedOperationException("Not yet implemented @ TransientSetMultimap.");
   }
 
   boolean __insert(final K key, final V val);
 
-  boolean __insertEquivalent(final K key, final V val, final Comparator<Object> cmp);
+  // boolean __insertEquivalent(final K key, final V val, final Comparator<Object> cmp);
 
   boolean __insertAll(final SetMultimap<? extends K, ? extends V> setMultimap);
 
-  boolean __insertAllEquivalent(final SetMultimap<? extends K, ? extends V> setMultimap,
-      final Comparator<Object> cmp);
+  // boolean __insertAllEquivalent(final SetMultimap<? extends K, ? extends V> setMultimap,
+  // final Comparator<Object> cmp);
 
   boolean __removeTuple(final K key, final V val);
 
-  boolean __removeTupleEquivalent(final K key, final V val, final Comparator<Object> cmp);
+  // boolean __removeTupleEquivalent(final K key, final V val, final Comparator<Object> cmp);
 
   Iterator<K> keyIterator();
 

@@ -118,22 +118,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
 
   @Override
   public boolean containsEquivalent(Object o, Comparator<Object> cmp) {
-    try {
-      T tuple = (T) o;
-
-      if (!tupleChecker.apply(tuple))
-        throw new ClassCastException("Type validation failed.");
-
-      @SuppressWarnings("unchecked")
-      final K key = (K) tupleElementAt.apply(tuple, 0);
-      @SuppressWarnings("unchecked")
-      final V val = (V) tupleElementAt.apply(tuple, 1);
-
-      return multimap.containsEntryEquivalent(key, val, cmp);
-    } catch (ClassCastException | ArrayIndexOutOfBoundsException e) {
-      // not a tuple or not at least two elements
-      return false;
-    }
+    return contains(o); // ignore cmp
   }
 
   @Override
@@ -177,23 +162,8 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
   }
 
   @Override
-  public ImmutableSet<T> __insertEquivalent(T tuple, Comparator<Object> cmp) {
-    if (!tupleChecker.apply(tuple))
-      throw new ClassCastException("Type validation failed.");
-
-    @SuppressWarnings("unchecked")
-    final K key = (K) tupleElementAt.apply(tuple, 0);
-    @SuppressWarnings("unchecked")
-    final V val = (V) tupleElementAt.apply(tuple, 1);
-
-    final ImmutableSetMultimap<K, V> multimapNew = multimap.__insertEquivalent(key, val, cmp);
-
-    if (multimapNew == multimap) {
-      return this;
-    } else {
-      return new ImmutableSetMultimapAsImmutableSetView<>(multimapNew, tupleOf, tupleElementAt,
-          tupleChecker);
-    }
+  public ImmutableSet<T> __insertEquivalent(T key, Comparator<Object> cmp) {
+    return __insert(key); // ignore cmp
   }
 
   @Override
@@ -220,16 +190,8 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
   }
 
   @Override
-  public ImmutableSet<T> __removeEquivalent(T tuple, Comparator<Object> cmp) {
-    @SuppressWarnings("unchecked")
-    final K key = (K) tupleElementAt.apply(tuple, 0);
-    @SuppressWarnings("unchecked")
-    final V val = (V) tupleElementAt.apply(tuple, 1);
-
-    final ImmutableSetMultimap<K, V> multimapNew = multimap.__removeEntryEquivalent(key, val, cmp);
-
-    return new ImmutableSetMultimapAsImmutableSetView<>(multimapNew, tupleOf, tupleElementAt,
-        tupleChecker);
+  public ImmutableSet<T> __removeEquivalent(T key, Comparator<Object> cmp) {
+    return __remove(key); // ignore cmp
   }
 
   @Override
@@ -368,22 +330,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
 
     @Override
     public boolean containsEquivalent(Object o, Comparator<Object> cmp) {
-      try {
-        T tuple = (T) o;
-
-        if (!tupleChecker.apply(tuple))
-          throw new ClassCastException("Type validation failed.");
-
-        @SuppressWarnings("unchecked")
-        final K key = (K) tupleElementAt.apply(tuple, 0);
-        @SuppressWarnings("unchecked")
-        final V val = (V) tupleElementAt.apply(tuple, 1);
-
-        return multimap.containsEntryEquivalent(key, val, cmp);
-      } catch (ClassCastException | ArrayIndexOutOfBoundsException e) {
-        // not a tuple or not at least two elements
-        return false;
-      }
+      return contains(o); // ignore cmp
     }
 
     @Override
@@ -420,16 +367,8 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
     }
 
     @Override
-    public boolean __insertEquivalent(T tuple, Comparator<Object> cmp) {
-      if (!tupleChecker.apply(tuple))
-        throw new ClassCastException("Type validation failed.");
-
-      @SuppressWarnings("unchecked")
-      final K key = (K) tupleElementAt.apply(tuple, 0);
-      @SuppressWarnings("unchecked")
-      final V val = (V) tupleElementAt.apply(tuple, 1);
-
-      return multimap.__insertEquivalent(key, val, cmp);
+    public boolean __insertEquivalent(T key, Comparator<Object> cmp) {
+      return __insert(key); // ignore cmp
     }
 
     @Override
@@ -453,13 +392,8 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
     }
 
     @Override
-    public boolean __removeEquivalent(T tuple, Comparator<Object> cmp) {
-      @SuppressWarnings("unchecked")
-      final K key = (K) tupleElementAt.apply(tuple, 0);
-      @SuppressWarnings("unchecked")
-      final V val = (V) tupleElementAt.apply(tuple, 1);
-
-      return multimap.__removeTupleEquivalent(key, val, cmp);
+    public boolean __removeEquivalent(T key, Comparator<Object> cmp) {
+      return __remove(key); // ignore cmp
     }
 
     @Override

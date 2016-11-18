@@ -32,6 +32,7 @@ import io.usethesource.capsule.api.deprecated.ImmutableSet;
 import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
 import io.usethesource.capsule.api.deprecated.SetMultimap;
 import io.usethesource.capsule.api.deprecated.TransientSetMultimap;
+import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableSet;
 
@@ -61,6 +62,10 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
   @SuppressWarnings("unchecked")
   public static final <K, V> ImmutableSetMultimap<K, V> of() {
     return TrieSetMultimap_ChampBasedPrototype.EMPTY_SETMULTIMAP;
+  }
+
+  public static final <K, V> ImmutableSetMultimap<K, V> of(EqualityComparator<Object> cmp) {
+    return of(); // ignore cmp
   }
 
   @SuppressWarnings("unchecked")
@@ -111,6 +116,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
     return hash;
   }
 
+  @Override
   public boolean containsKey(final Object o) {
     try {
       @SuppressWarnings("unchecked")
@@ -131,6 +137,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
     }
   }
 
+  @Override
   public boolean containsValue(final Object o) {
     for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
       if (iterator.next().equals(o)) {
@@ -149,6 +156,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
     return false;
   }
 
+  @Override
   public boolean containsEntry(final Object o0, final Object o1) {
     try {
       @SuppressWarnings("unchecked")
@@ -188,6 +196,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
     }
   }
 
+  @Override
   public ImmutableSet<V> get(final Object o) {
     try {
       @SuppressWarnings("unchecked")
@@ -222,10 +231,12 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
     }
   }
 
+  @Override
   public ImmutableSetMultimap<K, V> __put(final K key, final V val) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public ImmutableSetMultimap<K, V> __insert(final K key, final V val) {
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
@@ -259,6 +270,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
     return this;
   }
 
+  @Override
   public ImmutableSetMultimap<K, V> __insertAll(
       final SetMultimap<? extends K, ? extends V> setMultimap) {
     final TransientSetMultimap<K, V> tmpTransient = this.asTransient();
@@ -266,14 +278,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
     return tmpTransient.freeze();
   }
 
-  public ImmutableSetMultimap<K, V> __insertAllEquivalent(
-      final SetMultimap<? extends K, ? extends V> setMultimap,
-      final Comparator<Object> cmp) {
-    final TransientSetMultimap<K, V> tmpTransient = this.asTransient();
-    tmpTransient.__insertAllEquivalent(setMultimap, cmp);
-    return tmpTransient.freeze();
-  }
-
+  @Override
   public ImmutableSetMultimap<K, V> __removeEntry(final K key, final V val) {
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
@@ -309,46 +314,57 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
     return this;
   }
 
+  @Override
   public V put(final K key, final V val) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void putAll(final SetMultimap<? extends K, ? extends V> m) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void clear() {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public V remove(final Object key, final Object val) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public int size() {
     return cachedSize;
   }
 
+  @Override
   public boolean isEmpty() {
     return cachedSize == 0;
   }
 
+  @Override
   public Iterator<K> keyIterator() {
     return new SetMultimapKeyIterator<>(rootNode);
   }
 
+  @Override
   public Iterator<V> valueIterator() {
     return valueCollectionsStream().flatMap(Set::stream).iterator();
   }
 
+  @Override
   public Iterator<Map.Entry<K, V>> entryIterator() {
     return new SetMultimapTupleIterator<>(rootNode, AbstractSpecialisedImmutableMap::entryOf);
   }
 
+  @Override
   public Iterator<Map.Entry<K, Object>> nativeEntryIterator() {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public <T> Iterator<T> tupleIterator(final BiFunction<K, V, T> tupleOf) {
     return new SetMultimapTupleIterator<>(rootNode, tupleOf);
   }
@@ -837,7 +853,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 
     /**
      * The arity of this trie node (i.e. number of values and nodes stored on this level).
-     * 
+     *
      * @return sum of nodes and values stored within
      */
 
@@ -871,7 +887,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
     }
 
     static final int bitpos(final int mask) {
-      return (int) (1 << mask);
+      return 1 << mask;
     }
 
     abstract int nodeMap();
@@ -885,7 +901,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
     /**
      * Abstract predicate over a node's size. Value can be either {@value #SIZE_EMPTY},
      * {@value #SIZE_ONE}, or {@value #SIZE_MORE_THAN_ONE}.
-     * 
+     *
      * @return size predicate
      */
     abstract byte sizePredicate();
@@ -944,12 +960,12 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 
       if (mask0 != mask1) {
         // both nodes fit on same level
-        final int dataMap = (int) (bitpos(mask0) | bitpos(mask1));
+        final int dataMap = bitpos(mask0) | bitpos(mask1);
 
         if (mask0 < mask1) {
-          return nodeOf(null, (int) (0), dataMap, new Object[] {key0, valColl0, key1, valColl1});
+          return nodeOf(null, (0), dataMap, new Object[] {key0, valColl0, key1, valColl1});
         } else {
-          return nodeOf(null, (int) (0), dataMap, new Object[] {key1, valColl1, key0, valColl0});
+          return nodeOf(null, (0), dataMap, new Object[] {key1, valColl1, key0, valColl0});
         }
       } else {
         final CompactSetMultimapNode<K, V> node = mergeTwoKeyValPairs(key0, valColl0, keyHash0,
@@ -957,7 +973,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
         // values fit on next level
 
         final int nodeMap = bitpos(mask0);
-        return nodeOf(null, nodeMap, (int) (0), new Object[] {node});
+        return nodeOf(null, nodeMap, (0), new Object[] {node});
       }
     }
 
@@ -965,7 +981,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 
     static {
 
-      EMPTY_NODE = new BitmapIndexedSetMultimapNode<>(null, (int) (0), (int) (0), new Object[] {});
+      EMPTY_NODE = new BitmapIndexedSetMultimapNode<>(null, (0), (0), new Object[] {});
 
     };
 
@@ -982,7 +998,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
     static final <K, V> CompactSetMultimapNode<K, V> nodeOf(AtomicReference<Thread> mutator,
         final int nodeMap, final int dataMap, final K key, final ImmutableSet<V> valColl) {
       assert nodeMap == 0;
-      return nodeOf(mutator, (int) (0), dataMap, new Object[] {key, valColl});
+      return nodeOf(mutator, (0), dataMap, new Object[] {key, valColl});
     }
 
     static final int index(final int bitmap, final int bitpos) {
@@ -1005,6 +1021,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       return getNode(nodeIndex(bitpos));
     }
 
+    @Override
     boolean containsKey(final K key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -1024,6 +1041,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       return false;
     }
 
+    @Override
     boolean containsKey(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -1044,6 +1062,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       return false;
     }
 
+    @Override
     Optional<ImmutableSet<V>> findByKey(final K key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -1068,6 +1087,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       return Optional.empty();
     }
 
+    @Override
     Optional<ImmutableSet<V>> findByKey(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -1093,6 +1113,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       return Optional.empty();
     }
 
+    @Override
     CompactSetMultimapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key,
         final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details) {
       final int mask = mask(keyHash, shift);
@@ -1158,6 +1179,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       }
     }
 
+    @Override
     CompactSetMultimapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key,
         final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details,
         final Comparator<Object> cmp) {
@@ -1224,6 +1246,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       }
     }
 
+    @Override
     CompactSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
         final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details) {
       final int mask = mask(keyHash, shift);
@@ -1257,11 +1280,11 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
                     (shift == 0) ? (int) (dataMap() ^ bitpos) : bitpos(mask(keyHash, 0));
 
                 if (dataIndex == 0) {
-                  return CompactSetMultimapNode.<K, V>nodeOf(mutator, (int) 0, newDataMap,
-                      getKey(1), getValue(1));
+                  return CompactSetMultimapNode.<K, V>nodeOf(mutator, 0, newDataMap, getKey(1),
+                      getValue(1));
                 } else {
-                  return CompactSetMultimapNode.<K, V>nodeOf(mutator, (int) 0, newDataMap,
-                      getKey(0), getValue(0));
+                  return CompactSetMultimapNode.<K, V>nodeOf(mutator, 0, newDataMap, getKey(0),
+                      getValue(0));
                 }
               } else {
                 return copyAndRemoveValue(mutator, bitpos);
@@ -1307,6 +1330,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       return this;
     }
 
+    @Override
     CompactSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
         final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details,
         final Comparator<Object> cmp) {
@@ -1341,11 +1365,11 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
                     (shift == 0) ? (int) (dataMap() ^ bitpos) : bitpos(mask(keyHash, 0));
 
                 if (dataIndex == 0) {
-                  return CompactSetMultimapNode.<K, V>nodeOf(mutator, (int) 0, newDataMap,
-                      getKey(1), getValue(1));
+                  return CompactSetMultimapNode.<K, V>nodeOf(mutator, 0, newDataMap, getKey(1),
+                      getValue(1));
                 } else {
-                  return CompactSetMultimapNode.<K, V>nodeOf(mutator, (int) 0, newDataMap,
-                      getKey(0), getValue(0));
+                  return CompactSetMultimapNode.<K, V>nodeOf(mutator, 0, newDataMap, getKey(0),
+                      getValue(0));
                 }
               } else {
                 return copyAndRemoveValue(mutator, bitpos);
@@ -1409,7 +1433,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
           }
         }
 
-        map = (int) (map >> 1);
+        map = map >> 1;
         mask += 1;
       }
 
@@ -1565,8 +1589,8 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
     public int hashCode() {
       final int prime = 31;
       int result = 0;
-      result = prime * result + ((int) dataMap());
-      result = prime * result + ((int) dataMap());
+      result = prime * result + (dataMap());
+      result = prime * result + (dataMap());
       result = prime * result + Arrays.hashCode(nodes);
       return result;
     }
@@ -1622,7 +1646,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
         return this;
       } else {
         final Object[] src = this.nodes;
-        final Object[] dst = (Object[]) new Object[src.length];
+        final Object[] dst = new Object[src.length];
 
         // copy 'src' and set 1 element(s) at position 'idx'
         System.arraycopy(src, 0, dst, 0, src.length);
@@ -1644,7 +1668,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
         return this;
       } else {
         final Object[] src = this.nodes;
-        final Object[] dst = (Object[]) new Object[src.length];
+        final Object[] dst = new Object[src.length];
 
         // copy 'src' and set 1 element(s) at position 'idx'
         System.arraycopy(src, 0, dst, 0, src.length);
@@ -1660,7 +1684,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       final int idx = TUPLE_LENGTH * dataIndex(bitpos);
 
       final Object[] src = this.nodes;
-      final Object[] dst = (Object[]) new Object[src.length + 2];
+      final Object[] dst = new Object[src.length + 2];
 
       // copy 'src' and insert 2 element(s) at position 'idx'
       System.arraycopy(src, 0, dst, 0, idx);
@@ -1668,7 +1692,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       dst[idx + 1] = valColl;
       System.arraycopy(src, idx, dst, idx + 2, src.length - idx);
 
-      return nodeOf(mutator, nodeMap(), (int) (dataMap() | bitpos), dst);
+      return nodeOf(mutator, nodeMap(), dataMap() | bitpos, dst);
     }
 
     @Override
@@ -1677,13 +1701,13 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       final int idx = TUPLE_LENGTH * dataIndex(bitpos);
 
       final Object[] src = this.nodes;
-      final Object[] dst = (Object[]) new Object[src.length - 2];
+      final Object[] dst = new Object[src.length - 2];
 
       // copy 'src' and remove 2 element(s) at position 'idx'
       System.arraycopy(src, 0, dst, 0, idx);
       System.arraycopy(src, idx + 2, dst, idx, src.length - idx - 2);
 
-      return nodeOf(mutator, nodeMap(), (int) (dataMap() ^ bitpos), dst);
+      return nodeOf(mutator, nodeMap(), dataMap() ^ bitpos, dst);
     }
 
     @Override
@@ -1705,7 +1729,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       dst[idxNew + 0] = node;
       System.arraycopy(src, idxNew + 2, dst, idxNew + 1, src.length - idxNew - 2);
 
-      return nodeOf(mutator, (int) (nodeMap() | bitpos), (int) (dataMap() ^ bitpos), dst);
+      return nodeOf(mutator, nodeMap() | bitpos, dataMap() ^ bitpos, dst);
     }
 
     @Override
@@ -1728,7 +1752,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       System.arraycopy(src, idxNew, dst, idxNew + 2, idxOld - idxNew);
       System.arraycopy(src, idxOld + 1, dst, idxOld + 2, src.length - idxOld - 1);
 
-      return nodeOf(mutator, (int) (nodeMap() ^ bitpos), (int) (dataMap() | bitpos), dst);
+      return nodeOf(mutator, nodeMap() ^ bitpos, dataMap() | bitpos, dst);
     }
 
   }
@@ -1748,6 +1772,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       assert payloadArity() >= 2;
     }
 
+    @Override
     boolean containsKey(final K key, final int keyHash, final int shift) {
       if (this.hash == keyHash) {
         for (K k : keys) {
@@ -1759,6 +1784,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       return false;
     }
 
+    @Override
     boolean containsKey(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       if (this.hash == keyHash) {
@@ -1771,6 +1797,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       return false;
     }
 
+    @Override
     Optional<ImmutableSet<V>> findByKey(final K key, final int keyHash, final int shift) {
       for (int i = 0; i < keys.length; i++) {
         final K _key = keys[i];
@@ -1782,6 +1809,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       return Optional.empty();
     }
 
+    @Override
     Optional<ImmutableSet<V>> findByKey(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       for (int i = 0; i < keys.length; i++) {
@@ -1794,6 +1822,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       return Optional.empty();
     }
 
+    @Override
     CompactSetMultimapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key,
         final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details) {
       assert this.hash == keyHash;
@@ -1810,7 +1839,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 
             final ImmutableSet<V>[] src = this.vals;
             @SuppressWarnings("unchecked")
-            final ImmutableSet<V>[] dst = (ImmutableSet<V>[]) new ImmutableSet[src.length];
+            final ImmutableSet<V>[] dst = new ImmutableSet[src.length];
 
             // copy 'src' and set 1 element(s) at position 'idx'
             System.arraycopy(src, 0, dst, 0, src.length);
@@ -1839,7 +1868,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
           this.keys.length - keys.length);
 
       @SuppressWarnings("unchecked")
-      final ImmutableSet<V>[] valsNew = (ImmutableSet<V>[]) new ImmutableSet[this.vals.length + 1];
+      final ImmutableSet<V>[] valsNew = new ImmutableSet[this.vals.length + 1];
 
       // copy 'this.vals' and insert 1 element(s) at position
       // 'vals.length'
@@ -1852,6 +1881,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       return new HashCollisionSetMultimapNode_BleedingEdge<>(keyHash, keysNew, valsNew);
     }
 
+    @Override
     CompactSetMultimapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key,
         final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details,
         final Comparator<Object> cmp) {
@@ -1869,7 +1899,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 
             final ImmutableSet<V>[] src = this.vals;
             @SuppressWarnings("unchecked")
-            final ImmutableSet<V>[] dst = (ImmutableSet<V>[]) new ImmutableSet[src.length];
+            final ImmutableSet<V>[] dst = new ImmutableSet[src.length];
 
             // copy 'src' and set 1 element(s) at position 'idx'
             System.arraycopy(src, 0, dst, 0, src.length);
@@ -1898,7 +1928,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
           this.keys.length - keys.length);
 
       @SuppressWarnings("unchecked")
-      final ImmutableSet<V>[] valsNew = (ImmutableSet<V>[]) new ImmutableSet[this.vals.length + 1];
+      final ImmutableSet<V>[] valsNew = new ImmutableSet[this.vals.length + 1];
 
       // copy 'this.vals' and insert 1 element(s) at position
       // 'vals.length'
@@ -1911,6 +1941,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       return new HashCollisionSetMultimapNode_BleedingEdge<>(keyHash, keysNew, valsNew);
     }
 
+    @Override
     CompactSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
         final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details) {
       for (int idx = 0; idx < keys.length; idx++) {
@@ -1926,8 +1957,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
             if (valCollNew.size() != 0) {
               // update mapping
               @SuppressWarnings("unchecked")
-              final ImmutableSet<V>[] valsNew =
-                  (ImmutableSet<V>[]) new ImmutableSet[this.vals.length];
+              final ImmutableSet<V>[] valsNew = new ImmutableSet[this.vals.length];
 
               // copy 'this.vals' and set 1 element(s) at position
               // 'idx'
@@ -1960,8 +1990,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
                 System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
 
                 @SuppressWarnings("unchecked")
-                final ImmutableSet<V>[] valsNew =
-                    (ImmutableSet<V>[]) new ImmutableSet[this.vals.length - 1];
+                final ImmutableSet<V>[] valsNew = new ImmutableSet[this.vals.length - 1];
 
                 // copy 'this.vals' and remove 1 element(s) at
                 // position 'idx'
@@ -1979,6 +2008,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       return this;
     }
 
+    @Override
     CompactSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
         final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details,
         final Comparator<Object> cmp) {
@@ -1995,8 +2025,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
             if (valCollNew.size() != 0) {
               // update mapping
               @SuppressWarnings("unchecked")
-              final ImmutableSet<V>[] valsNew =
-                  (ImmutableSet<V>[]) new ImmutableSet[this.vals.length];
+              final ImmutableSet<V>[] valsNew = new ImmutableSet[this.vals.length];
 
               // copy 'this.vals' and set 1 element(s) at position
               // 'idx'
@@ -2029,8 +2058,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
                 System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
 
                 @SuppressWarnings("unchecked")
-                final ImmutableSet<V>[] valsNew =
-                    (ImmutableSet<V>[]) new ImmutableSet[this.vals.length - 1];
+                final ImmutableSet<V>[] valsNew = new ImmutableSet[this.vals.length - 1];
 
                 // copy 'this.vals' and remove 1 element(s) at
                 // position 'idx'
@@ -2355,6 +2383,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       this.tupleOf = tupleOf;
     }
 
+    @Override
     public boolean hasNext() {
       if (currentSetIterator.hasNext()) {
         return true;
@@ -2467,22 +2496,27 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       return hash == targetHash && size == targetSize;
     }
 
+    @Override
     public V put(final K key, final V val) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public void putAll(final SetMultimap<? extends K, ? extends V> m) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public void clear() {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public V remove(final Object key, final Object val) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean containsKey(final Object o) {
       try {
         @SuppressWarnings("unchecked")
@@ -2503,6 +2537,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       }
     }
 
+    @Override
     public boolean containsValue(final Object o) {
       for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
         if (iterator.next().equals(o)) {
@@ -2521,6 +2556,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       return false;
     }
 
+    @Override
     public boolean containsEntry(final Object o0, final Object o1) {
       try {
         @SuppressWarnings("unchecked")
@@ -2560,6 +2596,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       }
     }
 
+    @Override
     public ImmutableSet<V> get(final Object o) {
       try {
         @SuppressWarnings("unchecked")
@@ -2594,6 +2631,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       }
     }
 
+    @Override
     public boolean __insert(final K key, final V val) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -2656,6 +2694,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       return false;
     }
 
+    @Override
     public boolean __insertAll(final SetMultimap<? extends K, ? extends V> setMultimap) {
       boolean modified = false;
 
@@ -2666,8 +2705,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       return modified;
     }
 
-    public boolean __insertAllEquivalent(
-        final SetMultimap<? extends K, ? extends V> setMultimap,
+    public boolean __insertAllEquivalent(final SetMultimap<? extends K, ? extends V> setMultimap,
         final Comparator<Object> cmp) {
       boolean modified = false;
 
@@ -2678,6 +2716,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       return modified;
     }
 
+    @Override
     public boolean __removeTuple(final K key, final V val) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -2742,27 +2781,33 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
       return false;
     }
 
+    @Override
     public int size() {
       return cachedSize;
     }
 
+    @Override
     public boolean isEmpty() {
       return cachedSize == 0;
     }
 
+    @Override
     public Iterator<K> keyIterator() {
       return new TransientSetMultimapKeyIterator<>(this);
     }
 
+    @Override
     public Iterator<V> valueIterator() {
       return valueCollectionsStream().flatMap(Set::stream).iterator();
     }
 
+    @Override
     public Iterator<Map.Entry<K, V>> entryIterator() {
       return new TransientSetMultimapTupleIterator<>(this,
           AbstractSpecialisedImmutableMap::entryOf);
     }
 
+    @Override
     public <T> Iterator<T> tupleIterator(final BiFunction<K, V, T> tupleOf) {
       return new TransientSetMultimapTupleIterator<>(this, tupleOf);
     }
@@ -2791,10 +2836,12 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
         this.collection = collection;
       }
 
+      @Override
       public K next() {
         return lastKey = super.next();
       }
 
+      @Override
       public void remove() {
         throw new UnsupportedOperationException();
       }
@@ -2810,10 +2857,12 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
         this.collection = collection;
       }
 
+      @Override
       public ImmutableSet<V> next() {
         return super.next();
       }
 
+      @Override
       public void remove() {
         throw new UnsupportedOperationException();
       }
@@ -2830,10 +2879,12 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
         this.collection = collection;
       }
 
+      @Override
       public T next() {
         return super.next();
       }
 
+      @Override
       public void remove() {
         // TODO: test removal at iteration rigorously
         collection.__removeTuple(currentKey, currentValue);
@@ -3042,11 +3093,6 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements ImmutableSetMu
 
   @Override
   public ImmutableSetMultimap<K, V> __remove(K key) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public ImmutableSetMultimap<K, V> __removeEquivalent(K key, Comparator<Object> cmp) {
     throw new UnsupportedOperationException();
   }
 

@@ -17,37 +17,63 @@ public interface ImmutableSet<K> extends Set<K> {
   @Override
   boolean containsAll(final Collection<?> c);
 
-  boolean containsAllEquivalent(final Collection<?> c, final Comparator<Object> cmp);
+  @Deprecated
+  default boolean containsAllEquivalent(final Collection<?> c, final Comparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented @ ImmutableSet.");
+  }
 
   K get(final Object o);
 
-  K getEquivalent(final Object o, final Comparator<Object> cmp);
+  @Deprecated
+  default K getEquivalent(final Object o, final Comparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented @ ImmutableSet.");
+  }
 
   @Override
   boolean contains(final Object o);
 
-  boolean containsEquivalent(final Object o, final Comparator<Object> cmp);
+  @Deprecated
+  default boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented @ ImmutableSet.");
+  }
 
   ImmutableSet<K> __insert(final K key);
 
-  ImmutableSet<K> __insertEquivalent(final K key, final Comparator<Object> cmp);
+  @Deprecated
+  default ImmutableSet<K> __insertEquivalent(final K key, final Comparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented @ ImmutableSet.");
+  }
 
   ImmutableSet<K> __insertAll(final Set<? extends K> set);
 
-  ImmutableSet<K> __insertAllEquivalent(final Set<? extends K> set, final Comparator<Object> cmp);
+  @Deprecated
+  default ImmutableSet<K> __insertAllEquivalent(final Set<? extends K> set,
+      final Comparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented @ ImmutableSet.");
+  }
 
   ImmutableSet<K> __remove(final K key);
 
-  ImmutableSet<K> __removeEquivalent(final K key, final Comparator<Object> cmp);
+  @Deprecated
+  default ImmutableSet<K> __removeEquivalent(final K key, final Comparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented @ ImmutableSet.");
+  }
 
   ImmutableSet<K> __removeAll(final Set<? extends K> set);
 
-  ImmutableSet<K> __removeAllEquivalent(final Set<? extends K> set, final Comparator<Object> cmp);
+  @Deprecated
+  default ImmutableSet<K> __removeAllEquivalent(final Set<? extends K> set,
+      final Comparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented @ ImmutableSet.");
+  }
 
   ImmutableSet<K> __retainAll(final Set<? extends K> set);
 
-  ImmutableSet<K> __retainAllEquivalent(final TransientSet<? extends K> transientSet,
-      final Comparator<Object> cmp);
+  @Deprecated
+  default ImmutableSet<K> __retainAllEquivalent(final TransientSet<? extends K> transientSet,
+      final Comparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented @ ImmutableSet.");
+  }
 
   Iterator<K> keyIterator();
 

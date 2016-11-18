@@ -66,24 +66,28 @@ import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Speci
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EitherSingletonOrCollection.Type;
 import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8.AbstractSetNode;
 import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8.SetResult;
+import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.RangecopyUtils;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
 
 /**
  * NOTE: only difference to {@link TrieSetMultimap_HHAMT_Specialized_Interlinked} is the use of
  * {@link SetMultimapUtils#specSetNodeOf} instead of of {@link SetMultimapUtils#setNodeOf}.
- * 
+ *
  * TODO: unify by injecting factory method.
  */
 @SuppressWarnings({"rawtypes", "restriction"})
 public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
     implements ImmutableSetMultimap<K, V> {
 
+  private final EqualityComparator<Object> cmp;
+
   protected static final CompactSetMultimapNode EMPTY_NODE = new SetMultimap0To0Node<>(null, 0L);
 
   @SuppressWarnings("unchecked")
   private static final TrieSetMultimap_HHAMT_Specialized_Path_Interlinked EMPTY_SETMULTIMAP =
-      new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked(EMPTY_NODE, 0, 0);
+      new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked(EqualityComparator.EQUALS, EMPTY_NODE,
+          0, 0);
 
   private static final boolean DEBUG = false;
 
@@ -91,8 +95,9 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
   private final int hashCode;
   private final int cachedSize;
 
-  TrieSetMultimap_HHAMT_Specialized_Path_Interlinked(AbstractSetMultimapNode<K, V> rootNode,
-      int hashCode, int cachedSize) {
+  TrieSetMultimap_HHAMT_Specialized_Path_Interlinked(EqualityComparator<Object> cmp,
+      AbstractSetMultimapNode<K, V> rootNode, int hashCode, int cachedSize) {
+    this.cmp = cmp;
     this.rootNode = rootNode;
     this.hashCode = hashCode;
     this.cachedSize = cachedSize;
@@ -160,31 +165,16 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
     try {
       @SuppressWarnings("unchecked")
       final K key = (K) o;
-      return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0);
+      return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0, cmp);
     } catch (ClassCastException unused) {
       return false;
     }
   }
 
   @Override
-  public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
-    throw new UnsupportedOperationException("Not yet implemented.");
-  }
-
-  @Override
   public boolean containsValue(final Object o) {
     for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
-      if (iterator.next().equals(o)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  @Override
-  public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
-    for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
-      if (cmp.compare(iterator.next(), o) == 0) {
+      if (cmp.equals(iterator.next(), o)) {
         return true;
       }
     }
@@ -198,16 +188,10 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
       final K key = (K) o0;
       @SuppressWarnings("unchecked")
       final V val = (V) o1;
-      return rootNode.containsTuple(key, val, transformHashCode(key.hashCode()), 0);
+      return rootNode.containsTuple(key, val, transformHashCode(key.hashCode()), 0, cmp);
     } catch (ClassCastException unused) {
       return false;
     }
-  }
-
-  @Override
-  public boolean containsEntryEquivalent(final Object o0, final Object o1,
-      final Comparator<Object> cmp) {
-    throw new UnsupportedOperationException("Not yet implemented.");
   }
 
   @Override
@@ -216,7 +200,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
       @SuppressWarnings("unchecked")
       final K key = (K) o;
       final Optional<AbstractSetNode<V>> result =
-          rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
+          rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
       if (result.isPresent()) {
         return setFromNode(result.get());
@@ -229,17 +213,12 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
   }
 
   @Override
-  public ImmutableSet<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
-    throw new UnsupportedOperationException("Not yet implemented.");
-  }
-
-  @Override
   public ImmutableSetMultimap<K, V> __put(K key, V val) {
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
     final CompactSetMultimapNode<K, V> newRootNode =
-        rootNode.updated(null, key, val, transformHashCode(keyHash), 0, details);
+        rootNode.updated(null, key, val, transformHashCode(keyHash), 0, details, cmp);
 
     if (details.isModified()) {
       if (details.hasReplacedValue()) {
@@ -247,7 +226,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
           final int valHashOld = details.getReplacedValue().hashCode();
           final int valHashNew = val.hashCode();
 
-          return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(newRootNode,
+          return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(cmp, newRootNode,
               hashCode + ((keyHash ^ valHashNew)) - ((keyHash ^ valHashOld)), cachedSize);
         } else {
           int sumOfReplacedHashes = 0;
@@ -258,14 +237,14 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
           final int valHashNew = val.hashCode();
 
-          return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(newRootNode,
+          return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(cmp, newRootNode,
               hashCode + ((keyHash ^ valHashNew)) - sumOfReplacedHashes,
               cachedSize - details.getReplacedCollection().size() + 1);
         }
       }
 
       final int valHash = val.hashCode();
-      return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(newRootNode,
+      return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(cmp, newRootNode,
           hashCode + ((keyHash ^ valHash)), cachedSize + 1);
     }
 
@@ -278,21 +257,15 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
     final CompactSetMultimapNode<K, V> newRootNode =
-        rootNode.inserted(null, key, val, transformHashCode(keyHash), 0, details);
+        rootNode.inserted(null, key, val, transformHashCode(keyHash), 0, details, cmp);
 
     if (details.isModified()) {
       final int valHash = val.hashCode();
-      return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(newRootNode,
+      return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(cmp, newRootNode,
           hashCode + ((keyHash ^ valHash)), cachedSize + 1);
     }
 
     return this;
-  }
-
-  @Override
-  public ImmutableSetMultimap<K, V> __insertEquivalent(final K key, final V val,
-      final Comparator<Object> cmp) {
-    throw new UnsupportedOperationException("Not yet implemented.");
   }
 
   @Override
@@ -304,36 +277,21 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
   }
 
   @Override
-  public ImmutableSetMultimap<K, V> __insertAllEquivalent(
-      final SetMultimap<? extends K, ? extends V> setMultimap,
-      final Comparator<Object> cmp) {
-    final TransientSetMultimap<K, V> tmpTransient = this.asTransient();
-    tmpTransient.__insertAllEquivalent(setMultimap, cmp);
-    return tmpTransient.freeze();
-  }
-
-  @Override
   public ImmutableSetMultimap<K, V> __removeEntry(final K key, final V val) {
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
     final CompactSetMultimapNode<K, V> newRootNode =
-        rootNode.removed(null, key, val, transformHashCode(keyHash), 0, details);
+        rootNode.removed(null, key, val, transformHashCode(keyHash), 0, details, cmp);
 
     if (details.isModified()) {
       assert details.hasReplacedValue();
       final int valHash = details.getReplacedValue().hashCode();
-      return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(newRootNode,
+      return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(cmp, newRootNode,
           hashCode - ((keyHash ^ valHash)), cachedSize - 1);
     }
 
     return this;
-  }
-
-  @Override
-  public ImmutableSetMultimap<K, V> __removeEntryEquivalent(final K key, final V val,
-      final Comparator<Object> cmp) {
-    throw new UnsupportedOperationException("Not yet implemented.");
   }
 
   @Override
@@ -342,14 +300,14 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
     final CompactSetMultimapNode<K, V> newRootNode =
-        rootNode.removedAll(null, key, transformHashCode(keyHash), 0, details);
+        rootNode.removedAll(null, key, transformHashCode(keyHash), 0, details, cmp);
 
     if (details.isModified()) {
       assert details.hasReplacedValue();
 
       if (details.getType() == EitherSingletonOrCollection.Type.SINGLETON) {
         final int valHash = details.getReplacedValue().hashCode();
-        return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(newRootNode,
+        return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(cmp, newRootNode,
             hashCode - ((keyHash ^ valHash)), cachedSize - 1);
       } else {
         int sumOfReplacedHashes = 0;
@@ -358,17 +316,12 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
           sumOfReplacedHashes += (keyHash ^ replaceValue.hashCode());
         }
 
-        return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(newRootNode,
+        return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(cmp, newRootNode,
             hashCode - sumOfReplacedHashes, cachedSize - details.getReplacedCollection().size());
       }
     }
 
     return this;
-  }
-
-  @Override
-  public ImmutableSetMultimap<K, V> __removeEquivalent(K key, Comparator<Object> cmp) {
-    throw new UnsupportedOperationException("Not yet implemented.");
   }
 
   @Override
@@ -604,7 +557,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
           @SuppressWarnings("unchecked")
           final K key = (K) entry.getKey();
           final Optional<AbstractSetNode<V>> result =
-              rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
+              rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
           if (!result.isPresent()) {
             return false;
@@ -612,7 +565,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
             @SuppressWarnings("unchecked")
             final AbstractSetNode<V> valColl = (AbstractSetNode<V>) entry.getValue();
 
-            if (!result.get().equals(valColl)) {
+            if (!cmp.equals(result.get(), valColl)) {
               return false;
             }
           }
@@ -878,27 +831,30 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
     static final int TUPLE_LENGTH = 2;
 
-    abstract boolean containsKey(final K key, final int keyHash, final int shift);
+    abstract boolean containsKey(final K key, final int keyHash, final int shift,
+        EqualityComparator<Object> cmp);
 
-    abstract boolean containsTuple(final K key, final V val, final int keyHash, final int shift);
+    abstract boolean containsTuple(final K key, final V val, final int keyHash, final int shift,
+        EqualityComparator<Object> cmp);
 
-    abstract Optional<AbstractSetNode<V>> findByKey(final K key, final int keyHash,
-        final int shift);
+    abstract Optional<AbstractSetNode<V>> findByKey(final K key, final int keyHash, final int shift,
+        EqualityComparator<Object> cmp);
 
     abstract CompactSetMultimapNode<K, V> inserted(final AtomicReference<Thread> mutator,
         final K key, final V val, final int keyHash, final int shift,
-        final SetMultimapResult<K, V> details);
+        final SetMultimapResult<K, V> details, EqualityComparator<Object> cmp);
 
     abstract CompactSetMultimapNode<K, V> updated(final AtomicReference<Thread> mutator,
         final K key, final V val, final int keyHash, final int shift,
-        final SetMultimapResult<K, V> details);
+        final SetMultimapResult<K, V> details, EqualityComparator<Object> cmp);
 
     abstract CompactSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator,
         final K key, final V val, final int keyHash, final int shift,
-        final SetMultimapResult<K, V> details);
+        final SetMultimapResult<K, V> details, EqualityComparator<Object> cmp);
 
     abstract CompactSetMultimapNode<K, V> removedAll(final AtomicReference<Thread> mutator,
-        final K key, final int keyHash, final int shift, final SetMultimapResult<K, V> details);
+        final K key, final int keyHash, final int shift, final SetMultimapResult<K, V> details,
+        EqualityComparator<Object> cmp);
 
     static final boolean isAllowedToEdit(AtomicReference<Thread> x, AtomicReference<Thread> y) {
       return x != null && y != null && (x == y || x.get() == y.get());
@@ -967,7 +923,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
     /**
      * The arity of this trie node (i.e. number of values and nodes stored on this level).
-     * 
+     *
      * @return sum of nodes and values stored within
      */
     abstract int arity();
@@ -1270,6 +1226,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
       return getFromObjectRegion(this, arrayBase, index);
     }
 
+    @Override
     final int emptyArity() {
       return Long.bitCount(filter(bitmap, PATTERN_EMPTY));
       // return arity(bitmap, PATTERN_EMPTY);
@@ -1366,7 +1323,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
     /**
      * Abstract predicate over a node's size. Value can be either {@value #SIZE_EMPTY},
      * {@value #SIZE_ONE}, or {@value #SIZE_MORE_THAN_ONE}.
-     * 
+     *
      * @return size predicate
      */
     byte sizePredicate() {
@@ -1917,8 +1874,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
     // TODO: fix hash collision support
     static final <K, V> CompactSetMultimapNode<K, V> mergeTwoSingletonPairs(final K key0,
         final V val0, final int keyHash0, final K key1, final V val1, final int keyHash1,
-        final int shift) {
-      assert !(key0.equals(key1));
+        final int shift, EqualityComparator<Object> cmp) {
+      assert !(cmp.equals(key0, key1));
 
       if (shift >= HASH_CODE_LENGTH) {
         throw new IllegalStateException("Hash collision not yet fixed.");
@@ -1942,7 +1899,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
         }
       } else {
         final CompactSetMultimapNode<K, V> node = mergeTwoSingletonPairs(key0, val0, keyHash0, key1,
-            val1, keyHash1, shift + BIT_PARTITION_SIZE);
+            val1, keyHash1, shift + BIT_PARTITION_SIZE, cmp);
         // values fit on next level
         final long bitmap = setBitPattern(0L, doubledBitpos(mask0), PATTERN_NODE);
 
@@ -1953,8 +1910,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
     // TODO: fix hash collision support
     static final <K, V> CompactSetMultimapNode<K, V> mergeCollectionAndSingletonPairs(final K key0,
         final AbstractSetNode<V> valColl0, final int keyHash0, final K key1, final V val1,
-        final int keyHash1, final int shift) {
-      assert !(key0.equals(key1));
+        final int keyHash1, final int shift, EqualityComparator<Object> cmp) {
+      assert !(cmp.equals(key0, key1));
 
       if (shift >= HASH_CODE_LENGTH) {
         throw new IllegalStateException("Hash collision not yet fixed.");
@@ -1976,7 +1933,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
         return nodeOf2x1(null, bitmap, key1, val1, key0, valColl0);
       } else {
         final CompactSetMultimapNode<K, V> node = mergeCollectionAndSingletonPairs(key0, valColl0,
-            keyHash0, key1, val1, keyHash1, shift + BIT_PARTITION_SIZE);
+            keyHash0, key1, val1, keyHash1, shift + BIT_PARTITION_SIZE, cmp);
         // values fit on next level
         final long bitmap = setBitPattern(0L, doubledBitpos(mask0), PATTERN_NODE);
 
@@ -2008,7 +1965,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
     }
 
     @Override
-    boolean containsKey(final K key, final int keyHash, final int shift) {
+    boolean containsKey(final K key, final int keyHash, final int shift,
+        EqualityComparator<Object> cmp) {
       long bitmap = this.bitmap();
 
       final int doubledMask = doubledMask(keyHash, shift);
@@ -2019,15 +1977,15 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
       switch (pattern) {
         case PATTERN_NODE: {
           int index = index(bitmap, PATTERN_NODE, doubledBitpos);
-          return getNode(index).containsKey(key, keyHash, shift + BIT_PARTITION_SIZE);
+          return getNode(index).containsKey(key, keyHash, shift + BIT_PARTITION_SIZE, cmp);
         }
         case PATTERN_DATA_SINGLETON: {
           int index = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
-          return getSingletonKey(index).equals(key);
+          return cmp.equals(getSingletonKey(index), key);
         }
         case PATTERN_DATA_COLLECTION: {
           int index = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
-          return getCollectionKey(index).equals(key);
+          return cmp.equals(getCollectionKey(index), key);
         }
         default:
           return false;
@@ -2040,7 +1998,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
     }
 
     @Override
-    boolean containsTuple(final K key, final V val, final int keyHash, final int shift) {
+    boolean containsTuple(final K key, final V val, final int keyHash, final int shift,
+        EqualityComparator<Object> cmp) {
       long bitmap = this.bitmap();
 
       final int doubledMask = doubledMask(keyHash, shift);
@@ -2053,16 +2012,16 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
           int index = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final AbstractSetMultimapNode<K, V> subNode = getNode(index);
-          return subNode.containsTuple(key, val, keyHash, shift + BIT_PARTITION_SIZE);
+          return subNode.containsTuple(key, val, keyHash, shift + BIT_PARTITION_SIZE, cmp);
         }
         case PATTERN_DATA_SINGLETON: {
           int index = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(index);
-          if (currentKey.equals(key)) {
+          if (cmp.equals(currentKey, key)) {
 
             final V currentVal = getSingletonValue(index);
-            return currentVal.equals(val);
+            return cmp.equals(currentVal, val);
           }
 
           return false;
@@ -2071,7 +2030,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
           int index = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(index);
-          if (currentKey.equals(key)) {
+          if (cmp.equals(currentKey, key)) {
 
             final AbstractSetNode<V> currentValColl = getCollectionValue(index);
             return currentValColl.contains(val, val.hashCode(), 0);
@@ -2085,7 +2044,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
     }
 
     @Override
-    Optional<AbstractSetNode<V>> findByKey(final K key, final int keyHash, final int shift) {
+    Optional<AbstractSetNode<V>> findByKey(final K key, final int keyHash, final int shift,
+        EqualityComparator<Object> cmp) {
       long bitmap = this.bitmap();
 
       final int doubledMask = doubledMask(keyHash, shift);
@@ -2098,13 +2058,13 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
           int index = index(bitmap, PATTERN_NODE, doubledBitpos);
 
           final AbstractSetMultimapNode<K, V> subNode = getNode(index);
-          return subNode.findByKey(key, keyHash, shift + BIT_PARTITION_SIZE);
+          return subNode.findByKey(key, keyHash, shift + BIT_PARTITION_SIZE, cmp);
         }
         case PATTERN_DATA_SINGLETON: {
           int index = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(index);
-          if (currentKey.equals(key)) {
+          if (cmp.equals(currentKey, key)) {
 
             final V currentVal = getSingletonValue(index);
             return Optional.of(specSetNodeOf(currentVal));
@@ -2116,7 +2076,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
           int index = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(index);
-          if (currentKey.equals(key)) {
+          if (cmp.equals(currentKey, key)) {
 
             final AbstractSetNode<V> currentValColl = getCollectionValue(index);
             return Optional.of(currentValColl);
@@ -2136,7 +2096,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
     @Override
     CompactSetMultimapNode<K, V> inserted(final AtomicReference<Thread> mutator, final K key,
-        final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details) {
+        final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details,
+        EqualityComparator<Object> cmp) {
       long bitmap = this.bitmap();
 
       final int doubledMask = doubledMask(keyHash, shift);
@@ -2148,8 +2109,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
         case PATTERN_NODE: {
           int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
-          final CompactSetMultimapNode<K, V> subNodeNew =
-              subNode.inserted(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details);
+          final CompactSetMultimapNode<K, V> subNodeNew = subNode.inserted(mutator, key, val,
+              keyHash, shift + BIT_PARTITION_SIZE, details, cmp);
 
           if (details.isModified()) {
             return copyAndSetNode(mutator, nodeIndex, subNodeNew);
@@ -2161,10 +2122,10 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
           int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
           final K currentKey = getSingletonKey(dataIndex);
 
-          if (currentKey.equals(key)) {
+          if (cmp.equals(currentKey, key)) {
             final V currentVal = getSingletonValue(dataIndex);
 
-            if (currentVal.equals(val)) {
+            if (cmp.equals(currentKey, key)) {
               return this;
             } else {
               // migrate from singleton to collection
@@ -2180,7 +2141,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
             final CompactSetMultimapNode<K, V> subNodeNew = mergeTwoSingletonPairs(currentKey,
                 currentVal, transformHashCode(currentKey.hashCode()), key, val, keyHash,
-                shift + BIT_PARTITION_SIZE);
+                shift + BIT_PARTITION_SIZE, cmp);
 
             details.modified();
             return copyAndMigrateFromSingletonToNode(mutator, doubledBitpos, dataIndex, subNodeNew);
@@ -2190,7 +2151,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
           int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
           final K currentCollKey = getCollectionKey(collIndex);
 
-          if (currentCollKey.equals(key)) {
+          if (cmp.equals(currentCollKey, key)) {
             final AbstractSetNode<V> currentCollVal = getCollectionValue(collIndex);
 
             if (currentCollVal.contains(val, val.hashCode(), 0)) {
@@ -2208,7 +2169,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
             final AbstractSetNode<V> currentValNode = getCollectionValue(collIndex);
             final CompactSetMultimapNode<K, V> subNodeNew = mergeCollectionAndSingletonPairs(
                 currentCollKey, currentValNode, transformHashCode(currentCollKey.hashCode()), key,
-                val, keyHash, shift + BIT_PARTITION_SIZE);
+                val, keyHash, shift + BIT_PARTITION_SIZE, cmp);
 
             details.modified();
             return copyAndMigrateFromCollectionToNode(mutator, doubledBitpos, collIndex,
@@ -2224,7 +2185,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
     @Override
     CompactSetMultimapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key,
-        final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details) {
+        final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details,
+        EqualityComparator<Object> cmp) {
       long bitmap = this.bitmap();
 
       final int doubledMask = doubledMask(keyHash, shift);
@@ -2237,7 +2199,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
           int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
-              subNode.updated(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details);
+              subNode.updated(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details, cmp);
 
           if (details.isModified()) {
             return copyAndSetNode(mutator, nodeIndex, subNodeNew);
@@ -2249,7 +2211,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
           int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
           final K currentKey = getSingletonKey(dataIndex);
 
-          if (currentKey.equals(key)) {
+          if (cmp.equals(currentKey, key)) {
             final V currentVal = getSingletonValue(dataIndex);
 
             // update singleton value
@@ -2261,7 +2223,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
             final CompactSetMultimapNode<K, V> subNodeNew = mergeTwoSingletonPairs(currentKey,
                 currentVal, transformHashCode(currentKey.hashCode()), key, val, keyHash,
-                shift + BIT_PARTITION_SIZE);
+                shift + BIT_PARTITION_SIZE, cmp);
 
             details.modified();
             return copyAndMigrateFromSingletonToNode(mutator, doubledBitpos, dataIndex, subNodeNew);
@@ -2271,7 +2233,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
           int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
           final K currentCollKey = getCollectionKey(collIndex);
 
-          if (currentCollKey.equals(key)) {
+          if (cmp.equals(currentCollKey, key)) {
             final AbstractSetNode<V> currentCollVal = getCollectionValue(collIndex);
 
             // migrate from collection to singleton
@@ -2283,7 +2245,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
             final AbstractSetNode<V> currentValNode = getCollectionValue(collIndex);
             final CompactSetMultimapNode<K, V> subNodeNew = mergeCollectionAndSingletonPairs(
                 currentCollKey, currentValNode, transformHashCode(currentCollKey.hashCode()), key,
-                val, keyHash, shift + BIT_PARTITION_SIZE);
+                val, keyHash, shift + BIT_PARTITION_SIZE, cmp);
 
             details.modified();
             return copyAndMigrateFromCollectionToNode(mutator, doubledBitpos, collIndex,
@@ -2299,7 +2261,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
     @Override
     CompactSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
-        final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details) {
+        final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details,
+        EqualityComparator<Object> cmp) {
       long bitmap = this.bitmap();
 
       final int doubledMask = doubledMask(keyHash, shift);
@@ -2313,7 +2276,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
-              subNode.removed(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details);
+              subNode.removed(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details, cmp);
 
           if (!details.isModified()) {
             return this;
@@ -2359,10 +2322,10 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
           int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(dataIndex);
-          if (currentKey.equals(key)) {
+          if (cmp.equals(currentKey, key)) {
 
             final V currentVal = getSingletonValue(dataIndex);
-            if (currentVal.equals(val)) {
+            if (cmp.equals(currentKey, key)) {
 
               // remove mapping
               details.updated(val);
@@ -2378,7 +2341,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
           int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(collIndex);
-          if (currentKey.equals(key)) {
+          if (cmp.equals(currentKey, key)) {
 
             final AbstractSetNode<V> currentValColl = getCollectionValue(collIndex);
             if (currentValColl.contains(val, val.hashCode(), 0)) {
@@ -2439,7 +2402,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
     @Override
     CompactSetMultimapNode<K, V> removedAll(final AtomicReference<Thread> mutator, final K key,
-        final int keyHash, final int shift, final SetMultimapResult<K, V> details) {
+        final int keyHash, final int shift, final SetMultimapResult<K, V> details,
+        EqualityComparator<Object> cmp) {
       long bitmap = this.bitmap();
 
       final int doubledMask = doubledMask(keyHash, shift);
@@ -2453,7 +2417,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
           final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
           final CompactSetMultimapNode<K, V> subNodeNew =
-              subNode.removedAll(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, details);
+              subNode.removedAll(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, details, cmp);
 
           if (!details.isModified()) {
             return this;
@@ -2534,7 +2498,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
           int dataIndex = index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
 
           final K currentKey = getSingletonKey(dataIndex);
-          if (currentKey.equals(key)) {
+          if (cmp.equals(currentKey, key)) {
 
             final V currentVal = getSingletonValue(dataIndex);
 
@@ -2548,7 +2512,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
           int collIndex = index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
 
           final K currentKey = getCollectionKey(collIndex);
-          if (currentKey.equals(key)) {
+          if (cmp.equals(currentKey, key)) {
 
             final AbstractSetNode<V> currentValColl = getCollectionValue(collIndex);
 
@@ -3245,7 +3209,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
           return entryOf(lastKey, lastIterator.next());
         } else {
-          return (Map.Entry<K, V>) (Object) nextEntry;
+          return (Map.Entry<K, V>) nextEntry;
         }
       }
     }
@@ -3414,6 +3378,9 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
   static final class TransientTrieSetMultimap_BleedingEdge<K, V>
       implements TransientSetMultimap<K, V> {
+
+    private final EqualityComparator<Object> cmp;
+
     final private AtomicReference<Thread> mutator;
     private AbstractSetMultimapNode<K, V> rootNode;
     private int hashCode;
@@ -3421,6 +3388,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
     TransientTrieSetMultimap_BleedingEdge(
         TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V> trieSetMultimap_BleedingEdge) {
+      this.cmp = trieSetMultimap_BleedingEdge.cmp;
       this.mutator = new AtomicReference<Thread>(Thread.currentThread());
       this.rootNode = trieSetMultimap_BleedingEdge.rootNode;
       this.hashCode = trieSetMultimap_BleedingEdge.hashCode;
@@ -3471,30 +3439,20 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
       try {
         @SuppressWarnings("unchecked")
         final K key = (K) o;
-        return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0);
+        return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0, cmp);
       } catch (ClassCastException unused) {
         return false;
       }
     }
 
     @Override
-    public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented.");
-    }
-
-    @Override
     public boolean containsValue(final Object o) {
       for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
-        if (iterator.next().equals(o)) {
+        if (cmp.equals(iterator.next(), o)) {
           return true;
         }
       }
       return false;
-    }
-
-    @Override
-    public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Override
@@ -3505,7 +3463,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
         @SuppressWarnings("unchecked")
         final V val = (V) o1;
         final Optional<AbstractSetNode<V>> result =
-            rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
+            rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
         if (result.isPresent()) {
           return result.get().contains(val, val.hashCode(), 0);
@@ -3518,18 +3476,12 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
     }
 
     @Override
-    public boolean containsEntryEquivalent(final Object o0, final Object o1,
-        final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented.");
-    }
-
-    @Override
     public ImmutableSet<V> get(final Object o) {
       try {
         @SuppressWarnings("unchecked")
         final K key = (K) o;
         final Optional<AbstractSetNode<V>> result =
-            rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
+            rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
         if (result.isPresent()) {
           return setFromNode(result.get());
@@ -3542,11 +3494,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
     }
 
     @Override
-    public ImmutableSet<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented.");
-    }
-
-    @Override
     public boolean __insert(final K key, final V val) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -3556,7 +3503,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
       final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
       final CompactSetMultimapNode<K, V> newRootNode =
-          rootNode.inserted(mutator, key, val, transformHashCode(keyHash), 0, details);
+          rootNode.inserted(mutator, key, val, transformHashCode(keyHash), 0, details, cmp);
 
       if (details.isModified()) {
 
@@ -3579,11 +3526,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
     }
 
     @Override
-    public boolean __insertEquivalent(final K key, final V val, final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented.");
-    }
-
-    @Override
     public boolean __insertAll(final SetMultimap<? extends K, ? extends V> setMultimap) {
       boolean modified = false;
 
@@ -3592,13 +3534,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
       }
 
       return modified;
-    }
-
-    @Override
-    public boolean __insertAllEquivalent(
-        final SetMultimap<? extends K, ? extends V> setMultimap,
-        final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Override
@@ -3611,7 +3546,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
       final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
       final CompactSetMultimapNode<K, V> newRootNode =
-          rootNode.removed(mutator, key, val, transformHashCode(keyHash), 0, details);
+          rootNode.removed(mutator, key, val, transformHashCode(keyHash), 0, details, cmp);
 
       if (details.isModified()) {
         assert details.hasReplacedValue();
@@ -3632,11 +3567,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
       }
 
       return false;
-    }
-
-    @Override
-    public boolean __removeTupleEquivalent(final K key, final V val, final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Override
@@ -3910,7 +3840,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
             @SuppressWarnings("unchecked")
             final K key = (K) entry.getKey();
             final Optional<AbstractSetNode<V>> result =
-                rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
+                rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
             if (!result.isPresent()) {
               return false;
@@ -3918,7 +3848,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
               @SuppressWarnings("unchecked")
               final AbstractSetNode<V> valColl = (AbstractSetNode<V>) entry.getValue();
 
-              if (!result.get().equals(valColl)) {
+              if (!cmp.equals(result.get(), valColl)) {
                 return false;
               }
             }
@@ -3945,7 +3875,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
       }
 
       mutator.set(null);
-      return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(rootNode, hashCode,
+      return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(cmp, rootNode, hashCode,
           cachedSize);
     }
   }

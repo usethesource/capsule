@@ -8,7 +8,6 @@
 package io.usethesource.capsule.api.deprecated;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -25,7 +24,7 @@ public interface SetMultimap<K, V> {
 
   Set<V> get(final java.lang.Object o);
 
-  Set<V> getEquivalent(final java.lang.Object o, final Comparator<Object> cmp);
+  // Set<V> getEquivalent(final java.lang.Object o, final Comparator<Object> cmp);
 
   Set<K> keySet();
 
