@@ -7,25 +7,26 @@
  */
 package io.usethesource.capsule.generators;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import com.pholser.junit.quickcheck.generator.ComponentizedGenerator;
 import com.pholser.junit.quickcheck.generator.GenerationStatus;
 import com.pholser.junit.quickcheck.generator.Size;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 
-import io.usethesource.capsule.DefaultTrieSet;
 import io.usethesource.capsule.api.deprecated.ImmutableSet;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class CapsuleSetGenerator<T extends ImmutableSet> extends ComponentizedGenerator<T> {
+public abstract class CapsuleSetGenerator<T extends ImmutableSet>
+    extends ComponentizedGenerator<T> {
 
+  private Class<T> target;
   private Size sizeRange;
 
-  public CapsuleSetGenerator() {
-    super((Class<T>) DefaultTrieSet.getTargetClass());
-  }
-
-  public CapsuleSetGenerator(Class<T> type) {
-    super(type);
+  public CapsuleSetGenerator(Class<T> target) {
+    super(target);
+    this.target = target;
   }
 
   private int size(SourceOfRandomness random, GenerationStatus status) {
@@ -33,7 +34,13 @@ public class CapsuleSetGenerator<T extends ImmutableSet> extends ComponentizedGe
   }
 
   protected final T empty() {
-    return (T) DefaultTrieSet.of();
+    try {
+      final Method persistentSetOfEmpty = target.getMethod("of");
+      return (T) persistentSetOfEmpty.invoke(null);
+    } catch (NoSuchMethodException | SecurityException | IllegalAccessException
+        | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException();
+    }
   }
 
   @Override

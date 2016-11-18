@@ -17,6 +17,7 @@ import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 
 import io.usethesource.capsule.api.deprecated.ImmutableSet;
+import io.usethesource.capsule.experimental.lazy.TrieSet_5Bits_LazyHashCode;
 
 @RunWith(JUnitQuickcheck.class)
 public class BasicSetPropertiesTest {
@@ -31,6 +32,11 @@ public class BasicSetPropertiesTest {
 
   @Property(trials = DEFAULT_TRIALS)
   public <K> void sizeEqualsJavaCollection(ImmutableSet<K> input) {
+    assertEquals(input.size(), new HashSet<K>(input).size());
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public <K> void sizeEqualsJavaCollection1(TrieSet_5Bits_LazyHashCode<K> input) {
     assertEquals(input.size(), new HashSet<K>(input).size());
   }
 
