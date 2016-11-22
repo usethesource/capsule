@@ -1458,7 +1458,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
           if (cmp.equals(currentKey, key)) {
             final V currentVal = getSingletonValue(dataIndex);
 
-            if (cmp.equals(currentKey, key)) {
+            if (cmp.equals(currentVal, val)) {
               return this;
             } else {
               // migrate from singleton to collection
@@ -1760,7 +1760,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
           if (cmp.equals(currentKey, key)) {
 
             final V currentVal = getSingletonValue(dataIndex);
-            if (cmp.equals(currentKey, key)) {
+            if (cmp.equals(currentVal, val)) {
 
               // remove mapping
               details.updated(val);
