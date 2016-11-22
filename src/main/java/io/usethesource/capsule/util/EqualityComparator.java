@@ -7,7 +7,9 @@
  */
 package io.usethesource.capsule.util;
 
+import java.util.Comparator;
 import java.util.Objects;
+import java.util.Optional;
 
 @FunctionalInterface
 public interface EqualityComparator<T> {
@@ -15,5 +17,9 @@ public interface EqualityComparator<T> {
   boolean equals(T o1, T o2);
 
   final EqualityComparator<Object> EQUALS = (a, b) -> Objects.equals(a, b);
+
+//  default Comparator<T> toComparator() {
+//    return ((o1, o2) -> equals(o1, o2) == true ? 0 : -1);
+//  }
 
 }

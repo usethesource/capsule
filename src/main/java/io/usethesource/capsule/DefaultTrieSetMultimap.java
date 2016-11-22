@@ -7,21 +7,21 @@
  */
 package io.usethesource.capsule;
 
+import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP;
+import io.usethesource.capsule.util.EqualityComparator;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_ChampBasedPrototype;
-import io.usethesource.capsule.util.EqualityComparator;
 
 public class DefaultTrieSetMultimap {
 
   @SuppressWarnings("rawtypes")
-  private static Class<TrieSetMultimap_ChampBasedPrototype> target =
-      TrieSetMultimap_ChampBasedPrototype.class;
+  private static Class<TrieSetMultimap_HCHAMP> target =
+          TrieSetMultimap_HCHAMP.class;
 
   @SuppressWarnings("rawtypes")
-  public static Class<TrieSetMultimap_ChampBasedPrototype> getTargetClass() {
+  public static Class<TrieSetMultimap_HCHAMP> getTargetClass() {
     return target;
   }
 
