@@ -18,8 +18,8 @@ public interface EqualityComparator<T> {
 
   final EqualityComparator<Object> EQUALS = (a, b) -> Objects.equals(a, b);
 
-//  default Comparator<T> toComparator() {
-//    return ((o1, o2) -> equals(o1, o2) == true ? 0 : -1);
-//  }
+  default Comparator<T> toComparator() {
+    return ((o1, o2) -> equals(o1, o2) == true ? 0 : -1);
+  }
 
 }

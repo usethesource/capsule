@@ -1257,7 +1257,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
 
     static {
       EMPTY_NODE = new BitmapIndexedSetMultimapNode<>(null, 0L, new Object[] {});
-    };
+    }
 
     static final <K, V> CompactSetMultimapNode<K, V> nodeOf(final AtomicReference<Thread> mutator,
         final long bitmap, final Object[] nodes) {
