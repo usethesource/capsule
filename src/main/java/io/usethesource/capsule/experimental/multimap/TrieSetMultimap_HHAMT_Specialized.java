@@ -7,47 +7,22 @@
  */
 package io.usethesource.capsule.experimental.multimap;
 
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_COLLECTION;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_SINGLETON;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_EMPTY;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_NODE;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setBitPattern;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setOf;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.*;
 import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized.EitherSingletonOrCollection.Type.COLLECTION;
 import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized.EitherSingletonOrCollection.Type.SINGLETON;
 import static io.usethesource.capsule.util.BitmapUtils.filter;
 import static io.usethesource.capsule.util.BitmapUtils.index;
-import static io.usethesource.capsule.util.DataLayoutHelper.addressSize;
-import static io.usethesource.capsule.util.DataLayoutHelper.arrayOffsets;
-import static io.usethesource.capsule.util.DataLayoutHelper.fieldOffset;
-import static io.usethesource.capsule.util.DataLayoutHelper.unsafe;
-import static io.usethesource.capsule.util.RangecopyUtils._do_rangecompareObjectRegion;
-import static io.usethesource.capsule.util.RangecopyUtils.getFromObjectRegion;
-import static io.usethesource.capsule.util.RangecopyUtils.getFromObjectRegionAndCast;
-import static io.usethesource.capsule.util.RangecopyUtils.rangecopyObjectRegion;
-import static io.usethesource.capsule.util.RangecopyUtils.setInObjectRegion;
-import static io.usethesource.capsule.util.RangecopyUtils.setInObjectRegionVarArgs;
+import static io.usethesource.capsule.util.DataLayoutHelper.*;
+import static io.usethesource.capsule.util.RangecopyUtils.*;
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
-import java.util.AbstractCollection;
-import java.util.AbstractSet;
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.Spliterators;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -55,14 +30,8 @@ import io.usethesource.capsule.api.deprecated.ImmutableSet;
 import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
 import io.usethesource.capsule.api.deprecated.SetMultimap;
 import io.usethesource.capsule.api.deprecated.TransientSetMultimap;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations.SetMultimap0To0Node;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations.SetMultimap0To1Node;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations.SetMultimap0To2Node;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations.SetMultimap0To4Node;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations.SetMultimap1To0Node;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations.SetMultimap1To2Node;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations.SetMultimap2To0Node;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized.EitherSingletonOrCollection.Type;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations.*;
 import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.RangecopyUtils;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
@@ -99,6 +68,13 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
   public static final <K, V> ImmutableSetMultimap<K, V> of() {
     return TrieSetMultimap_HHAMT_Specialized.EMPTY_SETMULTIMAP;
   }
+
+  @SuppressWarnings("unchecked")
+  public static final <K, V> ImmutableSetMultimap<K, V> of(EqualityComparator<Object> cmp) {
+    // TODO: unify with `of()`
+    return new TrieSetMultimap_HHAMT_Specialized(cmp, EMPTY_NODE, 0, 0);
+  }
+
 
   @SuppressWarnings("unchecked")
   public static final <K, V> ImmutableSetMultimap<K, V> of(K key, V... values) {
@@ -623,82 +599,6 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     return sumNodes;
   }
 
-  // /*
-  // * For analysis purposes only. Payload X Node
-  // */
-  // protected int[][] arityCombinationsHistogram() {
-  // final Iterator<AbstractSetMultimapNode<K, V>> it = nodeIterator();
-  // final int[][] sumArityCombinations = new int[33][33];
-  //
-  // while (it.hasNext()) {
-  // final AbstractSetMultimapNode<K, V> node = it.next();
-  // sumArityCombinations[node.payloadArity()][node.nodeArity()] += 1;
-  // }
-  //
-  // return sumArityCombinations;
-  // }
-  //
-  // /*
-  // * For analysis purposes only.
-  // */
-  // protected int[] arityHistogram() {
-  // final int[][] sumArityCombinations = arityCombinationsHistogram();
-  // final int[] sumArity = new int[33];
-  //
-  // final int maxArity = 32; // TODO: factor out constant
-  //
-  // for (int j = 0; j <= maxArity; j++) {
-  // for (int maxRestArity = maxArity - j, k = 0; k <= maxRestArity - j; k++) {
-  // sumArity[j + k] += sumArityCombinations[j][k];
-  // }
-  // }
-  //
-  // return sumArity;
-  // }
-  //
-  // /*
-  // * For analysis purposes only.
-  // */
-  // public void printStatistics() {
-  // final int[][] sumArityCombinations = arityCombinationsHistogram();
-  // final int[] sumArity = arityHistogram();
-  // final int sumNodes = getNodeCount();
-  //
-  // final int[] cumsumArity = new int[33];
-  // for (int cumsum = 0, i = 0; i < 33; i++) {
-  // cumsum += sumArity[i];
-  // cumsumArity[i] = cumsum;
-  // }
-  //
-  // final float threshhold = 0.01f; // for printing results
-  // for (int i = 0; i < 33; i++) {
-  // float arityPercentage = (float) (sumArity[i]) / sumNodes;
-  // float cumsumArityPercentage = (float) (cumsumArity[i]) / sumNodes;
-  //
-  // if (arityPercentage != 0 && arityPercentage >= threshhold) {
-  // // details per level
-  // StringBuilder bldr = new StringBuilder();
-  // int max = i;
-  // for (int j = 0; j <= max; j++) {
-  // for (int k = max - j; k <= max - j; k++) {
-  // float arityCombinationsPercentage = (float) (sumArityCombinations[j][k]) / sumNodes;
-  //
-  // if (arityCombinationsPercentage != 0 && arityCombinationsPercentage >= threshhold) {
-  // bldr.append(String.format("%d/%d: %s, ", j, k,
-  // new DecimalFormat("0.00%").format(arityCombinationsPercentage)));
-  // }
-  // }
-  // }
-  // final String detailPercentages = bldr.toString();
-  //
-  // // overview
-  // System.out.println(String.format("%2d: %s\t[cumsum = %s]\t%s", i,
-  // new DecimalFormat("0.00%").format(arityPercentage),
-  // new DecimalFormat("0.00%").format(cumsumArityPercentage), detailPercentages));
-  // }
-  // }
-  // }
-
   static abstract class EitherSingletonOrCollection<T> {
     public enum Type {
       SINGLETON, COLLECTION
@@ -1171,23 +1071,27 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     // @Deprecated
     // abstract int nodeMap();
 
+    // NOTE: use 'final' when made collision node indepencent from compact node
     @Override
-    final boolean hasPayload() {
+    boolean hasPayload() {
       return payloadArity() != 0;
     }
 
+    // NOTE: use 'final' when made collision node indepencent from compact node
     @Override
-    final int payloadArity() {
+    int payloadArity() {
       return 32 - nodeArity() - emptyArity();
     }
 
+    // NOTE: use 'final' when made collision node indepencent from compact node
     @Override
-    final boolean hasPayload(EitherSingletonOrCollection.Type type) {
+    boolean hasPayload(EitherSingletonOrCollection.Type type) {
       return payloadArity(type) != 0;
     }
 
+    // NOTE: use 'final' when made collision node indepencent from compact node
     @Override
-    final int payloadArity(EitherSingletonOrCollection.Type type) {
+    int payloadArity(EitherSingletonOrCollection.Type type) {
       if (type == Type.SINGLETON) {
         return arity(bitmap(), PATTERN_DATA_SINGLETON);
       } else {
@@ -1195,45 +1099,52 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       }
     }
 
+    // NOTE: use 'final' when made collision node indepencent from compact node
     @SuppressWarnings("unchecked")
     @Override
-    final K getSingletonKey(final int index) {
+    K getSingletonKey(final int index) {
       return (K) getFromObjectRegion(this, arrayBase, TUPLE_LENGTH * index);
     }
 
+    // NOTE: use 'final' when made collision node indepencent from compact node
     @SuppressWarnings("unchecked")
     @Override
-    final V getSingletonValue(final int index) {
+    V getSingletonValue(final int index) {
       return (V) getFromObjectRegion(this, arrayBase, TUPLE_LENGTH * index + 1);
     }
 
+    // NOTE: use 'final' when made collision node indepencent from compact node
     @SuppressWarnings("unchecked")
     @Override
-    final K getCollectionKey(final int index) {
+    K getCollectionKey(final int index) {
       return (K) getFromObjectRegion(this, staticRareBase(), TUPLE_LENGTH * index);
     }
 
+    // NOTE: use 'final' when made collision node indepencent from compact node
     @SuppressWarnings("unchecked")
     @Override
-    final ImmutableSet<V> getCollectionValue(final int index) {
+    ImmutableSet<V> getCollectionValue(final int index) {
       return (ImmutableSet<V>) getFromObjectRegion(this, staticRareBase(),
           TUPLE_LENGTH * index + 1);
     }
 
+    // NOTE: use 'final' when made collision node indepencent from compact node
     @Override
-    final boolean hasSlots() {
+    boolean hasSlots() {
       return slotArity() != 0;
     }
 
+    // NOTE: use 'final' when made collision node indepencent from compact node
     @Override
-    final int slotArity() {
+    int slotArity() {
       return staticSlotArity();
 
       // return cachedSlotArity;
     }
 
+    // NOTE: use 'final' when made collision node indepencent from compact node
     @Override
-    final Object getSlot(final int index) {
+    Object getSlot(final int index) {
       return getFromObjectRegion(this, arrayBase, index);
     }
 
@@ -1531,17 +1442,19 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       return nodeArity() != 0;
     }
 
+    // NOTE: use 'final' when made collision node indepencent from compact node
     @Override
-    final int nodeArity() {
+    int nodeArity() {
       return Long.bitCount(filter(bitmap, PATTERN_NODE));
       // return arity(bitmap, PATTERN_NODE);
 
       // return cachedNodeArity;
     }
 
+    // NOTE: use 'final' when made collision node indepencent from compact node
     @SuppressWarnings("unchecked")
     @Override
-    final CompactSetMultimapNode<K, V> getNode(final int index) {
+    CompactSetMultimapNode<K, V> getNode(final int index) {
       final int pIndex = slotArity() - 1 - index;
 
       return (CompactSetMultimapNode<K, V>) getSlot(pIndex);
@@ -2058,9 +1971,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       assert !(cmp.equals(key0, key1));
 
       if (shift >= HASH_CODE_LENGTH) {
-        throw new IllegalStateException("Hash collision not yet fixed.");
-        // return new HashCollisionSetMultimapNode_BleedingEdge<>(keyHash0,
-        // (K[]) new Object[] {key0, key1}, (ImmutableSet<V>[]) new ImmutableSet[] {val0, val1});
+        return AbstractHashCollisionNode.of(keyHash0, key0, setOf(val0), key1, setOf(val1));
       }
 
       final int mask0 = doubledMask(keyHash0, shift);
@@ -2094,10 +2005,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       assert !(cmp.equals(key0, key1));
 
       if (shift >= HASH_CODE_LENGTH) {
-        throw new IllegalStateException("Hash collision not yet fixed.");
-        // return new HashCollisionSetMultimapNode_BleedingEdge<>(keyHash0,
-        // (K[]) new Object[] {key0, key1},
-        // (ImmutableSet<V>[]) new ImmutableSet[] {valColl0, val1});
+        return AbstractHashCollisionNode.of(keyHash0, key0, valColl0, key1, setOf(val1));
       }
 
       final int mask0 = doubledMask(keyHash0, shift);
@@ -2170,11 +2078,6 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
         default:
           return false;
       }
-    }
-
-    boolean containsKey(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Override
@@ -2267,11 +2170,6 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
         default:
           return Optional.empty();
       }
-    }
-
-    Optional<ImmutableSet<V>> findByKey(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Override
@@ -2871,6 +2769,394 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
       return new SetMultimap1To2Node<>(mutator, bitmap, key1, val1, slot0, slot1);
     }
 
+  }
+
+  private static abstract class AbstractHashCollisionNode<K, V>
+      extends CompactSetMultimapNode<K, V> {
+
+    // TODO: remove constructor and stored properties within CompactSetMultimapNode
+    AbstractHashCollisionNode() {
+      super(null, 0L);
+    }
+
+    static final <K, V, VS extends ImmutableSet<V>> AbstractHashCollisionNode<K, V> of(
+        final int hash, final K key0, final VS valColl0, final K key1, final VS valColl1) {
+      return new HashCollisionNode<>(hash, key0, valColl0, key1, valColl1);
+    }
+
+    private static final RuntimeException UOE_BOILERPLATE = new UnsupportedOperationException(
+        "TODO: CompactSetMultimapNode -> AbstractSetMultimapNode");
+
+    private static final Supplier<RuntimeException> UOE_FACTORY =
+        () -> new UnsupportedOperationException(
+            "TODO: CompactSetMultimapNode -> AbstractSetMultimapNode");
+
+    @Override
+    CompactSetMultimapNode<K, V> copyAndSetSingletonValue(AtomicReference<Thread> mutator,
+                                                          long doubledBitpos, V val) {
+      throw UOE_FACTORY.get();
+    }
+
+    @Override
+    CompactSetMultimapNode<K, V> copyAndSetCollectionValue(AtomicReference<Thread> mutator,
+                                                           long doubledBitpos, ImmutableSet<V> valColl) {
+      throw UOE_FACTORY.get();
+    }
+
+    @Override
+    CompactSetMultimapNode<K, V> copyAndInsertSingleton(AtomicReference<Thread> mutator,
+                                                        long doubledBitpos, K key, V val) {
+      throw UOE_FACTORY.get();
+    }
+
+    @Override
+    CompactSetMultimapNode<K, V> copyAndRemoveSingleton(AtomicReference<Thread> mutator,
+                                                        long doubledBitpos) {
+      throw UOE_FACTORY.get();
+    }
+
+    @Override
+    CompactSetMultimapNode<K, V> copyAndRemoveCollection(AtomicReference<Thread> mutator,
+                                                         long doubledBitpos) {
+      throw UOE_FACTORY.get();
+    }
+
+    @Override
+    CompactSetMultimapNode<K, V> copyAndMigrateFromNodeToSingleton(AtomicReference<Thread> mutator,
+                                                                   long doubledBitpos, CompactSetMultimapNode<K, V> node) {
+      throw UOE_FACTORY.get();
+    }
+
+    @Override
+    CompactSetMultimapNode<K, V> copyAndMigrateFromNodeToCollection(AtomicReference<Thread> mutator,
+                                                                    long doubledBitpos, CompactSetMultimapNode<K, V> node) {
+      throw UOE_FACTORY.get();
+    }
+
+    @Override
+    CompactSetMultimapNode<K, V> copyAndUpdateBitmaps(AtomicReference<Thread> mutator,
+                                                      long bitmap) {
+      throw UOE_FACTORY.get();
+    }
+
+    @Override
+    CompactSetMultimapNode<K, V> copyAndMigrateFromCollectionToSingleton(
+        AtomicReference<Thread> mutator, long doubledBitpos, K key, V val) {
+      throw UOE_FACTORY.get();
+    }
+
+    @Override
+    Type typeOfSingleton() {
+      throw UOE_FACTORY.get();
+    }
+
+    @Override
+    int patternOfSingleton() {
+      throw UOE_FACTORY.get();
+    }
+  }
+
+  private static final class HashCollisionNode<K, V> extends AbstractHashCollisionNode<K, V> {
+
+    private final int hash;
+    private final List<Map.Entry<K, ImmutableSet<V>>> collisionContent;
+
+    HashCollisionNode(final int hash, final K key0, final ImmutableSet<V> valColl0, final K key1,
+                      final ImmutableSet<V> valColl1) {
+      this(hash, Arrays.asList(entryOf(key0, valColl0), entryOf(key1, valColl1)));
+    }
+
+    HashCollisionNode(final int hash, final List<Map.Entry<K, ImmutableSet<V>>> collisionContent) {
+      this.hash = hash;
+      this.collisionContent = collisionContent;
+    }
+
+    private static final RuntimeException UOE = new UnsupportedOperationException();
+
+    private static final Supplier<RuntimeException> UOE_NOT_YET_IMPLEMENTED_FACTORY =
+        () -> new UnsupportedOperationException("Not yet implemented @ HashCollisionNode.");
+
+    @Override
+    byte sizePredicate() {
+      return SIZE_MORE_THAN_ONE;
+    }
+
+    @Override
+    boolean hasNodes() {
+      return false;
+    }
+
+    @Override
+    int nodeArity() {
+      return 0;
+    }
+
+    @Override
+    CompactSetMultimapNode<K, V> getNode(int index) {
+      throw UOE;
+    }
+
+    @Override
+    boolean hasPayload(EitherSingletonOrCollection.Type type) {
+      switch (type) {
+        case SINGLETON:
+          return collisionContent.stream()
+              .filter(kImmutableSetEntry -> kImmutableSetEntry.getValue().size() == 1).findAny()
+              .isPresent();
+        case COLLECTION:
+          return collisionContent.stream()
+              .filter(kImmutableSetEntry -> kImmutableSetEntry.getValue().size() >= 2).findAny()
+              .isPresent();
+      }
+      throw new RuntimeException();
+    }
+
+    @Override
+    int payloadArity(EitherSingletonOrCollection.Type type) {
+      switch (type) {
+        case SINGLETON:
+          return (int) collisionContent.stream()
+              .filter(kImmutableSetEntry -> kImmutableSetEntry.getValue().size() == 1).count();
+        case COLLECTION:
+          return (int) collisionContent.stream()
+              .filter(kImmutableSetEntry -> kImmutableSetEntry.getValue().size() >= 2).count();
+      }
+      throw new RuntimeException();
+    }
+
+    @Override
+    K getSingletonKey(int index) {
+      return collisionContent.stream()
+          .filter(kImmutableSetEntry -> kImmutableSetEntry.getValue().size() == 1).skip(index)
+          .findAny().get().getKey();
+    }
+
+    @Override
+    V getSingletonValue(int index) {
+      return collisionContent.stream()
+          .filter(kImmutableSetEntry -> kImmutableSetEntry.getValue().size() == 1).skip(index)
+          .findAny().get().getValue().stream().findAny().get();
+    }
+
+    @Override
+    K getCollectionKey(int index) {
+      return collisionContent.stream()
+          .filter(kImmutableSetEntry -> kImmutableSetEntry.getValue().size() >= 2).skip(index)
+          .findAny().get().getKey();
+    }
+
+    @Override
+    ImmutableSet<V> getCollectionValue(int index) {
+      return collisionContent.stream()
+          .filter(kImmutableSetEntry -> kImmutableSetEntry.getValue().size() >= 2).skip(index)
+          .findAny().get().getValue();
+    }
+
+    @Override
+    boolean hasSlots() {
+      return true;
+    }
+
+    @Override
+    int slotArity() {
+      return collisionContent.size() * 2;
+    }
+
+    @Override
+    Object getSlot(int index) {
+      if (index % 2 == 0) {
+        return collisionContent.get(index / 2).getKey();
+      } else {
+        return collisionContent.get(index / 2).getValue();
+      }
+    }
+
+    @Override
+    boolean containsKey(K key, int keyHash, int shift, EqualityComparator<Object> cmp) {
+      return collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny()
+          .isPresent();
+    }
+
+    @Override
+    boolean containsTuple(K key, V val, int keyHash, int shift, EqualityComparator<Object> cmp) {
+      return collisionContent.stream()
+          .filter(entry -> cmp.equals(key, entry.getKey())
+              && entry.getValue().containsEquivalent(val, cmp.toComparator()))
+          .findAny().isPresent();
+    }
+
+    @Override
+    Optional<ImmutableSet<V>> findByKey(K key, int keyHash, int shift,
+                                        EqualityComparator<Object> cmp) {
+      throw UOE_NOT_YET_IMPLEMENTED_FACTORY.get();
+    }
+
+    @Override
+    CompactSetMultimapNode<K, V> inserted(AtomicReference<Thread> mutator, K key, V val,
+                                          int keyHash, int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
+      Optional<Map.Entry<K, ImmutableSet<V>>> optionalTuple =
+          collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
+
+      if (optionalTuple.isPresent()) {
+        // contains key
+
+        ImmutableSet<V> values = optionalTuple.get().getValue();
+
+        if (values.containsEquivalent(val, cmp.toComparator())) {
+          // contains key and value
+          details.unchanged();
+          return this;
+
+        } else {
+          // contains key but not value
+
+          Function<Entry<K, ImmutableSet<V>>, Entry<K, ImmutableSet<V>>> substitutionMapper =
+              (kImmutableSetEntry) -> {
+                if (kImmutableSetEntry == optionalTuple.get()) {
+                  ImmutableSet<V> updatedValues =
+                      values.__insertEquivalent(val, cmp.toComparator());
+                  return entryOf(key, updatedValues);
+                } else {
+                  return kImmutableSetEntry;
+                }
+              };
+
+          List<Map.Entry<K, ImmutableSet<V>>> updatedCollisionContent =
+              collisionContent.stream().map(substitutionMapper).collect(Collectors.toList());
+
+          // TODO not all API uses EqualityComparator
+          // TODO does not check that remainder is unmodified
+          assert updatedCollisionContent.size() == collisionContent.size();
+          assert updatedCollisionContent.contains(optionalTuple.get()) == false;
+          // assert updatedCollisionContent.contains(entryOf(key, values.__insertEquivalent(val,
+          // cmp.toComparator())));
+          assert updatedCollisionContent.stream()
+              .filter(entry -> cmp.equals(key, entry.getKey())
+                  && entry.getValue().containsEquivalent(val, cmp.toComparator()))
+              .findAny().isPresent();
+
+          details.modified();
+          return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
+        }
+      } else {
+        // does not contain key
+
+        Stream.Builder<Map.Entry<K, ImmutableSet<V>>> builder =
+            Stream.<Map.Entry<K, ImmutableSet<V>>>builder().add(entryOf(key, setOf(val)));
+
+        collisionContent.forEach(builder::accept);
+
+        List<Map.Entry<K, ImmutableSet<V>>> updatedCollisionContent =
+            builder.build().collect(Collectors.toList());
+
+        // TODO not all API uses EqualityComparator
+        assert updatedCollisionContent.size() == collisionContent.size() + 1;
+        assert updatedCollisionContent.containsAll(collisionContent);
+        // assert updatedCollisionContent.contains(entryOf(key, setOf(val)));
+        assert updatedCollisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())
+            && Objects.equals(setOf(val), entry.getValue())).findAny().isPresent();
+
+        details.modified();
+        return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
+      }
+    }
+
+    @Override
+    CompactSetMultimapNode<K, V> updated(AtomicReference<Thread> mutator, K key, V val, int keyHash,
+                                         int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
+      Optional<Map.Entry<K, ImmutableSet<V>>> optionalTuple =
+          collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
+
+      if (optionalTuple.isPresent()) {
+        // contains key -> replace val anyways
+
+        ImmutableSet<V> values = optionalTuple.get().getValue();
+
+        Function<Map.Entry<K, ImmutableSet<V>>, Map.Entry<K, ImmutableSet<V>>> substitutionMapper =
+            (kImmutableSetEntry) -> {
+              if (kImmutableSetEntry == optionalTuple.get()) {
+                ImmutableSet<V> updatedValues = values.__insertEquivalent(val, cmp.toComparator());
+                return entryOf(key, updatedValues);
+              } else {
+                return kImmutableSetEntry;
+              }
+            };
+
+        List<Map.Entry<K, ImmutableSet<V>>> updatedCollisionContent =
+            collisionContent.stream().map(substitutionMapper).collect(Collectors.toList());
+
+        if (values.size() == 1) {
+          details.updated(values.stream().findAny().get()); // unbox singleton
+        } else {
+          details.updated(values);
+        }
+
+        return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
+      } else {
+        // does not contain key
+
+        Stream.Builder<Map.Entry<K, ImmutableSet<V>>> builder =
+            Stream.<Map.Entry<K, ImmutableSet<V>>>builder().add(entryOf(key, setOf(val)));
+
+        collisionContent.forEach(builder::accept);
+
+        List<Map.Entry<K, ImmutableSet<V>>> updatedCollisionContent =
+            builder.build().collect(Collectors.toList());
+
+        details.modified();
+        return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
+      }
+    }
+
+    @Override
+    CompactSetMultimapNode<K, V> removed(AtomicReference<Thread> mutator, K key, V val, int keyHash,
+                                         int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
+      Optional<Map.Entry<K, ImmutableSet<V>>> optionalTuple =
+          collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
+
+      if (optionalTuple.isPresent()) {
+        // contains key
+
+        ImmutableSet<V> values = optionalTuple.get().getValue();
+
+        if (values.containsEquivalent(val, cmp.toComparator())) {
+          // contains key and value -> remove mapping
+
+          final List<Map.Entry<K, ImmutableSet<V>>> updatedCollisionContent;
+
+          if (values.size() == 1) {
+            updatedCollisionContent = collisionContent.stream()
+                .filter(kImmutableSetEntry -> kImmutableSetEntry != optionalTuple.get())
+                .collect(Collectors.toList());
+          } else {
+            Function<Map.Entry<K, ImmutableSet<V>>, Map.Entry<K, ImmutableSet<V>>> substitutionMapper =
+                (kImmutableSetEntry) -> {
+                  if (kImmutableSetEntry == optionalTuple.get()) {
+                    ImmutableSet<V> updatedValues =
+                        values.__removeEquivalent(val, cmp.toComparator());
+                    return entryOf(key, updatedValues);
+                  } else {
+                    return kImmutableSetEntry;
+                  }
+                };
+
+            updatedCollisionContent =
+                collisionContent.stream().map(substitutionMapper).collect(Collectors.toList());
+          }
+
+          details.updated(val);
+          return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
+        }
+      }
+
+      details.unchanged();
+      return this;
+    }
+
+    @Override
+    State stateOfSingleton() {
+      return null;
+    }
   }
 
   /**
