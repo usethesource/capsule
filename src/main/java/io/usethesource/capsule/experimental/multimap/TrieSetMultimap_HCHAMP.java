@@ -2584,13 +2584,93 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     @Override
     CompactSetMultimapNode<K, V> updated(AtomicReference<Thread> mutator, K key, V val, int keyHash,
         int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
-      throw UOE_NOT_YET_IMPLEMENTED_FACTORY.get();
+      Optional<Map.Entry<K, ImmutableSet<V>>> optionalTuple =
+          collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
+
+      if (optionalTuple.isPresent()) {
+        // contains key -> replace val anyways
+
+        ImmutableSet<V> values = optionalTuple.get().getValue();
+
+        Function<Map.Entry<K, ImmutableSet<V>>, Map.Entry<K, ImmutableSet<V>>> substitutionMapper =
+            (kImmutableSetEntry) -> {
+              if (kImmutableSetEntry == optionalTuple.get()) {
+                ImmutableSet<V> updatedValues = values.__insertEquivalent(val, cmp.toComparator());
+                return entryOf(key, updatedValues);
+              } else {
+                return kImmutableSetEntry;
+              }
+            };
+
+        List<Map.Entry<K, ImmutableSet<V>>> updatedCollisionContent =
+            collisionContent.stream().map(substitutionMapper).collect(Collectors.toList());
+
+        if (values.size() == 1) {
+          details.updated(values.stream().findAny().get()); // unbox singleton
+        } else {
+          details.updated(values);
+        }
+
+        return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
+      } else {
+        // does not contain key
+
+        Stream.Builder<Map.Entry<K, ImmutableSet<V>>> builder =
+            Stream.<Map.Entry<K, ImmutableSet<V>>>builder().add(entryOf(key, setOf(val)));
+
+        collisionContent.forEach(builder::accept);
+
+        List<Map.Entry<K, ImmutableSet<V>>> updatedCollisionContent =
+            builder.build().collect(Collectors.toList());
+
+        details.modified();
+        return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
+      }
     }
 
     @Override
     CompactSetMultimapNode<K, V> removed(AtomicReference<Thread> mutator, K key, V val, int keyHash,
         int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
-      throw UOE_NOT_YET_IMPLEMENTED_FACTORY.get();
+      Optional<Map.Entry<K, ImmutableSet<V>>> optionalTuple =
+          collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
+
+      if (optionalTuple.isPresent()) {
+        // contains key
+
+        ImmutableSet<V> values = optionalTuple.get().getValue();
+
+        if (values.containsEquivalent(val, cmp.toComparator())) {
+          // contains key and value -> remove mapping
+
+          final List<Map.Entry<K, ImmutableSet<V>>> updatedCollisionContent;
+
+          if (values.size() == 1) {
+            updatedCollisionContent = collisionContent.stream()
+                .filter(kImmutableSetEntry -> kImmutableSetEntry != optionalTuple.get())
+                .collect(Collectors.toList());
+          } else {
+            Function<Map.Entry<K, ImmutableSet<V>>, Map.Entry<K, ImmutableSet<V>>> substitutionMapper =
+                (kImmutableSetEntry) -> {
+                  if (kImmutableSetEntry == optionalTuple.get()) {
+                    ImmutableSet<V> updatedValues =
+                        values.__removeEquivalent(val, cmp.toComparator());
+                    return entryOf(key, updatedValues);
+                  } else {
+                    return kImmutableSetEntry;
+                  }
+                };
+
+            updatedCollisionContent =
+                collisionContent.stream().map(substitutionMapper).collect(Collectors.toList());
+          }
+
+          details.updated(val);
+          return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
+        }
+      }
+
+      details.unchanged();
+      return this;
     }
   }
 
