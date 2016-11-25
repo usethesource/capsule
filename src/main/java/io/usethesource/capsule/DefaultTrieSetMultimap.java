@@ -11,16 +11,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Interlinked;
 import io.usethesource.capsule.util.EqualityComparator;
 
 public class DefaultTrieSetMultimap {
 
   @SuppressWarnings("rawtypes")
-  private static Class<TrieSetMultimap_HHAMT_Specialized> target = TrieSetMultimap_HHAMT_Specialized.class;
+  private static Class<TrieSetMultimap_HHAMT_Interlinked> target = TrieSetMultimap_HHAMT_Interlinked.class;
 
   @SuppressWarnings("rawtypes")
-  public static Class<TrieSetMultimap_HHAMT_Specialized> getTargetClass() {
+  public static Class<TrieSetMultimap_HHAMT_Interlinked> getTargetClass() {
     return target;
   }
 
