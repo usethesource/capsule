@@ -75,7 +75,6 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     return new TrieSetMultimap_HHAMT_Specialized(cmp, EMPTY_NODE, 0, 0);
   }
 
-
   @SuppressWarnings("unchecked")
   public static final <K, V> ImmutableSetMultimap<K, V> of(K key, V... values) {
     ImmutableSetMultimap<K, V> result = TrieSetMultimap_HHAMT_Specialized.EMPTY_SETMULTIMAP;
