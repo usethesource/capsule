@@ -13,22 +13,7 @@ import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHA
 import static io.usethesource.capsule.util.RangecopyUtils.isBitInBitmap;
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
-import java.util.AbstractCollection;
-import java.util.AbstractSet;
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -589,82 +574,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     return sumNodes;
   }
 
-  // /*
-  // * For analysis purposes only. Payload X Node
-  // */
-  // protected int[][] arityCombinationsHistogram() {
-  // final Iterator<AbstractSetMultimapNode<K, V>> it = nodeIterator();
-  // final int[][] sumArityCombinations = new int[33][33];
-  //
-  // while (it.hasNext()) {
-  // final AbstractSetMultimapNode<K, V> node = it.next();
-  // sumArityCombinations[node.payloadArity()][node.nodeArity()] += 1;
-  // }
-  //
-  // return sumArityCombinations;
-  // }
-  //
-  // /*
-  // * For analysis purposes only.
-  // */
-  // protected int[] arityHistogram() {
-  // final int[][] sumArityCombinations = arityCombinationsHistogram();
-  // final int[] sumArity = new int[33];
-  //
-  // final int maxArity = 32; // TODO: factor out constant
-  //
-  // for (int j = 0; j <= maxArity; j++) {
-  // for (int maxRestArity = maxArity - j, k = 0; k <= maxRestArity - j; k++) {
-  // sumArity[j + k] += sumArityCombinations[j][k];
-  // }
-  // }
-  //
-  // return sumArity;
-  // }
-  //
-  // /*
-  // * For analysis purposes only.
-  // */
-  // public void printStatistics() {
-  // final int[][] sumArityCombinations = arityCombinationsHistogram();
-  // final int[] sumArity = arityHistogram();
-  // final int sumNodes = getNodeCount();
-  //
-  // final int[] cumsumArity = new int[33];
-  // for (int cumsum = 0, i = 0; i < 33; i++) {
-  // cumsum += sumArity[i];
-  // cumsumArity[i] = cumsum;
-  // }
-  //
-  // final float threshhold = 0.01f; // for printing results
-  // for (int i = 0; i < 33; i++) {
-  // float arityPercentage = (float) (sumArity[i]) / sumNodes;
-  // float cumsumArityPercentage = (float) (cumsumArity[i]) / sumNodes;
-  //
-  // if (arityPercentage != 0 && arityPercentage >= threshhold) {
-  // // details per level
-  // StringBuilder bldr = new StringBuilder();
-  // int max = i;
-  // for (int j = 0; j <= max; j++) {
-  // for (int k = max - j; k <= max - j; k++) {
-  // float arityCombinationsPercentage = (float) (sumArityCombinations[j][k]) / sumNodes;
-  //
-  // if (arityCombinationsPercentage != 0 && arityCombinationsPercentage >= threshhold) {
-  // bldr.append(String.format("%d/%d: %s, ", j, k,
-  // new DecimalFormat("0.00%").format(arityCombinationsPercentage)));
-  // }
-  // }
-  // }
-  // final String detailPercentages = bldr.toString();
-  //
-  // // overview
-  // System.out.println(String.format("%2d: %s\t[cumsum = %s]\t%s", i,
-  // new DecimalFormat("0.00%").format(arityPercentage),
-  // new DecimalFormat("0.00%").format(cumsumArityPercentage), detailPercentages));
-  // }
-  // }
-  // }
-
   static abstract class EitherSingletonOrCollection<T> {
     public enum Type {
       SINGLETON, COLLECTION
@@ -858,12 +767,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       };
     }
 
-    // @Deprecated // split data / coll arity
-    // abstract boolean hasPayload();
-    //
-    // @Deprecated // split data / coll arity
-    // abstract int payloadArity();
-
     abstract boolean hasPayload(EitherSingletonOrCollection.Type type);
 
     abstract int payloadArity(EitherSingletonOrCollection.Type type);
@@ -1021,14 +924,12 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     abstract CompactSetMultimapNode<K, V> copyAndMigrateFromCollectionToSingleton(
         final AtomicReference<Thread> mutator, final int bitpos, final K key, final V val);
 
-    // TODO: fix hash collision support
     static final <K, V> CompactSetMultimapNode<K, V> mergeTwoSingletonPairs(final K key0,
         final V val0, final int keyHash0, final K key1, final V val1, final int keyHash1,
         final int shift, EqualityComparator<Object> cmp) {
       // assert !(cmp.equals(key0, key1));
 
       if (shift >= HASH_CODE_LENGTH) {
-        // throw new IllegalStateException("Hash collision not yet fixed.");
         return AbstractHashCollisionNode.of(keyHash0, key0, setOf(val0), key1, setOf(val1));
       }
 
@@ -1056,14 +957,12 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       }
     }
 
-    // TODO: fix hash collision support
     static final <K, V> CompactSetMultimapNode<K, V> mergeCollectionAndSingletonPairs(final K key0,
         final ImmutableSet<V> valColl0, final int keyHash0, final K key1, final V val1,
         final int keyHash1, final int shift, EqualityComparator<Object> cmp) {
       // assert !(cmp.equals(key0, key1));
 
       if (shift >= HASH_CODE_LENGTH) {
-        // throw new IllegalStateException("Hash collision not yet fixed.");
         return AbstractHashCollisionNode.of(keyHash0, key1, setOf(val1), key0, valColl0);
       }
 
