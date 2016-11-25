@@ -50,21 +50,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
   private final EqualityComparator<Object> cmp;
 
-  // public EqualityComparator<Object> keyComparator = EqualityComparator.EQUALS;
-  // public EqualityComparator<Object> valComparator = EqualityComparator.EQUALS;
-
-  protected boolean keysEquals(K a, K b) {
-    return EqualityComparator.EQUALS.equals(a, b);
-  }
-
-  protected boolean valsEquals(K a, K b) {
-    return EqualityComparator.EQUALS.equals(a, b);
-  }
-
-  // protected boolean objsEquals(Object a, Object b) {
-  // return EqualityComparator.EQUALS.equals(a, b);
-  // }
-
   @SuppressWarnings("unchecked")
   private static final TrieSetMultimap_HCHAMP EMPTY_SETMULTIMAP = new TrieSetMultimap_HCHAMP(
       EqualityComparator.EQUALS, CompactSetMultimapNode.EMPTY_NODE, 0, 0);
