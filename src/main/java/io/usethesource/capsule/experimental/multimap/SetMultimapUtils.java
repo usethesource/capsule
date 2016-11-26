@@ -155,6 +155,13 @@ public class SetMultimapUtils {
   }
 
   @Deprecated
+  public static final <T> io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8.AbstractSetNode<T> specSetToNode(
+      io.usethesource.capsule.api.deprecated.ImmutableSet<T> set) {
+    return ((TrieSet_5Bits_Spec0To8) set).getRootNode();
+  }
+
+
+  @Deprecated
   public static final <T> io.usethesource.capsule.core.deprecated.TrieSet_5Bits.AbstractSetNode<T> setNodeOf(T key1,
       T key2) {
     return ((TrieSet_5Bits) TrieSet_5Bits.of(key1, key2)).getRootNode();
@@ -168,6 +175,16 @@ public class SetMultimapUtils {
   @Deprecated
   public static final <T> ImmutableSet<T> setOf(T key1, T key2) {
     return TrieSet_5Bits.of(key1, key2);
+  }
+
+  @Deprecated
+  public static final <T> ImmutableSet<T> specSetOf(T key1) {
+    return TrieSet_5Bits_Spec0To8.of(key1);
+  }
+
+  @Deprecated
+  public static final <T> ImmutableSet<T> specSetOf(T key1, T key2) {
+    return TrieSet_5Bits_Spec0To8.of(key1, key2);
   }
 
   public static final <T> Set.Immutable<T> setOfNew() {
