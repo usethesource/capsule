@@ -1076,7 +1076,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         final CompactMapNode node8) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, val1, node8, node7, node6, node5, node4, node3, node2, node});
+          new Object[] {key1, val1, node8, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final CompactMapNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
