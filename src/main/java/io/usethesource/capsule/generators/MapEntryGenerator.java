@@ -7,59 +7,33 @@
  */
 package io.usethesource.capsule.generators;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
+
+import java.util.Map;
 
 import com.pholser.junit.quickcheck.generator.ComponentizedGenerator;
 import com.pholser.junit.quickcheck.generator.GenerationStatus;
-import com.pholser.junit.quickcheck.generator.Size;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 
-import io.usethesource.capsule.api.deprecated.ImmutableSet;
-
 @SuppressWarnings({"rawtypes", "unchecked"})
-public abstract class MapEntryGenerator<T extends ImmutableSet>
+public final class MapEntryGenerator<T extends Map.Entry>
     extends ComponentizedGenerator<T> {
 
-  private Class<T> target;
-  private Size sizeRange;
-
-  public MapEntryGenerator(Class<T> target) {
-    super(target);
-    this.target = target;
-  }
-
-  private int size(SourceOfRandomness random, GenerationStatus status) {
-    return sizeRange != null ? random.nextInt(sizeRange.min(), sizeRange.max()) : status.size();
-  }
-
-  protected final T empty() {
-    try {
-      final Method persistentSetOfEmpty = target.getMethod("of");
-      return (T) persistentSetOfEmpty.invoke(null);
-    } catch (NoSuchMethodException | SecurityException | IllegalAccessException
-        | IllegalArgumentException | InvocationTargetException e) {
-      throw new RuntimeException();
-    }
+  public MapEntryGenerator() {
+    super((Class<T>) Map.Entry.class);
   }
 
   @Override
   public int numberOfNeededComponents() {
-    return 1;
+    return 2;
   }
 
   @Override
   public T generate(SourceOfRandomness random, GenerationStatus status) {
-    int size = size(random, status);
+    Object item0 = componentGenerators().get(0).generate(random, status);
+    Object item1 = componentGenerators().get(0).generate(random, status);
 
-    T items = empty();
-    for (int i = 0; i < size; ++i) {
-      Object item = componentGenerators().get(0).generate(random, status);
-      if (item != null)
-        items = (T) items.__insert(item);
-    }
-
-    return items;
+    return (T) entryOf(item0, item1);
   }
 
 }

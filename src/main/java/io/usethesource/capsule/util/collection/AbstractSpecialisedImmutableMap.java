@@ -202,6 +202,11 @@ class MapEntry<K, V> implements Map.Entry<K, V> {
     throw new UnsupportedOperationException();
   }
 
+  @Override
+  public String toString() {
+    return String.format("<%s, %s>", key1, val1);
+  }
+
 }
 
 

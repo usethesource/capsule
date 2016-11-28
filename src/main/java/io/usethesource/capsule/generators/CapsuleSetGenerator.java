@@ -7,11 +7,23 @@
  */
 package io.usethesource.capsule.generators;
 
+import static com.pholser.junit.quickcheck.internal.Lists.removeFrom;
+import static com.pholser.junit.quickcheck.internal.Lists.shrinksOfOneItem;
+import static com.pholser.junit.quickcheck.internal.Ranges.checkRange;
+import static com.pholser.junit.quickcheck.internal.Ranges.Type.INTEGRAL;
+import static com.pholser.junit.quickcheck.internal.Sequences.halving;
+import static java.util.stream.StreamSupport.stream;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.pholser.junit.quickcheck.generator.ComponentizedGenerator;
 import com.pholser.junit.quickcheck.generator.GenerationStatus;
+import com.pholser.junit.quickcheck.generator.Shrink;
 import com.pholser.junit.quickcheck.generator.Size;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 
@@ -27,6 +39,11 @@ public abstract class CapsuleSetGenerator<T extends ImmutableSet>
   public CapsuleSetGenerator(Class<T> target) {
     super(target);
     this.target = target;
+  }
+
+  public void configure(Size size) {
+    this.sizeRange = size;
+    checkRange(INTEGRAL, size.min(), size.max());
   }
 
   private int size(SourceOfRandomness random, GenerationStatus status) {
@@ -60,6 +77,48 @@ public abstract class CapsuleSetGenerator<T extends ImmutableSet>
     }
 
     return items;
+  }
+
+  @Override public List<T> doShrink(SourceOfRandomness random, T larger) {
+    @SuppressWarnings("unchecked")
+    List<Object> asList = new ArrayList<>(larger);
+
+    List<T> shrinks = new ArrayList<>();
+    shrinks.addAll(removals(asList));
+
+    @SuppressWarnings("unchecked")
+    Shrink<Object> generator = (Shrink<Object>) componentGenerators().get(0);
+
+    List<List<Object>> oneItemShrinks = shrinksOfOneItem(random, asList, generator);
+    shrinks.addAll(oneItemShrinks.stream()
+        .map(this::convert)
+        .filter(this::inSizeRange)
+        .collect(Collectors.toList()));
+
+    return shrinks;
+  }
+
+  private boolean inSizeRange(T items) {
+    return sizeRange == null
+        || (items.size() >= sizeRange.min() && items.size() <= sizeRange.max());
+  }
+
+  private List<T> removals(List<?> items) {
+    return stream(halving(items.size()).spliterator(), false)
+        .map(i -> removeFrom(items, i))
+        .flatMap(Collection::stream)
+        .map(this::convert)
+        .filter(this::inSizeRange)
+        .collect(Collectors.toList());
+  }
+
+  @SuppressWarnings("unchecked")
+  private T convert(List<?> items) {
+    T converted = empty();
+    for (Object item : items) {
+      converted = (T) converted.__insert(item);
+    }
+    return converted;
   }
 
 }
