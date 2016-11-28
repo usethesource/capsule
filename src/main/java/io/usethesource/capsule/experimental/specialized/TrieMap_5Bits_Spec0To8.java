@@ -1000,8 +1000,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements ImmutableMap<K, V> {
         final CompactMapNode<K, V> node4, final CompactMapNode<K, V> node5,
         final CompactMapNode<K, V> node6, final CompactMapNode<K, V> node7,
         final CompactMapNode<K, V> node8, final CompactMapNode<K, V> node9) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {node1, node2, node3, node4, node5, node6, node7, node8, node9});
+          new Object[] {node9, node8, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final <K, V> CompactMapNode<K, V> nodeOf(final AtomicReference<Thread> mutator,
@@ -1071,8 +1072,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements ImmutableMap<K, V> {
         final CompactMapNode<K, V> node3, final CompactMapNode<K, V> node4,
         final CompactMapNode<K, V> node5, final CompactMapNode<K, V> node6,
         final CompactMapNode<K, V> node7, final CompactMapNode<K, V> node8) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, val1, node1, node2, node3, node4, node5, node6, node7, node8});
+          new Object[] {key1, val1, node8, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final <K, V> CompactMapNode<K, V> nodeOf(final AtomicReference<Thread> mutator,
@@ -1135,8 +1137,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements ImmutableMap<K, V> {
         final CompactMapNode<K, V> node3, final CompactMapNode<K, V> node4,
         final CompactMapNode<K, V> node5, final CompactMapNode<K, V> node6,
         final CompactMapNode<K, V> node7) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, val1, key2, val2, node1, node2, node3, node4, node5, node6, node7});
+          new Object[] {key1, val1, key2, val2, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final <K, V> CompactMapNode<K, V> nodeOf(final AtomicReference<Thread> mutator,
@@ -1193,8 +1196,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements ImmutableMap<K, V> {
         final CompactMapNode<K, V> node2, final CompactMapNode<K, V> node3,
         final CompactMapNode<K, V> node4, final CompactMapNode<K, V> node5,
         final CompactMapNode<K, V> node6) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
-          node1, node2, node3, node4, node5, node6});
+          node6, node5, node4, node3, node2, node1});
     }
 
     static final <K, V> CompactMapNode<K, V> nodeOf(final AtomicReference<Thread> mutator,
@@ -1244,8 +1248,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements ImmutableMap<K, V> {
         final CompactMapNode<K, V> node1, final CompactMapNode<K, V> node2,
         final CompactMapNode<K, V> node3, final CompactMapNode<K, V> node4,
         final CompactMapNode<K, V> node5) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
-          key4, val4, node1, node2, node3, node4, node5});
+          key4, val4, node5, node4, node3, node2, node1});
     }
 
     static final <K, V> CompactMapNode<K, V> nodeOf(final AtomicReference<Thread> mutator,
@@ -1286,8 +1291,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements ImmutableMap<K, V> {
         final V val2, final K key3, final V val3, final K key4, final V val4, final K key5,
         final V val5, final CompactMapNode<K, V> node1, final CompactMapNode<K, V> node2,
         final CompactMapNode<K, V> node3, final CompactMapNode<K, V> node4) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
-          key4, val4, key5, val5, node1, node2, node3, node4});
+          key4, val4, key5, val5, node4, node3, node2, node1});
     }
 
     static final <K, V> CompactMapNode<K, V> nodeOf(final AtomicReference<Thread> mutator,
@@ -1320,8 +1326,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements ImmutableMap<K, V> {
         final V val2, final K key3, final V val3, final K key4, final V val4, final K key5,
         final V val5, final K key6, final V val6, final CompactMapNode<K, V> node1,
         final CompactMapNode<K, V> node2, final CompactMapNode<K, V> node3) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
-          key4, val4, key5, val5, key6, val6, node1, node2, node3});
+          key4, val4, key5, val5, key6, val6, node3, node2, node1});
     }
 
     static final <K, V> CompactMapNode<K, V> nodeOf(final AtomicReference<Thread> mutator,
@@ -1346,8 +1353,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements ImmutableMap<K, V> {
         final V val2, final K key3, final V val3, final K key4, final V val4, final K key5,
         final V val5, final K key6, final V val6, final K key7, final V val7,
         final CompactMapNode<K, V> node1, final CompactMapNode<K, V> node2) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
-          key4, val4, key5, val5, key6, val6, key7, val7, node1, node2});
+          key4, val4, key5, val5, key6, val6, key7, val7, node2, node1});
     }
 
     static final <K, V> CompactMapNode<K, V> nodeOf(final AtomicReference<Thread> mutator,
@@ -1364,6 +1372,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements ImmutableMap<K, V> {
         final V val2, final K key3, final V val3, final K key4, final V val4, final K key5,
         final V val5, final K key6, final V val6, final K key7, final V val7, final K key8,
         final V val8, final CompactMapNode<K, V> node1) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
           key4, val4, key5, val5, key6, val6, key7, val7, key8, val8, node1});
     }

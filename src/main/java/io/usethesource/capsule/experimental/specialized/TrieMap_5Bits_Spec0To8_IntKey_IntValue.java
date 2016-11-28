@@ -1008,8 +1008,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         final CompactMapNode node3, final CompactMapNode node4, final CompactMapNode node5,
         final CompactMapNode node6, final CompactMapNode node7, final CompactMapNode node8,
         final CompactMapNode node9) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {node1, node2, node3, node4, node5, node6, node7, node8, node9});
+          new Object[] {node9, node8, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final CompactMapNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
@@ -1073,8 +1074,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         final CompactMapNode node2, final CompactMapNode node3, final CompactMapNode node4,
         final CompactMapNode node5, final CompactMapNode node6, final CompactMapNode node7,
         final CompactMapNode node8) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, val1, node1, node2, node3, node4, node5, node6, node7, node8});
+          new Object[] {key1, val1, node8, node7, node6, node5, node4, node3, node2, node});
     }
 
     static final CompactMapNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
@@ -1133,8 +1135,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         final CompactMapNode node1, final CompactMapNode node2, final CompactMapNode node3,
         final CompactMapNode node4, final CompactMapNode node5, final CompactMapNode node6,
         final CompactMapNode node7) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, val1, key2, val2, node1, node2, node3, node4, node5, node6, node7});
+          new Object[] {key1, val1, key2, val2, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final CompactMapNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
@@ -1187,8 +1190,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         final int key3, final int val3, final CompactMapNode node1, final CompactMapNode node2,
         final CompactMapNode node3, final CompactMapNode node4, final CompactMapNode node5,
         final CompactMapNode node6) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
-          node1, node2, node3, node4, node5, node6});
+          node6, node5, node4, node3, node2, node1});
     }
 
     static final CompactMapNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
@@ -1235,8 +1239,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         final int key3, final int val3, final int key4, final int val4, final CompactMapNode node1,
         final CompactMapNode node2, final CompactMapNode node3, final CompactMapNode node4,
         final CompactMapNode node5) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
-          key4, val4, node1, node2, node3, node4, node5});
+          key4, val4, node5, node4, node3, node2, node1});
     }
 
     static final CompactMapNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
@@ -1277,8 +1282,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         final int key3, final int val3, final int key4, final int val4, final int key5,
         final int val5, final CompactMapNode node1, final CompactMapNode node2,
         final CompactMapNode node3, final CompactMapNode node4) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
-          key4, val4, key5, val5, node1, node2, node3, node4});
+          key4, val4, key5, val5, node4, node3, node2, node1});
     }
 
     static final CompactMapNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
@@ -1311,8 +1317,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         final int key3, final int val3, final int key4, final int val4, final int key5,
         final int val5, final int key6, final int val6, final CompactMapNode node1,
         final CompactMapNode node2, final CompactMapNode node3) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
-          key4, val4, key5, val5, key6, val6, node1, node2, node3});
+          key4, val4, key5, val5, key6, val6, node3, node2, node1});
     }
 
     static final CompactMapNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
@@ -1337,8 +1344,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         final int key3, final int val3, final int key4, final int val4, final int key5,
         final int val5, final int key6, final int val6, final int key7, final int val7,
         final CompactMapNode node1, final CompactMapNode node2) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
-          key4, val4, key5, val5, key6, val6, key7, val7, node1, node2});
+          key4, val4, key5, val5, key6, val6, key7, val7, node2, node1});
     }
 
     static final CompactMapNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
@@ -1355,6 +1363,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         final int key3, final int val3, final int key4, final int val4, final int key5,
         final int val5, final int key6, final int val6, final int key7, final int val7,
         final int key8, final int val8, final CompactMapNode node1) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
           key4, val4, key5, val5, key6, val6, key7, val7, key8, val8, node1});
     }

@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -400,6 +401,12 @@ public class TrieSet_5Bits_Spec0To8<K> implements ImmutableSet<K> {
   @Override
   public int hashCode() {
     return hashCode;
+  }
+
+  @Override
+  public String toString() {
+    String body = stream().map(k -> k.toString()).reduce((o1, o2) -> String.join(", ", o1, o2)).orElse("");
+    return String.format("{%s}", body);
   }
 
   @Override
@@ -929,8 +936,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements ImmutableSet<K> {
         final CompactSetNode<K> node2, final CompactSetNode<K> node3, final CompactSetNode<K> node4,
         final CompactSetNode<K> node5, final CompactSetNode<K> node6, final CompactSetNode<K> node7,
         final CompactSetNode<K> node8, final CompactSetNode<K> node9) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {node1, node2, node3, node4, node5, node6, node7, node8, node9});
+          new Object[] {node9, node8, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
@@ -993,8 +1001,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements ImmutableSet<K> {
         final CompactSetNode<K> node2, final CompactSetNode<K> node3, final CompactSetNode<K> node4,
         final CompactSetNode<K> node5, final CompactSetNode<K> node6, final CompactSetNode<K> node7,
         final CompactSetNode<K> node8) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, node1, node2, node3, node4, node5, node6, node7, node8});
+          new Object[] {key1, node8, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
@@ -1052,8 +1061,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements ImmutableSet<K> {
         final CompactSetNode<K> node1, final CompactSetNode<K> node2, final CompactSetNode<K> node3,
         final CompactSetNode<K> node4, final CompactSetNode<K> node5, final CompactSetNode<K> node6,
         final CompactSetNode<K> node7) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, node1, node2, node3, node4, node5, node6, node7});
+          new Object[] {key1, key2, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
@@ -1103,8 +1113,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements ImmutableSet<K> {
         final CompactSetNode<K> node1, final CompactSetNode<K> node2, final CompactSetNode<K> node3,
         final CompactSetNode<K> node4, final CompactSetNode<K> node5,
         final CompactSetNode<K> node6) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, key3, node1, node2, node3, node4, node5, node6});
+          new Object[] {key1, key2, key3, node6, node5, node4, node3, node2, node1});
     }
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
@@ -1148,8 +1159,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements ImmutableSet<K> {
         final K key4, final CompactSetNode<K> node1, final CompactSetNode<K> node2,
         final CompactSetNode<K> node3, final CompactSetNode<K> node4,
         final CompactSetNode<K> node5) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, key3, key4, node1, node2, node3, node4, node5});
+          new Object[] {key1, key2, key3, key4, node5, node4, node3, node2, node1});
     }
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
@@ -1185,8 +1197,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements ImmutableSet<K> {
         final int nodeMap, final int dataMap, final K key1, final K key2, final K key3,
         final K key4, final K key5, final CompactSetNode<K> node1, final CompactSetNode<K> node2,
         final CompactSetNode<K> node3, final CompactSetNode<K> node4) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, key3, key4, key5, node1, node2, node3, node4});
+          new Object[] {key1, key2, key3, key4, key5, node4, node3, node2, node1});
     }
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
@@ -1215,8 +1228,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements ImmutableSet<K> {
         final int nodeMap, final int dataMap, final K key1, final K key2, final K key3,
         final K key4, final K key5, final K key6, final CompactSetNode<K> node1,
         final CompactSetNode<K> node2, final CompactSetNode<K> node3) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, key3, key4, key5, key6, node1, node2, node3});
+          new Object[] {key1, key2, key3, key4, key5, key6, node3, node2, node1});
     }
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
@@ -1237,8 +1251,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements ImmutableSet<K> {
         final int nodeMap, final int dataMap, final K key1, final K key2, final K key3,
         final K key4, final K key5, final K key6, final K key7, final CompactSetNode<K> node1,
         final CompactSetNode<K> node2) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, key3, key4, key5, key6, key7, node1, node2});
+          new Object[] {key1, key2, key3, key4, key5, key6, key7, node2, node1});
     }
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
@@ -1252,6 +1267,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements ImmutableSet<K> {
         final int nodeMap, final int dataMap, final K key1, final K key2, final K key3,
         final K key4, final K key5, final K key6, final K key7, final K key8,
         final CompactSetNode<K> node1) {
+      // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
           new Object[] {key1, key2, key3, key4, key5, key6, key7, key8, node1});
     }
