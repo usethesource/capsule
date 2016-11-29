@@ -10,25 +10,26 @@ package io.usethesource.capsule;
 import static org.junit.Assert.*;
 
 import java.util.HashSet;
-import java.util.Optional;
-
-import org.junit.runner.RunWith;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.generator.Size;
-import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 
 import io.usethesource.capsule.api.deprecated.ImmutableSet;
 
-@RunWith(JUnitQuickcheck.class)
-public class BasicSetPropertiesTest {
+public abstract class BasicSetPropertiesTest<T, CT extends ImmutableSet<T>> {
 
   private final int DEFAULT_TRIALS = 1_000;
   private final int MAX_SIZE = 1_000;
+  private final Class<?> type;
 
-  static public <T> void assertOptionalEquals(T expected, Optional<T> actual) {
-    assertTrue(actual.isPresent());
-    assertEquals(null, expected, actual.get());
+  public BasicSetPropertiesTest(Class<?> type) {
+    this.type = type;
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void test(CT input) {
+    assertEquals(type, input.getClass());
+    assertEquals(new HashSet<T>(input).size(), input.size());
   }
 
   /**
