@@ -14,7 +14,7 @@ Binary builds of capsule are deployed in the usethesource repository. In case yo
 <repositories>
 	<repository>
 		<id>usethesource</id>
-		<url>http://nexus.rascal-mpl.org/repository/maven-public/</url>
+		<url>http://nexus.usethesource.io/content/repositories/public/</url>
 	</repository>
 </repositories>
 ```
