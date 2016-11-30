@@ -10,7 +10,7 @@ package io.usethesource.capsule.generators;
 import io.usethesource.capsule.experimental.lazy.TrieSet_5Bits_LazyHashCode;
 
 @SuppressWarnings({"rawtypes"})
-public class SetGeneratorLazyHashCode<K> extends CapsuleSetGenerator<TrieSet_5Bits_LazyHashCode> {
+public class SetGeneratorLazyHashCode<K> extends AbstractSetGenerator<TrieSet_5Bits_LazyHashCode> {
 
   public SetGeneratorLazyHashCode() {
     super(TrieSet_5Bits_LazyHashCode.class);

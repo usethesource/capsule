@@ -30,13 +30,13 @@ import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 import io.usethesource.capsule.api.deprecated.ImmutableSet;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public abstract class CapsuleSetGenerator<T extends ImmutableSet>
+public abstract class AbstractSetGenerator<T extends ImmutableSet>
     extends ComponentizedGenerator<T> {
 
   private Class<T> target;
   private Size sizeRange;
 
-  public CapsuleSetGenerator(Class<T> target) {
+  public AbstractSetGenerator(Class<T> target) {
     super(target);
     this.target = target;
   }
@@ -50,7 +50,7 @@ public abstract class CapsuleSetGenerator<T extends ImmutableSet>
     return sizeRange != null ? random.nextInt(sizeRange.min(), sizeRange.max()) : status.size();
   }
 
-  protected final T empty() {
+  protected T empty() {
     try {
       final Method persistentSetOfEmpty = target.getMethod("of");
       return (T) persistentSetOfEmpty.invoke(null);
@@ -72,8 +72,7 @@ public abstract class CapsuleSetGenerator<T extends ImmutableSet>
     T items = empty();
     for (int i = 0; i < size; ++i) {
       Object item = componentGenerators().get(0).generate(random, status);
-      if (item != null)
-        items = (T) items.__insert(item);
+      items = (T) items.__insert(item);
     }
 
     return items;

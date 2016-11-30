@@ -11,7 +11,7 @@ import io.usethesource.capsule.experimental.memoized.TrieSet_5Bits_Memoized_Lazy
 
 @SuppressWarnings({"rawtypes"})
 public class SetGeneratorMemoizedLazyHashCode<K>
-    extends CapsuleSetGenerator<TrieSet_5Bits_Memoized_LazyHashCode> {
+    extends AbstractSetGenerator<TrieSet_5Bits_Memoized_LazyHashCode> {
 
   public SetGeneratorMemoizedLazyHashCode() {
     super(TrieSet_5Bits_Memoized_LazyHashCode.class);

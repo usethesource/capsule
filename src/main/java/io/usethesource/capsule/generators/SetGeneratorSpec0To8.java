@@ -10,7 +10,7 @@ package io.usethesource.capsule.generators;
 import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8;
 
 @SuppressWarnings({"rawtypes"})
-public class SetGeneratorSpec0To8<K> extends CapsuleSetGenerator<TrieSet_5Bits_Spec0To8> {
+public class SetGeneratorSpec0To8<K> extends AbstractSetGenerator<TrieSet_5Bits_Spec0To8> {
 
   public SetGeneratorSpec0To8() {
     super(TrieSet_5Bits_Spec0To8.class);

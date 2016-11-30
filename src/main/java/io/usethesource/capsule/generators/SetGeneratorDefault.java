@@ -11,7 +11,7 @@ import io.usethesource.capsule.DefaultTrieSet;
 import io.usethesource.capsule.api.deprecated.ImmutableSet;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class SetGeneratorDefault<T extends ImmutableSet> extends CapsuleSetGenerator<T> {
+public class SetGeneratorDefault<T extends ImmutableSet> extends AbstractSetGenerator<T> {
 
   public SetGeneratorDefault() {
     super((Class<T>) DefaultTrieSet.getTargetClass());
