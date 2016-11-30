@@ -7,9 +7,7 @@
  */
 package io.usethesource.capsule;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Collection;
 
@@ -18,7 +16,7 @@ import org.junit.Test;
 import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked;
 
-public class TrieMultimapTests {
+public class SetMultimapSmokeTest {
 
   final static int size = 64;
 

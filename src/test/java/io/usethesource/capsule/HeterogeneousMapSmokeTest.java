@@ -17,7 +17,7 @@ import org.junit.Test;
 
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_Heterogeneous_BleedingEdge;
 
-public class TrieMapHeterogeneousTests {
+public class HeterogeneousMapSmokeTest {
 
   final static int size = 2097152;
   // final static int size = (int) Math.pow(2, 10);

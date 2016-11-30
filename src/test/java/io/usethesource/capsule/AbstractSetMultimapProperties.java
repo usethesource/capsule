@@ -16,18 +16,13 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.junit.runner.RunWith;
-
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.generator.Size;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
-import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 
 import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
-import io.usethesource.capsule.api.deprecated.TransientSetMultimap;
 
-@RunWith(JUnitQuickcheck.class)
-public class BasicSetMultimapPropertiesTest {
+public abstract class AbstractSetMultimapProperties {
 
   private final int DEFAULT_TRIALS = 10_000;
 

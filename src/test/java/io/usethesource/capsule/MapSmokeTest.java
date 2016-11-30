@@ -7,9 +7,7 @@
  */
 package io.usethesource.capsule;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -21,7 +19,7 @@ import io.usethesource.capsule.api.deprecated.ImmutableMap;
 import io.usethesource.capsule.api.deprecated.TransientMap;
 import io.usethesource.capsule.core.deprecated.TrieMap_5Bits;
 
-public class BasicTrieMapTest {
+public class MapSmokeTest {
 
   /*
    * UTILS

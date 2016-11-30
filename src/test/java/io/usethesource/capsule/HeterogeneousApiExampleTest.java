@@ -10,9 +10,11 @@ package io.usethesource.capsule;
 import java.math.BigInteger;
 import java.util.function.Consumer;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
-public class RetrofittingHeterogeneousApi {
+@Ignore
+public class HeterogeneousApiExampleTest {
 
   @Test
   public void testIntAndBigIntSetImpl() {

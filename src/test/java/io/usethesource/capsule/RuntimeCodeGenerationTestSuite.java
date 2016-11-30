@@ -20,6 +20,9 @@ import org.junit.runners.Suite;
 import org.junit.runners.model.InitializationError;
 
 import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
+import io.usethesource.capsule.experimental.lazy.TrieSet_5Bits_LazyHashCode;
+import io.usethesource.capsule.experimental.memoized.TrieSet_5Bits_Memoized_LazyHashCode;
+import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8;
 
 @RunWith(Suite.class)
 public class RuntimeCodeGenerationTestSuite extends Suite {
@@ -32,18 +35,19 @@ public class RuntimeCodeGenerationTestSuite extends Suite {
      final List<Class<?>> suiteClasses = new ArrayList<Class<?>>();
 
     // @formatter:off
-    final List<Class> componentTypes = Arrays.asList(
-        Integer.class,
-        String.class);
-
-    final List<Class> setTypes = Arrays.asList(TrieSet_5Bits.class); // TODO: add support for TrieSet_5Bits_Spec0To8.class
+    final List<Class> componentTypes = Arrays.asList(Integer.class);
+    final List<Class> setTypes = Arrays.asList(
+        TrieSet_5Bits.class,
+        TrieSet_5Bits_Spec0To8.class,
+        TrieSet_5Bits_LazyHashCode.class,
+        TrieSet_5Bits_Memoized_LazyHashCode.class);
 
     final String javaClassNameTemplate = "io.usethesource.capsule.$CLASS_NAME$$COMPONENT_TYPE$SetPropertiesTest";
     final String javaSourceCodeTemplate =
         "package io.usethesource.capsule;\n" +
         "import $QUALIFIED_CLASS_NAME$;\n" +
         "@org.junit.runner.RunWith(com.pholser.junit.quickcheck.runner.JUnitQuickcheck.class)\n" +
-        "public class $CLASS_NAME$$COMPONENT_TYPE$SetPropertiesTest extends BasicSetPropertiesTest<$COMPONENT_TYPE$, $CLASS_NAME$<$COMPONENT_TYPE$>> {\n" +
+        "public class $CLASS_NAME$$COMPONENT_TYPE$SetPropertiesTest extends AbstractSetProperties<$COMPONENT_TYPE$, $CLASS_NAME$<$COMPONENT_TYPE$>> {\n" +
         "  public $CLASS_NAME$$COMPONENT_TYPE$SetPropertiesTest() {\n" +
         "    super($CLASS_NAME$.class);\n" +
         "  }\n" +

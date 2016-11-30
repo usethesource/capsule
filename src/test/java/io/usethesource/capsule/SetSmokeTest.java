@@ -10,12 +10,8 @@ package io.usethesource.capsule;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -23,7 +19,7 @@ import org.junit.Test;
 import io.usethesource.capsule.api.deprecated.ImmutableSet;
 import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
 
-public class BasicTrieSetTest {
+public class SetSmokeTest {
 
   private class DummyValue {
     public final int value;
