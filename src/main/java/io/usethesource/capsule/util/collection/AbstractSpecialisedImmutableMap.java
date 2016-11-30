@@ -7,14 +7,7 @@
  */
 package io.usethesource.capsule.util.collection;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import io.usethesource.capsule.DefaultTrieMap;
 import io.usethesource.capsule.SupplierIterator;
@@ -200,6 +193,21 @@ class MapEntry<K, V> implements Map.Entry<K, V> {
   @Override
   public V setValue(V value) {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(key1) ^ Objects.hashCode(val1);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    MapEntry<?, ?> mapEntry = (MapEntry<?, ?>) o;
+    return Objects.equals(key1, mapEntry.key1) && Objects.equals(val1, mapEntry.val1);
   }
 
   @Override
