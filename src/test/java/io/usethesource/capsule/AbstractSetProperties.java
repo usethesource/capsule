@@ -38,7 +38,8 @@ public abstract class AbstractSetProperties<T, CT extends ImmutableSet<T>> {
 
   @Property(trials = DEFAULT_TRIALS)
   public void convertToJavaSetAndCheckEquality(CT input) {
-    assertEquals(new HashSet<T>(input), input);
+    assertEquals("input.equals(convertToJavaSet)", input, new HashSet<T>(input));
+    assertEquals("convertToJavaSet.equals(input)", new HashSet<T>(input), input);
   }
 
   @Property(trials = DEFAULT_TRIALS)

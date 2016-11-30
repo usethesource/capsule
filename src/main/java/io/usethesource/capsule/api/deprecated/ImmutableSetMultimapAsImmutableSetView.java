@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /*
@@ -122,8 +123,12 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
   }
 
   @Override
-  public boolean containsAll(Collection<?> c) {
-    throw new UnsupportedOperationException("Auto-generated method stub; not implemented yet.");
+  public boolean containsAll(Collection<?> collection) {
+    return collection.stream()
+        .map(this::contains)
+        .filter(found -> found == false)
+        .findFirst()
+        .orElse(Boolean.TRUE);
   }
 
   @Override
@@ -168,7 +173,29 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
 
   @Override
   public ImmutableSet<T> __insertAll(Set<? extends T> set) {
-    throw new UnsupportedOperationException("Auto-generated method stub; not implemented yet.");
+    final TransientSetMultimap<K, V> tmp = multimap.asTransient();
+
+    Consumer<T> consumer = (tuple) -> {
+      if (!tupleChecker.apply(tuple))
+        throw new ClassCastException("Type validation failed.");
+
+      @SuppressWarnings("unchecked")
+      final K key = (K) tupleElementAt.apply(tuple, 0);
+      @SuppressWarnings("unchecked")
+      final V val = (V) tupleElementAt.apply(tuple, 1);
+
+      tmp.__insert(key, val);
+    };
+
+    set.forEach(consumer);
+    final ImmutableSetMultimap<K, V> multimapNew = tmp.freeze();
+
+    if (multimapNew == multimap) {
+      return this;
+    } else {
+      return new ImmutableSetMultimapAsImmutableSetView<>(multimapNew, tupleOf, tupleElementAt,
+          tupleChecker);
+    }
   }
 
   @Override
@@ -507,7 +534,11 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
 
   @Override
   public String toString() {
-    // TODO: use visual set representation
-    return multimap.toString();
+    String body = stream()
+        .map(tuple -> String.format("<%s, %s>", tupleElementAt.apply(tuple, 0),
+            tupleElementAt.apply(tuple, 1)))
+        .reduce((o1, o2) -> String.join(", ", o1, o2)).orElse("");
+
+    return String.format("{%s}", body);
   }
 }
