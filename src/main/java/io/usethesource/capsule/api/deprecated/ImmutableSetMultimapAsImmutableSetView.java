@@ -505,4 +505,9 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
     return false;
   }
 
+  @Override
+  public String toString() {
+    // TODO: use visual set representation
+    return multimap.toString();
+  }
 }

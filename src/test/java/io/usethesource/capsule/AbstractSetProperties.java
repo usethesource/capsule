@@ -37,6 +37,16 @@ public abstract class AbstractSetProperties<T, CT extends ImmutableSet<T>> {
   }
 
   @Property(trials = DEFAULT_TRIALS)
+  public void convertToJavaSetAndCheckEquality(CT input) {
+    assertEquals(new HashSet<T>(input), input);
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void streamYieldsSizeElements(CT input) {
+    assertEquals(input.size(), input.stream().count());
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
   public void checkSizeAfterInsertAll(@Size(min = 0, max = 0) final CT emptySet,
       java.util.HashSet<T> inputValues) {
     CT testSet = (CT) emptySet.__insertAll(inputValues);

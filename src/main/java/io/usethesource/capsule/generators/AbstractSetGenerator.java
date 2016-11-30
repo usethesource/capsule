@@ -46,7 +46,7 @@ public abstract class AbstractSetGenerator<T extends ImmutableSet>
     checkRange(INTEGRAL, size.min(), size.max());
   }
 
-  private int size(SourceOfRandomness random, GenerationStatus status) {
+  protected final int size(SourceOfRandomness random, GenerationStatus status) {
     return sizeRange != null ? random.nextInt(sizeRange.min(), sizeRange.max()) : status.size();
   }
 
