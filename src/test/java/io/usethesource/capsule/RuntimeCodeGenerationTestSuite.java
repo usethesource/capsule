@@ -20,6 +20,9 @@ import org.junit.runners.Suite;
 import org.junit.runners.model.InitializationError;
 
 import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
+import io.usethesource.capsule.experimental.lazy.TrieSet_5Bits_LazyHashCode;
+import io.usethesource.capsule.experimental.memoized.TrieSet_5Bits_Memoized_LazyHashCode;
+import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8;
 
 @RunWith(Suite.class)
 public class RuntimeCodeGenerationTestSuite extends Suite {
@@ -35,9 +38,9 @@ public class RuntimeCodeGenerationTestSuite extends Suite {
     final List<Class> componentTypes = Arrays.asList(Integer.class);
     final List<Class> setTypes = Arrays.asList(
         TrieSet_5Bits.class
-//        , TrieSet_5Bits_Spec0To8.class
-//        , TrieSet_5Bits_LazyHashCode.class
-//        , TrieSet_5Bits_Memoized_LazyHashCode.class
+        , TrieSet_5Bits_Spec0To8.class
+        , TrieSet_5Bits_LazyHashCode.class
+        , TrieSet_5Bits_Memoized_LazyHashCode.class
     );
 
     final String javaClassNameTemplate = "io.usethesource.capsule.$CLASS_NAME$$COMPONENT_TYPE$SetPropertiesTest";

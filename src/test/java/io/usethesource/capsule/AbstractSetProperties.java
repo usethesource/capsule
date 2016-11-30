@@ -38,7 +38,7 @@ public abstract class AbstractSetProperties<T, CT extends ImmutableSet<T>> {
 
   @Property(trials = DEFAULT_TRIALS)
   public void checkSizeAfterInsertAll(@Size(min = 0, max = 0) final CT emptySet,
-      java.util.Set<T> inputValues) {
+      java.util.HashSet<T> inputValues) {
     CT testSet = (CT) emptySet.__insertAll(inputValues);
     assertEquals(inputValues.size(), testSet.size());
   }
@@ -53,7 +53,7 @@ public abstract class AbstractSetProperties<T, CT extends ImmutableSet<T>> {
    */
   @Property(trials = DEFAULT_TRIALS)
   public void stepwiseContainsAfterInsert(@Size(min = 0, max = 0) final CT emptySet,
-      @Size(min = 1, max = MAX_SIZE) final java.util.Set<T> inputValues) {
+      @Size(min = 1, max = MAX_SIZE) final java.util.HashSet<T> inputValues) {
 
     final HashSet<T> insertedValues = new HashSet<>(inputValues.size());
     CT testSet = emptySet;
@@ -74,7 +74,7 @@ public abstract class AbstractSetProperties<T, CT extends ImmutableSet<T>> {
 
   @Property(trials = DEFAULT_TRIALS)
   public void containsAfterInsert(@Size(min = 0, max = 0) final CT emptySet,
-      @Size(min = 1, max = MAX_SIZE) final java.util.Set<T> inputValues) {
+      @Size(min = 1, max = MAX_SIZE) final java.util.HashSet<T> inputValues) {
 
     CT testSet = emptySet;
 
