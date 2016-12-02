@@ -8,19 +8,7 @@
 package io.usethesource.capsule.core.deprecated;
 
 import java.text.DecimalFormat;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -665,6 +653,26 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
       implements INode<K, java.lang.Void>, Iterable<K> {
 
     static final int TUPLE_LENGTH = 1;
+
+    // factory method to construct trie from outer classes
+    // TODO: find alternative solution that does not violate information hiding
+    public static <K> AbstractSetNode<K> newHashCollisonNode(final int hash, K... keys) {
+      return new HashCollisionSetNode_5Bits<>(hash, keys);
+    }
+
+    // factory method to construct trie from outer classes
+    // TODO: find alternative solution that does not violate information hiding
+    public static <K> AbstractSetNode<K> newBitmapIndexedNode(final int nodeMap, final int dataMap,
+        final K[] keys, final AbstractSetNode<K>[] nodes) {
+      final Object[] content = new Object[keys.length + nodes.length];
+      for (int i = 0; i < keys.length; i++) {
+        content[i] = keys[i];
+      }
+      for (int i = 0; i < nodes.length; i++) {
+        content[content.length - 1 - i] = nodes[i];
+      }
+      return new BitmapIndexedSetNode<>(null, nodeMap, dataMap, content);
+    }
 
     /*
      * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to

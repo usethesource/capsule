@@ -26,6 +26,7 @@ import io.usethesource.capsule.api.deprecated.ImmutableSet;
 import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
 import io.usethesource.capsule.api.deprecated.SetMultimap;
 import io.usethesource.capsule.api.deprecated.TransientSetMultimap;
+import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type;
 import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
@@ -348,40 +349,59 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     return StreamSupport.stream(valueCollectionsSpliterator(), isParallel);
   }
 
+//  @Override
+//  public Set<K> keySet() {
+//    Set<K> keySet = null;
+//
+//    if (keySet == null) {
+//      keySet = new AbstractSet<K>() {
+//        @Override
+//        public Iterator<K> iterator() {
+//          return TrieSetMultimap_HCHAMP.this.keyIterator();
+//        }
+//
+//        @Override
+//        public int size() {
+//          return TrieSetMultimap_HCHAMP.this.sizeDistinct();
+//        }
+//
+//        @Override
+//        public boolean isEmpty() {
+//          return TrieSetMultimap_HCHAMP.this.isEmpty();
+//        }
+//
+//        @Override
+//        public void clear() {
+//          TrieSetMultimap_HCHAMP.this.clear();
+//        }
+//
+//        @Override
+//        public boolean contains(Object k) {
+//          return TrieSetMultimap_HCHAMP.this.containsKey(k);
+//        }
+//      };
+//    }
+//
+//    return keySet;
+//  }
+
+  /**
+   * Eagerly calcualated set of keys (instead of returning a set view on a map).
+   *
+   * @return canonical immutable set of keys
+   */
   @Override
   public Set<K> keySet() {
-    Set<K> keySet = null;
+    final BiFunction<AbstractSetMultimapNode, TrieSet_5Bits.AbstractSetNode[], TrieSet_5Bits.AbstractSetNode> nodeMapper =
+        (node, newChildren) -> node.toSetNode(newChildren);
 
-    if (keySet == null) {
-      keySet = new AbstractSet<K>() {
-        @Override
-        public Iterator<K> iterator() {
-          return TrieSetMultimap_HCHAMP.this.keyIterator();
-        }
+    BottomUpNodeIterator<K, V, AbstractSetMultimapNode<K, V>, TrieSet_5Bits.AbstractSetNode<K>> iterator =
+        new BottomUpNodeIterator(rootNode, nodeMapper);
 
-        @Override
-        public int size() {
-          return TrieSetMultimap_HCHAMP.this.sizeDistinct();
-        }
+    while (iterator.hasNext())
+      iterator.next();
 
-        @Override
-        public boolean isEmpty() {
-          return TrieSetMultimap_HCHAMP.this.isEmpty();
-        }
-
-        @Override
-        public void clear() {
-          TrieSetMultimap_HCHAMP.this.clear();
-        }
-
-        @Override
-        public boolean contains(Object k) {
-          return TrieSetMultimap_HCHAMP.this.containsKey(k);
-        }
-      };
-    }
-
-    return keySet;
+    return new TrieSet_5Bits<>(iterator.result());
   }
 
   @Override
@@ -803,6 +823,15 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
       return size;
     }
+
+    /***** CONVERISONS *****/
+    abstract TrieSet_5Bits.AbstractSetNode<K> toSetNode(
+        TrieSet_5Bits.AbstractSetNode<K>... newChildren);
+
+    // TrieSet_5Bits.AbstractSetNode<K> toSetNode() {
+    // throw new UnsupportedOperationException(
+    // "Not yet implemented ~ structural conversion of multimap to set.");
+    // }
   }
 
   protected static abstract class CompactSetMultimapNode<K, V>
@@ -1775,6 +1804,35 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     }
 
     @Override
+    TrieSet_5Bits.AbstractSetNode<K> toSetNode(TrieSet_5Bits.AbstractSetNode<K>[] newChildren) {
+      final K[] keys = (K[]) new Object[arity(rawMap2())];
+
+      int dataMap = dataMap();
+      int collMap = collMap();
+
+      int collIndex = 0;
+      int dataIndex = 0;
+
+      int keysIndex = 0;
+
+      for (int i = 0; i < 32; i++) {
+        if ((dataMap & 0x01) == 0x01) {
+          keys[keysIndex] = getSingletonKey(dataIndex++);
+          keysIndex++;
+        } else if ((collMap & 0x01) == 0x01) {
+          keys[keysIndex] = getCollectionKey(collIndex++);
+          keysIndex++;
+        }
+
+        dataMap = dataMap >> 1;
+        collMap = collMap >> 1;
+      }
+
+      return TrieSet_5Bits.AbstractSetNode.newBitmapIndexedNode(nodeMap(), rawMap2(), keys,
+          newChildren);
+    }
+
+    @Override
     boolean hasSlots() {
       return nodes.length != 0;
     }
@@ -2279,6 +2337,12 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
     private static final Supplier<RuntimeException> UOE_NOT_YET_IMPLEMENTED_FACTORY =
         () -> new UnsupportedOperationException("Not yet implemented @ HashCollisionNode.");
+
+    @Override
+    TrieSet_5Bits.AbstractSetNode<K> toSetNode(TrieSet_5Bits.AbstractSetNode<K>[] newChildren) {
+      return TrieSet_5Bits.AbstractSetNode.newHashCollisonNode(hash,
+          (K[]) collisionContent.stream().map(Map.Entry::getKey).toArray());
+    }
 
     @Override
     byte sizePredicate() {
@@ -2838,6 +2902,125 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     public void remove() {
       throw new UnsupportedOperationException();
     }
+  }
+
+  private static class BottomUpNodeIterator<K, V, MN extends AbstractSetMultimapNode<K, V>, SN extends TrieSet_5Bits.AbstractSetNode<K>>
+      implements Iterator<SN> {
+
+    private static final int MAX_DEPTH = 7;
+
+    private final Function<MN, SN> leafNodeMapper;
+    private final BiFunction<MN, SN[], SN> nodeMapper;
+
+    boolean isNextAvailable;
+    private int currentStackLevel;
+    private final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
+
+    final MN[] nodes = (MN[]) new AbstractSetMultimapNode[MAX_DEPTH];
+
+    final Stack<SN> mappedNodesStack = new Stack<SN>();
+
+    BottomUpNodeIterator(final MN rootNode, final BiFunction<MN, SN[], SN> nodeMapper) {
+      this.leafNodeMapper =
+          (node) -> nodeMapper.apply(node, (SN[]) new TrieSet_5Bits.AbstractSetNode[] {});
+      this.nodeMapper = nodeMapper;
+
+      if (rootNode.hasNodes()) {
+        // rootNode == non-leaf node
+        currentStackLevel = 0;
+        isNextAvailable = false;
+
+        nodes[0] = rootNode;
+        nodeCursorsAndLengths[0] = 0;
+        nodeCursorsAndLengths[1] = rootNode.nodeArity();
+      } else {
+        currentStackLevel = -1;
+        isNextAvailable = true;
+
+        mappedNodesStack.push(leafNodeMapper.apply(rootNode));
+      }
+    }
+
+    /*
+     * search for next node that can be mapped
+     */
+    private boolean searchNextLeafNode() {
+      while (currentStackLevel >= 0) {
+        final int currentCursorIndex = currentStackLevel * 2;
+        final int currentLengthIndex = currentCursorIndex + 1;
+
+        final int childNodeCursor = nodeCursorsAndLengths[currentCursorIndex];
+        final int childNodeLength = nodeCursorsAndLengths[currentLengthIndex];
+
+        if (childNodeCursor < childNodeLength) {
+          final MN nextNode = (MN) nodes[currentStackLevel].getNode(childNodeCursor);
+          nodeCursorsAndLengths[currentCursorIndex]++;
+
+          if (nextNode.hasNodes()) {
+            // root node == non-leaf node
+            // put node on next stack level for depth-first traversal
+            final int nextStackLevel = ++currentStackLevel;
+            final int nextCursorIndex = nextStackLevel * 2;
+            final int nextLengthIndex = nextCursorIndex + 1;
+
+            nodes[nextStackLevel] = nextNode;
+            nodeCursorsAndLengths[nextCursorIndex] = 0;
+            nodeCursorsAndLengths[nextLengthIndex] = nextNode.nodeArity();
+          } else {
+            // nextNode == leaf node
+            mappedNodesStack.push(leafNodeMapper.apply(nextNode));
+            return true;
+          }
+        } else {
+          // pop all children
+          SN[] newChildren = (SN[]) new TrieSet_5Bits.AbstractSetNode[childNodeLength];
+          for (int i = childNodeLength - 1; i >= 0; i--) {
+            newChildren[i] = mappedNodesStack.pop();
+          }
+
+          // apply mapper, push mapped node
+          mappedNodesStack.push(nodeMapper.apply(nodes[currentStackLevel], newChildren));
+          currentStackLevel--;
+
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    public boolean hasNext() {
+      if (currentStackLevel >= -1 && isNextAvailable) {
+        return true;
+      } else {
+        return isNextAvailable = searchNextLeafNode();
+      }
+    }
+
+    /**
+     * Returns transformed --either internal or leaf-- node.
+     *
+     * @return mapped node
+     */
+    @Override
+    public SN next() {
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      } else {
+        isNextAvailable = false;
+        return mappedNodesStack.peek();
+      }
+    }
+
+    public void remove() {
+      throw new UnsupportedOperationException();
+    }
+
+    public SN result() {
+      assert !hasNext();
+      return mappedNodesStack.peek();
+    }
+
   }
 
   static final class TransientTrieSetMultimap_BleedingEdge<K, V>

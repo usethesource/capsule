@@ -11,6 +11,7 @@ import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutab
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -21,18 +22,19 @@ import com.pholser.junit.quickcheck.generator.Size;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 
 import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
+import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
 
 public abstract class AbstractSetMultimapProperties {
 
-  private final int DEFAULT_TRIALS = 10_000;
+  private final int DEFAULT_TRIALS = 1_000;
 
   private final SourceOfRandomness sourceOfRandomness = new SourceOfRandomness(new Random(13));
 
   private final static <K, V> ImmutableSetMultimap<K, V> toMultimap(Set<Map.Entry<K, V>> entrySet) {
-//    TransientSetMultimap<K, V> tmpMultimap = DefaultTrieSetMultimap.<K, V>of().asTransient();
-//    entrySet.forEach(entry -> tmpMultimap.__insert(entry.getKey(), entry.getValue()));
-//
-//    return tmpMultimap.freeze();
+    // TransientSetMultimap<K, V> tmpMultimap = DefaultTrieSetMultimap.<K, V>of().asTransient();
+    // entrySet.forEach(entry -> tmpMultimap.__insert(entry.getKey(), entry.getValue()));
+    //
+    // return tmpMultimap.freeze();
 
     ImmutableSetMultimap<K, V> tmpMultimap = DefaultTrieSetMultimap.<K, V>of();
     for (Map.Entry<K, V> entry : entrySet) {
@@ -46,6 +48,18 @@ public abstract class AbstractSetMultimapProperties {
     Set<Map.Entry<K, V>> entrySet =
         (Set) values.stream().map(value -> entryOf(key, value)).collect(Collectors.toSet());
     return toMultimap(entrySet);
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void keySetEqualsKeyIteratorElements(
+      java.util.HashSet<Map.Entry<Integer, Integer>> inputValues) {
+    final ImmutableSetMultimap multimap = toMultimap(inputValues);
+
+    final java.util.Set keySet = new HashSet();
+    multimap.keyIterator().forEachRemaining(keySet::add);
+
+    assertEquals(TrieSet_5Bits.class, multimap.keySet().getClass());
+    assertEquals(keySet, multimap.keySet());
   }
 
   @Property // (trials = DEFAULT_TRIALS)
@@ -77,8 +91,7 @@ public abstract class AbstractSetMultimapProperties {
       @Size(min = 2, max = 100) final java.util.HashSet<Integer> values) {
 
     Integer value = sourceOfRandomness.choose(values);
-    ImmutableSetMultimap<Integer, Integer> multimap =
-        toMultimap(key, values);
+    ImmutableSetMultimap<Integer, Integer> multimap = toMultimap(key, values);
 
     if (multimap.__removeEntry(key, value).size() + 1 == multimap.size()) {
       // succeed
@@ -89,13 +102,13 @@ public abstract class AbstractSetMultimapProperties {
       multimap = multimap.__removeEntry(key, value);
     }
 
-//    assertEquals(values.size() - 1, multimap.size());
-//    assertTrue(multimap.containsKey(key));
-//    values.forEach(currentValue -> {
-//      if (!currentValue.equals(value)) {
-//        assertTrue(multimap.containsEntry(key, currentValue));
-//      }
-//    });
+    // assertEquals(values.size() - 1, multimap.size());
+    // assertTrue(multimap.containsKey(key));
+    // values.forEach(currentValue -> {
+    // if (!currentValue.equals(value)) {
+    // assertTrue(multimap.containsEntry(key, currentValue));
+    // }
+    // });
   }
 
 }
