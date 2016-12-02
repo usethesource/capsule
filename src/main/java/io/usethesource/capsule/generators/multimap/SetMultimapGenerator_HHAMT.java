@@ -5,15 +5,16 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.capsule.generators;
+package io.usethesource.capsule.generators.multimap;
 
-import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT;
 
 @SuppressWarnings({"rawtypes"})
-public class SetGeneratorSpec0To8<K> extends AbstractSetGenerator<TrieSet_5Bits_Spec0To8> {
+public class SetMultimapGenerator_HHAMT<K>
+    extends AbstractSetMultimapGenerator<TrieSetMultimap_HHAMT> {
 
-  public SetGeneratorSpec0To8() {
-    super(TrieSet_5Bits_Spec0To8.class);
+  public SetMultimapGenerator_HHAMT() {
+    super(TrieSetMultimap_HHAMT.class);
   }
 
 }

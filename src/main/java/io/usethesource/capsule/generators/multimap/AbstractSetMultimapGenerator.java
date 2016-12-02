@@ -5,7 +5,7 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.capsule.generators;
+package io.usethesource.capsule.generators.multimap;
 
 import static com.pholser.junit.quickcheck.internal.Lists.removeFrom;
 import static com.pholser.junit.quickcheck.internal.Lists.shrinksOfOneItem;
@@ -28,15 +28,16 @@ import com.pholser.junit.quickcheck.generator.Size;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 
 import io.usethesource.capsule.api.deprecated.ImmutableSet;
+import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public abstract class AbstractSetGenerator<T extends ImmutableSet>
+public abstract class AbstractSetMultimapGenerator<T extends ImmutableSetMultimap>
     extends ComponentizedGenerator<T> {
 
   private Class<T> target;
   private Size sizeRange;
 
-  public AbstractSetGenerator(Class<T> target) {
+  public AbstractSetMultimapGenerator(Class<T> target) {
     super(target);
     this.target = target;
   }
@@ -62,7 +63,7 @@ public abstract class AbstractSetGenerator<T extends ImmutableSet>
 
   @Override
   public int numberOfNeededComponents() {
-    return 1;
+    return 2;
   }
 
   @Override
@@ -71,53 +72,59 @@ public abstract class AbstractSetGenerator<T extends ImmutableSet>
 
     T items = empty();
     for (int i = 0; i < size; ++i) {
-      Object item = componentGenerators().get(0).generate(random, status);
-      items = (T) items.__insert(item);
+      Object item0 = componentGenerators().get(0).generate(random, status);
+      Object item1 = componentGenerators().get(1).generate(random, status);
+      items = (T) items.__insert(item0, item1);
     }
 
     return items;
   }
 
-  @Override public List<T> doShrink(SourceOfRandomness random, T larger) {
-    @SuppressWarnings("unchecked")
-    List<Object> asList = new ArrayList<>(larger);
-
-    List<T> shrinks = new ArrayList<>();
-    shrinks.addAll(removals(asList));
-
-    @SuppressWarnings("unchecked")
-    Shrink<Object> generator = (Shrink<Object>) componentGenerators().get(0);
-
-    List<List<Object>> oneItemShrinks = shrinksOfOneItem(random, asList, generator);
-    shrinks.addAll(oneItemShrinks.stream()
-        .map(this::convert)
-        .filter(this::inSizeRange)
-        .collect(Collectors.toList()));
-
-    return shrinks;
+  @Override
+  public boolean canShrink(Object larger) {
+    return false;
   }
+
+//  @Override public List<T> doShrink(SourceOfRandomness random, T larger) {
+//    @SuppressWarnings("unchecked")
+//    List<Object> asList = new ArrayList<>(larger.entrySet());
+//
+//    List<T> shrinks = new ArrayList<>();
+//    shrinks.addAll(removals(asList));
+//
+//    @SuppressWarnings("unchecked")
+//    Shrink<Object> generator = (Shrink<Object>) componentGenerators().get(0);
+//
+//    List<List<Object>> oneItemShrinks = shrinksOfOneItem(random, asList, generator);
+//    shrinks.addAll(oneItemShrinks.stream()
+//        .map(this::convert)
+//        .filter(this::inSizeRange)
+//        .collect(Collectors.toList()));
+//
+//    return shrinks;
+//  }
 
   private boolean inSizeRange(T items) {
     return sizeRange == null
         || (items.size() >= sizeRange.min() && items.size() <= sizeRange.max());
   }
 
-  private List<T> removals(List<?> items) {
-    return stream(halving(items.size()).spliterator(), false)
-        .map(i -> removeFrom(items, i))
-        .flatMap(Collection::stream)
-        .map(this::convert)
-        .filter(this::inSizeRange)
-        .collect(Collectors.toList());
-  }
-
-  @SuppressWarnings("unchecked")
-  private T convert(List<?> items) {
-    T converted = empty();
-    for (Object item : items) {
-      converted = (T) converted.__insert(item);
-    }
-    return converted;
-  }
+//  private List<T> removals(List<?> items) {
+//    return stream(halving(items.size()).spliterator(), false)
+//        .map(i -> removeFrom(items, i))
+//        .flatMap(Collection::stream)
+//        .map(this::convert)
+//        .filter(this::inSizeRange)
+//        .collect(Collectors.toList());
+//  }
+//
+//  @SuppressWarnings("unchecked")
+//  private T convert(List<?> items) {
+//    T converted = empty();
+//    for (Object item : items) {
+//      converted = (T) converted.__insert(item);
+//    }
+//    return converted;
+//  }
 
 }

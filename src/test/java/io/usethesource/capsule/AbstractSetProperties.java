@@ -18,7 +18,7 @@ import io.usethesource.capsule.api.deprecated.ImmutableSet;
 
 public abstract class AbstractSetProperties<T, CT extends ImmutableSet<T>> {
 
-  private final int DEFAULT_TRIALS = 1_000;
+  private final int DEFAULT_TRIALS = 10_000;
   private final int MAX_SIZE = 1_000;
   private final Class<?> type;
 
@@ -55,7 +55,7 @@ public abstract class AbstractSetProperties<T, CT extends ImmutableSet<T>> {
   }
 
   /**
-   * Inserted element by element, starting from an emtpy set. Keeps track of all so far inserted
+   * Inserted element by element, starting from an empty set. Keeps track of all so far inserted
    * values and checks after each insertion if all inserted elements are contained (quadratic
    * operation).
    *
@@ -74,7 +74,7 @@ public abstract class AbstractSetProperties<T, CT extends ImmutableSet<T>> {
       insertedValues.add(newValue);
 
       boolean containsInsertedValues =
-          insertedValues.stream().map(tmpSet::contains).reduce(true, Boolean::logicalAnd);
+          insertedValues.stream().allMatch(tmpSet::contains);
 
       assertTrue("All so far inserted values must be contained.", containsInsertedValues);
       // String.format("%s.insert(%s)", testSet, newValue);
@@ -94,8 +94,7 @@ public abstract class AbstractSetProperties<T, CT extends ImmutableSet<T>> {
       testSet = tmpSet;
     }
 
-    boolean containsInsertedValues =
-        inputValues.stream().map(testSet::contains).reduce(true, Boolean::logicalAnd);
+    boolean containsInsertedValues = inputValues.stream().allMatch(testSet::contains);
 
     assertTrue("Must contain all inserted values.", containsInsertedValues);
   }

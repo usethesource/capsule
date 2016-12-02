@@ -7,108 +7,132 @@
  */
 package io.usethesource.capsule;
 
-import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.generator.Size;
-import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 
 import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
-import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
 
-public abstract class AbstractSetMultimapProperties {
+public abstract class AbstractSetMultimapProperties<K, V, CT extends ImmutableSetMultimap<K, V>> {
 
-  private final int DEFAULT_TRIALS = 1_000;
+  private final int DEFAULT_TRIALS = 10_000;
+  private final int MAX_SIZE = 1_000;
+  private final Class<?> type;
 
-  private final SourceOfRandomness sourceOfRandomness = new SourceOfRandomness(new Random(13));
-
-  private final static <K, V> ImmutableSetMultimap<K, V> toMultimap(Set<Map.Entry<K, V>> entrySet) {
-    // TransientSetMultimap<K, V> tmpMultimap = DefaultTrieSetMultimap.<K, V>of().asTransient();
-    // entrySet.forEach(entry -> tmpMultimap.__insert(entry.getKey(), entry.getValue()));
-    //
-    // return tmpMultimap.freeze();
-
-    ImmutableSetMultimap<K, V> tmpMultimap = DefaultTrieSetMultimap.<K, V>of();
-    for (Map.Entry<K, V> entry : entrySet) {
-      tmpMultimap = tmpMultimap.__insert(entry.getKey(), entry.getValue());
-    }
-
-    return tmpMultimap;
-  }
-
-  private final static <K, V> ImmutableSetMultimap<K, V> toMultimap(K key, Set<V> values) {
-    Set<Map.Entry<K, V>> entrySet =
-        (Set) values.stream().map(value -> entryOf(key, value)).collect(Collectors.toSet());
-    return toMultimap(entrySet);
+  public AbstractSetMultimapProperties(Class<?> type) {
+    this.type = type;
   }
 
   @Property(trials = DEFAULT_TRIALS)
-  public void keySetEqualsKeyIteratorElements(
-      java.util.HashSet<Map.Entry<Integer, Integer>> inputValues) {
-    final ImmutableSetMultimap multimap = toMultimap(inputValues);
+  public void convertToJavaSetAndCheckSize(CT input) {
+    assertEquals(new HashSet<>(input.entrySet()).size(), input.size());
+  }
 
-    final java.util.Set keySet = new HashSet();
+  @Property(trials = DEFAULT_TRIALS)
+  public void keySetEqualsKeyIteratorElements(final CT multimap) {
+    final java.util.Set<K> keySet = new HashSet<>();
     multimap.keyIterator().forEachRemaining(keySet::add);
 
-    assertEquals(TrieSet_5Bits.class, multimap.keySet().getClass());
+    // assertEquals(TrieSet_5Bits.class, multimap.keySet().getClass());
     assertEquals(keySet, multimap.keySet());
   }
 
-  @Property // (trials = DEFAULT_TRIALS)
-  public void size(java.util.HashSet<Map.Entry<Integer, Integer>> input) {
-    assertEquals(input.size(), toMultimap(input).size());
-  }
-
-  @Property // (trials = DEFAULT_TRIALS)
-  public void containsEntry(java.util.HashSet<Map.Entry<Integer, Integer>> input) {
-    input.forEach(
-        entry -> assertTrue(toMultimap(input).containsEntry(entry.getKey(), entry.getValue())));
-  }
+//  /**
+//   * TODO: replace batch construction by sequence of 'insert' operations
+//   */
+//  @Property // (trials = DEFAULT_TRIALS)
+//  public void testInsertTuplesThatShareSameKey(final Integer key,
+//      @Size(min = 1, max = 100) final java.util.HashSet<Integer> values) {
+//    assertEquals(values.size(), toMultimap(key, values).size());
+//    assertTrue(toMultimap(key, values).containsKey(key));
+//  }
+//
+//  /**
+//   * TODO: replace batch construction by sequence of 'insert' operations followed by a 'remove'
+//   */
+//  @Property(trials = DEFAULT_TRIALS)
+//  public void testInsertTuplesWithOneRemoveThatShareSameKeyX(final Integer key,
+//      @Size(min = 2, max = 100) final java.util.HashSet<Integer> values) {
+//
+//    Integer value = sourceOfRandomness.choose(values);
+//    ImmutableSetMultimap<Integer, Integer> multimap = toMultimap(key, values);
+//
+//    if (multimap.__removeEntry(key, value).size() + 1 == multimap.size()) {
+//      // succeed
+//      multimap = multimap.__removeEntry(key, value);
+//    } else {
+//      // fail
+//      assertTrue(multimap.containsEntry(key, value));
+//      multimap = multimap.__removeEntry(key, value);
+//    }
+//
+//    // assertEquals(values.size() - 1, multimap.size());
+//    // assertTrue(multimap.containsKey(key));
+//    // values.forEach(currentValue -> {
+//    // if (!currentValue.equals(value)) {
+//    // assertTrue(multimap.containsEntry(key, currentValue));
+//    // }
+//    // });
+//  }
 
   /**
-   * TODO: replace batch construction by sequence of 'insert' operations
-   */
-  @Property // (trials = DEFAULT_TRIALS)
-  public void testInsertTuplesThatShareSameKey(final Integer key,
-      @Size(min = 1, max = 100) final java.util.HashSet<Integer> values) {
-    assertEquals(values.size(), toMultimap(key, values).size());
-    assertTrue(toMultimap(key, values).containsKey(key));
-  }
-
-  /**
-   * TODO: replace batch construction by sequence of 'insert' operations followed by a 'remove'
+   * Inserted tuple by tuple, starting from an empty multimap. Keeps track of all so far inserted
+   * tuples and checks after each insertion if all inserted tuples are contained (quadratic
+   * operation).
+   *
+   * @param emptyCollection
+   * @param inputValues
    */
   @Property(trials = DEFAULT_TRIALS)
-  public void testInsertTuplesWithOneRemoveThatShareSameKeyX(final Integer key,
-      @Size(min = 2, max = 100) final java.util.HashSet<Integer> values) {
+  public void stepwiseContainsAfterInsert(@Size(min = 0, max = 0) final CT emptyCollection,
+      @Size(min = 1, max = MAX_SIZE) final java.util.HashSet<Map.Entry<K, V>> inputValues) {
 
-    Integer value = sourceOfRandomness.choose(values);
-    ImmutableSetMultimap<Integer, Integer> multimap = toMultimap(key, values);
+    final HashSet<Map.Entry<K, V>> insertedValues = new HashSet<>(inputValues.size());
+    CT testCollection = emptyCollection;
 
-    if (multimap.__removeEntry(key, value).size() + 1 == multimap.size()) {
-      // succeed
-      multimap = multimap.__removeEntry(key, value);
-    } else {
-      // fail
-      assertTrue(multimap.containsEntry(key, value));
-      multimap = multimap.__removeEntry(key, value);
+    for (Map.Entry<K, V> newValueTuple : inputValues) {
+      final CT tmpCollection =
+          (CT) testCollection.__insert(newValueTuple.getKey(), newValueTuple.getValue());
+      insertedValues.add(newValueTuple);
+
+      boolean containsInsertedValues = insertedValues.stream()
+          .allMatch(tuple -> tmpCollection.containsEntry(tuple.getKey(), tuple.getValue()));
+
+      assertTrue("All so far inserted values must be contained.", containsInsertedValues);
+      // String.format("%s.insert(%s)", testSet, newValue);
+
+      testCollection = tmpCollection;
+    }
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void containsAfterInsert(@Size(min = 0, max = 0) final CT emptyCollection,
+      @Size(min = 1, max = MAX_SIZE) final java.util.HashSet<Map.Entry<K, V>> inputValues) {
+
+    CT testCollection = emptyCollection;
+
+    for (Map.Entry<K, V> newValueTuple : inputValues) {
+      final CT tmpCollection =
+          (CT) testCollection.__insert(newValueTuple.getKey(), newValueTuple.getValue());
+      testCollection = tmpCollection;
     }
 
-    // assertEquals(values.size() - 1, multimap.size());
-    // assertTrue(multimap.containsKey(key));
-    // values.forEach(currentValue -> {
-    // if (!currentValue.equals(value)) {
-    // assertTrue(multimap.containsEntry(key, currentValue));
-    // }
-    // });
+    final CT finalCollection = testCollection;
+
+    boolean containsInsertedValues = inputValues.stream()
+        .allMatch(tuple -> finalCollection.containsEntry(tuple.getKey(), tuple.getValue()));
+
+    assertTrue("Must contain all inserted values.", containsInsertedValues);
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void notContainedAfterInsertRemove(CT input, K item0, V item1) {
+    assertFalse(
+        input.__insert(item0, item1).__removeEntry(item0, item1).containsEntry(item0, item1));
   }
 
 }
