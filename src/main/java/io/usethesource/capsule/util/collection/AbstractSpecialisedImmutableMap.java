@@ -25,8 +25,9 @@ public abstract class AbstractSpecialisedImmutableMap<K, V>
     return EMPTY_MAP;
   }
 
+  // TODO: check issue with generic bounds when used with Stream API
   @SuppressWarnings("unchecked")
-  public static final <K, V, T extends Map.Entry<K, V>> T entryOf(final K key, final V val) {
+  public static final <K, V, T extends Map.Entry<K, V>> Map.Entry<K, V> entryOf(final K key, final V val) {
     return (T) new MapEntry<K, V>(key, val);
   }
 

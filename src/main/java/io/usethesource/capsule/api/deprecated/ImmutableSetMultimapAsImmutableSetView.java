@@ -42,6 +42,11 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
     this.tupleChecker = tupleChecker;
   }
 
+  // internal use: introspecting backing implementation; TODO: reconsider visibility
+  public ImmutableSetMultimap<K, V> getMultimap() {
+    return multimap;
+  }
+
   @Override
   public int size() {
     return multimap.size();
@@ -124,11 +129,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
 
   @Override
   public boolean containsAll(Collection<?> collection) {
-    return collection.stream()
-        .map(this::contains)
-        .filter(found -> found == false)
-        .findFirst()
-        .orElse(Boolean.TRUE);
+    return collection.stream().allMatch(this::contains);
   }
 
   @Override

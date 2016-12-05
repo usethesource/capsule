@@ -349,41 +349,41 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     return StreamSupport.stream(valueCollectionsSpliterator(), isParallel);
   }
 
-//  @Override
-//  public Set<K> keySet() {
-//    Set<K> keySet = null;
-//
-//    if (keySet == null) {
-//      keySet = new AbstractSet<K>() {
-//        @Override
-//        public Iterator<K> iterator() {
-//          return TrieSetMultimap_HCHAMP.this.keyIterator();
-//        }
-//
-//        @Override
-//        public int size() {
-//          return TrieSetMultimap_HCHAMP.this.sizeDistinct();
-//        }
-//
-//        @Override
-//        public boolean isEmpty() {
-//          return TrieSetMultimap_HCHAMP.this.isEmpty();
-//        }
-//
-//        @Override
-//        public void clear() {
-//          TrieSetMultimap_HCHAMP.this.clear();
-//        }
-//
-//        @Override
-//        public boolean contains(Object k) {
-//          return TrieSetMultimap_HCHAMP.this.containsKey(k);
-//        }
-//      };
-//    }
-//
-//    return keySet;
-//  }
+  // @Override
+  // public Set<K> keySet() {
+  // Set<K> keySet = null;
+  //
+  // if (keySet == null) {
+  // keySet = new AbstractSet<K>() {
+  // @Override
+  // public Iterator<K> iterator() {
+  // return TrieSetMultimap_HCHAMP.this.keyIterator();
+  // }
+  //
+  // @Override
+  // public int size() {
+  // return TrieSetMultimap_HCHAMP.this.sizeDistinct();
+  // }
+  //
+  // @Override
+  // public boolean isEmpty() {
+  // return TrieSetMultimap_HCHAMP.this.isEmpty();
+  // }
+  //
+  // @Override
+  // public void clear() {
+  // TrieSetMultimap_HCHAMP.this.clear();
+  // }
+  //
+  // @Override
+  // public boolean contains(Object k) {
+  // return TrieSetMultimap_HCHAMP.this.containsKey(k);
+  // }
+  // };
+  // }
+  //
+  // return keySet;
+  // }
 
   /**
    * Eagerly calcualated set of keys (instead of returning a set view on a map).
@@ -392,16 +392,25 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
    */
   @Override
   public Set<K> keySet() {
-    final BiFunction<AbstractSetMultimapNode, TrieSet_5Bits.AbstractSetNode[], TrieSet_5Bits.AbstractSetNode> nodeMapper =
+    final BiFunction<AbstractSetMultimapNode<K, V>, TrieSet_5Bits.AbstractSetNode<K>[], TrieSet_5Bits.AbstractSetNode<K>> nodeMapper =
         (node, newChildren) -> node.toSetNode(newChildren);
 
-    BottomUpNodeIterator<K, V, AbstractSetMultimapNode<K, V>, TrieSet_5Bits.AbstractSetNode<K>> iterator =
-        new BottomUpNodeIterator(rootNode, nodeMapper);
+    // /***** PULL-based conversion *****/
+    // BottomUpNodeIterator<K, V, AbstractSetMultimapNode<K, V>, TrieSet_5Bits.AbstractSetNode<K>>
+    // iterator =
+    // new BottomUpNodeIterator(rootNode, nodeMapper);
+    //
+    // while (iterator.hasNext())
+    // iterator.next();
+    //
+    // return new TrieSet_5Bits<>(iterator.result());
 
-    while (iterator.hasNext())
-      iterator.next();
+    /***** PUSH-based conversion *****/
+    final TrieSet_5Bits.AbstractSetNode<K> newRootNode =
+        BottomUpNodeIterator.<K, V, AbstractSetMultimapNode<K, V>, TrieSet_5Bits.AbstractSetNode<K>>applyNodeTransformation(
+            rootNode, nodeMapper);
 
-    return new TrieSet_5Bits<>(iterator.result());
+    return new TrieSet_5Bits<>(newRootNode);
   }
 
   @Override
@@ -1109,12 +1118,13 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
       if (isBitInBitmap(dataMap, bitpos)) {
         final int index = index(dataMap, mask, bitpos);
-        return getSingletonKey(index).equals(key) && getSingletonValue(index).equals(val);
+        return cmp.equals(getSingletonKey(index), key) && cmp.equals(getSingletonValue(index), val);
       }
 
       if (isBitInBitmap(collMap, bitpos)) {
         final int index = index(collMap, mask, bitpos);
-        return getCollectionKey(index).equals(key) && getCollectionValue(index).contains(val);
+        return cmp.equals(getCollectionKey(index), key)
+            && getCollectionValue(index).containsEquivalent(val, cmp.toComparator());
       }
 
       if (isBitInBitmap(nodeMap, bitpos)) {
@@ -2904,8 +2914,25 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     }
   }
 
+  /**
+   * Basic support for both PUSH- and PULL-based data processing. Still needs tweaking of the
+   * interface and implementation, but the the functionality is there.
+   */
   private static class BottomUpNodeIterator<K, V, MN extends AbstractSetMultimapNode<K, V>, SN extends TrieSet_5Bits.AbstractSetNode<K>>
       implements Iterator<SN> {
+
+    private static enum StreamType {
+      PULL, PUSH
+    }
+
+    static final <K, V, MN extends AbstractSetMultimapNode<K, V>, SN extends TrieSet_5Bits.AbstractSetNode<K>> SN applyNodeTransformation(
+        final MN rootNode, final BiFunction<MN, SN[], SN> nodeMapper) {
+
+      BottomUpNodeIterator<K, V, MN, SN> transformer =
+          new BottomUpNodeIterator<>(rootNode, nodeMapper);
+      transformer.applyNodeTranformation(StreamType.PUSH);
+      return transformer.mappedNodesStack.peek();
+    }
 
     private static final int MAX_DEPTH = 7;
 
@@ -2944,7 +2971,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     /*
      * search for next node that can be mapped
      */
-    private boolean searchNextLeafNode() {
+    private boolean applyNodeTranformation(final StreamType streamType) {
       while (currentStackLevel >= 0) {
         final int currentCursorIndex = currentStackLevel * 2;
         final int currentLengthIndex = currentCursorIndex + 1;
@@ -2969,7 +2996,10 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
           } else {
             // nextNode == leaf node
             mappedNodesStack.push(leafNodeMapper.apply(nextNode));
-            return true;
+
+            if (streamType == StreamType.PULL) {
+              return true;
+            }
           }
         } else {
           // pop all children
@@ -2982,18 +3012,26 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
           mappedNodesStack.push(nodeMapper.apply(nodes[currentStackLevel], newChildren));
           currentStackLevel--;
 
-          return true;
+          if (streamType == StreamType.PULL) {
+            return true;
+          }
         }
       }
 
-      return false;
+      // TODO: this is mind tangling; rework
+      if (streamType == StreamType.PULL) {
+        return true;
+      } else {
+        return false;
+      }
     }
 
+    @Override
     public boolean hasNext() {
       if (currentStackLevel >= -1 && isNextAvailable) {
         return true;
       } else {
-        return isNextAvailable = searchNextLeafNode();
+        return isNextAvailable = applyNodeTranformation(StreamType.PULL);
       }
     }
 
@@ -3012,6 +3050,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       }
     }
 
+    @Override
     public void remove() {
       throw new UnsupportedOperationException();
     }
