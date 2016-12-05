@@ -1332,7 +1332,6 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
       this.nodes = nodes;
 
       if (DEBUG) {
-
         assert (TUPLE_LENGTH * java.lang.Integer.bitCount(dataMap)
             + java.lang.Integer.bitCount(nodeMap) == nodes.length);
 
@@ -1342,9 +1341,9 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
         for (int i = TUPLE_LENGTH * payloadArity(); i < nodes.length; i++) {
           assert ((nodes[i] instanceof CompactSetNode) == true);
         }
-      }
 
-      assert nodeInvariant();
+        assert nodeInvariant();
+      }
     }
 
     @SuppressWarnings("unchecked")

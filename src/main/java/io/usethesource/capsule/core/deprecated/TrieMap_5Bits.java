@@ -1370,7 +1370,6 @@ public class TrieMap_5Bits<K, V> implements ImmutableMap<K, V> {
       this.nodes = nodes;
 
       if (DEBUG) {
-
         assert (TUPLE_LENGTH * java.lang.Integer.bitCount(dataMap)
             + java.lang.Integer.bitCount(nodeMap) == nodes.length);
 
@@ -1380,9 +1379,9 @@ public class TrieMap_5Bits<K, V> implements ImmutableMap<K, V> {
         for (int i = TUPLE_LENGTH * payloadArity(); i < nodes.length; i++) {
           assert ((nodes[i] instanceof CompactMapNode) == true);
         }
-      }
 
-      assert nodeInvariant();
+        assert nodeInvariant();
+      }
     }
 
     @SuppressWarnings("unchecked")
