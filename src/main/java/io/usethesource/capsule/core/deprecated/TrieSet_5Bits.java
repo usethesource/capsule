@@ -7,15 +7,15 @@
  */
 package io.usethesource.capsule.core.deprecated;
 
+import io.usethesource.capsule.api.deprecated.ImmutableSet;
+import io.usethesource.capsule.api.deprecated.TransientSet;
+import io.usethesource.capsule.util.ArrayUtils;
+
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import io.usethesource.capsule.api.deprecated.ImmutableSet;
-import io.usethesource.capsule.api.deprecated.TransientSet;
-import io.usethesource.capsule.util.ArrayUtils;
 
 @SuppressWarnings("rawtypes")
 public class TrieSet_5Bits<K> implements ImmutableSet<K> {
@@ -662,8 +662,8 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
 
     // factory method to construct trie from outer classes
     // TODO: find alternative solution that does not violate information hiding
-    public static <K> AbstractSetNode<K> newBitmapIndexedNode(final int nodeMap, final int dataMap,
-        final K[] keys, final AbstractSetNode<K>[] nodes) {
+    public static <K> AbstractSetNode<K> newBitmapIndexedNode(final AtomicReference<Thread> mutator,
+        final int nodeMap, final int dataMap, final K[] keys, final AbstractSetNode<K>[] nodes) {
       final Object[] content = new Object[keys.length + nodes.length];
       for (int i = 0; i < keys.length; i++) {
         content[i] = keys[i];
@@ -671,7 +671,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
       for (int i = 0; i < nodes.length; i++) {
         content[content.length - 1 - i] = nodes[i];
       }
-      return new BitmapIndexedSetNode<>(null, nodeMap, dataMap, content);
+      return new BitmapIndexedSetNode<>(mutator, nodeMap, dataMap, content);
     }
 
     /*
@@ -719,6 +719,13 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
     abstract int nodeArity();
 
     abstract AbstractSetNode<K> getNode(final int index);
+
+    /*
+     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
+     * `protected` when experiments are finished.
+     */
+    public /* protected */ abstract void setNode(final AtomicReference<Thread> mutator,
+        final int index, final AbstractSetNode<K> node);
 
     @Deprecated
     Iterator<? extends AbstractSetNode<K>> nodeIterator() {
@@ -799,6 +806,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
     public Stream<K> stream() {
       return StreamSupport.stream(spliterator(), false);
     }
+
   }
 
   protected static abstract class CompactSetNode<K> extends AbstractSetNode<K> {
@@ -1359,6 +1367,16 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
     }
 
     @Override
+    public void setNode(final AtomicReference<Thread> mutator, final int index,
+        final AbstractSetNode<K> node) {
+      if (isAllowedToEdit(this.mutator, mutator)) {
+        nodes[nodes.length - 1 - index] = node;
+      } else {
+        throw new IllegalStateException();
+      }
+    }
+
+    @Override
     boolean hasPayload() {
       return dataMap() != 0;
     }
@@ -1766,6 +1784,11 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
 
     @Override
     public CompactSetNode<K> getNode(int index) {
+      throw new IllegalStateException("Is leaf node.");
+    }
+
+    @Override
+    public void setNode(AtomicReference<Thread> mutator, int index, AbstractSetNode<K> node) {
       throw new IllegalStateException("Is leaf node.");
     }
 

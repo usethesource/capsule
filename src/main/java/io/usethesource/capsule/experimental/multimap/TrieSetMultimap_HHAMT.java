@@ -1044,7 +1044,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements ImmutableSetMultimap<K, V> {
       assert !(cmp.equals(key0, key1));
 
       if (shift >= HASH_CODE_LENGTH) {
-        return AbstractHashCollisionNode.of(keyHash0, key0, setOf(val0), key1, setOf(val1));
+          return AbstractHashCollisionNode.of(keyHash0, key0, setOf(val0), key1, setOf(val1));
       }
 
       final int mask0 = doubledMask(keyHash0, shift);

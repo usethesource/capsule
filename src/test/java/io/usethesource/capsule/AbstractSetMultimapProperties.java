@@ -7,19 +7,18 @@
  */
 package io.usethesource.capsule;
 
-import static org.junit.Assert.*;
+import com.pholser.junit.quickcheck.Property;
+import com.pholser.junit.quickcheck.generator.Size;
+import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
 
 import java.util.HashSet;
 import java.util.Map;
 
-import com.pholser.junit.quickcheck.Property;
-import com.pholser.junit.quickcheck.generator.Size;
-
-import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
+import static org.junit.Assert.*;
 
 public abstract class AbstractSetMultimapProperties<K, V, CT extends ImmutableSetMultimap<K, V>> {
 
-  private final int DEFAULT_TRIALS = 10_000;
+  private final int DEFAULT_TRIALS = 1_000;
   private final int MAX_SIZE = 1_000;
   private final Class<?> type;
 
