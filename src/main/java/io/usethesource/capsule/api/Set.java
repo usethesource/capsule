@@ -9,7 +9,11 @@ package io.usethesource.capsule.api;
 
 import java.util.Iterator;
 import java.util.Optional;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Function;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public interface Set<K> extends Iterable<K>, Function<K, Optional<K>> {
 
@@ -44,6 +48,18 @@ public interface Set<K> extends Iterable<K>, Function<K, Optional<K>> {
 
   @Override
   boolean equals(Object other);
+
+  default Spliterator<K> spliterator() {
+    return Spliterators.spliterator(iterator(), size(), 0);
+  }
+
+  default Stream<K> stream() {
+    return StreamSupport.stream(spliterator(), false);
+  }
+
+  default Stream<K> parallelStream() {
+    return StreamSupport.stream(spliterator(), true);
+  }
 
   Set.Immutable<K> asImmutable();
 
