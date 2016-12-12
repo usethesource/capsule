@@ -7,20 +7,12 @@
  */
 package io.usethesource.capsule.core;
 
-import java.text.DecimalFormat;
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-
 import io.usethesource.capsule.api.Set;
 import io.usethesource.capsule.util.ArrayUtils;
+
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 @SuppressWarnings("rawtypes")
 public class TrieSet<K> implements Set.Immutable<K> {
@@ -233,13 +225,13 @@ public class TrieSet<K> implements Set.Immutable<K> {
       }
 
       return rootNode.equals(that.rootNode);
-    } else if (other instanceof Set) {
-      Set that = (Set) other;
+    } else if (other instanceof io.usethesource.capsule.api.Set) {
+      io.usethesource.capsule.api.Set that = (io.usethesource.capsule.api.Set) other;
 
       if (this.size() != that.size())
         return false;
 
-      return contains(that);
+      return containsAll(that);
     }
 
     return false;
