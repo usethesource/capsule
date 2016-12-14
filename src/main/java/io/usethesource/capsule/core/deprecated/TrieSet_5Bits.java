@@ -9,6 +9,8 @@ package io.usethesource.capsule.core.deprecated;
 
 import io.usethesource.capsule.api.deprecated.ImmutableSet;
 import io.usethesource.capsule.api.deprecated.TransientSet;
+import io.usethesource.capsule.core.trie.ArrayView;
+import io.usethesource.capsule.core.trie.Node;
 import io.usethesource.capsule.util.ArrayUtils;
 
 import java.text.DecimalFormat;
@@ -642,15 +644,11 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
     }
   }
 
-  protected static interface INode<K, V> {
-  }
-
   /*
    * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
    * `protected` when experiments are finished.
    */
-  public /* protected */ static abstract class AbstractSetNode<K>
-      implements INode<K, java.lang.Void>, Iterable<K> {
+  public /* protected */ static abstract class AbstractSetNode<K> implements Node, Iterable<K> {
 
     static final int TUPLE_LENGTH = 1;
 
@@ -710,9 +708,16 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
         final int keyHash, final int shift, final SetResult<K> details,
         final Comparator<Object> cmp);
 
-    static final boolean isAllowedToEdit(AtomicReference<Thread> x, AtomicReference<Thread> y) {
+    // static final <T> boolean isAllowedToEdit(AtomicReference<T> x, AtomicReference<T> y) {
+    // return x != null && y != null && (x == y || x.get() == y.get());
+    // }
+
+    static final <T> boolean isAllowedToEdit(AtomicReference<?> x, AtomicReference<?> y) {
       return x != null && y != null && (x == y || x.get() == y.get());
     }
+
+    @Override
+    public abstract ArrayView<AbstractSetNode<K>> nodeArray();
 
     abstract boolean hasNodes();
 
@@ -720,12 +725,12 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
 
     abstract AbstractSetNode<K> getNode(final int index);
 
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
-    public /* protected */ abstract void setNode(final AtomicReference<Thread> mutator,
-        final int index, final AbstractSetNode<K> node);
+//    /*
+//     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
+//     * `protected` when experiments are finished.
+//     */
+//    public /* protected */ abstract void setNode(final AtomicReference<Thread> mutator,
+//        final int index, final AbstractSetNode<K> node);
 
     @Deprecated
     Iterator<? extends AbstractSetNode<K>> nodeIterator() {
@@ -1354,6 +1359,40 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
       }
     }
 
+    @Override
+    public ArrayView<AbstractSetNode<K>> nodeArray() {
+      return new ArrayView<AbstractSetNode<K>>() {
+        @Override
+        public int size() {
+          return BitmapIndexedSetNode.this.nodeArity();
+        }
+
+        @Override
+        public AbstractSetNode<K> get(int index) {
+          return BitmapIndexedSetNode.this.getNode(index);
+        }
+
+        @Override
+        public void set(int index, AbstractSetNode<K> item) {
+          // if (!isAllowedToEdit(BitmapIndexedSetNode.this.mutator, writeCapabilityToken)) {
+          // throw new IllegalStateException();
+          // }
+
+          nodes[nodes.length - 1 - index] = item;
+        }
+
+        @Override
+        public void set(int index, AbstractSetNode<K> item,
+            AtomicReference<?> writeCapabilityToken) {
+          if (!isAllowedToEdit(BitmapIndexedSetNode.this.mutator, writeCapabilityToken)) {
+            throw new IllegalStateException();
+          }
+
+          nodes[nodes.length - 1 - index] = item;
+        }
+      };
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     K getKey(final int index) {
@@ -1366,15 +1405,15 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
       return (CompactSetNode<K>) nodes[nodes.length - 1 - index];
     }
 
-    @Override
-    public void setNode(final AtomicReference<Thread> mutator, final int index,
-        final AbstractSetNode<K> node) {
-      if (isAllowedToEdit(this.mutator, mutator)) {
-        nodes[nodes.length - 1 - index] = node;
-      } else {
-        throw new IllegalStateException();
-      }
-    }
+//    @Override
+//    public void setNode(final AtomicReference<Thread> mutator, final int index,
+//        final AbstractSetNode<K> node) {
+//      if (isAllowedToEdit(this.mutator, mutator)) {
+//        nodes[nodes.length - 1 - index] = node;
+//      } else {
+//        throw new IllegalStateException();
+//      }
+//    }
 
     @Override
     boolean hasPayload() {
@@ -1568,6 +1607,11 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
       this.hash = hash;
 
       assert payloadArity() >= 2;
+    }
+
+    @Override
+    public ArrayView<AbstractSetNode<K>> nodeArray() {
+      return ArrayView.empty();
     }
 
     /*
@@ -1787,10 +1831,10 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
       throw new IllegalStateException("Is leaf node.");
     }
 
-    @Override
-    public void setNode(AtomicReference<Thread> mutator, int index, AbstractSetNode<K> node) {
-      throw new IllegalStateException("Is leaf node.");
-    }
+//    @Override
+//    public void setNode(AtomicReference<Thread> mutator, int index, AbstractSetNode<K> node) {
+//      throw new IllegalStateException("Is leaf node.");
+//    }
 
     @Override
     Object getSlot(final int index) {

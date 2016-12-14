@@ -46,7 +46,7 @@ import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heteroge
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge_IntIntSpecializations.Map1To0Node_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge_IntIntSpecializations.Map1To2Node_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge_IntIntSpecializations.Map2To0Node_5Bits_Heterogeneous_BleedingEdge;
-import io.usethesource.capsule.util.RangecopyUtils.ArrayView;
+import io.usethesource.capsule.util.RangecopyUtils.AbstractArrayView;
 import io.usethesource.capsule.util.RangecopyUtils.Companion;
 import io.usethesource.capsule.util.RangecopyUtils.EitherIntOrObject;
 import io.usethesource.capsule.util.RangecopyUtils.IntArrayView;
@@ -1108,7 +1108,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
 
     }
 
-    final ArrayView getIntArrayView() {
+    final AbstractArrayView getIntArrayView() {
       final Class<?> clazz = this.getClass();
       final int payloadArity = unsafe.getInt(clazz, globalPayloadArityOffset);
 
@@ -1467,16 +1467,16 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
     // bitpos,
     // final int index, final Object key, final Object val) {
     //
-    // ArrayView src1 = getIntArrayView();
-    // ArrayView src2 = getObjectArrayView();
+    // AbstractArrayView src1 = getIntArrayView();
+    // AbstractArrayView src2 = getObjectArrayView();
     //
     // final CompactMapNode dst = allocateHeapRegion(src1.length / 2, src2.length + TUPLE_LENGTH);
     //
     // dst.rawMap1 = rawMap1 | bitpos;
     // dst.rawMap2 = rawMap2 | bitpos;
     //
-    // ArrayView dst1 = dst.getIntArrayView();
-    // ArrayView dst2 = dst.getObjectArrayView();
+    // AbstractArrayView dst1 = dst.getIntArrayView();
+    // AbstractArrayView dst2 = dst.getObjectArrayView();
     //
     // arrayviewcopy(src1, 0, dst1, 0, src1.length);
     //
@@ -1633,16 +1633,16 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
     // CompactMapNode copyAndSetNode(final AtomicReference<Thread> mutator, final int index,
     // final AbstractMapNode node) {
     //
-    // ArrayView src1 = getIntArrayView();
-    // ArrayView src2 = getObjectArrayView();
+    // AbstractArrayView src1 = getIntArrayView();
+    // AbstractArrayView src2 = getObjectArrayView();
     //
     // final CompactMapNode dst = allocateHeapRegion(getClass());
     //
     // dst.rawMap1 = rawMap1;
     // dst.rawMap2 = rawMap2;
     //
-    // ArrayView dst1 = dst.getIntArrayView();
-    // ArrayView dst2 = dst.getObjectArrayView();
+    // AbstractArrayView dst1 = dst.getIntArrayView();
+    // AbstractArrayView dst2 = dst.getObjectArrayView();
     //
     // arrayviewcopy(src1, 0, dst1, 0, src1.length);
     //
@@ -1724,8 +1724,8 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
     // CompactMapNode copyAndMigrateFromRareInlineToNode(final AtomicReference<Thread> mutator,
     // final int bitpos, final int indexOld, final int indexNew, final AbstractMapNode node) {
     //
-    // ArrayView src1 = getIntArrayView();
-    // ArrayView src2 = getObjectArrayView();
+    // AbstractArrayView src1 = getIntArrayView();
+    // AbstractArrayView src2 = getObjectArrayView();
     //
     // final CompactMapNode dst = allocateHeapRegion(src1.length / 2, src2.length - TUPLE_LENGTH +
     // 1);
@@ -1733,8 +1733,8 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
     // dst.rawMap1 = rawMap1 | bitpos;
     // dst.rawMap2 = rawMap2 ^ bitpos;
     //
-    // ArrayView dst1 = dst.getIntArrayView();
-    // ArrayView dst2 = dst.getObjectArrayView();
+    // AbstractArrayView dst1 = dst.getIntArrayView();
+    // AbstractArrayView dst2 = dst.getObjectArrayView();
     //
     // arrayviewcopy(src1, 0, dst1, 0, src1.length);
     //
@@ -1754,7 +1754,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
     // CompactMapNode copyAndMigrateFromRareInlineToNode(final AtomicReference<Thread> mutator,
     // final int bitpos, final int indexOld, final int indexNew, final AbstractMapNode node) {
     //
-    // ArrayView src1 = getIntArrayView();
+    // AbstractArrayView src1 = getIntArrayView();
     // ObjectArrayView src2 = getObjectArrayView();
     //
     // final CompactMapNode dst =
@@ -1763,7 +1763,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
     // dst.rawMap1 = rawMap1 | bitpos;
     // dst.rawMap2 = rawMap2 ^ bitpos;
     //
-    // ArrayView dst1 = dst.getIntArrayView();
+    // AbstractArrayView dst1 = dst.getIntArrayView();
     // ObjectArrayView dst2 = dst.getObjectArrayView();
     //
     // arrayviewcopy(src1, 0, dst1, 0, src1.length);

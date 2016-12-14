@@ -7,9 +7,7 @@
  */
 package io.usethesource.capsule.util;
 
-import static io.usethesource.capsule.util.DataLayoutHelper.addressSize;
-import static io.usethesource.capsule.util.DataLayoutHelper.isCopyMemorySupported;
-import static io.usethesource.capsule.util.DataLayoutHelper.unsafe;
+import static io.usethesource.capsule.util.DataLayoutHelper.*;
 
 @SuppressWarnings({"restriction"})
 public final class RangecopyUtils {
@@ -620,9 +618,9 @@ public final class RangecopyUtils {
 
   }
 
-  public abstract static class ArrayView {
+  public abstract static class AbstractArrayView {
 
-    public ArrayView(final Object base, final long offset, final int length) {
+    public AbstractArrayView(final Object base, final long offset, final int length) {
       this.base = base;
       this.offset = offset;
       this.length = length;
@@ -638,7 +636,7 @@ public final class RangecopyUtils {
     abstract void set(int idx, Object value);
   }
 
-  public static class ObjectArrayView extends ArrayView {
+  public static class ObjectArrayView extends AbstractArrayView {
 
     public ObjectArrayView(Object base, long offset, int length) {
       super(base, offset, length);
@@ -661,7 +659,7 @@ public final class RangecopyUtils {
 
   }
 
-  public static class IntArrayView extends ArrayView {
+  public static class IntArrayView extends AbstractArrayView {
 
     public IntArrayView(Object base, long offset, int length) {
       super(base, offset, length);
@@ -704,8 +702,8 @@ public final class RangecopyUtils {
   public static final void arrayviewcopyObject(Object src, int srcPos, Object dst, int dstPos,
       int length) {
     if (length != 0) {
-      ArrayView srcView = (ArrayView) src;
-      ArrayView dstView = (ArrayView) dst;
+      AbstractArrayView srcView = (AbstractArrayView) src;
+      AbstractArrayView dstView = (AbstractArrayView) dst;
 
       _do_rangecopyObjectRegion(srcView.base, srcView.offset + srcPos * addressSize, dstView.base,
           dstView.offset + dstPos * addressSize, length);
@@ -715,8 +713,8 @@ public final class RangecopyUtils {
   public static final void arrayviewcopyInt(Object src, int srcPos, Object dst, int dstPos,
       int length) {
     if (length != 0) {
-      ArrayView srcView = (ArrayView) src;
-      ArrayView dstView = (ArrayView) dst;
+      AbstractArrayView srcView = (AbstractArrayView) src;
+      AbstractArrayView dstView = (AbstractArrayView) dst;
 
       _do_rangecopyIntRegion(srcView.base, srcView.offset + srcPos * addressSize, dstView.base,
           dstView.offset + dstPos * addressSize, length);
@@ -729,8 +727,8 @@ public final class RangecopyUtils {
       // if (!(src instanceof ArrayView && dst instanceof ArrayView))
       // throw new IllegalArgumentException();
 
-      ArrayView srcView = (ArrayView) src;
-      ArrayView dstView = (ArrayView) dst;
+      AbstractArrayView srcView = (AbstractArrayView) src;
+      AbstractArrayView dstView = (AbstractArrayView) dst;
 
       // if (!(srcView.getElementType() == dstView.getElementType()))
       // throw new IllegalArgumentException();

@@ -13,7 +13,6 @@ import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHA
 import static io.usethesource.capsule.util.RangecopyUtils.isBitInBitmap;
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
@@ -28,6 +27,8 @@ import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
 import io.usethesource.capsule.api.deprecated.SetMultimap;
 import io.usethesource.capsule.api.deprecated.TransientSetMultimap;
 import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
+import io.usethesource.capsule.core.trie.ArrayView;
+import io.usethesource.capsule.core.trie.Node;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type;
 import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
@@ -714,10 +715,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     }
   }
 
-  protected static interface INode<K, V> {
-  }
-
-  protected static abstract class AbstractSetMultimapNode<K, V> implements INode<K, V> {
+  protected static abstract class AbstractSetMultimapNode<K, V> implements Node {
 
     static final int TUPLE_LENGTH = 2;
 
@@ -746,9 +744,12 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
         final K key, final int keyHash, final int shift, final SetMultimapResult<K, V> details,
         EqualityComparator<Object> cmp);
 
-    static final boolean isAllowedToEdit(AtomicReference<Thread> x, AtomicReference<Thread> y) {
+    static final boolean isAllowedToEdit(AtomicReference<?> x, AtomicReference<?> y) {
       return x != null && y != null && (x == y || x.get() == y.get());
     }
+
+    @Override
+    public abstract ArrayView<AbstractSetMultimapNode<K, V>> nodeArray();
 
     abstract boolean hasNodes();
 
@@ -1729,6 +1730,31 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       assert nodeInvariant();
     }
 
+    @Override
+    public ArrayView<AbstractSetMultimapNode<K, V>> nodeArray() {
+      return new ArrayView<AbstractSetMultimapNode<K, V>>() {
+        @Override
+        public int size() {
+          return BitmapIndexedSetMultimapNode.this.nodeArity();
+        }
+
+        @Override
+        public AbstractSetMultimapNode<K, V> get(int index) {
+          return (AbstractSetMultimapNode<K, V>) BitmapIndexedSetMultimapNode.this.getNode(index);
+        }
+
+        @Override
+        public void set(int index, AbstractSetMultimapNode<K, V> item,
+            AtomicReference<?> writeCapabilityToken) {
+          if (!isAllowedToEdit(BitmapIndexedSetMultimapNode.this.mutator, writeCapabilityToken)) {
+            throw new IllegalStateException();
+          }
+
+          nodes[nodes.length - 1 - index] = item;
+        }
+      };
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     K getSingletonKey(final int index) {
@@ -2363,6 +2389,11 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     HashCollisionNode(final int hash, final List<Map.Entry<K, ImmutableSet<V>>> collisionContent) {
       this.hash = hash;
       this.collisionContent = collisionContent;
+    }
+
+    @Override
+    public ArrayView<AbstractSetMultimapNode<K, V>> nodeArray() {
+      throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     private static final RuntimeException UOE = new UnsupportedOperationException();
@@ -3200,110 +3231,152 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
    * Basic support for both PUSH- and PULL-based data processing. Still needs tweaking of the
    * interface and implementation, but the the functionality is there.
    */
-  private static class BottomUpTransientNodeTransformer<K, V, MN extends AbstractSetMultimapNode<K, V>, SN extends TrieSet_5Bits.AbstractSetNode<K>> {
+  private static class BottomUpTransientNodeTransformer<K, V, MN extends Node, SN extends Node> {
 
     private static final int MAX_DEPTH = 7;
-    private static final Class<?> MAP_CLASS = AbstractSetMultimapNode.class;
-    private static final Class<?> SET_CLASS = TrieSet_5Bits.AbstractSetNode.class;
 
     private final BiFunction<MN, AtomicReference<Thread>, SN> nodeMapper;
     private final AtomicReference<Thread> mutator;
 
-    private int currentStackLevel;
-    private final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
-
-    private final MN[] mapNodes = (MN[]) Array.newInstance(MAP_CLASS, MAX_DEPTH);
-    private final SN[] setNodes = (SN[]) Array.newInstance(SET_CLASS, MAX_DEPTH);
+    private int index;
+    private final ListIterator<MN>[] srcIteratorStack = new ListIterator[MAX_DEPTH];
+    private final ListIterator<SN>[] dstIteratorStack = new ListIterator[MAX_DEPTH];
 
     private final AtomicReference<Optional<SN>> next;
+
+    private final SN setRootNode;
 
     public BottomUpTransientNodeTransformer(final MN mapRootNode,
         final BiFunction<MN, AtomicReference<Thread>, SN> nodeMapper) {
       this.nodeMapper = nodeMapper;
       this.mutator = new AtomicReference<>(Thread.currentThread());
 
-      final SN setRootNode = nodeMapper.apply(mapRootNode, mutator);
+      setRootNode = nodeMapper.apply(mapRootNode, mutator);
 
-      if (mapRootNode.hasNodes()) {
+      final ListIterator<MN> subNodeIterator =
+          (ListIterator<MN>) mapRootNode.nodeArray().iterator();
+
+      if (subNodeIterator.hasNext()) {
         // rootNode == non-leaf node
-        currentStackLevel = 0;
+        index = 0;
         next = new AtomicReference<>(Optional.empty());
 
-        mapNodes[0] = mapRootNode;
-        setNodes[0] = setRootNode;
-
-        nodeCursorsAndLengths[0] = 0;
-        nodeCursorsAndLengths[1] = mapRootNode.nodeArity();
+        srcIteratorStack[index] = subNodeIterator;
+        dstIteratorStack[index] = (ListIterator<SN>) setRootNode.nodeArray().iterator();
       } else {
         // nextNode == leaf node
-        currentStackLevel = -1;
+        index = -1;
         next = new AtomicReference<>(Optional.of(setRootNode));
       }
     }
 
     public final SN apply() {
-      if (currentStackLevel >= 0) {
-        next.set(applyNodeTranformation(false));
-      }
+//      if (stackLevel >= 0) {
+//        // next.set(applyNodeTranformation(false));
+//        applyNodeTranformation(false);
+//      }
 
-      assert currentStackLevel == -1;
-      assert next.get().isPresent();
+      // assert stackLevel == -1;
+      // assert next.get().isPresent();
+
+      if (index >= 0)
+        applyNodeTranformation();
 
       mutator.set(null);
-      return next.get().get();
+      return setRootNode;
     }
 
     /*
      * search for next node that can be mapped
      */
-    private final Optional<SN> applyNodeTranformation(boolean yieldIntermediate) {
-      SN result = null;
+    private final void applyNodeTranformation() {
+      while (index >= 0) {
+        final ListIterator<MN> srcNodeIterator = srcIteratorStack[index];
+        final ListIterator<SN> dstNodeIterator = dstIteratorStack[index];
 
-      while (currentStackLevel >= 0 && result == null) {
-        final int currentCursorIndex = currentStackLevel * 2;
-        final int currentLengthIndex = currentCursorIndex + 1;
+        final int startIndex = index;
 
-        final int childNodeCursor = nodeCursorsAndLengths[currentCursorIndex];
-        final int childNodeLength = nodeCursorsAndLengths[currentLengthIndex];
+        do {
+          if (srcNodeIterator.hasNext()) {
+            final MN srcNode = srcNodeIterator.next();
+            final SN dstNode = nodeMapper.apply(srcNode, mutator);
 
-        if (childNodeCursor < childNodeLength) {
-          final MN nextMapNode = (MN) mapNodes[currentStackLevel].getNode(childNodeCursor);
-          nodeCursorsAndLengths[currentCursorIndex]++;
+            dstNodeIterator.next();
+            dstNodeIterator.set(dstNode);
 
-          final SN nextSetNode = nodeMapper.apply(nextMapNode, mutator);
-          setNodes[currentStackLevel].setNode(mutator, childNodeCursor, nextSetNode);
+            final ListIterator<MN> subNodeIterator =
+                (ListIterator<MN>) srcNode.nodeArray().iterator();
 
-          if (nextMapNode.hasNodes()) {
-            // next node == (to process) intermediate node
-            // put node on next stack level for depth-first traversal
-            final int nextStackLevel = ++currentStackLevel;
-            final int nextCursorIndex = nextStackLevel * 2;
-            final int nextLengthIndex = nextCursorIndex + 1;
-
-            mapNodes[nextStackLevel] = nextMapNode;
-            setNodes[nextStackLevel] = nextSetNode;
-
-            nodeCursorsAndLengths[nextCursorIndex] = 0;
-            nodeCursorsAndLengths[nextLengthIndex] = nextMapNode.nodeArity();
-          } else if (yieldIntermediate) {
-            // nextNode == (finished) leaf node
-            result = nextSetNode;
+            if (subNodeIterator.hasNext()) {
+              // next node == (to process) intermediate node
+              // put node on next stack level for depth-first traversal
+              final int nextIndex = ++index;
+              srcIteratorStack[nextIndex] = subNodeIterator;
+              dstIteratorStack[nextIndex] = (ListIterator<SN>) dstNode.nodeArray().iterator();
+            } else {
+              // nextNode == (finished) leaf node
+            }
+          } else {
+            // pop from stack
+            srcIteratorStack[index] = null;
+            dstIteratorStack[index] = null;
+            index--;
           }
-        } else {
-          if (yieldIntermediate || currentStackLevel == 0) {
-            // nextNode == (finished) intermidate node
-            result = setNodes[currentStackLevel];
-          }
-
-          // pop from stack
-          mapNodes[currentStackLevel] = null;
-          setNodes[currentStackLevel] = null;
-          currentStackLevel--;
-        }
+        } while (startIndex == index);
       }
-
-      return Optional.ofNullable(result);
     }
+
+//    /*
+//     * search for next node that can be mapped
+//     */
+//    private final Optional<SN> applyNodeTranformation(boolean yieldIntermediate) {
+//      SN result = null;
+//
+//      while (stackLevel >= 0 && result == null) {
+//        final ListIterator<MN> srcSubNodeIterator = srcIteratorStack[stackLevel];
+//        final ListIterator<SN> dstSubNodeIterator = dstIteratorStack[stackLevel];
+//
+//        if (srcSubNodeIterator.hasNext()) {
+//          final MN nextMapNode = srcSubNodeIterator.next();
+//          final SN nextSetNode = nodeMapper.apply(nextMapNode, mutator);
+//
+//          dstSubNodeIterator.next();
+//          dstSubNodeIterator.set(nextSetNode);
+//
+//          final ListIterator<MN> subNodeIterator =
+//              (ListIterator<MN>) nextMapNode.nodeArray().iterator();
+//
+//          if (subNodeIterator.hasNext()) {
+//            // next node == (to process) intermediate node
+//            // put node on next stack level for depth-first traversal
+////            final SN nextSetNode = nodeMapper.apply(nextMapNode, mutator);
+//
+//            final int nextStackLevel = ++stackLevel;
+//            srcIteratorStack[nextStackLevel] = subNodeIterator;
+//            dstIteratorStack[nextStackLevel] =
+//                (ListIterator<SN>) nextSetNode.nodeArray().iterator();
+//          } else if (yieldIntermediate) {
+//            // nextNode == (finished) leaf node
+//            result = nextSetNode;
+//          }
+//        } else {
+//          if (yieldIntermediate) {
+//            // nextNode == (finished) intermidate node
+//            // result = setNodes[stackLevel]; // ???
+//            throw new IllegalStateException("TODO: figure out how to return previous element.");
+//          } else if (stackLevel == 0) {
+//            result = setRootNode;
+//          }
+//
+//          // pop from stack
+//          srcIteratorStack[stackLevel] = null;
+//          dstIteratorStack[stackLevel] = null;
+//          stackLevel--;
+//        }
+//      }
+//
+//      return Optional.ofNullable(result);
+//    }
 
 //    @Override
 //    public boolean hasNext() {
