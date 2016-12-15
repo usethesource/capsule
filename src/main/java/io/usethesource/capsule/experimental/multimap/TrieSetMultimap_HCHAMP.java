@@ -1668,17 +1668,17 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     }
 
     @Override
-    int dataMap() {
+    final int dataMap() {
       return rawMap2() ^ collMap();
     }
 
     @Override
-    int collMap() {
+    final int collMap() {
       return rawMap1() & rawMap2();
     }
 
     @Override
-    int nodeMap() {
+    final int nodeMap() {
       return rawMap1() ^ collMap();
     }
 
@@ -1838,31 +1838,34 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
     @Override
     TrieSet_5Bits.AbstractSetNode<K> toSetNode(final AtomicReference<Thread> mutator) {
+      final int mergedPayloadMap = rawMap2();
+
       // allocate an array that can hold the keys + empty placeholder slots for sub-nodes
-      final Object[] slots = new Object[arity(rawMap2()) + arity(nodeMap())];
+      final Object[] setContent = new Object[arity(mergedPayloadMap) + arity(nodeMap())];
+      int index = 0;
 
-      int dataMap = dataMap();
-      int collMap = collMap();
+      int offset1 = 0;
+      int slidingMap1 = dataMap();
 
-      int collIndex = 0;
-      int dataIndex = 0;
-
-      int keysIndex = 0;
+      int offset2 = TUPLE_LENGTH * arity(dataMap());
+      int slidingMap2 = collMap();
 
       for (int i = 0; i < 32; i++) {
-        if ((dataMap & 0x01) == 0x01) {
-          slots[keysIndex] = getSingletonKey(dataIndex++);
-          keysIndex++;
-        } else if ((collMap & 0x01) == 0x01) {
-          slots[keysIndex] = getCollectionKey(collIndex++);
-          keysIndex++;
+        if ((slidingMap1 & 0x01) != 0) {
+          setContent[index] = nodes[offset1];
+          offset1 += TUPLE_LENGTH;
+          index++;
+        } else if ((slidingMap2 & 0x01) != 0) {
+          setContent[index] = nodes[offset2];
+          offset2 += TUPLE_LENGTH;
+          index++;
         }
 
-        dataMap = dataMap >> 1;
-        collMap = collMap >> 1;
+        slidingMap1 = slidingMap1 >> 1;
+        slidingMap2 = slidingMap2 >> 1;
       }
 
-      return TrieSet_5Bits.AbstractSetNode.newBitmapIndexedNode(mutator, nodeMap(), rawMap2(), slots);
+      return TrieSet_5Bits.AbstractSetNode.newBitmapIndexedNode(mutator, nodeMap(), mergedPayloadMap, setContent);
     }
 
     // @Override
