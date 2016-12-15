@@ -832,8 +832,8 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
     abstract TrieSet_5Bits.AbstractSetNode<K> toSetNode(AtomicReference<Thread> mutator);
 
-    abstract TrieSet_5Bits.AbstractSetNode<K> toSetNode(
-        TrieSet_5Bits.AbstractSetNode<K>... newChildren);
+    // abstract TrieSet_5Bits.AbstractSetNode<K> toSetNode(
+    // TrieSet_5Bits.AbstractSetNode<K>... newChildren);
 
     // TrieSet_5Bits.AbstractSetNode<K> toSetNode() {
     // throw new UnsupportedOperationException(
@@ -1838,7 +1838,8 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
     @Override
     TrieSet_5Bits.AbstractSetNode<K> toSetNode(final AtomicReference<Thread> mutator) {
-      final K[] keys = (K[]) new Object[arity(rawMap2())];
+      // allocate an array that can hold the keys + empty placeholder slots for sub-nodes
+      final Object[] slots = new Object[arity(rawMap2()) + arity(nodeMap())];
 
       int dataMap = dataMap();
       int collMap = collMap();
@@ -1850,10 +1851,10 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
       for (int i = 0; i < 32; i++) {
         if ((dataMap & 0x01) == 0x01) {
-          keys[keysIndex] = getSingletonKey(dataIndex++);
+          slots[keysIndex] = getSingletonKey(dataIndex++);
           keysIndex++;
         } else if ((collMap & 0x01) == 0x01) {
-          keys[keysIndex] = getCollectionKey(collIndex++);
+          slots[keysIndex] = getCollectionKey(collIndex++);
           keysIndex++;
         }
 
@@ -1861,42 +1862,37 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
         collMap = collMap >> 1;
       }
 
-      // empty placeholder
-      TrieSet_5Bits.AbstractSetNode<K>[] newChildren =
-          new TrieSet_5Bits.AbstractSetNode[arity(nodeMap())];
-
-      return TrieSet_5Bits.AbstractSetNode.newBitmapIndexedNode(mutator, nodeMap(), rawMap2(), keys,
-          newChildren);
+      return TrieSet_5Bits.AbstractSetNode.newBitmapIndexedNode(mutator, nodeMap(), rawMap2(), slots);
     }
 
-    @Override
-    TrieSet_5Bits.AbstractSetNode<K> toSetNode(TrieSet_5Bits.AbstractSetNode<K>[] newChildren) {
-      final K[] keys = (K[]) new Object[arity(rawMap2())];
-
-      int dataMap = dataMap();
-      int collMap = collMap();
-
-      int collIndex = 0;
-      int dataIndex = 0;
-
-      int keysIndex = 0;
-
-      for (int i = 0; i < 32; i++) {
-        if ((dataMap & 0x01) == 0x01) {
-          keys[keysIndex] = getSingletonKey(dataIndex++);
-          keysIndex++;
-        } else if ((collMap & 0x01) == 0x01) {
-          keys[keysIndex] = getCollectionKey(collIndex++);
-          keysIndex++;
-        }
-
-        dataMap = dataMap >> 1;
-        collMap = collMap >> 1;
-      }
-
-      return TrieSet_5Bits.AbstractSetNode.newBitmapIndexedNode(null, nodeMap(), rawMap2(), keys,
-          newChildren);
-    }
+    // @Override
+    // TrieSet_5Bits.AbstractSetNode<K> toSetNode(TrieSet_5Bits.AbstractSetNode<K>[] newChildren) {
+    // final K[] keys = (K[]) new Object[arity(rawMap2())];
+    //
+    // int dataMap = dataMap();
+    // int collMap = collMap();
+    //
+    // int collIndex = 0;
+    // int dataIndex = 0;
+    //
+    // int keysIndex = 0;
+    //
+    // for (int i = 0; i < 32; i++) {
+    // if ((dataMap & 0x01) == 0x01) {
+    // keys[keysIndex] = getSingletonKey(dataIndex++);
+    // keysIndex++;
+    // } else if ((collMap & 0x01) == 0x01) {
+    // keys[keysIndex] = getCollectionKey(collIndex++);
+    // keysIndex++;
+    // }
+    //
+    // dataMap = dataMap >> 1;
+    // collMap = collMap >> 1;
+    // }
+    //
+    // return TrieSet_5Bits.AbstractSetNode.newBitmapIndexedNode(null, nodeMap(), rawMap2(), keys,
+    // newChildren);
+    // }
 
     @Override
     boolean hasSlots() {
@@ -2416,12 +2412,12 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
           (K[]) collisionContent.stream().map(Map.Entry::getKey).toArray());
     }
 
-    @Override
-    TrieSet_5Bits.AbstractSetNode<K> toSetNode(TrieSet_5Bits.AbstractSetNode<K>[] newChildren) {
-      // is leaf; ignore newChildren
-      return TrieSet_5Bits.AbstractSetNode.newHashCollisonNode(hash,
-          (K[]) collisionContent.stream().map(Map.Entry::getKey).toArray());
-    }
+    // @Override
+    // TrieSet_5Bits.AbstractSetNode<K> toSetNode(TrieSet_5Bits.AbstractSetNode<K>[] newChildren) {
+    // // is leaf; ignore newChildren
+    // return TrieSet_5Bits.AbstractSetNode.newHashCollisonNode(hash,
+    // (K[]) collisionContent.stream().map(Map.Entry::getKey).toArray());
+    // }
 
     @Override
     byte sizePredicate() {

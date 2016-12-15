@@ -661,14 +661,8 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
     // factory method to construct trie from outer classes
     // TODO: find alternative solution that does not violate information hiding
     public static <K> AbstractSetNode<K> newBitmapIndexedNode(final AtomicReference<Thread> mutator,
-        final int nodeMap, final int dataMap, final K[] keys, final AbstractSetNode<K>[] nodes) {
-      final Object[] content = new Object[keys.length + nodes.length];
-      for (int i = 0; i < keys.length; i++) {
-        content[i] = keys[i];
-      }
-      for (int i = 0; i < nodes.length; i++) {
-        content[content.length - 1 - i] = nodes[i];
-      }
+        final int nodeMap, final int dataMap, final Object[] content) {
+      // content is assumed to be effectivle immutable to avoid defensive copying
       return new BitmapIndexedSetNode<>(mutator, nodeMap, dataMap, content);
     }
 
