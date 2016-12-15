@@ -394,8 +394,11 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
    */
   @Override
   public Set<K> keySet() {
-    final TrieSet_5Bits.AbstractSetNode<K> newRootNode =
-        applyNodeTransformation(rootNode, (node, mutator) -> node.toSetNode(mutator));
+    final BottomUpTransientNodeTransformer<AbstractSetMultimapNode<K, V>, TrieSet_5Bits.AbstractSetNode<K>> transformer =
+        new BottomUpTransientNodeTransformer<>(rootNode,
+            (node, mutator) -> node.toSetNode(mutator));
+
+    final TrieSet_5Bits.AbstractSetNode<K> newRootNode = transformer.apply();
 
     return new TrieSet_5Bits<>(newRootNode);
   }
@@ -3138,15 +3141,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
   }
 
-  public static final <K, V, MN extends AbstractSetMultimapNode<K, V>, SN extends TrieSet_5Bits.AbstractSetNode<K>> SN applyNodeTransformation(
-      final MN rootNode, final BiFunction<MN, AtomicReference<Thread>, SN> nodeMapper) {
-
-    final BottomUpTransientNodeTransformer<K, V, MN, SN> transformer =
-        new BottomUpTransientNodeTransformer<>(rootNode, nodeMapper);
-
-    return transformer.apply();
-  }
-
   // private static final int MAX_DEPTH = 7;
   // private final static Class<?> MAP_CLASS = AbstractSetMultimapNode.class;
   // private final static Class<?> SET_CLASS = TrieSet_5Bits.AbstractSetNode.class;
@@ -3232,7 +3226,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
    * Mapper that traverses a trie and converts each node (of {@code SN}) to a node of type
    * {@code DN}.
    */
-  private static class BottomUpTransientNodeTransformer<K, V, SN extends Node, DN extends Node> {
+  private static class BottomUpTransientNodeTransformer<SN extends Node, DN extends Node> {
 
     private static final int MAX_DEPTH = 7;
 
