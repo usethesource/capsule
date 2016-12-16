@@ -857,6 +857,8 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       return 1 << mask;
     }
 
+    abstract int bitmap(int category);
+
     @Deprecated
     abstract int dataMap();
 
@@ -1668,6 +1670,18 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     }
 
     @Override
+    final int bitmap(int category) {
+      switch (category) {
+        case 0:
+          return dataMap();
+        case 1:
+          return collMap();
+        default:
+          return 0;
+      }
+    }
+
+    @Override
     final int dataMap() {
       return rawMap2() ^ collMap();
     }
@@ -1736,6 +1750,54 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       }
 
       assert nodeInvariant();
+    }
+
+    @Override
+    public <T> ArrayView<T> dataArray(final int category, final int component) {
+      switch (category) {
+        case 0:
+          return categoryArrayView0(component);
+        case 1:
+          return categoryArrayView1(component);
+        default:
+          throw new IllegalArgumentException(String.format("Category %i is not supported."));
+      }
+    }
+
+    private <T> ArrayView<T> categoryArrayView0(final int component) {
+      return new ArrayView<T>() {
+        @Override
+        public int size() {
+          return arity(dataMap());
+        }
+
+        @Override
+        public T get(int index) {
+          switch(component) {
+            case 0: return (T) getSingletonKey(index);
+            case 1: return (T) getSingletonValue(index);
+          }
+          throw new IllegalStateException();
+        }
+      };
+    }
+
+    private <T> ArrayView<T> categoryArrayView1(final int component) {
+      return new ArrayView<T>() {
+        @Override
+        public int size() {
+          return arity(collMap());
+        }
+
+        @Override
+        public T get(int index) {
+          switch(component) {
+            case 0: return (T) getCollectionKey(index);
+            case 1: return (T) getCollectionValue(index);
+          }
+          throw new IllegalStateException();
+        }
+      };
     }
 
     @Override
@@ -1840,33 +1902,85 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     TrieSet_5Bits.AbstractSetNode<K> toSetNode(final AtomicReference<Thread> mutator) {
       final int mergedPayloadMap = rawMap2();
 
+      final ArrayView<K> dataArray0 = dataArray(0, 0);
+      final ArrayView<K> dataArray1 = dataArray(1, 0);
+
+      final Iterator<K> iterator = ziperator(arity(mergedPayloadMap), bitmap(0),
+          dataArray0.iterator(), bitmap(1), dataArray1.iterator());
+
       // allocate an array that can hold the keys + empty placeholder slots for sub-nodes
-      final Object[] setContent = new Object[arity(mergedPayloadMap) + arity(nodeMap())];
-      int index = 0;
+      final Object[] content = new Object[arity(mergedPayloadMap) + arity(nodeMap())];
 
-      int offset1 = 0;
-      int slidingMap1 = dataMap();
-
-      int offset2 = TUPLE_LENGTH * arity(dataMap());
-      int slidingMap2 = collMap();
-
-      for (int i = 0; i < 32; i++) {
-        if ((slidingMap1 & 0x01) != 0) {
-          setContent[index] = nodes[offset1];
-          offset1 += TUPLE_LENGTH;
-          index++;
-        } else if ((slidingMap2 & 0x01) != 0) {
-          setContent[index] = nodes[offset2];
-          offset2 += TUPLE_LENGTH;
-          index++;
-        }
-
-        slidingMap1 = slidingMap1 >> 1;
-        slidingMap2 = slidingMap2 >> 1;
+      for (int i = 0; iterator.hasNext(); i++) {
+        content[i] = iterator.next();
       }
 
-      return TrieSet_5Bits.AbstractSetNode.newBitmapIndexedNode(mutator, nodeMap(), mergedPayloadMap, setContent);
+      return TrieSet_5Bits.AbstractSetNode.newBitmapIndexedNode(mutator, nodeMap(), mergedPayloadMap, content);
     }
+
+    private <T> Iterator<T> ziperator(final int expectedSize, final int bitmap0,
+        final Iterator<T> dataIterator0, final int bitmap1, final Iterator<T> dataIterator1) {
+      return new Iterator<T>() {
+
+        private int encounteredSize = 0;
+        private int bitsToSkip = 0;
+
+        @Override
+        public boolean hasNext() {
+          return encounteredSize < expectedSize;
+        }
+
+        @Override
+        public T next() {
+          // assume that operation succeeds
+          encounteredSize += 1;
+
+          int trailingZeroCount0 = Integer.numberOfTrailingZeros(bitmap0 >> bitsToSkip);
+          int trailingZeroCount1 = Integer.numberOfTrailingZeros(bitmap1 >> bitsToSkip);
+
+          bitsToSkip = bitsToSkip + 1 + Math.min(trailingZeroCount0, trailingZeroCount1);
+
+          if (trailingZeroCount0 < trailingZeroCount1) {
+            return dataIterator0.next();
+          } else {
+            return dataIterator1.next();
+          }
+        }
+      };
+    }
+
+
+//    @Override
+//    TrieSet_5Bits.AbstractSetNode<K> toSetNode(final AtomicReference<Thread> mutator) {
+//      final int mergedPayloadMap = rawMap2();
+//
+//      // allocate an array that can hold the keys + empty placeholder slots for sub-nodes
+//      final Object[] setContent = new Object[arity(mergedPayloadMap) + arity(nodeMap())];
+//      int index = 0;
+//
+//      int offset1 = 0;
+//      int slidingMap1 = dataMap();
+//
+//      int offset2 = TUPLE_LENGTH * arity(dataMap());
+//      int slidingMap2 = collMap();
+//
+//      for (int i = 0; i < 32; i++) {
+//        if ((slidingMap1 & 0x01) != 0) {
+//          setContent[index] = nodes[offset1];
+//          offset1 += TUPLE_LENGTH;
+//          index++;
+//        } else if ((slidingMap2 & 0x01) != 0) {
+//          setContent[index] = nodes[offset2];
+//          offset2 += TUPLE_LENGTH;
+//          index++;
+//        }
+//
+//        slidingMap1 = slidingMap1 >> 1;
+//        slidingMap2 = slidingMap2 >> 1;
+//      }
+//
+//      return TrieSet_5Bits.AbstractSetNode.newBitmapIndexedNode(mutator, nodeMap(), mergedPayloadMap, setContent);
+//    }
 
     // @Override
     // TrieSet_5Bits.AbstractSetNode<K> toSetNode(TrieSet_5Bits.AbstractSetNode<K>[] newChildren) {
@@ -2267,6 +2381,11 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     private static final Supplier<RuntimeException> UOE_FACTORY =
         () -> new UnsupportedOperationException(
             "TODO: CompactSetMultimapNode -> AbstractSetMultimapNode");
+
+    @Override
+    int bitmap(int category) {
+      throw UOE_FACTORY.get();
+    }
 
     @Override
     int dataMap() {

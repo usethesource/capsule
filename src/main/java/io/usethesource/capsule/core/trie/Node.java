@@ -20,6 +20,10 @@ public interface Node {
   // throw new UnsupportedOperationException("Immutable.");
   // }
 
+  default <T> ArrayView<T> dataArray(int category, int component) {
+    throw new UnsupportedOperationException("Experimental and only partially supported.");
+  }
+
   ArrayView<? extends Node> nodeArray();
 
 }
