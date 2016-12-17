@@ -2519,7 +2519,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
     @Override
     public ArrayView<AbstractSetMultimapNode<K, V>> nodeArray() {
-      throw new UnsupportedOperationException("Not yet implemented.");
+      return ArrayView.empty();
     }
 
     private static final RuntimeException UOE = new UnsupportedOperationException();
