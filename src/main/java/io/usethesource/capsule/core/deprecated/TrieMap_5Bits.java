@@ -7,27 +7,16 @@
  */
 package io.usethesource.capsule.core.deprecated;
 
-import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
-
-import java.text.DecimalFormat;
-import java.util.AbstractCollection;
-import java.util.AbstractSet;
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
-
 import io.usethesource.capsule.api.deprecated.ImmutableMap;
 import io.usethesource.capsule.api.deprecated.TransientMap;
 import io.usethesource.capsule.util.ArrayUtils;
+
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
+
+import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 @SuppressWarnings("rawtypes")
 public class TrieMap_5Bits<K, V> implements ImmutableMap<K, V> {
@@ -2265,7 +2254,12 @@ public class TrieMap_5Bits<K, V> implements ImmutableMap<K, V> {
 
     @Override
     public V put(final K key, final V val) {
-      throw new UnsupportedOperationException();
+      /**
+       * Delegation added to support {@link Map#compute(Object, BiFunction)}.
+       */
+      return __put(key, val);
+
+      // throw new UnsupportedOperationException();
     }
 
     @Override
