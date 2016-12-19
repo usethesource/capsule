@@ -88,6 +88,12 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
   }
 
   @SuppressWarnings("unchecked")
+  public static final <K, V> TransientSetMultimap<K, V> transientOf(EqualityComparator<Object> cmp) {
+    // TODO: unify with `of()`
+    return (TransientSetMultimap<K, V>) of(cmp).asTransient();
+  }
+
+  @SuppressWarnings("unchecked")
   public static final <K, V> TransientSetMultimap<K, V> transientOf(K key, V... values) {
     final TransientSetMultimap<K, V> result =
         TrieSetMultimap_HCHAMP.EMPTY_SETMULTIMAP.asTransient();
@@ -2653,7 +2659,8 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     @Override
     Optional<ImmutableSet<V>> findByKey(K key, int keyHash, int shift,
         EqualityComparator<Object> cmp) {
-      throw UOE_NOT_YET_IMPLEMENTED_FACTORY.get();
+      return collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny()
+          .map(Map.Entry::getValue);
     }
 
     @Override
@@ -2816,6 +2823,12 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
       details.unchanged();
       return this;
+    }
+
+    @Override
+    CompactSetMultimapNode<K, V> removedAll(AtomicReference<Thread> mutator, K key, int keyHash,
+        int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
+      throw UOE_NOT_YET_IMPLEMENTED_FACTORY.get();
     }
   }
 
