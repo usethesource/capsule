@@ -27,20 +27,17 @@ public class DefaultTrieSetMultimap {
 
   private static Method persistentSetMultimapOfEmpty;
   private static Method persistentSetMultimapOfEmptyEq;
-  private static Method persistentSetMultimapOfKeyValuePairs;
 
   private static Method transientSetMultimapOfEmpty;
-  private static Method transientSetMultimapOfKeyValuePairs;
+  private static Method transientSetMultimapOfEmptyEq;
 
   static {
     try {
       persistentSetMultimapOfEmpty = target.getMethod("of");
       persistentSetMultimapOfEmptyEq = target.getMethod("of", EqualityComparator.class);
 
-      // persistentSetMultimapOfKeyValuePairs = target.getMethod("of", Object[].class);
-      //
       transientSetMultimapOfEmpty = target.getMethod("transientOf");
-      // transientSetMultimapOfKeyValuePairs = target.getMethod("transientOf", Object[].class);
+      transientSetMultimapOfEmptyEq = target.getMethod("transientOf", EqualityComparator.class);
     } catch (NoSuchMethodException | SecurityException e) {
       e.printStackTrace();
       throw new RuntimeException(e);
@@ -74,34 +71,14 @@ public class DefaultTrieSetMultimap {
     }
   }
 
-  // @SuppressWarnings("unchecked")
-  // public static final <K, V> ImmutableSetMultimap<K, V> of(Object... keyValuePairs) {
-  // try {
-  // return (ImmutableSetMultimap<K, V>) persistentSetMultimapOfKeyValuePairs.invoke(null,
-  // (Object) keyValuePairs);
-  // } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-  // throw new RuntimeException(e);
-  // }
-  // }
-  //
-  // @SuppressWarnings("unchecked")
-  // public static final <K, V> TransientSetMultimap<K, V> transientOf() {
-  // try {
-  // return (TransientSetMultimap<K, V>) transientSetMultimapOfEmpty.invoke(null);
-  // } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-  // throw new RuntimeException(e);
-  // }
-  // }
-  //
-  // @SuppressWarnings("unchecked")
-  // public static final <K, V> TransientSetMultimap<K, V> transientOf(Object... keyValuePairs) {
-  // try {
-  // return (TransientSetMultimap<K, V>) transientSetMultimapOfKeyValuePairs.invoke(null,
-  // (Object) keyValuePairs);
-  // } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-  // e.printStackTrace();
-  // throw new RuntimeException(e);
-  // }
-  // }
+  @SuppressWarnings("unchecked")
+  public static final <K, V> TransientSetMultimap<K, V> transientOf(
+      EqualityComparator<Object> cmp) {
+    try {
+      return (TransientSetMultimap<K, V>) transientSetMultimapOfEmptyEq.invoke(null, cmp);
+    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
 }
