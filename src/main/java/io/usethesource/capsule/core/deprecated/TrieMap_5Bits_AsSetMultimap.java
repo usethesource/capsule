@@ -10,19 +10,7 @@ package io.usethesource.capsule.core.deprecated;
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 import java.text.DecimalFormat;
-import java.util.AbstractCollection;
-import java.util.AbstractSet;
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 
@@ -2492,7 +2480,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
       return modified;
     }
 
-    public V __remove(final K key) {
+    public boolean __remove(final K key) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -2505,6 +2493,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
 
       if (details.isModified()) {
         assert details.hasReplacedValue();
+
         final int valHash = details.getReplacedValue().hashCode();
 
         rootNode = newRootNode;
@@ -2514,14 +2503,16 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
         if (DEBUG) {
           assert checkHashCodeAndSize(hashCode, cachedSize);
         }
-        return details.getReplacedValue();
+        // return DefaultTrieSet.of(details.getReplacedValue());
+        return true;
       }
 
       if (DEBUG) {
         assert checkHashCodeAndSize(hashCode, cachedSize);
       }
 
-      return null;
+      // return null;
+      return false;
     }
 
     public V __removeEquivalent(final K key, final Comparator<Object> cmp) {
