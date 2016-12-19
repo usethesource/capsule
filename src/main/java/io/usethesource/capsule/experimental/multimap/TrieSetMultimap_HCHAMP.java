@@ -567,6 +567,14 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
   }
 
   @Override
+  public String toString() {
+    String body =
+        entrySet().stream().map(entry -> String.format("%s: %s", entry.getKey(), entry.getValue()))
+            .reduce((o1, o2) -> String.join(", ", o1, o2)).orElse("");
+    return String.format("{%s}", body);
+  }
+
+  @Override
   public boolean isTransientSupported() {
     return true;
   }
