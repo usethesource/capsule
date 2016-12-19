@@ -9,6 +9,10 @@ package io.usethesource.capsule.util;
 
 public class ArrayUtils {
 
+  public static final <T> T[] arrayOf(T... items) {
+    return items;
+  }
+
   public static boolean equals(Object[] a1, Object[] a2) {
     if (null == a1 || null == a2) {
       return false;

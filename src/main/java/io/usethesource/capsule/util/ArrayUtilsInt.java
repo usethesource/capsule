@@ -9,6 +9,10 @@ package io.usethesource.capsule.util;
 
 public class ArrayUtilsInt {
 
+  public static final int[] arrayOfInt(int... items) {
+    return items;
+  }
+
   public static int[] arraycopyAndInsertInt(final int[] src, final int idx, final int value) {
     final int[] dst = new int[src.length + 1];
 
