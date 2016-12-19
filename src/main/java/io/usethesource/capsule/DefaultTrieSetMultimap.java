@@ -7,12 +7,13 @@
  */
 package io.usethesource.capsule;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
+import io.usethesource.capsule.api.deprecated.TransientSetMultimap;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP;
 import io.usethesource.capsule.util.EqualityComparator;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class DefaultTrieSetMultimap {
 
@@ -38,7 +39,7 @@ public class DefaultTrieSetMultimap {
 
       // persistentSetMultimapOfKeyValuePairs = target.getMethod("of", Object[].class);
       //
-      // transientSetMultimapOfEmpty = target.getMethod("transientOf");
+      transientSetMultimapOfEmpty = target.getMethod("transientOf");
       // transientSetMultimapOfKeyValuePairs = target.getMethod("transientOf", Object[].class);
     } catch (NoSuchMethodException | SecurityException e) {
       e.printStackTrace();
@@ -59,6 +60,15 @@ public class DefaultTrieSetMultimap {
   public static final <K, V> ImmutableSetMultimap<K, V> of(EqualityComparator<Object> cmp) {
     try {
       return (ImmutableSetMultimap<K, V>) persistentSetMultimapOfEmptyEq.invoke(null, cmp);
+    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static final <K, V> TransientSetMultimap<K, V> transientOf() {
+    try {
+      return (TransientSetMultimap<K, V>) transientSetMultimapOfEmpty.invoke(null);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }

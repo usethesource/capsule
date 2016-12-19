@@ -7,12 +7,12 @@
  */
 package io.usethesource.capsule;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import io.usethesource.capsule.api.deprecated.ImmutableMap;
 import io.usethesource.capsule.api.deprecated.TransientMap;
 import io.usethesource.capsule.core.deprecated.TrieMap_5Bits;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class DefaultTrieMap {
 
@@ -62,9 +62,9 @@ public class DefaultTrieMap {
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> TransientMap<K, V> transientOf() {
+  public static final <K, V, M extends TransientMap<K, V>> M transientOf() {
     try {
-      return (TransientMap<K, V>) transientMapOfEmpty.invoke(null);
+      return (M) transientMapOfEmpty.invoke(null);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
