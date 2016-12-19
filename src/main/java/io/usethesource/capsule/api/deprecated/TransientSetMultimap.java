@@ -49,6 +49,11 @@ public interface TransientSetMultimap<K, V> extends SetMultimap<K, V> {
 
   // boolean __removeTupleEquivalent(final K key, final V val, final Comparator<Object> cmp);
 
+  // TODO: return ImmutableSet<V> or boolean?
+  default boolean __remove(K key) {
+    throw new UnsupportedOperationException("Not yet implemented @ TransientSetMultimap.");
+  }
+
   Iterator<K> keyIterator();
 
   Iterator<V> valueIterator();

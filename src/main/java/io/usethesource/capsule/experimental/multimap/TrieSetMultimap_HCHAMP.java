@@ -3218,6 +3218,49 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
       }
     }
 
+//    @Override
+//    public boolean __put(K key, ImmutableSet<V> valColl) {
+//      if (mutator.get() == null) {
+//        throw new IllegalStateException("Transient already frozen.");
+//      }
+//
+//      final int keyHash = key.hashCode();
+//      final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
+//
+//      final CompactSetMultimapNode<K, V> newRootNode =
+//          rootNode.updated(mutator, key, valColl, transformHashCode(keyHash), 0, details, cmp);
+//
+//      if (details.isModified()) {
+//        if (details.hasReplacedValue()) {
+//          if (details.getType() == EitherSingletonOrCollection.Type.SINGLETON) {
+//            final int valHashOld = details.getReplacedValue().hashCode();
+//            final int valHashNew = val.hashCode();
+//
+//            return new TrieSetMultimap_HCHAMP<K, V>(cmp, newRootNode,
+//                hashCode + ((keyHash ^ valHashNew)) - ((keyHash ^ valHashOld)), cachedSize);
+//          } else {
+//            int sumOfReplacedHashes = 0;
+//
+//            for (V replaceValue : details.getReplacedCollection()) {
+//              sumOfReplacedHashes += (keyHash ^ replaceValue.hashCode());
+//            }
+//
+//            final int valHashNew = val.hashCode();
+//
+//            return new TrieSetMultimap_HCHAMP<K, V>(cmp, newRootNode,
+//                hashCode + ((keyHash ^ valHashNew)) - sumOfReplacedHashes,
+//                cachedSize - details.getReplacedCollection().size() + 1);
+//          }
+//        }
+//
+//        final int valHash = val.hashCode();
+//        return new TrieSetMultimap_HCHAMP<K, V>(cmp, newRootNode, hashCode + ((keyHash ^ valHash)),
+//            cachedSize + 1);
+//      }
+//
+//      return false;
+//    }
+
     @Override
     public boolean __insert(final K key, final V val) {
       if (mutator.get() == null) {
@@ -3289,6 +3332,47 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
       if (DEBUG) {
         assert checkHashCodeAndSize(hashCode, cachedSize);
+      }
+
+      return false;
+    }
+
+    @Override
+    public boolean __remove(K key) {
+      if (mutator.get() == null) {
+        throw new IllegalStateException("Transient already frozen.");
+      }
+
+      final int keyHash = key.hashCode();
+      final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
+
+      final CompactSetMultimapNode<K, V> newRootNode =
+          rootNode.removedAll(mutator, key, transformHashCode(keyHash), 0, details, cmp);
+
+      if (details.isModified()) {
+        assert details.hasReplacedValue();
+
+        if (details.getType() == EitherSingletonOrCollection.Type.SINGLETON) {
+          final int valHash = details.getReplacedValue().hashCode();
+
+          rootNode = newRootNode;
+          hashCode = hashCode - ((keyHash ^ valHash));
+          cachedSize = cachedSize - 1;
+
+          return true;
+        } else {
+          int sumOfReplacedHashes = 0;
+
+          for (V replaceValue : details.getReplacedCollection()) {
+            sumOfReplacedHashes += (keyHash ^ replaceValue.hashCode());
+          }
+
+          rootNode = newRootNode;
+          hashCode = hashCode - sumOfReplacedHashes;
+          cachedSize = cachedSize - details.getReplacedCollection().size();
+
+          return true;
+        }
       }
 
       return false;
