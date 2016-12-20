@@ -2310,7 +2310,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
 
       final Object[] dst = copyAndMigrateFromNodeToXxx(idxOld, idxNew, keyToInline, valToInline);
 
-      return nodeOf(mutator, rawMap1() ^ bitpos, rawMap2() | bitpos, dst);
+      return nodeOf(mutator, rawMap1() | bitpos, rawMap2() | bitpos, dst);
 
     }
 
@@ -2836,7 +2836,31 @@ public class TrieSetMultimap_HCHAMP<K, V> implements ImmutableSetMultimap<K, V> 
     @Override
     CompactSetMultimapNode<K, V> removedAll(AtomicReference<Thread> mutator, K key, int keyHash,
         int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
-      throw UOE_NOT_YET_IMPLEMENTED_FACTORY.get();
+      final Optional<Map.Entry<K, ImmutableSet<V>>> optionalTuple =
+          collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
+
+      if (optionalTuple.isPresent()) {
+        // contains key
+
+        ImmutableSet<V> values = optionalTuple.get().getValue();
+
+        final List<Map.Entry<K, ImmutableSet<V>>> updatedCollisionContent;
+
+        updatedCollisionContent = collisionContent.stream()
+            .filter(kImmutableSetEntry -> kImmutableSetEntry != optionalTuple.get())
+            .collect(Collectors.toList());
+
+        if (values.size() == 1) {
+          details.updated(values.stream().findFirst().get());
+          return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
+        } else {
+          details.updated(values);
+          return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
+        }
+      }
+
+      details.unchanged();
+      return this;
     }
   }
 
