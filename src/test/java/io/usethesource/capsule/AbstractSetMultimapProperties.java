@@ -13,6 +13,10 @@ import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static org.junit.Assert.*;
 
@@ -132,6 +136,29 @@ public abstract class AbstractSetMultimapProperties<K, V, CT extends ImmutableSe
   public void notContainedAfterInsertRemove(CT input, K item0, V item1) {
     assertFalse(
         input.__insert(item0, item1).__removeEntry(item0, item1).containsEntry(item0, item1));
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void entryIteratorAfterInsert(@Size(min = 0, max = 0) final CT emptyCollection,
+      @Size(min = 1, max = MAX_SIZE) final java.util.HashSet<Map.Entry<K, V>> inputValues) {
+
+    CT testCollection = emptyCollection;
+
+    for (Map.Entry<K, V> newValueTuple : inputValues) {
+      final CT tmpCollection =
+          (CT) testCollection.__insert(newValueTuple.getKey(), newValueTuple.getValue());
+      testCollection = tmpCollection;
+    }
+
+    final CT finalCollection = testCollection;
+
+    final Spliterator<Map.Entry> entrySpliterator = Spliterators
+        .spliterator(finalCollection.entryIterator(), finalCollection.size(), Spliterator.DISTINCT);
+    final Stream<Map.Entry> entryStream = StreamSupport.stream(entrySpliterator, false);
+
+    boolean containsInsertedValues = entryStream.allMatch(inputValues::contains);
+
+    assertTrue("Must contain all inserted values.", containsInsertedValues);
   }
 
 }
