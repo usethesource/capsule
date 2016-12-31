@@ -26,4 +26,9 @@ public interface Node {
 
   ArrayView<? extends Node> nodeArray();
 
+  // /** TODO: create local stream transformer */
+  // default <T> Stream<T> localStream() {
+  // return new Spliterators.spliterator(dataArray());
+  // }
+
 }
