@@ -25,11 +25,11 @@ Furthermore, you have to declare capsule as a dependency. To obtain the latest s
 <dependency>
 	<groupId>io.usethesource</groupId>
 	<artifactId>capsule</artifactId>
-	<version>0.2.1</version>
+	<version>0.2.2</version>
 </dependency>
 ```
 
-To obtain the latest stable backport for Java 7, insert the following snippet in your pom.xml file:
+To obtain the latest stable backport for Java 7 (that lags behind the Java 8+ release), insert the following snippet in your pom.xml file:
 
 ```
 <dependency>
