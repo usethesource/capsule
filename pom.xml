@@ -3,12 +3,12 @@
 
 	<groupId>io.usethesource</groupId>
 	<artifactId>capsule</artifactId>
-	<version>0.3.0-SNAPSHOT</version>
+	<version>0.2.2</version>
 	<packaging>jar</packaging>
 
 	<scm>
 		<developerConnection>scm:git:https://github.com/usethesource/capsule.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>v0.2.2</tag>
 	</scm>
 
 	<!-- deployment configuration (usethesource) -->
