@@ -7,14 +7,7 @@
  */
 package io.usethesource.capsule;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public abstract class AbstractSpecialisedImmutableMap<K, V>
     implements ImmutableMap<K, V>, Cloneable {
@@ -585,8 +578,8 @@ class Map2<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
 
   @Override
   public Collection<V> values() {
-    // TODO: will fail if two values are equals; return listOf(...)
-    return AbstractSpecialisedImmutableSet.setOf(val1, val2);
+    // TODO: return immutable or persistent --not only unmodifiable-- listOf(...)
+    return Collections.unmodifiableList(Arrays.asList(val1, val2));
   }
 
   @Override
@@ -823,8 +816,8 @@ class Map3<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
 
   @Override
   public Collection<V> values() {
-    // TODO: will fail if two values are equals; return listOf(...)
-    return AbstractSpecialisedImmutableSet.setOf(val1, val2, val3);
+    // TODO: return immutable or persistent --not only unmodifiable-- listOf(...)
+    return Collections.unmodifiableList(Arrays.asList(val1, val2, val3));
   }
 
   @Override
@@ -1094,8 +1087,8 @@ class Map4<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
 
   @Override
   public Collection<V> values() {
-    // TODO: will fail if two values are equals; return listOf(...)
-    return AbstractSpecialisedImmutableSet.setOf(val1, val2, val3, val4);
+    // TODO: return immutable or persistent --not only unmodifiable-- listOf(...)
+    return Collections.unmodifiableList(Arrays.asList(val1, val2, val3, val4));
   }
 
   @Override
@@ -1398,8 +1391,8 @@ class Map5<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
 
   @Override
   public Collection<V> values() {
-    // TODO: will fail if two values are equals; return listOf(...)
-    return AbstractSpecialisedImmutableSet.setOf(val1, val2, val3, val4, val5);
+    // TODO: return immutable or persistent --not only unmodifiable-- listOf(...)
+    return Collections.unmodifiableList(Arrays.asList(val1, val2, val3, val4, val5));
   }
 
   @Override
