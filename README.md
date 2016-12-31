@@ -1,5 +1,6 @@
 # The Capsule Hash Trie Collections Library
-Capsule aims to become a full-fledged (immutable) collections library that is solely built around persistent tries.
+
+Capsule aims to become a full-fledged (immutable) collections library for Java 8+ (with backport to Java 7) that is solely built around persistent tries.
 
 Capsule was recently extracted from the [usethesource/rascal-value](https://github.com/usethesource/rascal-value) project and still has to undergo some incubation before it can ship as a well-rounded collection library. Nevertheless, the code is stable and performance is already solid. Feel free to use it and let us about your experiences!
 
@@ -13,18 +14,28 @@ Binary builds of capsule are deployed in the usethesource repository. In case yo
 <repositories>
 	<repository>
 		<id>usethesource</id>
-		<url>http://nexus.rascal-mpl.org/repository/maven-public/</url>
+		<url>http://nexus.usethesource.io/content/repositories/public/</url>
 	</repository>
 </repositories>
 ```
 
-Furthermore, you have to declare capsule as a dependency. To obtain the latest stable version insert the following snippet in your pom.xml file:
+Furthermore, you have to declare capsule as a dependency. To obtain the latest stable version for Java 8+, insert the following snippet in your pom.xml file:
 
 ```
 <dependency>
 	<groupId>io.usethesource</groupId>
 	<artifactId>capsule</artifactId>
-	<version>0.2.0</version>
+	<version>0.2.1</version>
+</dependency>
+```
+
+To obtain the latest stable backport for Java 7, insert the following snippet in your pom.xml file:
+
+```
+<dependency>
+	<groupId>io.usethesource</groupId>
+	<artifactId>capsule-jdk7</artifactId>
+	<version>0.2.1</version>
 </dependency>
 ```
 
@@ -44,5 +55,5 @@ We introduce CHAMP (Compressed Hash-Array Mapped Prefix-tree), an evolutionary i
 ## Papers
 * [Paper: Optimizing Hash-Array Mapped Tries for Fast and Lean Immutable JVM Collections (OOPSLA 2015)](http://michael.steindorfer.name/publications/oopsla15.pdf)
 * [Paper: Fast and Lean Immutable Multi-Maps on the JVM based on Heterogeneous Hash-Array Mapped Tries (Draft, 2016)](https://arxiv.org/abs/1608.01036)
-* [Paper: Towards a Software Product Line of Trie-Based Collections (Draft, 2016)](http://michael.steindorfer.name/drafts/gpce16.pdf)
+* [Paper: Towards a Software Product Line of Trie-Based Collections (Short Paper, GPCE 2016)](http://michael.steindorfer.name/publications/gpce16.pdf)
 * [Paper: Code Specialization for Memory Efficient Hash Tries (Short Paper, GPCE 2014)](http://michael.steindorfer.name/publications/gpce14.pdf)
