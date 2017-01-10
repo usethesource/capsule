@@ -7,11 +7,11 @@
  */
 package io.usethesource.capsule.api;
 
+import io.usethesource.capsule.SupplierIterator;
+
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Function;
-
-import io.usethesource.capsule.SupplierIterator;
 
 public interface Map<K, V> extends Iterable<K>, Function<K, Optional<V>> {
 
@@ -60,7 +60,7 @@ public interface Map<K, V> extends Iterable<K>, Function<K, Optional<V>> {
 
   Map.Immutable<K, V> asImmutable();
 
-  public static interface Immutable<K, V> extends Map<K, V> {
+  interface Immutable<K, V> extends Map<K, V> {
 
     Map.Immutable<K, V> insert(final K key, final V val);
 
@@ -75,7 +75,7 @@ public interface Map<K, V> extends Iterable<K>, Function<K, Optional<V>> {
     java.util.Map<K, V> asJdkCollection();
   }
 
-  public static interface Transient<K, V> extends Map<K, V> {
+  interface Transient<K, V> extends Map<K, V> {
 
     V insert(final K key, final V val);
 

@@ -22,7 +22,7 @@ import java.util.function.Function;
  */
 public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements ImmutableSet<T> {
 
-  final ImmutableSetMultimap<K, V> multimap;
+  final SetMultimap.Immutable<K, V> multimap;
 
   final BiFunction<K, V, T> tupleOf;
 
@@ -33,7 +33,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
    */
   final Function<T, Boolean> tupleChecker;
 
-  public ImmutableSetMultimapAsImmutableSetView(ImmutableSetMultimap<K, V> multimap,
+  public ImmutableSetMultimapAsImmutableSetView(SetMultimap.Immutable<K, V> multimap,
       BiFunction<K, V, T> tupleOf, BiFunction<T, Integer, Object> tupleElementAt,
       Function<T, Boolean> tupleChecker) {
     this.multimap = multimap;
@@ -43,7 +43,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
   }
 
   // internal use: introspecting backing implementation; TODO: reconsider visibility
-  public ImmutableSetMultimap<K, V> getMultimap() {
+  public SetMultimap.Immutable<K, V> getMultimap() {
     return multimap;
   }
 
@@ -157,7 +157,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
     @SuppressWarnings("unchecked")
     final V val = (V) tupleElementAt.apply(tuple, 1);
 
-    final ImmutableSetMultimap<K, V> multimapNew = multimap.__insert(key, val);
+    final SetMultimap.Immutable<K, V> multimapNew = multimap.__insert(key, val);
 
     if (multimapNew == multimap) {
       return this;
@@ -174,7 +174,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
 
   @Override
   public ImmutableSet<T> __insertAll(Set<? extends T> set) {
-    final TransientSetMultimap<K, V> tmp = multimap.asTransient();
+    final SetMultimap.Transient<K, V> tmp = multimap.asTransient();
 
     Consumer<T> consumer = (tuple) -> {
       if (!tupleChecker.apply(tuple))
@@ -189,7 +189,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
     };
 
     set.forEach(consumer);
-    final ImmutableSetMultimap<K, V> multimapNew = tmp.freeze();
+    final SetMultimap.Immutable<K, V> multimapNew = tmp.freeze();
 
     if (multimapNew == multimap) {
       return this;
@@ -211,7 +211,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
     @SuppressWarnings("unchecked")
     final V val = (V) tupleElementAt.apply(tuple, 1);
 
-    final ImmutableSetMultimap<K, V> multimapNew = multimap.__removeEntry(key, val);
+    final SetMultimap.Immutable<K, V> multimapNew = multimap.__removeEntry(key, val);
 
     return new ImmutableSetMultimapAsImmutableSetView<>(multimapNew, tupleOf, tupleElementAt,
         tupleChecker);
@@ -261,7 +261,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
 
   static final class TransientSetMultimapAsTransientSetView<K, V, T> implements TransientSet<T> {
 
-    final TransientSetMultimap<K, V> multimap;
+    final SetMultimap.Transient<K, V> multimap;
 
     final BiFunction<K, V, T> tupleOf;
 
@@ -272,7 +272,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
      */
     final Function<T, Boolean> tupleChecker;
 
-    public TransientSetMultimapAsTransientSetView(TransientSetMultimap<K, V> multimap,
+    public TransientSetMultimapAsTransientSetView(SetMultimap.Transient<K, V> multimap,
         BiFunction<K, V, T> tupleOf, BiFunction<T, Integer, Object> tupleElementAt,
         Function<T, Boolean> tupleChecker) {
       this.multimap = multimap;

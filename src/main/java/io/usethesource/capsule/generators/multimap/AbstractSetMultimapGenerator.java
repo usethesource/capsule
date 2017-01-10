@@ -7,31 +7,22 @@
  */
 package io.usethesource.capsule.generators.multimap;
 
-import static com.pholser.junit.quickcheck.internal.Lists.removeFrom;
-import static com.pholser.junit.quickcheck.internal.Lists.shrinksOfOneItem;
 import static com.pholser.junit.quickcheck.internal.Ranges.checkRange;
 import static com.pholser.junit.quickcheck.internal.Ranges.Type.INTEGRAL;
-import static com.pholser.junit.quickcheck.internal.Sequences.halving;
 import static java.util.stream.StreamSupport.stream;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import com.pholser.junit.quickcheck.generator.ComponentizedGenerator;
 import com.pholser.junit.quickcheck.generator.GenerationStatus;
-import com.pholser.junit.quickcheck.generator.Shrink;
 import com.pholser.junit.quickcheck.generator.Size;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 
-import io.usethesource.capsule.api.deprecated.ImmutableSet;
-import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
+import io.usethesource.capsule.api.deprecated.SetMultimap;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public abstract class AbstractSetMultimapGenerator<T extends ImmutableSetMultimap>
+public abstract class AbstractSetMultimapGenerator<T extends SetMultimap.Immutable>
     extends ComponentizedGenerator<T> {
 
   private Class<T> target;

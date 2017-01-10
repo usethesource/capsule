@@ -7,18 +7,17 @@
  */
 package io.usethesource.capsule;
 
+import io.usethesource.capsule.api.deprecated.SetMultimap;
 import org.junit.runner.RunWith;
 
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 
-import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
-
 @RunWith(JUnitQuickcheck.class)
 public class SetMultimapPropertiesTest extends
-    AbstractSetMultimapProperties<Integer, Integer, ImmutableSetMultimap<Integer, Integer>> {
+    AbstractSetMultimapProperties<Integer, Integer, SetMultimap.Immutable<Integer, Integer>> {
 
   public SetMultimapPropertiesTest() {
-    super(ImmutableSetMultimap.class);
+    super(SetMultimap.Immutable.class);
   }
 
 }

@@ -17,8 +17,8 @@ import com.pholser.junit.quickcheck.generator.GenerationStatus;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 
 import io.usethesource.capsule.DefaultTrieSetMultimap;
-import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
 import io.usethesource.capsule.api.deprecated.ImmutableSetMultimapAsImmutableSetView;
+import io.usethesource.capsule.api.deprecated.SetMultimap;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class SetGeneratorMultimapAsSetView<K, V>
@@ -30,7 +30,7 @@ public class SetGeneratorMultimapAsSetView<K, V>
 
   @Override
   protected final ImmutableSetMultimapAsImmutableSetView<K, V, Map.Entry<K, V>> empty() {
-    final ImmutableSetMultimap<K, V> multimap = DefaultTrieSetMultimap.of();
+    final SetMultimap.Immutable<K, V> multimap = DefaultTrieSetMultimap.of();
 
     final BiFunction<K, V, Map.Entry<K, V>> tupleOf = (first, second) -> entryOf(first, second);
 

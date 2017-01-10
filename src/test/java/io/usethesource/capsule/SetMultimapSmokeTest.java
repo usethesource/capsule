@@ -11,9 +11,9 @@ import static org.junit.Assert.*;
 
 import java.util.Collection;
 
+import io.usethesource.capsule.api.deprecated.SetMultimap;
 import org.junit.Test;
 
-import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked;
 
 public class SetMultimapSmokeTest {
@@ -22,7 +22,7 @@ public class SetMultimapSmokeTest {
 
   @Test
   public void testInsertTwoTuplesThatShareSameKey() {
-    ImmutableSetMultimap<Integer, String> map =
+    SetMultimap.Immutable<Integer, String> map =
         TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.<Integer, String>of().__insert(1, "x").__insert(1, "y");
 
     assertEquals(2, map.size());
@@ -31,7 +31,7 @@ public class SetMultimapSmokeTest {
 
   @Test
   public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyX() {
-    ImmutableSetMultimap<Integer, String> map = TrieSetMultimap_HHAMT_Specialized_Path_Interlinked
+    SetMultimap.Immutable<Integer, String> map = TrieSetMultimap_HHAMT_Specialized_Path_Interlinked
         .<Integer, String>of().__insert(1, "x").__insert(1, "y").__removeEntry(1, "x");
 
     assertEquals(1, map.size());
@@ -40,7 +40,7 @@ public class SetMultimapSmokeTest {
 
   @Test
   public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyY() {
-    ImmutableSetMultimap<Integer, String> map = TrieSetMultimap_HHAMT_Specialized_Path_Interlinked
+    SetMultimap.Immutable<Integer, String> map = TrieSetMultimap_HHAMT_Specialized_Path_Interlinked
         .<Integer, String>of().__insert(1, "x").__insert(1, "y").__removeEntry(1, "y");
 
     assertEquals(1, map.size());
@@ -49,7 +49,7 @@ public class SetMultimapSmokeTest {
 
   @Test
   public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyXY() {
-    ImmutableSetMultimap<Integer, String> map =
+    SetMultimap.Immutable<Integer, String> map =
         TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.<Integer, String>of().__insert(1, "x").__insert(1, "y")
             .__removeEntry(1, "x").__removeEntry(1, "y");
 
@@ -59,7 +59,7 @@ public class SetMultimapSmokeTest {
 
   @Test
   public void testInsertTwoTuplesThatShareSameKey_Iterate() {
-    ImmutableSetMultimap<Integer, String> map =
+    SetMultimap.Immutable<Integer, String> map =
         TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.<Integer, String>of().__insert(1, "x").__insert(1, "y");
 
     Collection<String> values = map.values();

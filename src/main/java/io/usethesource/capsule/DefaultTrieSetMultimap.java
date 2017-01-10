@@ -7,8 +7,7 @@
  */
 package io.usethesource.capsule;
 
-import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
-import io.usethesource.capsule.api.deprecated.TransientSetMultimap;
+import io.usethesource.capsule.api.deprecated.SetMultimap;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP;
 import io.usethesource.capsule.util.EqualityComparator;
 
@@ -45,37 +44,37 @@ public class DefaultTrieSetMultimap {
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> ImmutableSetMultimap<K, V> of() {
+  public static final <K, V> SetMultimap.Immutable<K, V> of() {
     try {
-      return (ImmutableSetMultimap<K, V>) persistentSetMultimapOfEmpty.invoke(null);
+      return (SetMultimap.Immutable<K, V>) persistentSetMultimapOfEmpty.invoke(null);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> ImmutableSetMultimap<K, V> of(EqualityComparator<Object> cmp) {
+  public static final <K, V> SetMultimap.Immutable<K, V> of(EqualityComparator<Object> cmp) {
     try {
-      return (ImmutableSetMultimap<K, V>) persistentSetMultimapOfEmptyEq.invoke(null, cmp);
+      return (SetMultimap.Immutable<K, V>) persistentSetMultimapOfEmptyEq.invoke(null, cmp);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> TransientSetMultimap<K, V> transientOf() {
+  public static final <K, V> SetMultimap.Transient<K, V> transientOf() {
     try {
-      return (TransientSetMultimap<K, V>) transientSetMultimapOfEmpty.invoke(null);
+      return (SetMultimap.Transient<K, V>) transientSetMultimapOfEmpty.invoke(null);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> TransientSetMultimap<K, V> transientOf(
+  public static final <K, V> SetMultimap.Transient<K, V> transientOf(
       EqualityComparator<Object> cmp) {
     try {
-      return (TransientSetMultimap<K, V>) transientSetMultimapOfEmptyEq.invoke(null, cmp);
+      return (SetMultimap.Transient<K, V>) transientSetMultimapOfEmptyEq.invoke(null, cmp);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }

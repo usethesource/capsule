@@ -63,7 +63,7 @@ public interface Set<K> extends Iterable<K>, Function<K, Optional<K>> {
 
   Set.Immutable<K> asImmutable();
 
-  public static interface Immutable<K> extends Set<K> {
+  interface Immutable<K> extends Set<K> {
 
     Set.Immutable<K> insert(final K key);
 
@@ -83,7 +83,7 @@ public interface Set<K> extends Iterable<K>, Function<K, Optional<K>> {
 
   }
 
-  public static interface Transient<K> extends Set<K> {
+  interface Transient<K> extends Set<K> {
 
     boolean insert(final K key);
 

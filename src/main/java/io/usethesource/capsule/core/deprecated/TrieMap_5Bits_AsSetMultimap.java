@@ -7,22 +7,20 @@
  */
 package io.usethesource.capsule.core.deprecated;
 
-import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
+import io.usethesource.capsule.api.deprecated.ImmutableSet;
+import io.usethesource.capsule.api.deprecated.SetMultimap;
+import io.usethesource.capsule.util.ArrayUtils;
+import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableSet;
 
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 
-import io.usethesource.capsule.api.deprecated.ImmutableSet;
-import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
-import io.usethesource.capsule.api.deprecated.SetMultimap;
-import io.usethesource.capsule.api.deprecated.TransientSetMultimap;
-import io.usethesource.capsule.util.ArrayUtils;
-import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableSet;
+import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 @SuppressWarnings("rawtypes")
-public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K, V> {
+public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
 
   @SuppressWarnings("unchecked")
   private static final TrieMap_5Bits_AsSetMultimap EMPTY_MAP =
@@ -44,13 +42,13 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> ImmutableSetMultimap<K, V> of() {
+  public static final <K, V> SetMultimap.Immutable<K, V> of() {
     return TrieMap_5Bits_AsSetMultimap.EMPTY_MAP;
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> ImmutableSetMultimap<K, V> of(K key, V... values) {
-    ImmutableSetMultimap<K, V> result = TrieMap_5Bits_AsSetMultimap.EMPTY_MAP;
+  public static final <K, V> SetMultimap.Immutable<K, V> of(K key, V... values) {
+    SetMultimap.Immutable<K, V> result = TrieMap_5Bits_AsSetMultimap.EMPTY_MAP;
 
     for (V value : values) {
       result = result.__insert(key, value);
@@ -60,13 +58,13 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> TransientSetMultimap<K, V> transientOf() {
+  public static final <K, V> SetMultimap.Transient<K, V> transientOf() {
     return TrieMap_5Bits_AsSetMultimap.EMPTY_MAP.asTransient();
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> TransientSetMultimap<K, V> transientOf(K key, V... values) {
-    final TransientSetMultimap<K, V> result = TrieMap_5Bits_AsSetMultimap.EMPTY_MAP.asTransient();
+  public static final <K, V> SetMultimap.Transient<K, V> transientOf(K key, V... values) {
+    final SetMultimap.Transient<K, V> result = TrieMap_5Bits_AsSetMultimap.EMPTY_MAP.asTransient();
 
     for (V value : values) {
       result.__insert(key, value);
@@ -188,7 +186,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
   }
 
   @Override
-  public ImmutableSetMultimap<K, V> __put(final K key, final V val) {
+  public SetMultimap.Immutable<K, V> __put(final K key, final V val) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -213,29 +211,29 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
   }
 
   @Override
-  public ImmutableSetMultimap<K, V> __insert(final K key, final V val) {
+  public SetMultimap.Immutable<K, V> __insert(final K key, final V val) {
     return __put(key, val); // NOTE: semantically incorrect
   }
 
-  public ImmutableSetMultimap<K, V> __insertEquivalent(final K key, final V val,
-      final Comparator<Object> cmp) {
+  public SetMultimap.Immutable<K, V> __insertEquivalent(final K key, final V val,
+                                            final Comparator<Object> cmp) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public ImmutableSetMultimap<K, V> __insertAll(final SetMultimap<? extends K, ? extends V> map) {
-    final TransientSetMultimap<K, V> tmpTransient = this.asTransient();
+  public SetMultimap.Immutable<K, V> __insertAll(final SetMultimap<? extends K, ? extends V> map) {
+    final SetMultimap.Transient<K, V> tmpTransient = this.asTransient();
     tmpTransient.__insertAll(map);
     return tmpTransient.freeze();
   }
 
   @Override
-  public ImmutableSetMultimap<K, V> __removeEntry(K key, V val) {
+  public SetMultimap.Immutable<K, V> __removeEntry(K key, V val) {
     return __remove(key); // NOTE performs remove all (unchecked of val)
   }
 
   @Override
-  public ImmutableSetMultimap<K, V> __remove(final K key) {
+  public SetMultimap.Immutable<K, V> __remove(final K key) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -252,7 +250,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
     return this;
   }
 
-  public ImmutableSetMultimap<K, V> __removeEquivalent(final K key, final Comparator<Object> cmp) {
+  public SetMultimap.Immutable<K, V> __removeEquivalent(final K key, final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -517,7 +515,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
   }
 
   @Override
-  public TransientSetMultimap<K, V> asTransient() {
+  public SetMultimap.Transient<K, V> asTransient() {
     return new TransientTrieMap_5Bits<K, V>(this);
   }
 
@@ -2219,7 +2217,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
     }
   }
 
-  static final class TransientTrieMap_5Bits<K, V> implements TransientSetMultimap<K, V> {
+  static final class TransientTrieMap_5Bits<K, V> implements SetMultimap.Transient<K, V> {
     final private AtomicReference<Thread> mutator;
     private AbstractMapNode<K, V> rootNode;
     private int hashCode;
@@ -2825,7 +2823,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements ImmutableSetMultimap<K
     }
 
     @Override
-    public ImmutableSetMultimap<K, V> freeze() {
+    public SetMultimap.Immutable<K, V> freeze() {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }

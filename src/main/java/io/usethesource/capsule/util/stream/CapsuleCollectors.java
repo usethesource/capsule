@@ -9,10 +9,7 @@ package io.usethesource.capsule.util.stream;
 
 import io.usethesource.capsule.DefaultTrieSet;
 import io.usethesource.capsule.DefaultTrieSetMultimap;
-import io.usethesource.capsule.api.deprecated.ImmutableSet;
-import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
-import io.usethesource.capsule.api.deprecated.TransientSet;
-import io.usethesource.capsule.api.deprecated.TransientSetMultimap;
+import io.usethesource.capsule.api.deprecated.*;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -35,19 +32,19 @@ public class CapsuleCollectors {
         }, TransientSet::freeze, UNORDERED);
   }
 
-  public static <T, K, V> Collector<T, ?, ImmutableSetMultimap<K, V>> toSetMultimap(
+  public static <T, K, V> Collector<T, ?, SetMultimap.Immutable<K, V>> toSetMultimap(
       Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends V> valueMapper) {
 
     /** extract key/value from type {@code T} and insert into multimap */
-    final BiConsumer<TransientSetMultimap<K, V>, T> accumulator =
+    final BiConsumer<SetMultimap.Transient<K, V>, T> accumulator =
         (map, element) -> map.__insert(keyMapper.apply(element), valueMapper.apply(element));
 
     return new DefaultCollector<>(
-        (Supplier<TransientSetMultimap<K, V>>) DefaultTrieSetMultimap::transientOf, accumulator,
+        (Supplier<SetMultimap.Transient<K, V>>) DefaultTrieSetMultimap::transientOf, accumulator,
         (left, right) -> {
           left.__insertAll(right);
           return left;
-        }, TransientSetMultimap::freeze, UNORDERED);
+        }, SetMultimap.Transient::freeze, UNORDERED);
   }
 
 }

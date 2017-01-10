@@ -9,7 +9,7 @@ package io.usethesource.capsule;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.generator.Size;
-import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
+import io.usethesource.capsule.api.deprecated.SetMultimap;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -20,7 +20,7 @@ import java.util.stream.StreamSupport;
 
 import static org.junit.Assert.*;
 
-public abstract class AbstractSetMultimapProperties<K, V, CT extends ImmutableSetMultimap<K, V>> {
+public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap.Immutable<K, V>> {
 
   private final int DEFAULT_TRIALS = 1_000;
   private final int MAX_SIZE = 1_000;
@@ -62,7 +62,7 @@ public abstract class AbstractSetMultimapProperties<K, V, CT extends ImmutableSe
 //      @Size(min = 2, max = 100) final java.util.HashSet<Integer> values) {
 //
 //    Integer value = sourceOfRandomness.choose(values);
-//    ImmutableSetMultimap<Integer, Integer> multimap = toMultimap(key, values);
+//    SetMultimap.Immutable<Integer, Integer> multimap = toMultimap(key, values);
 //
 //    if (multimap.__removeEntry(key, value).size() + 1 == multimap.size()) {
 //      // succeed

@@ -51,7 +51,7 @@ public interface SetMultimap<K, V>
 
   SetMultimap.Immutable<K, V> asImmutable();
 
-  public static interface Immutable<K, V> extends SetMultimap<K, V> {
+  interface Immutable<K, V> extends SetMultimap<K, V> {
 
     SetMultimap.Immutable<K, V> put(final K key, final V val);
 
@@ -77,7 +77,7 @@ public interface SetMultimap<K, V>
 
   }
 
-  public static interface Transient<K, V> extends SetMultimap<K, V> {
+  interface Transient<K, V> extends SetMultimap<K, V> {
 
     boolean put(final K key, final V val); // TODO: return Set<V> instead of boolean?
 

@@ -10,12 +10,11 @@ package io.usethesource.capsule;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
-import io.usethesource.capsule.api.deprecated.TransientSetMultimap;
+import io.usethesource.capsule.api.deprecated.SetMultimap;
 
 public class SetMultimapFactory {
 
-  // private final Class<? extends ImmutableSetMultimap<?, ?>> targetClass;
+  // private final Class<? extends Immutable<?, ?>> targetClass;
 
   private final Method persistentMapOfEmpty;
   private final Method persistentMapOfKeyValuePairs;
@@ -39,41 +38,41 @@ public class SetMultimapFactory {
     }
   }
 
-  // public Class<? extends ImmutableSetMultimap<?, ?>> getTargetClass() {
+  // public Class<? extends Immutable<?, ?>> getTargetClass() {
   // return targetClass;
   // }
 
   @SuppressWarnings("unchecked")
-  public final <K, V> ImmutableSetMultimap<K, V> of() {
+  public final <K, V> SetMultimap.Immutable<K, V> of() {
     try {
-      return (ImmutableSetMultimap<K, V>) persistentMapOfEmpty.invoke(null);
+      return (SetMultimap.Immutable<K, V>) persistentMapOfEmpty.invoke(null);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public final <K, V> ImmutableSetMultimap<K, V> of(K key, V... values) {
+  public final <K, V> SetMultimap.Immutable<K, V> of(K key, V... values) {
     try {
-      return (ImmutableSetMultimap<K, V>) persistentMapOfKeyValuePairs.invoke(null, key, values);
+      return (SetMultimap.Immutable<K, V>) persistentMapOfKeyValuePairs.invoke(null, key, values);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public final <K, V> TransientSetMultimap<K, V> transientOf() {
+  public final <K, V> SetMultimap.Transient<K, V> transientOf() {
     try {
-      return (TransientSetMultimap<K, V>) transientMapOfEmpty.invoke(null);
+      return (SetMultimap.Transient<K, V>) transientMapOfEmpty.invoke(null);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public final <K, V> TransientSetMultimap<K, V> transientOf(K key, V... values) {
+  public final <K, V> SetMultimap.Transient<K, V> transientOf(K key, V... values) {
     try {
-      return (TransientSetMultimap<K, V>) transientMapOfKeyValuePairs.invoke(null, key, values);
+      return (SetMultimap.Transient<K, V>) transientMapOfKeyValuePairs.invoke(null, key, values);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       e.printStackTrace();
       throw new RuntimeException(e);

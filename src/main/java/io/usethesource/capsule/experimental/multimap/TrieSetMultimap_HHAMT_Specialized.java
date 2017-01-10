@@ -27,9 +27,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import io.usethesource.capsule.api.deprecated.ImmutableSet;
-import io.usethesource.capsule.api.deprecated.ImmutableSetMultimap;
 import io.usethesource.capsule.api.deprecated.SetMultimap;
-import io.usethesource.capsule.api.deprecated.TransientSetMultimap;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized.EitherSingletonOrCollection.Type;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations.*;
 import io.usethesource.capsule.util.EqualityComparator;
@@ -37,7 +35,7 @@ import io.usethesource.capsule.util.RangecopyUtils;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
 
 @SuppressWarnings({"rawtypes", "restriction"})
-public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMultimap<K, V> {
+public class TrieSetMultimap_HHAMT_Specialized<K, V> implements SetMultimap.Immutable<K, V> {
 
   private final EqualityComparator<Object> cmp;
 
@@ -65,19 +63,19 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> ImmutableSetMultimap<K, V> of() {
+  public static final <K, V> SetMultimap.Immutable<K, V> of() {
     return TrieSetMultimap_HHAMT_Specialized.EMPTY_SETMULTIMAP;
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> ImmutableSetMultimap<K, V> of(EqualityComparator<Object> cmp) {
+  public static final <K, V> SetMultimap.Immutable<K, V> of(EqualityComparator<Object> cmp) {
     // TODO: unify with `of()`
     return new TrieSetMultimap_HHAMT_Specialized(cmp, EMPTY_NODE, 0, 0);
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> ImmutableSetMultimap<K, V> of(K key, V... values) {
-    ImmutableSetMultimap<K, V> result = TrieSetMultimap_HHAMT_Specialized.EMPTY_SETMULTIMAP;
+  public static final <K, V> SetMultimap.Immutable<K, V> of(K key, V... values) {
+    SetMultimap.Immutable<K, V> result = TrieSetMultimap_HHAMT_Specialized.EMPTY_SETMULTIMAP;
 
     for (V value : values) {
       result = result.__insert(key, value);
@@ -87,13 +85,13 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> TransientSetMultimap<K, V> transientOf() {
+  public static final <K, V> SetMultimap.Transient<K, V> transientOf() {
     return TrieSetMultimap_HHAMT_Specialized.EMPTY_SETMULTIMAP.asTransient();
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> TransientSetMultimap<K, V> transientOf(K key, V... values) {
-    final TransientSetMultimap<K, V> result =
+  public static final <K, V> SetMultimap.Transient<K, V> transientOf(K key, V... values) {
+    final SetMultimap.Transient<K, V> result =
         TrieSetMultimap_HHAMT_Specialized.EMPTY_SETMULTIMAP.asTransient();
 
     for (V value : values) {
@@ -188,7 +186,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
   }
 
   @Override
-  public ImmutableSetMultimap<K, V> __put(K key, V val) {
+  public SetMultimap.Immutable<K, V> __put(K key, V val) {
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
@@ -227,7 +225,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
   }
 
   @Override
-  public ImmutableSetMultimap<K, V> __insert(final K key, final V val) {
+  public SetMultimap.Immutable<K, V> __insert(final K key, final V val) {
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
@@ -244,15 +242,15 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
   }
 
   @Override
-  public ImmutableSetMultimap<K, V> __insertAll(
+  public SetMultimap.Immutable<K, V> __insertAll(
       final SetMultimap<? extends K, ? extends V> setMultimap) {
-    final TransientSetMultimap<K, V> tmpTransient = this.asTransient();
+    final SetMultimap.Transient<K, V> tmpTransient = this.asTransient();
     tmpTransient.__insertAll(setMultimap);
     return tmpTransient.freeze();
   }
 
   @Override
-  public ImmutableSetMultimap<K, V> __removeEntry(final K key, final V val) {
+  public SetMultimap.Immutable<K, V> __removeEntry(final K key, final V val) {
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
@@ -270,7 +268,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
   }
 
   @Override
-  public ImmutableSetMultimap<K, V> __remove(K key) {
+  public SetMultimap.Immutable<K, V> __remove(K key) {
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
@@ -566,7 +564,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
   }
 
   @Override
-  public TransientSetMultimap<K, V> asTransient() {
+  public SetMultimap.Transient<K, V> asTransient() {
     return new TransientTrieSetMultimap_BleedingEdge<K, V>(this);
   }
 
@@ -4009,7 +4007,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
   }
 
   static final class TransientTrieSetMultimap_BleedingEdge<K, V>
-      implements TransientSetMultimap<K, V> {
+      implements SetMultimap.Transient<K, V> {
 
     private final EqualityComparator<Object> cmp;
 
@@ -4501,7 +4499,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements ImmutableSetMult
     }
 
     @Override
-    public ImmutableSetMultimap<K, V> freeze() {
+    public SetMultimap.Immutable<K, V> freeze() {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
