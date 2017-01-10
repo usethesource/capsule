@@ -37,8 +37,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
-import io.usethesource.capsule.api.deprecated.ImmutableMap;
-import io.usethesource.capsule.api.deprecated.TransientMap;
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge_IntIntSpecializations.Map0To0Node_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge_IntIntSpecializations.Map0To1Node_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge_IntIntSpecializations.Map0To2Node_5Bits_Heterogeneous_BleedingEdge;
@@ -53,7 +51,7 @@ import io.usethesource.capsule.util.RangecopyUtils.IntArrayView;
 import io.usethesource.capsule.util.RangecopyUtils.ObjectArrayView;
 
 @SuppressWarnings({"rawtypes", "restriction"})
-public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Object, Object> {
+public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Object, Object> {
 
   protected static final AbstractMapNode EMPTY_NODE =
       new Map0To0Node_5Bits_Heterogeneous_BleedingEdge(null, (int) 0, (int) 0);
@@ -78,17 +76,17 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
   }
 
   @SuppressWarnings("unchecked")
-  public static final ImmutableMap<Object, Object> of() {
+  public static final io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Object, Object> of() {
     return TrieMap_5Bits_Heterogeneous_BleedingEdge.EMPTY_MAP;
   }
 
   @SuppressWarnings("unchecked")
-  public static final ImmutableMap<Object, Object> of(Object... keyValuePairs) {
+  public static final io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Object, Object> of(Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
       throw new IllegalArgumentException("Length of argument list is uneven: no key/value pairs.");
     }
 
-    ImmutableMap<Object, Object> result = TrieMap_5Bits_Heterogeneous_BleedingEdge.EMPTY_MAP;
+    io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Object, Object> result = TrieMap_5Bits_Heterogeneous_BleedingEdge.EMPTY_MAP;
 
     for (int i = 0; i < keyValuePairs.length; i += 2) {
       final int key = (int) keyValuePairs[i];
@@ -101,17 +99,17 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
   }
 
   @SuppressWarnings("unchecked")
-  public static final TransientMap<Object, Object> transientOf() {
+  public static final io.usethesource.capsule.api.deprecated.Map.TransientMap<Object, Object> transientOf() {
     return TrieMap_5Bits_Heterogeneous_BleedingEdge.EMPTY_MAP.asTransient();
   }
 
   @SuppressWarnings("unchecked")
-  public static final TransientMap<Object, Object> transientOf(Object... keyValuePairs) {
+  public static final io.usethesource.capsule.api.deprecated.Map.TransientMap<Object, Object> transientOf(Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
       throw new IllegalArgumentException("Length of argument list is uneven: no key/value pairs.");
     }
 
-    final TransientMap<Object, Object> result =
+    final io.usethesource.capsule.api.deprecated.Map.TransientMap<Object, Object> result =
         TrieMap_5Bits_Heterogeneous_BleedingEdge.EMPTY_MAP.asTransient();
 
     for (int i = 0; i < keyValuePairs.length; i += 2) {
@@ -222,7 +220,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
     }
   }
 
-  public ImmutableMap<Object, Object> __put(final int key, final int val) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Object, Object> __put(final int key, final int val) {
     final int keyHash = (int) key;
     final MapResult details = MapResult.unchanged();
 
@@ -248,8 +246,8 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
     return this;
   }
 
-  public ImmutableMap<Object, Object> __putEquivalent(final int key, final int val,
-      final Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Object, Object> __putEquivalent(final int key, final int val,
+                                                                                                 final Comparator<Object> cmp) {
     final int keyHash = (int) key;
     final MapResult details = MapResult.unchanged();
 
@@ -274,7 +272,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
     return this;
   }
 
-  public ImmutableMap<Object, Object> __put(final Object key, final Object val) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Object, Object> __put(final Object key, final Object val) {
     final int keyHash = key.hashCode();
     final MapResult details = MapResult.unchanged();
 
@@ -299,8 +297,8 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
     return this;
   }
 
-  public ImmutableMap<Object, Object> __putEquivalent(final Object key, final Object val,
-      final Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Object, Object> __putEquivalent(final Object key, final Object val,
+                                                                                                 final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult details = MapResult.unchanged();
 
@@ -325,20 +323,20 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
     return this;
   }
 
-  public ImmutableMap<Object, Object> __putAll(final Map<? extends Object, ? extends Object> map) {
-    final TransientMap<Object, Object> tmpTransient = this.asTransient();
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Object, Object> __putAll(final Map<? extends Object, ? extends Object> map) {
+    final io.usethesource.capsule.api.deprecated.Map.TransientMap<Object, Object> tmpTransient = this.asTransient();
     tmpTransient.__putAll(map);
     return tmpTransient.freeze();
   }
 
-  public ImmutableMap<Object, Object> __putAllEquivalent(
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Object, Object> __putAllEquivalent(
       final Map<? extends Object, ? extends Object> map, final Comparator<Object> cmp) {
-    final TransientMap<Object, Object> tmpTransient = this.asTransient();
+    final io.usethesource.capsule.api.deprecated.Map.TransientMap<Object, Object> tmpTransient = this.asTransient();
     tmpTransient.__putAllEquivalent(map, cmp);
     return tmpTransient.freeze();
   }
 
-  public ImmutableMap<Object, Object> __remove(final int key) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Object, Object> __remove(final int key) {
     final int keyHash = (int) key;
     final MapResult details = MapResult.unchanged();
 
@@ -355,8 +353,8 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
     return this;
   }
 
-  public ImmutableMap<Object, Object> __removeEquivalent(final int key,
-      final Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Object, Object> __removeEquivalent(final int key,
+                                                                                                    final Comparator<Object> cmp) {
     final int keyHash = (int) key;
     final MapResult details = MapResult.unchanged();
 
@@ -373,7 +371,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
     return this;
   }
 
-  public ImmutableMap<Object, Object> __remove(final Object key) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Object, Object> __remove(final Object key) {
     final int keyHash = key.hashCode();
     final MapResult details = MapResult.unchanged();
 
@@ -390,8 +388,8 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
     return this;
   }
 
-  public ImmutableMap<Object, Object> __removeEquivalent(final Object key,
-      final Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Object, Object> __removeEquivalent(final Object key,
+                                                                                                    final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult details = MapResult.unchanged();
 
@@ -639,7 +637,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
   }
 
   @Override
-  public TransientMap<Object, Object> asTransient() {
+  public io.usethesource.capsule.api.deprecated.Map.TransientMap<Object, Object> asTransient() {
     return new TransientTrieMap_5Bits_Heterogeneous_BleedingEdge(this);
   }
 
@@ -3995,7 +3993,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
     }
   }
   static final class TransientTrieMap_5Bits_Heterogeneous_BleedingEdge
-      implements TransientMap<Object, Object> {
+      implements io.usethesource.capsule.api.deprecated.Map.TransientMap<Object, Object> {
     final private AtomicReference<Thread> mutator;
     private AbstractMapNode rootNode;
     private int hashCode;
@@ -4724,7 +4722,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements ImmutableMap<Ob
     }
 
     @Override
-    public ImmutableMap<Object, Object> freeze() {
+    public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Object, Object> freeze() {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }

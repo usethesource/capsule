@@ -11,11 +11,10 @@ import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Comparator;
 
-import io.usethesource.capsule.api.deprecated.ImmutableSet;
-import io.usethesource.capsule.api.deprecated.TransientSet;
+import io.usethesource.capsule.api.deprecated.Set;
 
 @Deprecated
-public abstract class AbstractImmutableSet<E> extends AbstractSet<E> implements ImmutableSet<E> {
+public abstract class AbstractImmutableSet<E> extends AbstractSet<E> implements Set.ImmutableSet<E> {
 
   @Override
   public boolean add(E e) {
@@ -53,7 +52,7 @@ public abstract class AbstractImmutableSet<E> extends AbstractSet<E> implements 
   }
 
   @Override
-  public TransientSet<E> asTransient() {
+  public Set.TransientSet<E> asTransient() {
     throw new UnsupportedOperationException();
   }
 

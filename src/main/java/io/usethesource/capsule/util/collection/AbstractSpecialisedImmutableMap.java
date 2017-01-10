@@ -8,20 +8,20 @@
 package io.usethesource.capsule.util.collection;
 
 import java.util.*;
+import java.util.Map;
+import java.util.Set;
 
 import io.usethesource.capsule.DefaultTrieMap;
 import io.usethesource.capsule.SupplierIterator;
-import io.usethesource.capsule.api.deprecated.ImmutableMap;
-import io.usethesource.capsule.api.deprecated.TransientMap;
 import io.usethesource.capsule.util.iterator.EmptySupplierIterator;
 
 public abstract class AbstractSpecialisedImmutableMap<K, V>
-    implements ImmutableMap<K, V>, Cloneable {
+    implements io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V>, Cloneable {
   @SuppressWarnings("rawtypes")
-  private static ImmutableMap EMPTY_MAP = new Map0();
+  private static io.usethesource.capsule.api.deprecated.Map.ImmutableMap EMPTY_MAP = new Map0();
 
   @SuppressWarnings("unchecked")
-  public static <K, V> ImmutableMap<K, V> mapOf() {
+  public static <K, V> io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> mapOf() {
     return EMPTY_MAP;
   }
 
@@ -31,40 +31,40 @@ public abstract class AbstractSpecialisedImmutableMap<K, V>
     return (T) new MapEntry<K, V>(key, val);
   }
 
-  public static <K, V> ImmutableMap<K, V> mapOf(K key1, V val1) {
+  public static <K, V> io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> mapOf(K key1, V val1) {
     return new Map1<K, V>(key1, val1);
   }
 
-  public static <K, V> ImmutableMap<K, V> mapOf(K key1, V val1, K key2, V val2) {
+  public static <K, V> io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> mapOf(K key1, V val1, K key2, V val2) {
     return new Map2<K, V>(key1, val1, key2, val2);
   }
 
-  public static <K, V> ImmutableMap<K, V> mapOf(K key1, V val1, K key2, V val2, K key3, V val3) {
+  public static <K, V> io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> mapOf(K key1, V val1, K key2, V val2, K key3, V val3) {
     return new Map3<K, V>(key1, val1, key2, val2, key3, val3);
   }
 
-  public static <K, V> ImmutableMap<K, V> mapOf(K key1, V val1, K key2, V val2, K key3, V val3,
-      K key4, V val4) {
+  public static <K, V> io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> mapOf(K key1, V val1, K key2, V val2, K key3, V val3,
+                                                                                           K key4, V val4) {
     return new Map4<K, V>(key1, val1, key2, val2, key3, val3, key4, val4);
   }
 
-  public static <K, V> ImmutableMap<K, V> mapOf(K key1, V val1, K key2, V val2, K key3, V val3,
-      K key4, V val4, K key5, V val5) {
+  public static <K, V> io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> mapOf(K key1, V val1, K key2, V val2, K key3, V val3,
+                                                                                           K key4, V val4, K key5, V val5) {
     return new Map5<K, V>(key1, val1, key2, val2, key3, val3, key4, val4, key5, val5);
   }
 
-  public static <K, V> ImmutableMap<K, V> mapOf(K key1, V val1, K key2, V val2, K key3, V val3,
-      K key4, V val4, K key5, V val5, K key6, V val6) {
-    final TransientMap<K, V> tmp = DefaultTrieMap.transientOf(key1, val1, key2, val2, key3, val3,
+  public static <K, V> io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> mapOf(K key1, V val1, K key2, V val2, K key3, V val3,
+                                                                                           K key4, V val4, K key5, V val5, K key6, V val6) {
+    final io.usethesource.capsule.api.deprecated.Map.TransientMap<K, V> tmp = DefaultTrieMap.transientOf(key1, val1, key2, val2, key3, val3,
         key4, val4, key5, val5, key6, val6);
     return tmp.freeze();
   }
 
-  public static <K, V> ImmutableMap<K, V> mapOf(Map<K, V> map) {
-    if (map instanceof ImmutableMap) {
-      return (ImmutableMap<K, V>) map;
+  public static <K, V> io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> mapOf(Map<K, V> map) {
+    if (map instanceof io.usethesource.capsule.api.deprecated.Map.ImmutableMap) {
+      return (io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V>) map;
     } else {
-      final TransientMap<K, V> tmp = DefaultTrieMap.transientOf();
+      final io.usethesource.capsule.api.deprecated.Map.TransientMap<K, V> tmp = DefaultTrieMap.transientOf();
       tmp.__putAll(map);
       return tmp.freeze();
     }
@@ -139,8 +139,8 @@ public abstract class AbstractSpecialisedImmutableMap<K, V>
   }
 
   @Override
-  public ImmutableMap<K, V> __putAll(Map<? extends K, ? extends V> map) {
-    TransientMap<K, V> tmp = asTransient();
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __putAll(Map<? extends K, ? extends V> map) {
+    io.usethesource.capsule.api.deprecated.Map.TransientMap<K, V> tmp = asTransient();
     if (tmp.__putAll(map)) {
       return tmp.freeze();
     } else {
@@ -149,9 +149,9 @@ public abstract class AbstractSpecialisedImmutableMap<K, V>
   }
 
   @Override
-  public ImmutableMap<K, V> __putAllEquivalent(Map<? extends K, ? extends V> map,
-      Comparator<Object> cmp) {
-    TransientMap<K, V> tmp = asTransient();
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __putAllEquivalent(Map<? extends K, ? extends V> map,
+                                                                                          Comparator<Object> cmp) {
+    io.usethesource.capsule.api.deprecated.Map.TransientMap<K, V> tmp = asTransient();
     if (tmp.__putAllEquivalent(map, cmp)) {
       return tmp.freeze();
     } else {
@@ -281,27 +281,27 @@ class Map0<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __put(K key, V val) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __put(K key, V val) {
     return mapOf(key, val);
   }
 
   @Override
-  public ImmutableMap<K, V> __putEquivalent(K key, V val, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __putEquivalent(K key, V val, Comparator<Object> cmp) {
     return mapOf(key, val);
   }
 
   @Override
-  public ImmutableMap<K, V> __remove(K key) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __remove(K key) {
     return this;
   }
 
   @Override
-  public ImmutableMap<K, V> __removeEquivalent(K key, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __removeEquivalent(K key, Comparator<Object> cmp) {
     return this;
   }
 
   @Override
-  public TransientMap<K, V> asTransient() {
+  public io.usethesource.capsule.api.deprecated.Map.TransientMap<K, V> asTransient() {
     return DefaultTrieMap.transientOf();
   }
 
@@ -448,7 +448,7 @@ class Map1<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __put(K key, V val) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __put(K key, V val) {
     if (key.equals(key1)) {
       return mapOf(key, val);
     } else {
@@ -457,7 +457,7 @@ class Map1<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __putEquivalent(K key, V val, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __putEquivalent(K key, V val, Comparator<Object> cmp) {
     if (cmp.compare(key, key1) == 0) {
       return mapOf(key, val);
     } else {
@@ -466,7 +466,7 @@ class Map1<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __remove(K key) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __remove(K key) {
     if (key.equals(key1)) {
       return mapOf();
     } else {
@@ -475,7 +475,7 @@ class Map1<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __removeEquivalent(K key, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __removeEquivalent(K key, Comparator<Object> cmp) {
     if (cmp.compare(key, key1) == 0) {
       return mapOf();
     } else {
@@ -484,7 +484,7 @@ class Map1<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public TransientMap<K, V> asTransient() {
+  public io.usethesource.capsule.api.deprecated.Map.TransientMap<K, V> asTransient() {
     return DefaultTrieMap.transientOf(key1, val1);
   }
 
@@ -659,7 +659,7 @@ class Map2<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __put(K key, V val) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __put(K key, V val) {
     if (key.equals(key1)) {
       return mapOf(key, val, key2, val2);
     } else if (key.equals(key2)) {
@@ -670,7 +670,7 @@ class Map2<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __putEquivalent(K key, V val, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __putEquivalent(K key, V val, Comparator<Object> cmp) {
     if (cmp.compare(key, key1) == 0) {
       return mapOf(key, val, key2, val2);
     } else if (cmp.compare(key, key2) == 0) {
@@ -681,7 +681,7 @@ class Map2<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __remove(K key) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __remove(K key) {
     if (key.equals(key1)) {
       return mapOf(key2, val2);
     } else if (key.equals(key2)) {
@@ -692,7 +692,7 @@ class Map2<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __removeEquivalent(K key, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __removeEquivalent(K key, Comparator<Object> cmp) {
     if (cmp.compare(key, key1) == 0) {
       return mapOf(key2, val2);
     } else if (cmp.compare(key, key2) == 0) {
@@ -703,7 +703,7 @@ class Map2<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public TransientMap<K, V> asTransient() {
+  public io.usethesource.capsule.api.deprecated.Map.TransientMap<K, V> asTransient() {
     return DefaultTrieMap.transientOf(key1, val1, key2, val2);
   }
 
@@ -901,7 +901,7 @@ class Map3<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __put(K key, V val) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __put(K key, V val) {
     if (key.equals(key1)) {
       return mapOf(key, val, key2, val2, key3, val3);
     } else if (key.equals(key2)) {
@@ -914,7 +914,7 @@ class Map3<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __putEquivalent(K key, V val, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __putEquivalent(K key, V val, Comparator<Object> cmp) {
     if (cmp.compare(key, key1) == 0) {
       return mapOf(key, val, key2, val2, key3, val3);
     } else if (cmp.compare(key, key2) == 0) {
@@ -927,7 +927,7 @@ class Map3<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __remove(K key) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __remove(K key) {
     if (key.equals(key1)) {
       return mapOf(key2, val2, key3, val3);
     } else if (key.equals(key2)) {
@@ -940,7 +940,7 @@ class Map3<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __removeEquivalent(K key, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __removeEquivalent(K key, Comparator<Object> cmp) {
     if (cmp.compare(key, key1) == 0) {
       return mapOf(key2, val2, key3, val3);
     } else if (cmp.compare(key, key2) == 0) {
@@ -953,7 +953,7 @@ class Map3<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public TransientMap<K, V> asTransient() {
+  public io.usethesource.capsule.api.deprecated.Map.TransientMap<K, V> asTransient() {
     return DefaultTrieMap.transientOf(key1, val1, key2, val2, key3, val3);
   }
 
@@ -1176,7 +1176,7 @@ class Map4<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __put(K key, V val) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __put(K key, V val) {
     if (key.equals(key1)) {
       return mapOf(key, val, key2, val2, key3, val3, key4, val4);
     } else if (key.equals(key2)) {
@@ -1191,7 +1191,7 @@ class Map4<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __putEquivalent(K key, V val, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __putEquivalent(K key, V val, Comparator<Object> cmp) {
     if (cmp.compare(key, key1) == 0) {
       return mapOf(key, val, key2, val2, key3, val3, key4, val4);
     } else if (cmp.compare(key, key2) == 0) {
@@ -1206,7 +1206,7 @@ class Map4<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __remove(K key) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __remove(K key) {
     if (key.equals(key1)) {
       return mapOf(key2, val2, key3, val3, key4, val4);
     } else if (key.equals(key2)) {
@@ -1221,7 +1221,7 @@ class Map4<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __removeEquivalent(K key, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __removeEquivalent(K key, Comparator<Object> cmp) {
     if (cmp.compare(key, key1) == 0) {
       return mapOf(key2, val2, key3, val3, key4, val4);
     } else if (cmp.compare(key, key2) == 0) {
@@ -1236,7 +1236,7 @@ class Map4<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public TransientMap<K, V> asTransient() {
+  public io.usethesource.capsule.api.deprecated.Map.TransientMap<K, V> asTransient() {
     return DefaultTrieMap.transientOf(key1, val1, key2, val2, key3, val3, key4, val4);
   }
 
@@ -1484,7 +1484,7 @@ class Map5<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __put(K key, V val) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __put(K key, V val) {
     if (key.equals(key1)) {
       return mapOf(key, val, key2, val2, key3, val3, key4, val4, key5, val5);
     } else if (key.equals(key2)) {
@@ -1501,7 +1501,7 @@ class Map5<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __putEquivalent(K key, V val, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __putEquivalent(K key, V val, Comparator<Object> cmp) {
     if (cmp.compare(key, key1) == 0) {
       return mapOf(key, val, key2, val2, key3, val3, key4, val4, key5, val5);
     } else if (cmp.compare(key, key2) == 0) {
@@ -1518,7 +1518,7 @@ class Map5<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __remove(K key) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __remove(K key) {
     if (key.equals(key1)) {
       return mapOf(key2, val2, key3, val3, key4, val4, key5, val5);
     } else if (key.equals(key2)) {
@@ -1535,7 +1535,7 @@ class Map5<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public ImmutableMap<K, V> __removeEquivalent(K key, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __removeEquivalent(K key, Comparator<Object> cmp) {
     if (cmp.compare(key, key1) == 0) {
       return mapOf(key2, val2, key3, val3, key4, val4, key5, val5);
     } else if (cmp.compare(key, key2) == 0) {
@@ -1552,7 +1552,7 @@ class Map5<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public TransientMap<K, V> asTransient() {
+  public io.usethesource.capsule.api.deprecated.Map.TransientMap<K, V> asTransient() {
     return DefaultTrieMap.transientOf(key1, val1, key2, val2, key3, val3, key4, val4, key5, val5);
   }
 

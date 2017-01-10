@@ -7,8 +7,7 @@
  */
 package io.usethesource.capsule;
 
-import io.usethesource.capsule.api.deprecated.ImmutableMap;
-import io.usethesource.capsule.api.deprecated.TransientMap;
+import io.usethesource.capsule.api.deprecated.Map;
 import io.usethesource.capsule.core.deprecated.TrieMap_5Bits;
 
 import java.lang.reflect.InvocationTargetException;
@@ -44,25 +43,25 @@ public class DefaultTrieMap {
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> ImmutableMap<K, V> of() {
+  public static final <K, V> Map.ImmutableMap<K, V> of() {
     try {
-      return (ImmutableMap<K, V>) persistentMapOfEmpty.invoke(null);
+      return (Map.ImmutableMap<K, V>) persistentMapOfEmpty.invoke(null);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> ImmutableMap<K, V> of(Object... keyValuePairs) {
+  public static final <K, V> Map.ImmutableMap<K, V> of(Object... keyValuePairs) {
     try {
-      return (ImmutableMap<K, V>) persistentMapOfKeyValuePairs.invoke(null, (Object) keyValuePairs);
+      return (Map.ImmutableMap<K, V>) persistentMapOfKeyValuePairs.invoke(null, (Object) keyValuePairs);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V, M extends TransientMap<K, V>> M transientOf() {
+  public static final <K, V, M extends Map.TransientMap<K, V>> M transientOf() {
     try {
       return (M) transientMapOfEmpty.invoke(null);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
@@ -71,9 +70,9 @@ public class DefaultTrieMap {
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> TransientMap<K, V> transientOf(Object... keyValuePairs) {
+  public static final <K, V> Map.TransientMap<K, V> transientOf(Object... keyValuePairs) {
     try {
-      return (TransientMap<K, V>) transientMapOfKeyValuePairs.invoke(null, (Object) keyValuePairs);
+      return (Map.TransientMap<K, V>) transientMapOfKeyValuePairs.invoke(null, (Object) keyValuePairs);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       e.printStackTrace();
       throw new RuntimeException(e);

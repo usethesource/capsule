@@ -14,9 +14,9 @@ import java.util.HashSet;
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.generator.Size;
 
-import io.usethesource.capsule.api.deprecated.ImmutableSet;
+import io.usethesource.capsule.api.deprecated.Set;
 
-public abstract class AbstractSetProperties<T, CT extends ImmutableSet<T>> {
+public abstract class AbstractSetProperties<T, CT extends Set.ImmutableSet<T>> {
 
   private final int DEFAULT_TRIALS = 1_000;
   private final int MAX_SIZE = 1_000;

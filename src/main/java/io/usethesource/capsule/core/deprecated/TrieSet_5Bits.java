@@ -7,8 +7,7 @@
  */
 package io.usethesource.capsule.core.deprecated;
 
-import io.usethesource.capsule.api.deprecated.ImmutableSet;
-import io.usethesource.capsule.api.deprecated.TransientSet;
+import io.usethesource.capsule.api.deprecated.Set;
 import io.usethesource.capsule.core.trie.ArrayView;
 import io.usethesource.capsule.core.trie.Node;
 import io.usethesource.capsule.util.ArrayUtils;
@@ -20,7 +19,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @SuppressWarnings("rawtypes")
-public class TrieSet_5Bits<K> implements ImmutableSet<K> {
+public class TrieSet_5Bits<K> implements io.usethesource.capsule.api.deprecated.Set.ImmutableSet<K> {
 
   @SuppressWarnings("unchecked")
   private static final TrieSet_5Bits EMPTY_SET = new TrieSet_5Bits(CompactSetNode.EMPTY_NODE, 0, 0);
@@ -51,11 +50,11 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K> ImmutableSet<K> of() {
+  public static final <K> io.usethesource.capsule.api.deprecated.Set.ImmutableSet<K> of() {
     return TrieSet_5Bits.EMPTY_SET;
   }
 
-  public static final <K> ImmutableSet<K> of(K key0) {
+  public static final <K> io.usethesource.capsule.api.deprecated.Set.ImmutableSet<K> of(K key0) {
     final int keyHash0 = key0.hashCode();
 
     final int nodeMap = 0;
@@ -66,7 +65,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
     return new TrieSet_5Bits<K>(newRootNode, keyHash0, 1);
   }
 
-  public static final <K> ImmutableSet<K> of(K key0, K key1) {
+  public static final <K> io.usethesource.capsule.api.deprecated.Set.ImmutableSet<K> of(K key0, K key1) {
     assert !Objects.equals(key0, key1);
 
     final int keyHash0 = key0.hashCode();
@@ -79,8 +78,8 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K> ImmutableSet<K> of(K... keys) {
-    ImmutableSet<K> result = TrieSet_5Bits.EMPTY_SET;
+  public static final <K> io.usethesource.capsule.api.deprecated.Set.ImmutableSet<K> of(K... keys) {
+    io.usethesource.capsule.api.deprecated.Set.ImmutableSet<K> result = TrieSet_5Bits.EMPTY_SET;
 
     for (final K key : keys) {
       result = result.__insert(key);
@@ -90,13 +89,13 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K> TransientSet<K> transientOf() {
+  public static final <K> Set.TransientSet<K> transientOf() {
     return TrieSet_5Bits.EMPTY_SET.asTransient();
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K> TransientSet<K> transientOf(K... keys) {
-    final TransientSet<K> result = TrieSet_5Bits.EMPTY_SET.asTransient();
+  public static final <K> Set.TransientSet<K> transientOf(K... keys) {
+    final Set.TransientSet<K> result = TrieSet_5Bits.EMPTY_SET.asTransient();
 
     for (final K key : keys) {
       result.__insert(key);
@@ -200,7 +199,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
   }
 
   @Override
-  public ImmutableSet<K> __insert(final K key) {
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<K> __insert(final K key) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -215,7 +214,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
   }
 
   @Override
-  public ImmutableSet<K> __insertEquivalent(final K key, final Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<K> __insertEquivalent(final K key, final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -230,22 +229,22 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
   }
 
   @Override
-  public ImmutableSet<K> __insertAll(final java.util.Set<? extends K> set) {
-    final TransientSet<K> tmpTransient = this.asTransient();
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<K> __insertAll(final java.util.Set<? extends K> set) {
+    final Set.TransientSet<K> tmpTransient = this.asTransient();
     tmpTransient.__insertAll(set);
     return tmpTransient.freeze();
   }
 
   @Override
-  public ImmutableSet<K> __insertAllEquivalent(final java.util.Set<? extends K> set,
-      final Comparator<Object> cmp) {
-    final TransientSet<K> tmpTransient = this.asTransient();
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<K> __insertAllEquivalent(final java.util.Set<? extends K> set,
+                                                                                          final Comparator<Object> cmp) {
+    final Set.TransientSet<K> tmpTransient = this.asTransient();
     tmpTransient.__insertAllEquivalent(set, cmp);
     return tmpTransient.freeze();
   }
 
   @Override
-  public ImmutableSet<K> __remove(final K key) {
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<K> __remove(final K key) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -260,7 +259,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
   }
 
   @Override
-  public ImmutableSet<K> __removeEquivalent(final K key, final Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<K> __removeEquivalent(final K key, final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -275,31 +274,31 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
   }
 
   @Override
-  public ImmutableSet<K> __removeAll(final java.util.Set<? extends K> set) {
-    final TransientSet<K> tmpTransient = this.asTransient();
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<K> __removeAll(final java.util.Set<? extends K> set) {
+    final Set.TransientSet<K> tmpTransient = this.asTransient();
     tmpTransient.__removeAll(set);
     return tmpTransient.freeze();
   }
 
   @Override
-  public ImmutableSet<K> __removeAllEquivalent(final java.util.Set<? extends K> set,
-      final Comparator<Object> cmp) {
-    final TransientSet<K> tmpTransient = this.asTransient();
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<K> __removeAllEquivalent(final java.util.Set<? extends K> set,
+                                                                                          final Comparator<Object> cmp) {
+    final Set.TransientSet<K> tmpTransient = this.asTransient();
     tmpTransient.__removeAllEquivalent(set, cmp);
     return tmpTransient.freeze();
   }
 
   @Override
-  public ImmutableSet<K> __retainAll(final java.util.Set<? extends K> set) {
-    final TransientSet<K> tmpTransient = this.asTransient();
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<K> __retainAll(final java.util.Set<? extends K> set) {
+    final Set.TransientSet<K> tmpTransient = this.asTransient();
     tmpTransient.__retainAll(set);
     return tmpTransient.freeze();
   }
 
   @Override
-  public ImmutableSet<K> __retainAllEquivalent(final TransientSet<? extends K> transientSet,
-      final Comparator<Object> cmp) {
-    final TransientSet<K> tmpTransient = this.asTransient();
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<K> __retainAllEquivalent(final Set.TransientSet<? extends K> transientSet,
+                                                                                          final Comparator<Object> cmp) {
+    final Set.TransientSet<K> tmpTransient = this.asTransient();
     tmpTransient.__retainAllEquivalent(transientSet, cmp);
     return tmpTransient.freeze();
   }
@@ -448,7 +447,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
   }
 
   @Override
-  public TransientSet<K> asTransient() {
+  public Set.TransientSet<K> asTransient() {
     return new TransientTrieSet_5Bits<K>(this);
   }
 
@@ -2094,7 +2093,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
     }
   }
 
-  static final class TransientTrieSet_5Bits<K> implements TransientSet<K> {
+  static final class TransientTrieSet_5Bits<K> implements Set.TransientSet<K> {
     final private AtomicReference<Thread> mutator;
     private AbstractSetNode<K> rootNode;
     private int hashCode;
@@ -2395,7 +2394,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
     }
 
     @Override
-    public boolean __retainAllEquivalent(final TransientSet<? extends K> transientSet,
+    public boolean __retainAllEquivalent(final Set.TransientSet<? extends K> transientSet,
         final Comparator<Object> cmp) {
       boolean modified = false;
 
@@ -2534,7 +2533,7 @@ public class TrieSet_5Bits<K> implements ImmutableSet<K> {
     }
 
     @Override
-    public ImmutableSet<K> freeze() {
+    public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<K> freeze() {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }

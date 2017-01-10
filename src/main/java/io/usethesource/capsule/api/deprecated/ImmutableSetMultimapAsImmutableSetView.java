@@ -20,7 +20,7 @@ import java.util.function.Function;
  *
  * Wrapping kev-value pair to tuple
  */
-public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements ImmutableSet<T> {
+public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements io.usethesource.capsule.api.deprecated.Set.ImmutableSet<T> {
 
   final SetMultimap.Immutable<K, V> multimap;
 
@@ -148,7 +148,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
   }
 
   @Override
-  public ImmutableSet<T> __insert(T tuple) {
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<T> __insert(T tuple) {
     if (!tupleChecker.apply(tuple))
       throw new ClassCastException("Type validation failed.");
 
@@ -168,12 +168,12 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
   }
 
   @Override
-  public ImmutableSet<T> __insertEquivalent(T key, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<T> __insertEquivalent(T key, Comparator<Object> cmp) {
     return __insert(key); // ignore cmp
   }
 
   @Override
-  public ImmutableSet<T> __insertAll(Set<? extends T> set) {
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<T> __insertAll(Set<? extends T> set) {
     final SetMultimap.Transient<K, V> tmp = multimap.asTransient();
 
     Consumer<T> consumer = (tuple) -> {
@@ -200,12 +200,12 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
   }
 
   @Override
-  public ImmutableSet<T> __insertAllEquivalent(Set<? extends T> set, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<T> __insertAllEquivalent(Set<? extends T> set, Comparator<Object> cmp) {
     throw new UnsupportedOperationException("Auto-generated method stub; not implemented yet.");
   }
 
   @Override
-  public ImmutableSet<T> __remove(T tuple) {
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<T> __remove(T tuple) {
     @SuppressWarnings("unchecked")
     final K key = (K) tupleElementAt.apply(tuple, 0);
     @SuppressWarnings("unchecked")
@@ -218,28 +218,28 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
   }
 
   @Override
-  public ImmutableSet<T> __removeEquivalent(T key, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<T> __removeEquivalent(T key, Comparator<Object> cmp) {
     return __remove(key); // ignore cmp
   }
 
   @Override
-  public ImmutableSet<T> __removeAll(Set<? extends T> set) {
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<T> __removeAll(Set<? extends T> set) {
     throw new UnsupportedOperationException("Auto-generated method stub; not implemented yet.");
   }
 
   @Override
-  public ImmutableSet<T> __removeAllEquivalent(Set<? extends T> set, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<T> __removeAllEquivalent(Set<? extends T> set, Comparator<Object> cmp) {
     throw new UnsupportedOperationException("Auto-generated method stub; not implemented yet.");
   }
 
   @Override
-  public ImmutableSet<T> __retainAll(Set<? extends T> set) {
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<T> __retainAll(Set<? extends T> set) {
     throw new UnsupportedOperationException("Auto-generated method stub; not implemented yet.");
   }
 
   @Override
-  public ImmutableSet<T> __retainAllEquivalent(TransientSet<? extends T> set,
-      Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<T> __retainAllEquivalent(io.usethesource.capsule.api.deprecated.Set.TransientSet<? extends T> set,
+                                                                                          Comparator<Object> cmp) {
     throw new UnsupportedOperationException("Auto-generated method stub; not implemented yet.");
   }
 
@@ -254,12 +254,12 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
   }
 
   @Override
-  public TransientSet<T> asTransient() {
+  public io.usethesource.capsule.api.deprecated.Set.TransientSet<T> asTransient() {
     return new TransientSetMultimapAsTransientSetView<>(multimap.asTransient(), tupleOf,
         tupleElementAt, tupleChecker);
   }
 
-  static final class TransientSetMultimapAsTransientSetView<K, V, T> implements TransientSet<T> {
+  static final class TransientSetMultimapAsTransientSetView<K, V, T> implements io.usethesource.capsule.api.deprecated.Set.TransientSet<T> {
 
     final SetMultimap.Transient<K, V> multimap;
 
@@ -440,7 +440,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
     }
 
     @Override
-    public boolean __retainAllEquivalent(TransientSet<? extends T> set, Comparator<Object> cmp) {
+    public boolean __retainAllEquivalent(io.usethesource.capsule.api.deprecated.Set.TransientSet<? extends T> set, Comparator<Object> cmp) {
       throw new UnsupportedOperationException("Auto-generated method stub; not implemented yet.");
     }
 
@@ -488,7 +488,7 @@ public class ImmutableSetMultimapAsImmutableSetView<K, V, T> implements Immutabl
     }
 
     @Override
-    public ImmutableSet<T> freeze() {
+    public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<T> freeze() {
       return new ImmutableSetMultimapAsImmutableSetView<>(multimap.freeze(), tupleOf,
           tupleElementAt, tupleChecker);
     }

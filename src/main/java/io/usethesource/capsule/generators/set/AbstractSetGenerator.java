@@ -27,10 +27,10 @@ import com.pholser.junit.quickcheck.generator.Shrink;
 import com.pholser.junit.quickcheck.generator.Size;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 
-import io.usethesource.capsule.api.deprecated.ImmutableSet;
+import io.usethesource.capsule.api.deprecated.Set;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public abstract class AbstractSetGenerator<T extends ImmutableSet>
+public abstract class AbstractSetGenerator<T extends Set.ImmutableSet>
     extends ComponentizedGenerator<T> {
 
   private Class<T> target;

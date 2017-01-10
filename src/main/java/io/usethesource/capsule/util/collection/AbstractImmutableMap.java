@@ -10,11 +10,9 @@ package io.usethesource.capsule.util.collection;
 import java.util.AbstractMap;
 import java.util.Map;
 
-import io.usethesource.capsule.api.deprecated.ImmutableMap;
-
 @Deprecated
 public abstract class AbstractImmutableMap<K, V> extends AbstractMap<K, V>
-    implements ImmutableMap<K, V> {
+    implements io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> {
 
   @Override
   public V remove(Object key) {

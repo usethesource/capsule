@@ -16,6 +16,8 @@ import static io.usethesource.capsule.util.BitmapUtils.index;
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 import java.util.*;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -24,8 +26,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import io.usethesource.capsule.api.deprecated.ImmutableSet;
-import io.usethesource.capsule.api.deprecated.SetMultimap;
+import io.usethesource.capsule.api.deprecated.*;
 import io.usethesource.capsule.core.deprecated.TrieSet_5Bits.AbstractSetNode;
 import io.usethesource.capsule.core.deprecated.TrieSet_5Bits.SetResult;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Interlinked.EitherSingletonOrCollection.Type;
@@ -153,7 +154,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
   }
 
   @Override
-  public ImmutableSet<V> get(final Object o) {
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> get(final Object o) {
     try {
       @SuppressWarnings("unchecked")
       final K key = (K) o;
@@ -2574,7 +2575,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
 //      super(null, 0L);
 //    }
 
-    static final <K, V, VS extends ImmutableSet<V>> AbstractHashCollisionNode<K, V> of(
+    static final <K, V, VS extends io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>> AbstractHashCollisionNode<K, V> of(
         final int hash, final K key0, final VS valColl0, final K key1, final VS valColl1) {
       return new HashCollisionNode<>(hash, key0, valColl0, key1, valColl1);
     }
@@ -2700,14 +2701,14 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
   private static final class HashCollisionNode<K, V> extends AbstractHashCollisionNode<K, V> {
 
     private final int hash;
-    private final List<Map.Entry<K, ImmutableSet<V>>> collisionContent;
+    private final List<Map.Entry<K, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>>> collisionContent;
 
-    HashCollisionNode(final int hash, final K key0, final ImmutableSet<V> valColl0, final K key1,
-                      final ImmutableSet<V> valColl1) {
+    HashCollisionNode(final int hash, final K key0, final io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> valColl0, final K key1,
+                      final io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> valColl1) {
       this(hash, Arrays.asList(entryOf(key0, valColl0), entryOf(key1, valColl1)));
     }
 
-    HashCollisionNode(final int hash, final List<Map.Entry<K, ImmutableSet<V>>> collisionContent) {
+    HashCollisionNode(final int hash, final List<Map.Entry<K, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>>> collisionContent) {
       this.hash = hash;
       this.collisionContent = collisionContent;
     }
@@ -2788,7 +2789,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
 
     @Override
     AbstractSetNode<V> getCollectionValue(int index) {
-      ImmutableSet<V> result = collisionContent.stream()
+      io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> result = collisionContent.stream()
           .filter(kImmutableSetEntry -> kImmutableSetEntry.getValue().size() >= 2).skip(index)
           .findAny().get().getValue();
 
@@ -2837,13 +2838,13 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     @Override
     CompactSetMultimapNode<K, V> inserted(AtomicReference<Thread> mutator, K key, V val,
                                           int keyHash, int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
-      Optional<Map.Entry<K, ImmutableSet<V>>> optionalTuple =
+      Optional<Map.Entry<K, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>>> optionalTuple =
           collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
 
       if (optionalTuple.isPresent()) {
         // contains key
 
-        ImmutableSet<V> values = optionalTuple.get().getValue();
+        io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> values = optionalTuple.get().getValue();
 
         if (values.containsEquivalent(val, cmp.toComparator())) {
           // contains key and value
@@ -2853,10 +2854,10 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
         } else {
           // contains key but not value
 
-          Function<Map.Entry<K, ImmutableSet<V>>, Map.Entry<K, ImmutableSet<V>>> substitutionMapper =
+          Function<Map.Entry<K, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>>, Map.Entry<K, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>>> substitutionMapper =
               (kImmutableSetEntry) -> {
                 if (kImmutableSetEntry == optionalTuple.get()) {
-                  ImmutableSet<V> updatedValues =
+                  io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> updatedValues =
                       values.__insertEquivalent(val, cmp.toComparator());
                   return entryOf(key, updatedValues);
                 } else {
@@ -2864,7 +2865,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
                 }
               };
 
-          List<Map.Entry<K, ImmutableSet<V>>> updatedCollisionContent =
+          List<Map.Entry<K, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>>> updatedCollisionContent =
               collisionContent.stream().map(substitutionMapper).collect(Collectors.toList());
 
           // TODO not all API uses EqualityComparator
@@ -2884,12 +2885,12 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
       } else {
         // does not contain key
 
-        Stream.Builder<Map.Entry<K, ImmutableSet<V>>> builder =
-            Stream.<Map.Entry<K, ImmutableSet<V>>>builder().add(entryOf(key, setOf(val)));
+        Stream.Builder<Map.Entry<K, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>>> builder =
+            Stream.<Map.Entry<K, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>>>builder().add(entryOf(key, setOf(val)));
 
         collisionContent.forEach(builder::accept);
 
-        List<Map.Entry<K, ImmutableSet<V>>> updatedCollisionContent =
+        List<Map.Entry<K, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>>> updatedCollisionContent =
             builder.build().collect(Collectors.toList());
 
         // TODO not all API uses EqualityComparator
@@ -2907,25 +2908,25 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     @Override
     CompactSetMultimapNode<K, V> updated(AtomicReference<Thread> mutator, K key, V val, int keyHash,
                                          int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
-      Optional<Map.Entry<K, ImmutableSet<V>>> optionalTuple =
+      Optional<Map.Entry<K, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>>> optionalTuple =
           collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
 
       if (optionalTuple.isPresent()) {
         // contains key -> replace val anyways
 
-        ImmutableSet<V> values = optionalTuple.get().getValue();
+        io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> values = optionalTuple.get().getValue();
 
-        Function<Map.Entry<K, ImmutableSet<V>>, Map.Entry<K, ImmutableSet<V>>> substitutionMapper =
+        Function<Map.Entry<K, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>>, Map.Entry<K, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>>> substitutionMapper =
             (kImmutableSetEntry) -> {
               if (kImmutableSetEntry == optionalTuple.get()) {
-                ImmutableSet<V> updatedValues = values.__insertEquivalent(val, cmp.toComparator());
+                io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> updatedValues = values.__insertEquivalent(val, cmp.toComparator());
                 return entryOf(key, updatedValues);
               } else {
                 return kImmutableSetEntry;
               }
             };
 
-        List<Map.Entry<K, ImmutableSet<V>>> updatedCollisionContent =
+        List<Map.Entry<K, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>>> updatedCollisionContent =
             collisionContent.stream().map(substitutionMapper).collect(Collectors.toList());
 
         if (values.size() == 1) {
@@ -2938,12 +2939,12 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
       } else {
         // does not contain key
 
-        Stream.Builder<Map.Entry<K, ImmutableSet<V>>> builder =
-            Stream.<Map.Entry<K, ImmutableSet<V>>>builder().add(entryOf(key, setOf(val)));
+        Stream.Builder<Map.Entry<K, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>>> builder =
+            Stream.<Map.Entry<K, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>>>builder().add(entryOf(key, setOf(val)));
 
         collisionContent.forEach(builder::accept);
 
-        List<Map.Entry<K, ImmutableSet<V>>> updatedCollisionContent =
+        List<Map.Entry<K, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>>> updatedCollisionContent =
             builder.build().collect(Collectors.toList());
 
         details.modified();
@@ -2954,28 +2955,28 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     @Override
     CompactSetMultimapNode<K, V> removed(AtomicReference<Thread> mutator, K key, V val, int keyHash,
                                          int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
-      Optional<Map.Entry<K, ImmutableSet<V>>> optionalTuple =
+      Optional<Map.Entry<K, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>>> optionalTuple =
           collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
 
       if (optionalTuple.isPresent()) {
         // contains key
 
-        ImmutableSet<V> values = optionalTuple.get().getValue();
+        io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> values = optionalTuple.get().getValue();
 
         if (values.containsEquivalent(val, cmp.toComparator())) {
           // contains key and value -> remove mapping
 
-          final List<Map.Entry<K, ImmutableSet<V>>> updatedCollisionContent;
+          final List<Map.Entry<K, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>>> updatedCollisionContent;
 
           if (values.size() == 1) {
             updatedCollisionContent = collisionContent.stream()
                 .filter(kImmutableSetEntry -> kImmutableSetEntry != optionalTuple.get())
                 .collect(Collectors.toList());
           } else {
-            Function<Map.Entry<K, ImmutableSet<V>>, Map.Entry<K, ImmutableSet<V>>> substitutionMapper =
+            Function<Map.Entry<K, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>>, Map.Entry<K, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V>>> substitutionMapper =
                 (kImmutableSetEntry) -> {
                   if (kImmutableSetEntry == optionalTuple.get()) {
-                    ImmutableSet<V> updatedValues =
+                    io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> updatedValues =
                         values.__removeEquivalent(val, cmp.toComparator());
                     return entryOf(key, updatedValues);
                   } else {
@@ -3390,7 +3391,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     }
 
     @Override
-    public ImmutableSet<V> get(final Object o) {
+    public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> get(final Object o) {
       try {
         @SuppressWarnings("unchecked")
         final K key = (K) o;
@@ -3408,7 +3409,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     }
 
     @Override
-    public boolean __put(K key, ImmutableSet<V> valColl) {
+    public boolean __put(K key, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> valColl) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }

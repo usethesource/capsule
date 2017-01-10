@@ -24,12 +24,12 @@ public class CapsuleCollectors {
   public static final Set<Collector.Characteristics> UNORDERED =
       Collections.unmodifiableSet(EnumSet.of(Collector.Characteristics.UNORDERED));
 
-  public static <T> Collector<T, ?, ImmutableSet<T>> toSet() {
-    return new DefaultCollector<>((Supplier<TransientSet<T>>) DefaultTrieSet::transientOf,
-        TransientSet::__insert, (left, right) -> {
+  public static <T> Collector<T, ?, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<T>> toSet() {
+    return new DefaultCollector<>((Supplier<io.usethesource.capsule.api.deprecated.Set.TransientSet<T>>) DefaultTrieSet::transientOf,
+        io.usethesource.capsule.api.deprecated.Set.TransientSet::__insert, (left, right) -> {
           left.__insertAll(right);
           return left;
-        }, TransientSet::freeze, UNORDERED);
+        }, io.usethesource.capsule.api.deprecated.Set.TransientSet::freeze, UNORDERED);
   }
 
   public static <T, K, V> Collector<T, ?, SetMultimap.Immutable<K, V>> toSetMultimap(

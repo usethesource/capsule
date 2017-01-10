@@ -7,13 +7,14 @@
  */
 package io.usethesource.capsule.core.deprecated;
 
-import io.usethesource.capsule.api.deprecated.ImmutableSet;
-import io.usethesource.capsule.api.deprecated.SetMultimap;
+import io.usethesource.capsule.api.deprecated.*;
 import io.usethesource.capsule.util.ArrayUtils;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableSet;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 
@@ -153,7 +154,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
   }
 
   @Override
-  public ImmutableSet<V> get(final Object o) {
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> get(final Object o) {
     try {
       @SuppressWarnings("unchecked")
       final K key = (K) o;
@@ -169,7 +170,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
     }
   }
 
-  public ImmutableSet<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
       @SuppressWarnings("unchecked")
       final K key = (K) o;
@@ -2334,7 +2335,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
     }
 
     @Override
-    public ImmutableSet<V> get(final Object o) {
+    public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> get(final Object o) {
       try {
         @SuppressWarnings("unchecked")
         final K key = (K) o;
@@ -2350,7 +2351,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
       }
     }
 
-    public ImmutableSet<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
+    public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
       try {
         @SuppressWarnings("unchecked")
         final K key = (K) o;

@@ -8,10 +8,10 @@
 package io.usethesource.capsule.generators.set;
 
 import io.usethesource.capsule.DefaultTrieSet;
-import io.usethesource.capsule.api.deprecated.ImmutableSet;
+import io.usethesource.capsule.api.deprecated.Set;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class SetGeneratorDefault<T extends ImmutableSet> extends AbstractSetGenerator<T> {
+public class SetGeneratorDefault<T extends Set.ImmutableSet> extends AbstractSetGenerator<T> {
 
   public SetGeneratorDefault() {
     super((Class<T>) DefaultTrieSet.getTargetClass());

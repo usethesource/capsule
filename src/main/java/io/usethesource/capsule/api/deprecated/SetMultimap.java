@@ -56,7 +56,7 @@ public interface SetMultimap<K, V> {
   interface Immutable<K, V> extends SetMultimap<K, V> {
 
     @Override
-    ImmutableSet<V> get(final Object o);
+    io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> get(final Object o);
 
     // ImmutableSet<V> getEquivalent(final Object o, final Comparator<Object> cmp);
 
@@ -120,7 +120,7 @@ public interface SetMultimap<K, V> {
   interface Transient<K, V> extends SetMultimap<K, V> {
 
     @Override
-    ImmutableSet<V> get(final Object o);
+    io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> get(final Object o);
 
     // ImmutableSet<V> getEquivalent(final Object o, final Comparator<Object> cmp);
 
@@ -138,7 +138,7 @@ public interface SetMultimap<K, V> {
     // boolean containsEntryEquivalent(final Object o0, final Object o1, final Comparator<Object>
     // cmp);
 
-    default boolean __put(K key, ImmutableSet<V> valColl) {
+    default boolean __put(K key, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> valColl) {
       throw new UnsupportedOperationException("Not yet implemented @ Transient.");
     }
 

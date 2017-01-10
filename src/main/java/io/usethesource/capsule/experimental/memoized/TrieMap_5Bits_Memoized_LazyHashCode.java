@@ -25,13 +25,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import io.usethesource.capsule.api.deprecated.ImmutableMap;
-import io.usethesource.capsule.api.deprecated.TransientMap;
 import io.usethesource.capsule.util.ArrayUtils;
 import io.usethesource.capsule.util.ArrayUtilsInt;
 
 @SuppressWarnings("rawtypes")
-public class TrieMap_5Bits_Memoized_LazyHashCode<K, V> implements ImmutableMap<K, V> {
+public class TrieMap_5Bits_Memoized_LazyHashCode<K, V> implements io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> {
 
   @SuppressWarnings("unchecked")
   private static final TrieMap_5Bits_Memoized_LazyHashCode EMPTY_MAP =
@@ -52,17 +50,17 @@ public class TrieMap_5Bits_Memoized_LazyHashCode<K, V> implements ImmutableMap<K
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> ImmutableMap<K, V> of() {
+  public static final <K, V> io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> of() {
     return TrieMap_5Bits_Memoized_LazyHashCode.EMPTY_MAP;
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> ImmutableMap<K, V> of(Object... keyValuePairs) {
+  public static final <K, V> io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> of(Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
       throw new IllegalArgumentException("Length of argument list is uneven: no key/value pairs.");
     }
 
-    ImmutableMap<K, V> result = TrieMap_5Bits_Memoized_LazyHashCode.EMPTY_MAP;
+    io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> result = TrieMap_5Bits_Memoized_LazyHashCode.EMPTY_MAP;
 
     for (int i = 0; i < keyValuePairs.length; i += 2) {
       final K key = (K) keyValuePairs[i];
@@ -75,17 +73,17 @@ public class TrieMap_5Bits_Memoized_LazyHashCode<K, V> implements ImmutableMap<K
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> TransientMap<K, V> transientOf() {
+  public static final <K, V> io.usethesource.capsule.api.deprecated.Map.TransientMap<K, V> transientOf() {
     return TrieMap_5Bits_Memoized_LazyHashCode.EMPTY_MAP.asTransient();
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> TransientMap<K, V> transientOf(Object... keyValuePairs) {
+  public static final <K, V> io.usethesource.capsule.api.deprecated.Map.TransientMap<K, V> transientOf(Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
       throw new IllegalArgumentException("Length of argument list is uneven: no key/value pairs.");
     }
 
-    final TransientMap<K, V> result = TrieMap_5Bits_Memoized_LazyHashCode.EMPTY_MAP.asTransient();
+    final io.usethesource.capsule.api.deprecated.Map.TransientMap<K, V> result = TrieMap_5Bits_Memoized_LazyHashCode.EMPTY_MAP.asTransient();
 
     for (int i = 0; i < keyValuePairs.length; i += 2) {
       final K key = (K) keyValuePairs[i];
@@ -194,7 +192,7 @@ public class TrieMap_5Bits_Memoized_LazyHashCode<K, V> implements ImmutableMap<K
   }
 
   @Override
-  public ImmutableMap<K, V> __put(final K key, final V val) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __put(final K key, final V val) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -213,8 +211,8 @@ public class TrieMap_5Bits_Memoized_LazyHashCode<K, V> implements ImmutableMap<K
   }
 
   @Override
-  public ImmutableMap<K, V> __putEquivalent(final K key, final V val,
-      final Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __putEquivalent(final K key, final V val,
+                                                                                       final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -234,22 +232,22 @@ public class TrieMap_5Bits_Memoized_LazyHashCode<K, V> implements ImmutableMap<K
   }
 
   @Override
-  public ImmutableMap<K, V> __putAll(final Map<? extends K, ? extends V> map) {
-    final TransientMap<K, V> tmpTransient = this.asTransient();
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __putAll(final Map<? extends K, ? extends V> map) {
+    final io.usethesource.capsule.api.deprecated.Map.TransientMap<K, V> tmpTransient = this.asTransient();
     tmpTransient.__putAll(map);
     return tmpTransient.freeze();
   }
 
   @Override
-  public ImmutableMap<K, V> __putAllEquivalent(final Map<? extends K, ? extends V> map,
-      final Comparator<Object> cmp) {
-    final TransientMap<K, V> tmpTransient = this.asTransient();
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __putAllEquivalent(final Map<? extends K, ? extends V> map,
+                                                                                          final Comparator<Object> cmp) {
+    final io.usethesource.capsule.api.deprecated.Map.TransientMap<K, V> tmpTransient = this.asTransient();
     tmpTransient.__putAllEquivalent(map, cmp);
     return tmpTransient.freeze();
   }
 
   @Override
-  public ImmutableMap<K, V> __remove(final K key) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __remove(final K key) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -266,7 +264,7 @@ public class TrieMap_5Bits_Memoized_LazyHashCode<K, V> implements ImmutableMap<K
   }
 
   @Override
-  public ImmutableMap<K, V> __removeEquivalent(final K key, final Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> __removeEquivalent(final K key, final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -530,7 +528,7 @@ public class TrieMap_5Bits_Memoized_LazyHashCode<K, V> implements ImmutableMap<K
   }
 
   @Override
-  public TransientMap<K, V> asTransient() {
+  public io.usethesource.capsule.api.deprecated.Map.TransientMap<K, V> asTransient() {
     return new TransientTrieMap_5Bits_Memoized<K, V>(this);
   }
 
@@ -2312,7 +2310,7 @@ public class TrieMap_5Bits_Memoized_LazyHashCode<K, V> implements ImmutableMap<K
     }
   }
 
-  static final class TransientTrieMap_5Bits_Memoized<K, V> implements TransientMap<K, V> {
+  static final class TransientTrieMap_5Bits_Memoized<K, V> implements io.usethesource.capsule.api.deprecated.Map.TransientMap<K, V> {
     final private AtomicReference<Thread> mutator;
     private AbstractMapNode<K, V> rootNode;
     private int cachedSize;
@@ -2853,7 +2851,7 @@ public class TrieMap_5Bits_Memoized_LazyHashCode<K, V> implements ImmutableMap<K
     }
 
     @Override
-    public ImmutableMap<K, V> freeze() {
+    public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<K, V> freeze() {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }

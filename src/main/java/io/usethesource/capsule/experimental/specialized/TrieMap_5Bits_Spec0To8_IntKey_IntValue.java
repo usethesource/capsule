@@ -25,12 +25,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import io.usethesource.capsule.api.deprecated.ImmutableMap;
-import io.usethesource.capsule.api.deprecated.TransientMap;
-
 @SuppressWarnings("rawtypes")
 public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
-    implements ImmutableMap<java.lang.Integer, java.lang.Integer> {
+    implements io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Integer, Integer> {
 
   @SuppressWarnings("unchecked")
   private static final TrieMap_5Bits_Spec0To8_IntKey_IntValue EMPTY_MAP =
@@ -52,18 +49,18 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
   }
 
   @SuppressWarnings("unchecked")
-  public static final ImmutableMap<java.lang.Integer, java.lang.Integer> of() {
+  public static final io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Integer, Integer> of() {
     return TrieMap_5Bits_Spec0To8_IntKey_IntValue.EMPTY_MAP;
   }
 
   @SuppressWarnings("unchecked")
-  public static final ImmutableMap<java.lang.Integer, java.lang.Integer> of(
+  public static final io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Integer, Integer> of(
       Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
       throw new IllegalArgumentException("Length of argument list is uneven: no key/value pairs.");
     }
 
-    ImmutableMap<java.lang.Integer, java.lang.Integer> result =
+    io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Integer, Integer> result =
         TrieMap_5Bits_Spec0To8_IntKey_IntValue.EMPTY_MAP;
 
     for (int i = 0; i < keyValuePairs.length; i += 2) {
@@ -77,18 +74,18 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
   }
 
   @SuppressWarnings("unchecked")
-  public static final TransientMap<java.lang.Integer, java.lang.Integer> transientOf() {
+  public static final io.usethesource.capsule.api.deprecated.Map.TransientMap<Integer, Integer> transientOf() {
     return TrieMap_5Bits_Spec0To8_IntKey_IntValue.EMPTY_MAP.asTransient();
   }
 
   @SuppressWarnings("unchecked")
-  public static final TransientMap<java.lang.Integer, java.lang.Integer> transientOf(
+  public static final io.usethesource.capsule.api.deprecated.Map.TransientMap<Integer, Integer> transientOf(
       Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
       throw new IllegalArgumentException("Length of argument list is uneven: no key/value pairs.");
     }
 
-    final TransientMap<java.lang.Integer, java.lang.Integer> result =
+    final io.usethesource.capsule.api.deprecated.Map.TransientMap<Integer, Integer> result =
         TrieMap_5Bits_Spec0To8_IntKey_IntValue.EMPTY_MAP.asTransient();
 
     for (int i = 0; i < keyValuePairs.length; i += 2) {
@@ -193,8 +190,8 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     }
   }
 
-  public ImmutableMap<java.lang.Integer, java.lang.Integer> __put(final java.lang.Integer key,
-      final java.lang.Integer val) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Integer, Integer> __put(final java.lang.Integer key,
+                                                                                         final java.lang.Integer val) {
     final int keyHash = key.hashCode();
     final MapResult details = MapResult.unchanged();
 
@@ -218,7 +215,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     return this;
   }
 
-  public ImmutableMap<java.lang.Integer, java.lang.Integer> __putEquivalent(
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Integer, Integer> __putEquivalent(
       final java.lang.Integer key, final java.lang.Integer val, final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult details = MapResult.unchanged();
@@ -243,22 +240,22 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     return this;
   }
 
-  public ImmutableMap<java.lang.Integer, java.lang.Integer> __putAll(
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Integer, Integer> __putAll(
       final Map<? extends java.lang.Integer, ? extends java.lang.Integer> map) {
-    final TransientMap<java.lang.Integer, java.lang.Integer> tmpTransient = this.asTransient();
+    final io.usethesource.capsule.api.deprecated.Map.TransientMap<Integer, Integer> tmpTransient = this.asTransient();
     tmpTransient.__putAll(map);
     return tmpTransient.freeze();
   }
 
-  public ImmutableMap<java.lang.Integer, java.lang.Integer> __putAllEquivalent(
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Integer, Integer> __putAllEquivalent(
       final Map<? extends java.lang.Integer, ? extends java.lang.Integer> map,
       final Comparator<Object> cmp) {
-    final TransientMap<java.lang.Integer, java.lang.Integer> tmpTransient = this.asTransient();
+    final io.usethesource.capsule.api.deprecated.Map.TransientMap<Integer, Integer> tmpTransient = this.asTransient();
     tmpTransient.__putAllEquivalent(map, cmp);
     return tmpTransient.freeze();
   }
 
-  public ImmutableMap<java.lang.Integer, java.lang.Integer> __remove(final java.lang.Integer key) {
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Integer, Integer> __remove(final java.lang.Integer key) {
     final int keyHash = key.hashCode();
     final MapResult details = MapResult.unchanged();
 
@@ -275,7 +272,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     return this;
   }
 
-  public ImmutableMap<java.lang.Integer, java.lang.Integer> __removeEquivalent(
+  public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Integer, Integer> __removeEquivalent(
       final java.lang.Integer key, final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult details = MapResult.unchanged();
@@ -524,7 +521,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
   }
 
   @Override
-  public TransientMap<java.lang.Integer, java.lang.Integer> asTransient() {
+  public io.usethesource.capsule.api.deprecated.Map.TransientMap<Integer, Integer> asTransient() {
     return new TransientTrieMap_5Bits_Spec0To8_IntKey_IntValue(this);
   }
 
@@ -3577,7 +3574,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
   }
 
   static final class TransientTrieMap_5Bits_Spec0To8_IntKey_IntValue
-      implements TransientMap<java.lang.Integer, java.lang.Integer> {
+      implements io.usethesource.capsule.api.deprecated.Map.TransientMap<Integer, Integer> {
     final private AtomicReference<Thread> mutator;
     private AbstractMapNode rootNode;
     private int hashCode;
@@ -4156,7 +4153,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     }
 
     @Override
-    public ImmutableMap<java.lang.Integer, java.lang.Integer> freeze() {
+    public io.usethesource.capsule.api.deprecated.Map.ImmutableMap<Integer, Integer> freeze() {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
