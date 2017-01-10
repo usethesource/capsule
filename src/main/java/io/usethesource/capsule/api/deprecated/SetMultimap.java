@@ -56,9 +56,9 @@ public interface SetMultimap<K, V> {
   interface Immutable<K, V> extends SetMultimap<K, V> {
 
     @Override
-    io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> get(final Object o);
+    io.usethesource.capsule.api.deprecated.Set.Immutable<V> get(final Object o);
 
-    // ImmutableSet<V> getEquivalent(final Object o, final Comparator<Object> cmp);
+    // Immutable<V> getEquivalent(final Object o, final Comparator<Object> cmp);
 
     boolean containsKey(final Object o);
 
@@ -74,27 +74,27 @@ public interface SetMultimap<K, V> {
     // boolean containsEntryEquivalent(final Object o0, final Object o1, final Comparator<Object>
     // cmp);
 
-    SetMultimap.Immutable<K, V> __put(final K key, final V val);
+    Immutable __put(final K key, final V val);
 
     // TODO: SetMultimap.Immutable<K, V> __insert(final K key, final Set<V> values);
 
-    SetMultimap.Immutable<K, V> __insert(final K key, final V val);
+    Immutable __insert(final K key, final V val);
 
     // SetMultimap.Immutable<K, V> __insertEquivalent(final K key, final V val,
     // final Comparator<Object> cmp);
 
-    SetMultimap.Immutable<K, V> __insertAll(final SetMultimap<? extends K, ? extends V> setMultimap);
+    Immutable __insertAll(final SetMultimap<? extends K, ? extends V> setMultimap);
 
     // SetMultimap.Immutable<K, V> __insertAllEquivalent(
     // final SetMultimap<? extends K, ? extends V> setMultimap, final Comparator<Object> cmp);
 
     // removes all mappings with 'key'
-    SetMultimap.Immutable<K, V> __remove(final K key);
+    Immutable __remove(final K key);
 
     // // removes all mappings with 'key'
     // SetMultimap.Immutable<K, V> __removeEquivalent(final K key, final Comparator<Object> cmp);
 
-    SetMultimap.Immutable<K, V> __removeEntry(final K key, final V val);
+    Immutable __removeEntry(final K key, final V val);
 
     // SetMultimap.Immutable<K, V> __removeEntryEquivalent(final K key, final V val,
     // final Comparator<Object> cmp);
@@ -120,9 +120,9 @@ public interface SetMultimap<K, V> {
   interface Transient<K, V> extends SetMultimap<K, V> {
 
     @Override
-    io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> get(final Object o);
+    io.usethesource.capsule.api.deprecated.Set.Immutable<V> get(final Object o);
 
-    // ImmutableSet<V> getEquivalent(final Object o, final Comparator<Object> cmp);
+    // Immutable<V> getEquivalent(final Object o, final Comparator<Object> cmp);
 
     boolean containsKey(final Object o);
 
@@ -138,7 +138,7 @@ public interface SetMultimap<K, V> {
     // boolean containsEntryEquivalent(final Object o0, final Object o1, final Comparator<Object>
     // cmp);
 
-    default boolean __put(K key, io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> valColl) {
+    default boolean __put(K key, io.usethesource.capsule.api.deprecated.Set.Immutable<V> valColl) {
       throw new UnsupportedOperationException("Not yet implemented @ Transient.");
     }
 
@@ -155,7 +155,7 @@ public interface SetMultimap<K, V> {
 
     // boolean __removeTupleEquivalent(final K key, final V val, final Comparator<Object> cmp);
 
-    // TODO: return ImmutableSet<V> or boolean?
+    // TODO: return Immutable<V> or boolean?
     default boolean __remove(K key) {
       throw new UnsupportedOperationException("Not yet implemented @ Transient.");
     }
@@ -168,7 +168,7 @@ public interface SetMultimap<K, V> {
 
     <T> Iterator<T> tupleIterator(final BiFunction<K, V, T> tupleOf);
 
-    SetMultimap.Immutable<K, V> freeze();
+    Immutable freeze();
 
   }
 }

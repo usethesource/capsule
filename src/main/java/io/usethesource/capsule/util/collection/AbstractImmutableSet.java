@@ -14,7 +14,7 @@ import java.util.Comparator;
 import io.usethesource.capsule.api.deprecated.Set;
 
 @Deprecated
-public abstract class AbstractImmutableSet<E> extends AbstractSet<E> implements Set.ImmutableSet<E> {
+public abstract class AbstractImmutableSet<E> extends AbstractSet<E> implements Set.Immutable<E> {
 
   @Override
   public boolean add(E e) {
@@ -52,7 +52,7 @@ public abstract class AbstractImmutableSet<E> extends AbstractSet<E> implements 
   }
 
   @Override
-  public Set.TransientSet<E> asTransient() {
+  public Set.Transient<E> asTransient() {
     throw new UnsupportedOperationException();
   }
 

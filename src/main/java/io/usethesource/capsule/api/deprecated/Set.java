@@ -5,21 +5,21 @@ import java.util.Comparator;
 import java.util.Iterator;
 
 public interface Set {
-  interface ImmutableSet<K> extends java.util.Set<K> {
+  interface Immutable<K> extends java.util.Set<K> {
 
     @Override
     boolean containsAll(final Collection<?> c);
 
     @Deprecated
     default boolean containsAllEquivalent(final Collection<?> c, final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ ImmutableSet.");
+      throw new UnsupportedOperationException("Not yet implemented @ Set.Immutable.");
     }
 
     K get(final Object o);
 
     @Deprecated
     default K getEquivalent(final Object o, final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ ImmutableSet.");
+      throw new UnsupportedOperationException("Not yet implemented @ Set.Immutable.");
     }
 
     @Override
@@ -27,70 +27,70 @@ public interface Set {
 
     @Deprecated
     default boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ ImmutableSet.");
+      throw new UnsupportedOperationException("Not yet implemented @ Set.Immutable.");
     }
 
-    ImmutableSet<K> __insert(final K key);
+    Set.Immutable<K> __insert(final K key);
 
     @Deprecated
-    default ImmutableSet<K> __insertEquivalent(final K key, final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ ImmutableSet.");
+    default Set.Immutable<K> __insertEquivalent(final K key, final Comparator<Object> cmp) {
+      throw new UnsupportedOperationException("Not yet implemented @ Set.Immutable.");
     }
 
-    ImmutableSet<K> __insertAll(final java.util.Set<? extends K> set);
+    Set.Immutable<K> __insertAll(final java.util.Set<? extends K> set);
 
     @Deprecated
-    default ImmutableSet<K> __insertAllEquivalent(final java.util.Set<? extends K> set,
-                                                  final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ ImmutableSet.");
+    default Set.Immutable<K> __insertAllEquivalent(final java.util.Set<? extends K> set,
+                                               final Comparator<Object> cmp) {
+      throw new UnsupportedOperationException("Not yet implemented @ Set.Immutable.");
     }
 
-    ImmutableSet<K> __remove(final K key);
+    Set.Immutable<K> __remove(final K key);
 
     @Deprecated
-    default ImmutableSet<K> __removeEquivalent(final K key, final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ ImmutableSet.");
+    default Set.Immutable<K> __removeEquivalent(final K key, final Comparator<Object> cmp) {
+      throw new UnsupportedOperationException("Not yet implemented @ Set.Immutable.");
     }
 
-    ImmutableSet<K> __removeAll(final java.util.Set<? extends K> set);
+    Set.Immutable<K> __removeAll(final java.util.Set<? extends K> set);
 
     @Deprecated
-    default ImmutableSet<K> __removeAllEquivalent(final java.util.Set<? extends K> set,
-                                                  final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ ImmutableSet.");
+    default Set.Immutable<K> __removeAllEquivalent(final java.util.Set<? extends K> set,
+                                               final Comparator<Object> cmp) {
+      throw new UnsupportedOperationException("Not yet implemented @ Set.Immutable.");
     }
 
-    ImmutableSet<K> __retainAll(final java.util.Set<? extends K> set);
+    Set.Immutable<K> __retainAll(final java.util.Set<? extends K> set);
 
     @Deprecated
-    default ImmutableSet<K> __retainAllEquivalent(final TransientSet<? extends K> transientSet,
-                                                  final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ ImmutableSet.");
+    default Set.Immutable<K> __retainAllEquivalent(final Set.Transient<? extends K> transientSet,
+                                               final Comparator<Object> cmp) {
+      throw new UnsupportedOperationException("Not yet implemented @ Set.Immutable.");
     }
 
     Iterator<K> keyIterator();
 
     boolean isTransientSupported();
 
-    TransientSet<K> asTransient();
+    Set.Transient<K> asTransient();
 
   }
 
-  interface TransientSet<K> extends java.util.Set<K> {
+  interface Transient<K> extends java.util.Set<K> {
 
     @Override
     boolean containsAll(final Collection<?> c);
 
     @Deprecated
     default boolean containsAllEquivalent(final Collection<?> c, final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ TransientSet.");
+      throw new UnsupportedOperationException("Not yet implemented @ Set.Transient.");
     }
 
     K get(final Object o);
 
     @Deprecated
     default K getEquivalent(final Object o, final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ TransientSet.");
+      throw new UnsupportedOperationException("Not yet implemented @ Set.Transient.");
     }
 
     @Override
@@ -98,48 +98,48 @@ public interface Set {
 
     @Deprecated
     default boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ TransientSet.");
+      throw new UnsupportedOperationException("Not yet implemented @ Set.Transient.");
     }
 
     boolean __insert(final K key);
 
     @Deprecated
     default boolean __insertEquivalent(final K key, final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ TransientSet.");
+      throw new UnsupportedOperationException("Not yet implemented @ Set.Transient.");
     }
 
     boolean __insertAll(final java.util.Set<? extends K> set);
 
     @Deprecated
     default boolean __insertAllEquivalent(final java.util.Set<? extends K> set, final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ TransientSet.");
+      throw new UnsupportedOperationException("Not yet implemented @ Set.Transient.");
     }
 
     boolean __remove(final K key);
 
     @Deprecated
     default boolean __removeEquivalent(final K key, final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ TransientSet.");
+      throw new UnsupportedOperationException("Not yet implemented @ Set.Transient.");
     }
 
     boolean __removeAll(final java.util.Set<? extends K> set);
 
     @Deprecated
     default boolean __removeAllEquivalent(final java.util.Set<? extends K> set, final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ TransientSet.");
+      throw new UnsupportedOperationException("Not yet implemented @ Set.Transient.");
     }
 
     boolean __retainAll(final java.util.Set<? extends K> set);
 
     @Deprecated
-    default boolean __retainAllEquivalent(final TransientSet<? extends K> transientSet,
+    default boolean __retainAllEquivalent(final Set.Transient<? extends K> transientSet,
                                           final Comparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ TransientSet.");
+      throw new UnsupportedOperationException("Not yet implemented @ Set.Transient.");
     }
 
     Iterator<K> keyIterator();
 
-    ImmutableSet<K> freeze();
+    Set.Immutable<K> freeze();
 
   }
 }

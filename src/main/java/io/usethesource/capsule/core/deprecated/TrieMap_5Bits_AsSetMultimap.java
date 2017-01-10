@@ -21,7 +21,7 @@ import java.util.function.BiFunction;
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 @SuppressWarnings("rawtypes")
-public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
+public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable {
 
   @SuppressWarnings("unchecked")
   private static final TrieMap_5Bits_AsSetMultimap EMPTY_MAP =
@@ -43,13 +43,13 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> SetMultimap.Immutable<K, V> of() {
+  public static final <K, V> Immutable of() {
     return TrieMap_5Bits_AsSetMultimap.EMPTY_MAP;
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> SetMultimap.Immutable<K, V> of(K key, V... values) {
-    SetMultimap.Immutable<K, V> result = TrieMap_5Bits_AsSetMultimap.EMPTY_MAP;
+  public static final <K, V> Immutable of(K key, V... values) {
+    Immutable result = TrieMap_5Bits_AsSetMultimap.EMPTY_MAP;
 
     for (V value : values) {
       result = result.__insert(key, value);
@@ -154,7 +154,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
   }
 
   @Override
-  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> get(final Object o) {
+  public io.usethesource.capsule.api.deprecated.Set.Immutable<V> get(final Object o) {
     try {
       @SuppressWarnings("unchecked")
       final K key = (K) o;
@@ -170,7 +170,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
     }
   }
 
-  public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.deprecated.Set.Immutable<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
       @SuppressWarnings("unchecked")
       final K key = (K) o;
@@ -187,7 +187,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
   }
 
   @Override
-  public SetMultimap.Immutable<K, V> __put(final K key, final V val) {
+  public Immutable __put(final K key, final V val) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -212,29 +212,29 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
   }
 
   @Override
-  public SetMultimap.Immutable<K, V> __insert(final K key, final V val) {
+  public Immutable __insert(final K key, final V val) {
     return __put(key, val); // NOTE: semantically incorrect
   }
 
-  public SetMultimap.Immutable<K, V> __insertEquivalent(final K key, final V val,
-                                            final Comparator<Object> cmp) {
+  public Immutable __insertEquivalent(final K key, final V val,
+                                      final Comparator<Object> cmp) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public SetMultimap.Immutable<K, V> __insertAll(final SetMultimap<? extends K, ? extends V> map) {
+  public Immutable __insertAll(final SetMultimap<? extends K, ? extends V> map) {
     final SetMultimap.Transient<K, V> tmpTransient = this.asTransient();
     tmpTransient.__insertAll(map);
     return tmpTransient.freeze();
   }
 
   @Override
-  public SetMultimap.Immutable<K, V> __removeEntry(K key, V val) {
+  public Immutable __removeEntry(K key, V val) {
     return __remove(key); // NOTE performs remove all (unchecked of val)
   }
 
   @Override
-  public SetMultimap.Immutable<K, V> __remove(final K key) {
+  public Immutable __remove(final K key) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -251,7 +251,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
     return this;
   }
 
-  public SetMultimap.Immutable<K, V> __removeEquivalent(final K key, final Comparator<Object> cmp) {
+  public Immutable __removeEquivalent(final K key, final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -2335,7 +2335,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
     }
 
     @Override
-    public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> get(final Object o) {
+    public io.usethesource.capsule.api.deprecated.Set.Immutable<V> get(final Object o) {
       try {
         @SuppressWarnings("unchecked")
         final K key = (K) o;
@@ -2351,7 +2351,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
       }
     }
 
-    public io.usethesource.capsule.api.deprecated.Set.ImmutableSet<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
+    public io.usethesource.capsule.api.deprecated.Set.Immutable<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
       try {
         @SuppressWarnings("unchecked")
         final K key = (K) o;
@@ -2824,7 +2824,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
     }
 
     @Override
-    public SetMultimap.Immutable<K, V> freeze() {
+    public Immutable freeze() {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }

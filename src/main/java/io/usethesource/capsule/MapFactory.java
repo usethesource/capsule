@@ -14,7 +14,7 @@ import io.usethesource.capsule.api.deprecated.Map;
 
 public class MapFactory {
 
-  // private final Class<? extends ImmutableMap<?, ?>> targetClass;
+  // private final Class<? extends Immutable<?, ?>> targetClass;
 
   private final Method persistentMapOfEmpty;
   private final Method persistentMapOfKeyValuePairs;
@@ -37,41 +37,41 @@ public class MapFactory {
     }
   }
 
-  // public Class<? extends ImmutableMap<?, ?>> getTargetClass() {
+  // public Class<? extends Immutable<?, ?>> getTargetClass() {
   // return targetClass;
   // }
 
   @SuppressWarnings("unchecked")
-  public final <K, V> Map.ImmutableMap<K, V> of() {
+  public final <K, V> Map.Immutable<K, V> of() {
     try {
-      return (Map.ImmutableMap<K, V>) persistentMapOfEmpty.invoke(null);
+      return (Map.Immutable<K, V>) persistentMapOfEmpty.invoke(null);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public final <K, V> Map.ImmutableMap<K, V> of(Object... keyValuePairs) {
+  public final <K, V> Map.Immutable<K, V> of(Object... keyValuePairs) {
     try {
-      return (Map.ImmutableMap<K, V>) persistentMapOfKeyValuePairs.invoke(null, (Object) keyValuePairs);
+      return (Map.Immutable<K, V>) persistentMapOfKeyValuePairs.invoke(null, (Object) keyValuePairs);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public final <K, V> Map.TransientMap<K, V> transientOf() {
+  public final <K, V> Map.Transient<K, V> transientOf() {
     try {
-      return (Map.TransientMap<K, V>) transientMapOfEmpty.invoke(null);
+      return (Map.Transient<K, V>) transientMapOfEmpty.invoke(null);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public final <K, V> Map.TransientMap<K, V> transientOf(Object... keyValuePairs) {
+  public final <K, V> Map.Transient<K, V> transientOf(Object... keyValuePairs) {
     try {
-      return (Map.TransientMap<K, V>) transientMapOfKeyValuePairs.invoke(null, (Object) keyValuePairs);
+      return (Map.Transient<K, V>) transientMapOfKeyValuePairs.invoke(null, (Object) keyValuePairs);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       e.printStackTrace();
       throw new RuntimeException(e);

@@ -14,7 +14,7 @@ import io.usethesource.capsule.api.deprecated.Set;
 
 public class SetFactory {
 
-  // private final Class<? extends ImmutableSet<?>> targetClass;
+  // private final Class<? extends Immutable<?>> targetClass;
 
   private final Method persistentSetOfEmpty;
   private final Method persistentSetOfKeyValuePairs;
@@ -37,41 +37,41 @@ public class SetFactory {
     }
   }
 
-  // public Class<? extends ImmutableSet<?>> getTargetClass() {
+  // public Class<? extends Immutable<?>> getTargetClass() {
   // return targetClass;
   // }
 
   @SuppressWarnings("unchecked")
-  public final <K> Set.ImmutableSet<K> of() {
+  public final <K> Set.Immutable<K> of() {
     try {
-      return (Set.ImmutableSet<K>) persistentSetOfEmpty.invoke(null);
+      return (Set.Immutable<K>) persistentSetOfEmpty.invoke(null);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public final <K> Set.ImmutableSet<K> of(K... keys) {
+  public final <K> Set.Immutable<K> of(K... keys) {
     try {
-      return (Set.ImmutableSet<K>) persistentSetOfKeyValuePairs.invoke(null, (Object) keys);
+      return (Set.Immutable<K>) persistentSetOfKeyValuePairs.invoke(null, (Object) keys);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public final <K> Set.TransientSet<K> transientOf() {
+  public final <K> Set.Transient<K> transientOf() {
     try {
-      return (Set.TransientSet<K>) transientSetOfEmpty.invoke(null);
+      return (Set.Transient<K>) transientSetOfEmpty.invoke(null);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public final <K> Set.TransientSet<K> transientOf(K... keys) {
+  public final <K> Set.Transient<K> transientOf(K... keys) {
     try {
-      return (Set.TransientSet<K>) transientSetOfKeyValuePairs.invoke(null, (Object) keys);
+      return (Set.Transient<K>) transientSetOfKeyValuePairs.invoke(null, (Object) keys);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }

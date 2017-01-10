@@ -51,36 +51,36 @@ public class MapSmokeTest {
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> Map.ImmutableMap<K, V> mapOf() {
+  public static final <K, V> Map.Immutable<K, V> mapOf() {
     try {
-      return (Map.ImmutableMap<K, V>) persistentMapOfEmpty.invoke(null);
+      return (Map.Immutable<K, V>) persistentMapOfEmpty.invoke(null);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> Map.ImmutableMap<K, V> mapOf(Object... keyValuePairs) {
+  public static final <K, V> Map.Immutable<K, V> mapOf(Object... keyValuePairs) {
     try {
-      return (Map.ImmutableMap<K, V>) persistentMapOfKeyValuePairs.invoke(null, (Object) keyValuePairs);
+      return (Map.Immutable<K, V>) persistentMapOfKeyValuePairs.invoke(null, (Object) keyValuePairs);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> Map.TransientMap<K, V> transientMapOf() {
+  public static final <K, V> Map.Transient<K, V> transientMapOf() {
     try {
-      return (Map.TransientMap<K, V>) transientMapOfEmpty.invoke(null);
+      return (Map.Transient<K, V>) transientMapOfEmpty.invoke(null);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> Map.TransientMap<K, V> transientMapOf(Object... keyValuePairs) {
+  public static final <K, V> Map.Transient<K, V> transientMapOf(Object... keyValuePairs) {
     try {
-      return (Map.TransientMap<K, V>) transientMapOfKeyValuePairs.invoke(null, (Object) keyValuePairs);
+      return (Map.Transient<K, V>) transientMapOfKeyValuePairs.invoke(null, (Object) keyValuePairs);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       e.printStackTrace();
       throw new RuntimeException(e);
@@ -97,10 +97,10 @@ public class MapSmokeTest {
   public void testPrintStatsSequential() {
     // int size = 128;
 
-    Map.ImmutableMap<Integer, Integer> map = (Map.ImmutableMap) mapOf();
+    Map.Immutable<Integer, Integer> map = (Map.Immutable) mapOf();
 
     for (int i = size; i > 0; i--) {
-      Map.ImmutableMap<Integer, Integer> res = map.__put(i, i);
+      Map.Immutable<Integer, Integer> res = map.__put(i, i);
       assert res.containsKey(i);
       map = res;
     }
@@ -112,14 +112,14 @@ public class MapSmokeTest {
   public void testPrintStatsRandom() {
     // int size = 128;
 
-    Map.ImmutableMap<Integer, Integer> map = (Map.ImmutableMap) mapOf();
+    Map.Immutable<Integer, Integer> map = (Map.Immutable) mapOf();
 
     Random rand = new Random(13);
 
     for (int i = size; i > 0; i--) {
       final int j = rand.nextInt();
 
-      Map.ImmutableMap<Integer, Integer> res = map.__put(j, j);
+      Map.Immutable<Integer, Integer> res = map.__put(j, j);
       assert res.containsKey(j);
       map = res;
     }
@@ -131,9 +131,9 @@ public class MapSmokeTest {
   public void testCheckPrefixConstruction() {
     // int size = 128;
 
-    Map.ImmutableMap<Integer, Integer> map = (Map.ImmutableMap) mapOf();
+    Map.Immutable<Integer, Integer> map = (Map.Immutable) mapOf();
 
-    Map.ImmutableMap<Integer, Integer> res1 = map.__put(63, 63).__put(64, 64).__put(32768, 32768)
+    Map.Immutable<Integer, Integer> res1 = map.__put(63, 63).__put(64, 64).__put(32768, 32768)
         .__put(2147483647, 2147483647).__put(65536, 65536);
 
     assert res1.containsKey(63);
@@ -142,7 +142,7 @@ public class MapSmokeTest {
     assert res1.containsKey(65536);
     assert res1.containsKey(2147483647);
 
-    Map.ImmutableMap<Integer, Integer> res2 = map.__put(2147483647, 2147483647).__put(32768, 32768)
+    Map.Immutable<Integer, Integer> res2 = map.__put(2147483647, 2147483647).__put(32768, 32768)
         .__put(63, 63).__put(64, 64).__put(65536, 65536);
 
     assert res2.containsKey(63);
@@ -160,11 +160,11 @@ public class MapSmokeTest {
   @Test
   public void testCheckCompactionFromBeginUponDelete() {
 
-    Map.ImmutableMap<Integer, Integer> map = (Map.ImmutableMap) mapOf();
+    Map.Immutable<Integer, Integer> map = (Map.Immutable) mapOf();
 
-    Map.ImmutableMap<Integer, Integer> res1 = map.__put(1, 1).__put(2, 2);
+    Map.Immutable<Integer, Integer> res1 = map.__put(1, 1).__put(2, 2);
 
-    Map.ImmutableMap<Integer, Integer> res2 = res1.__put(32769, 32769).__remove(2);
+    Map.Immutable<Integer, Integer> res2 = res1.__put(32769, 32769).__remove(2);
 
     // what to test for?
     assert !res1.equals(res2);
@@ -174,11 +174,11 @@ public class MapSmokeTest {
   @Test
   public void testCheckCompactionFromMiddleUponDelete() {
 
-    Map.ImmutableMap<Integer, Integer> map = (Map.ImmutableMap) mapOf();
+    Map.Immutable<Integer, Integer> map = (Map.Immutable) mapOf();
 
-    Map.ImmutableMap<Integer, Integer> res1 = map.__put(1, 1).__put(2, 2).__put(65, 65).__put(66, 66);
+    Map.Immutable<Integer, Integer> res1 = map.__put(1, 1).__put(2, 2).__put(65, 65).__put(66, 66);
 
-    Map.ImmutableMap<Integer, Integer> res2 = res1.__put(32769, 32769).__remove(66);
+    Map.Immutable<Integer, Integer> res2 = res1.__put(32769, 32769).__remove(66);
 
     // what to test for?
     assert !res1.equals(res2);
@@ -196,21 +196,21 @@ public class MapSmokeTest {
   @Test
   public void testCheckCompactionFromBeginUponDelete_HashCollisionNode1() {
 
-    Map.ImmutableMap map = mapOf();
+    Map.Immutable map = mapOf();
 
-    Map.ImmutableMap res1 = map.__put(p(11, 1), p(11, 1)).__put(p(12, 1), p(12, 1));
+    Map.Immutable res1 = map.__put(p(11, 1), p(11, 1)).__put(p(12, 1), p(12, 1));
     assertTrue(res1.containsKey(p(11, 1)));
     assertTrue(res1.containsKey(p(12, 1)));
 
-    Map.ImmutableMap res2 = res1.__remove(p(12, 1));
+    Map.Immutable res2 = res1.__remove(p(12, 1));
     assertTrue(res2.containsKey(p(11, 1)));
     assertEquals(mapOf(p(11, 1), p(11, 1)), res2);
 
-    Map.ImmutableMap res3 = res1.__remove(p(11, 1));
+    Map.Immutable res3 = res1.__remove(p(11, 1));
     assertTrue(res3.containsKey(p(12, 1)));
     assertEquals(mapOf(p(12, 1), p(12, 1)), res3);
 
-    Map.ImmutableMap resX = res1.__put(p(32769), p(32769)).__remove(p(12, 1));
+    Map.Immutable resX = res1.__put(p(32769), p(32769)).__remove(p(12, 1));
     assertTrue(resX.containsKey(p(11, 1)));
     assertTrue(resX.containsKey(p(32769)));
 
@@ -222,26 +222,26 @@ public class MapSmokeTest {
   @Test
   public void testCheckCompactionFromBeginUponDelete_HashCollisionNode2() {
 
-    Map.ImmutableMap map = mapOf();
+    Map.Immutable map = mapOf();
 
-    Map.ImmutableMap res1 =
+    Map.Immutable res1 =
         map.__put(p(32769_1, 32769), p(32769_1, 32769)).__put(p(32769_2, 32769), p(32769_2, 32769));
     assertEquals(2, res1.size());
     assertTrue(res1.containsKey(p(32769_1, 32769)));
     assertTrue(res1.containsKey(p(32769_2, 32769)));
 
-    Map.ImmutableMap res2 = res1.__put(p(1, 1), p(1, 1));
+    Map.Immutable res2 = res1.__put(p(1, 1), p(1, 1));
     assertEquals(3, res2.size());
     assertTrue(res2.containsKey(p(1, 1)));
     assertTrue(res2.containsKey(p(32769_1, 32769)));
     assertTrue(res2.containsKey(p(32769_2, 32769)));
 
-    Map.ImmutableMap res3 = res2.__remove(p(32769_2, 32769));
+    Map.Immutable res3 = res2.__remove(p(32769_2, 32769));
     assertEquals(2, res3.size());
     assertTrue(res3.containsKey(p(1, 1)));
     assertTrue(res3.containsKey(p(32769_1, 32769)));
 
-    Map.ImmutableMap expected = mapOf(p(1, 1), p(1, 1), p(32769_1, 32769), p(32769_1, 32769));
+    Map.Immutable expected = mapOf(p(1, 1), p(1, 1), p(32769_1, 32769), p(32769_1, 32769));
     assertEquals(expected, res3);
   }
 
@@ -249,21 +249,21 @@ public class MapSmokeTest {
   @Test
   public void testCheckCompactionFromBeginUponDelete_HashCollisionNode3() {
 
-    Map.ImmutableMap map = mapOf();
+    Map.Immutable map = mapOf();
 
-    Map.ImmutableMap res1 =
+    Map.Immutable res1 =
         map.__put(p(32769_1, 32769), p(32769_1, 32769)).__put(p(32769_2, 32769), p(32769_2, 32769));
     assertEquals(2, res1.size());
     assertTrue(res1.containsKey(p(32769_1, 32769)));
     assertTrue(res1.containsKey(p(32769_2, 32769)));
 
-    Map.ImmutableMap res2 = res1.__put(p(1, 1), p(1, 1));
+    Map.Immutable res2 = res1.__put(p(1, 1), p(1, 1));
     assertEquals(3, res2.size());
     assertTrue(res2.containsKey(p(1, 1)));
     assertTrue(res2.containsKey(p(32769_1, 32769)));
     assertTrue(res2.containsKey(p(32769_2, 32769)));
 
-    Map.ImmutableMap res3 = res2.__remove(p(1, 1));
+    Map.Immutable res3 = res2.__remove(p(1, 1));
     assertEquals(2, res3.size());
     assertTrue(res3.containsKey(p(32769_1, 32769)));
     assertTrue(res3.containsKey(p(32769_2, 32769)));
@@ -275,21 +275,21 @@ public class MapSmokeTest {
   @Test
   public void testCheckCompactionFromBeginUponDelete_HashCollisionNode4() {
 
-    Map.ImmutableMap map = mapOf();
+    Map.Immutable map = mapOf();
 
-    Map.ImmutableMap res1 =
+    Map.Immutable res1 =
         map.__put(p(32769_1, 32769), p(32769_1, 32769)).__put(p(32769_2, 32769), p(32769_2, 32769));
     assertEquals(2, res1.size());
     assertTrue(res1.containsKey(p(32769_1, 32769)));
     assertTrue(res1.containsKey(p(32769_2, 32769)));
 
-    Map.ImmutableMap res2 = res1.__put(p(5), p(5));
+    Map.Immutable res2 = res1.__put(p(5), p(5));
     assertEquals(3, res2.size());
     assertTrue(res2.containsKey(p(5)));
     assertTrue(res2.containsKey(p(32769_1, 32769)));
     assertTrue(res2.containsKey(p(32769_2, 32769)));
 
-    Map.ImmutableMap res3 = res2.__remove(p(5));
+    Map.Immutable res3 = res2.__remove(p(5));
     assertEquals(2, res3.size());
     assertTrue(res3.containsKey(p(32769_1, 32769)));
     assertTrue(res3.containsKey(p(32769_2, 32769)));
@@ -371,15 +371,15 @@ public class MapSmokeTest {
 
   @Test
   public void testCreateSingletonWithFactoryMethod() {
-    Map.ImmutableMap<Integer, Integer> map = mapOf(63, 65);
+    Map.Immutable<Integer, Integer> map = mapOf(63, 65);
     assertTrue(map.containsKey(63));
     assertEquals(Integer.valueOf(65), map.get(63));
   }
 
   @Test
   public void testRemoveFromSingleton() {
-    Map.ImmutableMap<Integer, Integer> map = mapOf(63, 65);
-    Map.ImmutableMap<Integer, Integer> res = map.__remove(63);
+    Map.Immutable<Integer, Integer> map = mapOf(63, 65);
+    Map.Immutable<Integer, Integer> res = map.__remove(63);
     assertTrue(res.isEmpty());
     assertFalse(res.containsKey(63));
     assertEquals(mapOf(), res);
