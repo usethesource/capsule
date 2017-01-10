@@ -7,6 +7,23 @@
  */
 package io.usethesource.capsule.experimental.multimap;
 
+import io.usethesource.capsule.api.deprecated.SetMultimap;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations.*;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized.EitherSingletonOrCollection.Type;
+import io.usethesource.capsule.util.EqualityComparator;
+import io.usethesource.capsule.util.RangecopyUtils;
+import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.*;
 import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized.EitherSingletonOrCollection.Type.COLLECTION;
 import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized.EitherSingletonOrCollection.Type.SINGLETON;
@@ -16,27 +33,8 @@ import static io.usethesource.capsule.util.DataLayoutHelper.*;
 import static io.usethesource.capsule.util.RangecopyUtils.*;
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
-import java.util.*;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
-import io.usethesource.capsule.api.deprecated.*;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized.EitherSingletonOrCollection.Type;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations.*;
-import io.usethesource.capsule.util.EqualityComparator;
-import io.usethesource.capsule.util.RangecopyUtils;
-import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
-
 @SuppressWarnings({"rawtypes", "restriction"})
-public class TrieSetMultimap_HHAMT_Specialized<K, V> implements SetMultimap.Immutable {
+public class TrieSetMultimap_HHAMT_Specialized<K, V> implements SetMultimap.Immutable<K, V> {
 
   private final EqualityComparator<Object> cmp;
 
@@ -64,19 +62,19 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements SetMultimap.Immu
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> Immutable of() {
+  public static final <K, V> SetMultimap.Immutable<K, V> of() {
     return TrieSetMultimap_HHAMT_Specialized.EMPTY_SETMULTIMAP;
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> Immutable of(EqualityComparator<Object> cmp) {
+  public static final <K, V> SetMultimap.Immutable<K, V> of(EqualityComparator<Object> cmp) {
     // TODO: unify with `of()`
     return new TrieSetMultimap_HHAMT_Specialized(cmp, EMPTY_NODE, 0, 0);
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> Immutable of(K key, V... values) {
-    Immutable result = TrieSetMultimap_HHAMT_Specialized.EMPTY_SETMULTIMAP;
+  public static final <K, V> SetMultimap.Immutable<K, V> of(K key, V... values) {
+    SetMultimap.Immutable<K, V> result = TrieSetMultimap_HHAMT_Specialized.EMPTY_SETMULTIMAP;
 
     for (V value : values) {
       result = result.__insert(key, value);
@@ -187,7 +185,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements SetMultimap.Immu
   }
 
   @Override
-  public Immutable __put(K key, V val) {
+  public SetMultimap.Immutable<K, V> __put(K key, V val) {
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
@@ -226,7 +224,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements SetMultimap.Immu
   }
 
   @Override
-  public Immutable __insert(final K key, final V val) {
+  public SetMultimap.Immutable<K, V> __insert(final K key, final V val) {
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
@@ -243,7 +241,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements SetMultimap.Immu
   }
 
   @Override
-  public Immutable __insertAll(
+  public SetMultimap.Immutable<K, V> __insertAll(
       final SetMultimap<? extends K, ? extends V> setMultimap) {
     final SetMultimap.Transient<K, V> tmpTransient = this.asTransient();
     tmpTransient.__insertAll(setMultimap);
@@ -251,7 +249,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements SetMultimap.Immu
   }
 
   @Override
-  public Immutable __removeEntry(final K key, final V val) {
+  public SetMultimap.Immutable<K, V> __removeEntry(final K key, final V val) {
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
@@ -269,7 +267,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements SetMultimap.Immu
   }
 
   @Override
-  public Immutable __remove(K key) {
+  public SetMultimap.Immutable<K, V> __remove(K key) {
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
@@ -358,7 +356,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements SetMultimap.Immu
 
   private Spliterator<io.usethesource.capsule.api.deprecated.Set.Immutable<V>> valueCollectionsSpliterator() {
     /*
-     * TODO: specialize between mutable / immutable ({@see Spliterator.IMMUTABLE})
+     * TODO: specialize between mutable / SetMultimap.Immutable<K, V> ({@see Spliterator.IMMUTABLE})
      */
     int characteristics = Spliterator.NONNULL | Spliterator.SIZED | Spliterator.SUBSIZED;
     return Spliterators.spliterator(new SetMultimapValueIterator<>(rootNode), size(),
@@ -4233,7 +4231,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements SetMultimap.Immu
 
     private Spliterator<io.usethesource.capsule.api.deprecated.Set.Immutable<V>> valueCollectionsSpliterator() {
       /*
-       * TODO: specialize between mutable / immutable ({@see Spliterator.IMMUTABLE})
+       * TODO: specialize between mutable / SetMultimap.Immutable<K, V> ({@see Spliterator.IMMUTABLE})
        */
       int characteristics = Spliterator.NONNULL | Spliterator.SIZED | Spliterator.SUBSIZED;
       return Spliterators.spliterator(new SetMultimapValueIterator<>(rootNode), size(),
@@ -4500,7 +4498,7 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements SetMultimap.Immu
     }
 
     @Override
-    public Immutable freeze() {
+    public SetMultimap.Immutable<K, V> freeze() {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }

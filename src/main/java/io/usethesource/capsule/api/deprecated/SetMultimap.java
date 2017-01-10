@@ -74,27 +74,27 @@ public interface SetMultimap<K, V> {
     // boolean containsEntryEquivalent(final Object o0, final Object o1, final Comparator<Object>
     // cmp);
 
-    Immutable __put(final K key, final V val);
+    SetMultimap.Immutable<K, V> __put(final K key, final V val);
 
     // TODO: SetMultimap.Immutable<K, V> __insert(final K key, final Set<V> values);
 
-    Immutable __insert(final K key, final V val);
+    SetMultimap.Immutable<K, V> __insert(final K key, final V val);
 
     // SetMultimap.Immutable<K, V> __insertEquivalent(final K key, final V val,
     // final Comparator<Object> cmp);
 
-    Immutable __insertAll(final SetMultimap<? extends K, ? extends V> setMultimap);
+    SetMultimap.Immutable<K, V> __insertAll(final SetMultimap<? extends K, ? extends V> setMultimap);
 
     // SetMultimap.Immutable<K, V> __insertAllEquivalent(
     // final SetMultimap<? extends K, ? extends V> setMultimap, final Comparator<Object> cmp);
 
     // removes all mappings with 'key'
-    Immutable __remove(final K key);
+    SetMultimap.Immutable<K, V> __remove(final K key);
 
     // // removes all mappings with 'key'
     // SetMultimap.Immutable<K, V> __removeEquivalent(final K key, final Comparator<Object> cmp);
 
-    Immutable __removeEntry(final K key, final V val);
+    SetMultimap.Immutable<K, V> __removeEntry(final K key, final V val);
 
     // SetMultimap.Immutable<K, V> __removeEntryEquivalent(final K key, final V val,
     // final Comparator<Object> cmp);
@@ -168,7 +168,7 @@ public interface SetMultimap<K, V> {
 
     <T> Iterator<T> tupleIterator(final BiFunction<K, V, T> tupleOf);
 
-    Immutable freeze();
+    SetMultimap.Immutable<K, V> freeze();
 
   }
 }

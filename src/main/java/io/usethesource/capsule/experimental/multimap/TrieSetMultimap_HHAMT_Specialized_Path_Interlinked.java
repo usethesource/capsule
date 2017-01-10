@@ -7,48 +7,18 @@
  */
 package io.usethesource.capsule.experimental.multimap;
 
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_COLLECTION;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_SINGLETON;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_EMPTY;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_NODE;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setBitPattern;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setFromNode;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.specSetNodeOf;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.specSetOf;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.specSetToNode;
-import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EitherSingletonOrCollection.Type.COLLECTION;
-import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EitherSingletonOrCollection.Type.SINGLETON;
-import static io.usethesource.capsule.util.BitmapUtils.filter;
-import static io.usethesource.capsule.util.BitmapUtils.index;
-import static io.usethesource.capsule.util.DataLayoutHelper.addressSize;
-import static io.usethesource.capsule.util.DataLayoutHelper.arrayOffsets;
-import static io.usethesource.capsule.util.DataLayoutHelper.fieldOffset;
-import static io.usethesource.capsule.util.DataLayoutHelper.unsafe;
-import static io.usethesource.capsule.util.RangecopyUtils._do_rangecompareObjectRegion;
-import static io.usethesource.capsule.util.RangecopyUtils.getFromObjectRegion;
-import static io.usethesource.capsule.util.RangecopyUtils.getFromObjectRegionAndCast;
-import static io.usethesource.capsule.util.RangecopyUtils.rangecopyObjectRegion;
-import static io.usethesource.capsule.util.RangecopyUtils.setInObjectRegion;
-import static io.usethesource.capsule.util.RangecopyUtils.setInObjectRegionVarArgs;
-import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
+import io.usethesource.capsule.api.deprecated.SetMultimap;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.*;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EitherSingletonOrCollection.Type;
+import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8;
+import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8.AbstractSetNode;
+import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8.SetResult;
+import io.usethesource.capsule.util.EqualityComparator;
+import io.usethesource.capsule.util.RangecopyUtils;
+import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
 
-import java.util.AbstractCollection;
-import java.util.AbstractSet;
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.Spliterators;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -57,21 +27,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import io.usethesource.capsule.api.deprecated.SetMultimap;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.SetMultimap0To0Node;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.SetMultimap0To1Node;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.SetMultimap0To2Node;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.SetMultimap0To4Node;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.SetMultimap1To0Node;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.SetMultimap1To2Node;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.SetMultimap2To0Node;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EitherSingletonOrCollection.Type;
-import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8;
-import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8.AbstractSetNode;
-import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8.SetResult;
-import io.usethesource.capsule.util.EqualityComparator;
-import io.usethesource.capsule.util.RangecopyUtils;
-import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.*;
+import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EitherSingletonOrCollection.Type.COLLECTION;
+import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EitherSingletonOrCollection.Type.SINGLETON;
+import static io.usethesource.capsule.util.BitmapUtils.filter;
+import static io.usethesource.capsule.util.BitmapUtils.index;
+import static io.usethesource.capsule.util.DataLayoutHelper.*;
+import static io.usethesource.capsule.util.RangecopyUtils.*;
+import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 /**
  * NOTE: only difference to {@link TrieSetMultimap_HHAMT_Specialized_Interlinked} is the use of
@@ -81,7 +44,7 @@ import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
  */
 @SuppressWarnings({"rawtypes", "restriction"})
 public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
-    implements SetMultimap.Immutable {
+    implements SetMultimap.Immutable<K, V> {
 
   private final EqualityComparator<Object> cmp;
 
@@ -110,19 +73,19 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> Immutable of() {
+  public static final <K, V> SetMultimap.Immutable<K, V> of() {
     return TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EMPTY_SETMULTIMAP;
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> Immutable of(EqualityComparator<Object> cmp) {
+  public static final <K, V> SetMultimap.Immutable<K, V> of(EqualityComparator<Object> cmp) {
     // TODO: unify with `of()`
     return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked(cmp, EMPTY_NODE, 0, 0);
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> Immutable of(K key, V... values) {
-    Immutable result =
+  public static final <K, V> SetMultimap.Immutable<K, V> of(K key, V... values) {
+    SetMultimap.Immutable<K, V> result =
         TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EMPTY_SETMULTIMAP;
 
     for (V value : values) {
@@ -222,7 +185,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
   }
 
   @Override
-  public Immutable __put(K key, V val) {
+  public SetMultimap.Immutable<K, V> __put(K key, V val) {
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
@@ -261,7 +224,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
   }
 
   @Override
-  public Immutable __insert(final K key, final V val) {
+  public SetMultimap.Immutable<K, V> __insert(final K key, final V val) {
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
@@ -278,7 +241,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
   }
 
   @Override
-  public Immutable __insertAll(
+  public SetMultimap.Immutable<K, V> __insertAll(
       final SetMultimap<? extends K, ? extends V> setMultimap) {
     final SetMultimap.Transient<K, V> tmpTransient = this.asTransient();
     tmpTransient.__insertAll(setMultimap);
@@ -286,7 +249,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
   }
 
   @Override
-  public Immutable __removeEntry(final K key, final V val) {
+  public SetMultimap.Immutable<K, V> __removeEntry(final K key, final V val) {
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
@@ -304,7 +267,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
   }
 
   @Override
-  public Immutable __remove(K key) {
+  public SetMultimap.Immutable<K, V> __remove(K key) {
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
@@ -394,7 +357,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
   private Spliterator<AbstractSetNode<V>> valueCollectionsSpliterator() {
     /*
-     * TODO: specialize between mutable / immutable ({@see Spliterator.IMMUTABLE})
+     * TODO: specialize between mutable / SetMultimap.Immutable<K, V> ({@see Spliterator.IMMUTABLE})
      */
     int characteristics = Spliterator.NONNULL | Spliterator.SIZED | Spliterator.SUBSIZED;
     return Spliterators.spliterator(new SetMultimapValueIterator<>(rootNode), size(),
@@ -4090,7 +4053,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
     private Spliterator<AbstractSetNode<V>> valueCollectionsSpliterator() {
       /*
-       * TODO: specialize between mutable / immutable ({@see Spliterator.IMMUTABLE})
+       * TODO: specialize between mutable / SetMultimap.Immutable<K, V> ({@see Spliterator.IMMUTABLE})
        */
       int characteristics = Spliterator.NONNULL | Spliterator.SIZED | Spliterator.SUBSIZED;
       return Spliterators.spliterator(new SetMultimapValueIterator<>(rootNode), size(),
@@ -4357,7 +4320,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
     }
 
     @Override
-    public Immutable freeze() {
+    public SetMultimap.Immutable<K, V> freeze() {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
