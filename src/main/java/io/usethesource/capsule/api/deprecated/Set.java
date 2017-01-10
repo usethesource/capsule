@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 
-public interface Set {
-  interface Immutable<K> extends java.util.Set<K> {
+public interface Set<K> extends java.util.Set<K> {
+  interface Immutable<K> extends Set<K> {
 
     @Override
     boolean containsAll(final Collection<?> c);
@@ -76,7 +76,7 @@ public interface Set {
 
   }
 
-  interface Transient<K> extends java.util.Set<K> {
+  interface Transient<K> extends Set<K> {
 
     @Override
     boolean containsAll(final Collection<?> c);

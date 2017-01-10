@@ -3,8 +3,8 @@ package io.usethesource.capsule.api.deprecated;
 import java.util.Comparator;
 import java.util.Iterator;
 
-public interface Map {
-  interface Immutable<K, V> extends java.util.Map<K, V> {
+public interface Map<K, V> extends java.util.Map<K, V> {
+  interface Immutable<K, V> extends Map<K, V> {
 
     @Override
     V get(final Object o);
@@ -46,7 +46,7 @@ public interface Map {
 
   }
 
-  interface Transient<K, V> extends java.util.Map<K, V> {
+  interface Transient<K, V> extends Map<K, V> {
 
     @Override
     V get(final Object o);
