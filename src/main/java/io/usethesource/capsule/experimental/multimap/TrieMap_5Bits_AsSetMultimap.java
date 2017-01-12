@@ -5,7 +5,7 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.capsule.core.deprecated;
+package io.usethesource.capsule.experimental.multimap;
 
 import io.usethesource.capsule.api.deprecated.*;
 import io.usethesource.capsule.util.ArrayUtils;
@@ -269,26 +269,6 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
   }
 
   @Override
-  public V put(final K key, final V val) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void putAll(final SetMultimap<? extends K, ? extends V> m) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void clear() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public V remove(final Object key, final Object value) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public int size() {
     return cachedSize;
   }
@@ -346,7 +326,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
 
         @Override
         public void clear() {
-          TrieMap_5Bits_AsSetMultimap.this.clear();
+          throw new UnsupportedOperationException();
         }
 
         @Override
@@ -382,7 +362,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
 
         @Override
         public void clear() {
-          TrieMap_5Bits_AsSetMultimap.this.clear();
+          throw new UnsupportedOperationException();
         }
 
         @Override
@@ -435,7 +415,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
 
         @Override
         public void clear() {
-          TrieMap_5Bits_AsSetMultimap.this.clear();
+          throw new UnsupportedOperationException();
         }
 
         @Override
@@ -2251,26 +2231,6 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
     }
 
     @Override
-    public V put(final K key, final V val) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void putAll(final SetMultimap<? extends K, ? extends V> m) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void clear() {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public V remove(final Object key, final Object val) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
     public boolean __removeTuple(K key, V val) {
       throw new UnsupportedOperationException();
     }
@@ -2658,7 +2618,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
 
           @Override
           public void clear() {
-            TransientTrieMap_5Bits.this.clear();
+            throw new UnsupportedOperationException();
           }
 
           @Override
@@ -2694,7 +2654,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
 
           @Override
           public void clear() {
-            TransientTrieMap_5Bits.this.clear();
+            throw new UnsupportedOperationException();
           }
 
           @Override
@@ -2747,7 +2707,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
 
           @Override
           public void clear() {
-            TransientTrieMap_5Bits.this.clear();
+            throw new UnsupportedOperationException();
           }
 
           @Override

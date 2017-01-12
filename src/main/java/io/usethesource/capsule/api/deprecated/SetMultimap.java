@@ -7,34 +7,26 @@
  */
 package io.usethesource.capsule.api.deprecated;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.function.BiFunction;
 
 public interface SetMultimap<K, V> {
 
-  V put(final K key, final V val);
+  Set.Immutable<V> get(final java.lang.Object o);
 
-  V remove(final java.lang.Object key, final java.lang.Object val);
+  boolean containsKey(final Object o);
 
-  void putAll(final SetMultimap<? extends K, ? extends V> multimap);
+  boolean containsValue(final Object o);
 
-  boolean containsValue(Object value);
+  boolean containsEntry(final Object o0, final Object o1);
 
-  Set<V> get(final java.lang.Object o);
+  java.util.Set<K> keySet();
 
-  // Set<V> getEquivalent(final java.lang.Object o, final Comparator<Object> cmp);
+  java.util.Collection<V> values();
 
-  Set<K> keySet();
-
-  Collection<V> values();
-
-  Set<Map.Entry<K, V>> entrySet();
-
-  void clear();
+  java.util.Set<Map.Entry<K, V>> entrySet();
 
   int size();
 
@@ -43,6 +35,26 @@ public interface SetMultimap<K, V> {
   }
 
   boolean isEmpty();
+
+  Iterator<K> keyIterator();
+
+  Iterator<V> valueIterator();
+
+  // TODO: Iterator<Map.Entry<K, Set<V>>> groupByKeyIterator();
+
+  Iterator<Entry<K, V>> entryIterator();
+
+  /**
+   * Iterates over the raw internal structure. Optional operation.
+   *
+   * @return native iterator, if supported
+   * @throws UnsupportedOperationException, if not supported
+   */
+  default Iterator<Entry<K, Object>> nativeEntryIterator() throws UnsupportedOperationException {
+    throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
+  }
+
+  <T> Iterator<T> tupleIterator(final BiFunction<K, V, T> tupleOf);
 
   /*
    * Uses semantic of Set<Map.Entry<K, V>> instead of Map<K, Set<V>>.
@@ -55,61 +67,19 @@ public interface SetMultimap<K, V> {
 
   interface Immutable<K, V> extends SetMultimap<K, V> {
 
-    @Override
-    io.usethesource.capsule.api.deprecated.Set.Immutable<V> get(final Object o);
-
-    // Immutable<V> getEquivalent(final Object o, final Comparator<Object> cmp);
-
-    boolean containsKey(final Object o);
-
-    // boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp);
-
-    @Override
-    boolean containsValue(final Object o);
-
-    // boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp);
-
-    boolean containsEntry(final Object o0, final Object o1);
-
-    // boolean containsEntryEquivalent(final Object o0, final Object o1, final Comparator<Object>
-    // cmp);
-
     SetMultimap.Immutable<K, V> __put(final K key, final V val);
 
     // TODO: SetMultimap.Immutable<K, V> __insert(final K key, final Set<V> values);
 
     SetMultimap.Immutable<K, V> __insert(final K key, final V val);
 
-    // SetMultimap.Immutable<K, V> __insertEquivalent(final K key, final V val,
-    // final Comparator<Object> cmp);
-
-    SetMultimap.Immutable<K, V> __insertAll(final SetMultimap<? extends K, ? extends V> setMultimap);
-
-    // SetMultimap.Immutable<K, V> __insertAllEquivalent(
-    // final SetMultimap<? extends K, ? extends V> setMultimap, final Comparator<Object> cmp);
+    SetMultimap.Immutable<K, V> __insertAll(
+        final SetMultimap<? extends K, ? extends V> setMultimap);
 
     // removes all mappings with 'key'
     SetMultimap.Immutable<K, V> __remove(final K key);
 
-    // // removes all mappings with 'key'
-    // SetMultimap.Immutable<K, V> __removeEquivalent(final K key, final Comparator<Object> cmp);
-
     SetMultimap.Immutable<K, V> __removeEntry(final K key, final V val);
-
-    // SetMultimap.Immutable<K, V> __removeEntryEquivalent(final K key, final V val,
-    // final Comparator<Object> cmp);
-
-    Iterator<K> keyIterator();
-
-    Iterator<V> valueIterator();
-
-    // TODO: Iterator<Map.Entry<K, Set<V>>> groupByKeyIterator();
-
-    Iterator<Entry<K, V>> entryIterator();
-
-    Iterator<Entry<K, Object>> nativeEntryIterator();
-
-    <T> Iterator<T> tupleIterator(final BiFunction<K, V, T> tupleOf);
 
     boolean isTransientSupported();
 
@@ -119,54 +89,20 @@ public interface SetMultimap<K, V> {
 
   interface Transient<K, V> extends SetMultimap<K, V> {
 
-    @Override
-    io.usethesource.capsule.api.deprecated.Set.Immutable<V> get(final Object o);
-
-    // Immutable<V> getEquivalent(final Object o, final Comparator<Object> cmp);
-
-    boolean containsKey(final Object o);
-
-    // boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp);
-
-    @Override
-    boolean containsValue(final Object o);
-
-    // boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp);
-
-    boolean containsEntry(final Object o0, final Object o1);
-
-    // boolean containsEntryEquivalent(final Object o0, final Object o1, final Comparator<Object>
-    // cmp);
-
     default boolean __put(K key, io.usethesource.capsule.api.deprecated.Set.Immutable<V> valColl) {
       throw new UnsupportedOperationException("Not yet implemented @ Transient.");
     }
 
     boolean __insert(final K key, final V val);
 
-    // boolean __insertEquivalent(final K key, final V val, final Comparator<Object> cmp);
-
     boolean __insertAll(final SetMultimap<? extends K, ? extends V> setMultimap);
 
-    // boolean __insertAllEquivalent(final SetMultimap<? extends K, ? extends V> setMultimap,
-    // final Comparator<Object> cmp);
-
     boolean __removeTuple(final K key, final V val);
-
-    // boolean __removeTupleEquivalent(final K key, final V val, final Comparator<Object> cmp);
 
     // TODO: return Immutable<V> or boolean?
     default boolean __remove(K key) {
       throw new UnsupportedOperationException("Not yet implemented @ Transient.");
     }
-
-    Iterator<K> keyIterator();
-
-    Iterator<V> valueIterator();
-
-    Iterator<Entry<K, V>> entryIterator();
-
-    <T> Iterator<T> tupleIterator(final BiFunction<K, V, T> tupleOf);
 
     SetMultimap.Immutable<K, V> freeze();
 

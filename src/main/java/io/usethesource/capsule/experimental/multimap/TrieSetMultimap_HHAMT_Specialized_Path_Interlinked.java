@@ -297,26 +297,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
   }
 
   @Override
-  public V put(final K key, final V val) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void putAll(final SetMultimap<? extends K, ? extends V> m) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void clear() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public V remove(final Object key, final Object val) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public int size() {
     return cachedSize;
   }
@@ -392,7 +372,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
         @Override
         public void clear() {
-          TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.this.clear();
+          throw new UnsupportedOperationException();
         }
 
         @Override
@@ -428,7 +408,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
         @Override
         public void clear() {
-          TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.this.clear();
+          throw new UnsupportedOperationException();
         }
 
         @Override
@@ -481,7 +461,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
         @Override
         public void clear() {
-          TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.this.clear();
+          throw new UnsupportedOperationException();
         }
 
         @Override
@@ -3866,26 +3846,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
     }
 
     @Override
-    public V put(final K key, final V val) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void putAll(final SetMultimap<? extends K, ? extends V> m) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void clear() {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public V remove(final Object key, final Object val) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
     public boolean containsKey(final Object o) {
       try {
         @SuppressWarnings("unchecked")
@@ -4153,7 +4113,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
           @Override
           public void clear() {
-            TransientTrieSetMultimap_BleedingEdge.this.clear();
+            throw new UnsupportedOperationException();
           }
 
           @Override
@@ -4189,7 +4149,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
           @Override
           public void clear() {
-            TransientTrieSetMultimap_BleedingEdge.this.clear();
+            throw new UnsupportedOperationException();
           }
 
           @Override
@@ -4242,7 +4202,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
           @Override
           public void clear() {
-            TransientTrieSetMultimap_BleedingEdge.this.clear();
+            throw new UnsupportedOperationException();
           }
 
           @Override
