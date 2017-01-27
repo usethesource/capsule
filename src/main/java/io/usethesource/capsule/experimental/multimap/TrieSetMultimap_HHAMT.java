@@ -3154,7 +3154,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
 
             K nextKey = (K) payloadNode.getSlot(nextSlot++);
             // nextSlot += 1;
-            io.usethesource.capsule.api.deprecated.Set.Immutable<V> nextValueSet = (io.usethesource.capsule.api.deprecated.Set.Immutable<V>) payloadNode.getSlot(nextSlot);
+            io.usethesource.capsule.api.deprecated.Set.Immutable<V> nextValueSet = (io.usethesource.capsule.api.deprecated.Set.Immutable<V>) payloadNode.getSlot(nextSlot++);
             // nextSlot += 1;
 
             payloadCategoryOffset = nextSlot;
