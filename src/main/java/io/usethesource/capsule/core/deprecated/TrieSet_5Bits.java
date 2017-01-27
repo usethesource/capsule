@@ -40,7 +40,11 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
     this.cachedSize = size(rootNode);
   }
 
-  TrieSet_5Bits(AbstractSetNode<K> rootNode, int hashCode, int cachedSize) {
+  /*
+   * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
+   * `protected` when experiments are finished.
+   */
+  public /* protected */ TrieSet_5Bits(AbstractSetNode<K> rootNode, int hashCode, int cachedSize) {
     this.rootNode = rootNode;
     this.hashCode = hashCode;
     this.cachedSize = cachedSize;
@@ -1314,12 +1318,12 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
     }
 
     @Override
-    public int nodeMap() {
+    final int nodeMap() {
       return nodeMap;
     }
 
     @Override
-    public int dataMap() {
+    final int dataMap() {
       return dataMap;
     }
 
@@ -1925,12 +1929,12 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
     }
 
     @Override
-    int nodeMap() {
+    final int nodeMap() {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    int dataMap() {
+    final int dataMap() {
       throw new UnsupportedOperationException();
     }
 
