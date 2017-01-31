@@ -159,24 +159,24 @@ public final class RangecopyUtils {
   static {
     IS_COPY_MEMORY_SUPPORTED = isCopyMemorySupported();
 
-    if (IS_COPY_MEMORY_SUPPORTED) {
-      System.err.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
-          "isSunMiscUnsafeCopyMemorySupported", "true"));
-    } else {
-      System.err.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
-          "isSunMiscUnsafeCopyMemorySupported", "false"));
-    }
+//    if (IS_COPY_MEMORY_SUPPORTED) {
+//      System.err.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
+//          "isSunMiscUnsafeCopyMemorySupported", "true"));
+//    } else {
+//      System.err.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
+//          "isSunMiscUnsafeCopyMemorySupported", "false"));
+//    }
 
     USE_COPY_MEMORY = IS_COPY_MEMORY_SUPPORTED && !Boolean.getBoolean(
         String.format("%s.%s", RangecopyUtils.class.getName(), "dontUseSunMiscUnsafeCopyMemory"));
 
-    if (USE_COPY_MEMORY) {
-      System.err.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
-          "useSunMiscUnsafeCopyMemory", "true"));
-    } else {
-      System.err.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
-          "useSunMiscUnsafeCopyMemory", "false"));
-    }
+//    if (USE_COPY_MEMORY) {
+//      System.err.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
+//          "useSunMiscUnsafeCopyMemory", "true"));
+//    } else {
+//      System.err.println(String.format("%s.%s=%s", RangecopyUtils.class.getName(),
+//          "useSunMiscUnsafeCopyMemory", "false"));
+//    }
   }
 
   public static final long rangecopyPrimitiveRegion(Object src, long srcOffset, Object dst,
