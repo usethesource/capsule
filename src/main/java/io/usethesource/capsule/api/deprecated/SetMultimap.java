@@ -10,7 +10,11 @@ package io.usethesource.capsule.api.deprecated;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.BiFunction;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public interface SetMultimap<K, V> {
 
@@ -40,9 +44,9 @@ public interface SetMultimap<K, V> {
 
   Iterator<V> valueIterator();
 
-  // TODO: Iterator<Map.Entry<K, Set<V>>> groupByKeyIterator();
-
   Iterator<Entry<K, V>> entryIterator();
+
+  // TODO: Iterator<Map.Entry<K, Set<V>>> groupByKeyIterator();
 
   /**
    * Iterates over the raw internal structure. Optional operation.
@@ -54,7 +58,20 @@ public interface SetMultimap<K, V> {
     throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
   }
 
-  <T> Iterator<T> tupleIterator(final BiFunction<K, V, T> tupleOf);
+  <T> Iterator<T> tupleIterator(final BiFunction<K, V, T> dataConverter);
+
+  default <T> Stream<T> tupleStream(final BiFunction<K, V, T> dataConverter) {
+    final Iterator<T> iterator = tupleIterator(dataConverter);
+
+    /**
+     * TODO: differentiate characteristics between TRANSIENT and IMMUTABLE. For the latter case add
+     * {@link Spliterator.IMMUTABLE}.
+     */
+    final int characteristics = Spliterator.DISTINCT | Spliterator.SIZED;
+    final Spliterator<T> spliterator = Spliterators.spliterator(iterator, size(), characteristics);
+
+    return StreamSupport.stream(spliterator, false);
+  }
 
   /*
    * Uses semantic of Set<Map.Entry<K, V>> instead of Map<K, Set<V>>.
