@@ -7,16 +7,26 @@
  */
 package io.usethesource.capsule.experimental.multimap;
 
-import io.usethesource.capsule.api.SetMultimap;
-import io.usethesource.capsule.util.ArrayUtils;
-import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableSet;
-
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.AbstractCollection;
+import java.util.AbstractSet;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Deque;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
+
+import io.usethesource.capsule.api.SetMultimap;
+import io.usethesource.capsule.util.ArrayUtils;
+import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableSet;
 
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
@@ -170,7 +180,8 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
     }
   }
 
-  public io.usethesource.capsule.api.Set.Immutable<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Set.Immutable<V> getEquivalent(final Object o,
+      final Comparator<Object> cmp) {
     try {
       @SuppressWarnings("unchecked")
       final K key = (K) o;
@@ -217,7 +228,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
   }
 
   public SetMultimap.Immutable<K, V> __insertEquivalent(final K key, final V val,
-                                      final Comparator<Object> cmp) {
+      final Comparator<Object> cmp) {
     throw new UnsupportedOperationException();
   }
 
@@ -2311,7 +2322,8 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
       }
     }
 
-    public io.usethesource.capsule.api.Set.Immutable<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
+    public io.usethesource.capsule.api.Set.Immutable<V> getEquivalent(final Object o,
+        final Comparator<Object> cmp) {
       try {
         @SuppressWarnings("unchecked")
         final K key = (K) o;
@@ -2474,7 +2486,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
       return false;
     }
 
-    public V __removeEquivalent(final K key, final Comparator<Object> cmp) {
+    public boolean __removeEquivalent(final K key, final Comparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -2496,14 +2508,16 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
         if (DEBUG) {
           assert checkHashCodeAndSize(hashCode, cachedSize);
         }
-        return details.getReplacedValue();
+        // return details.getReplacedValue();
+        return true;
       }
 
       if (DEBUG) {
         assert checkHashCodeAndSize(hashCode, cachedSize);
       }
 
-      return null;
+      // return null;
+      return false;
     }
 
     @Override

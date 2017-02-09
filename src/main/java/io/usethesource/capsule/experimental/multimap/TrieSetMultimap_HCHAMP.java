@@ -7,17 +7,22 @@
  */
 package io.usethesource.capsule.experimental.multimap;
 
-import io.usethesource.capsule.api.SetMultimap;
-import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
-import io.usethesource.capsule.core.trie.ArrayView;
-import io.usethesource.capsule.core.trie.Node;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type;
-import io.usethesource.capsule.util.EqualityComparator;
-import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
-
-import java.util.*;
+import java.util.AbstractCollection;
+import java.util.AbstractSet;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -25,6 +30,14 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import io.usethesource.capsule.api.SetMultimap;
+import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
+import io.usethesource.capsule.core.trie.ArrayView;
+import io.usethesource.capsule.core.trie.Node;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type;
+import io.usethesource.capsule.util.EqualityComparator;
+import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
 
 import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setOf;
 import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type.COLLECTION;
@@ -98,7 +111,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
   public static final <K, V> SetMultimap.Transient<K, V> transientOf(
       EqualityComparator<Object> cmp) {
     // TODO: unify with `of()`
-    return (Transient<K, V>) of(cmp).asTransient();
+    return (SetMultimap.Transient<K, V>) of(cmp).asTransient();
   }
 
   @SuppressWarnings("unchecked")

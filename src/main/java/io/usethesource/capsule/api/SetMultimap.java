@@ -104,23 +104,15 @@ public interface SetMultimap<K, V> {
   @Override
   boolean equals(Object other);
 
-  interface Immutable<K, V> extends SetMultimap<K, V> {
+  interface Immutable<K, V> extends SetMultimap<K, V>, SetMultimapEq.Immutable<K, V> {
 
     SetMultimap.Immutable<K, V> __put(final K key, final V value);
-
-    default SetMultimap.Immutable<K, V> __put(final K key, final V... values) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-    }
 
     default SetMultimap.Immutable<K, V> __put(final K key, final Set.Immutable<V> values) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
     SetMultimap.Immutable<K, V> __insert(final K key, final V value);
-
-    default SetMultimap.Immutable<K, V> __insert(final K key, final V... values) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-    }
 
     default SetMultimap.Immutable<K, V> __insert(final K key, final Set.Immutable<V> values) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
@@ -130,10 +122,6 @@ public interface SetMultimap<K, V> {
     SetMultimap.Immutable<K, V> __remove(final K key);
 
     SetMultimap.Immutable<K, V> __remove(final K key, final V val);
-
-    default SetMultimap.Immutable<K, V> __remove(final K key, final V... values) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-    }
 
     default SetMultimap.Immutable<K, V> union(
         final SetMultimap<? extends K, ? extends V> setMultimap) {
@@ -159,13 +147,9 @@ public interface SetMultimap<K, V> {
   /*
    * TODO: consider return types for observability: i.e., either returning Immutable<V> or boolean?
    */
-  interface Transient<K, V> extends SetMultimap<K, V> {
+  interface Transient<K, V> extends SetMultimap<K, V>, SetMultimapEq.Transient<K, V> {
 
     default boolean __put(final K key, final V value) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-    }
-
-    default boolean __put(final K key, final V... values) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
@@ -174,10 +158,6 @@ public interface SetMultimap<K, V> {
     }
 
     boolean __insert(final K key, final V value);
-
-    default boolean __insert(final K key, final V... values) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-    }
 
     default boolean __insert(final K key, final Set.Immutable<V> values) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
@@ -188,10 +168,6 @@ public interface SetMultimap<K, V> {
     }
 
     boolean __remove(final K key, final V val);
-
-    default boolean __remove(final K key, final V... values) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-    }
 
     default boolean union(final SetMultimap<? extends K, ? extends V> setMultimap) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");

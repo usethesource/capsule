@@ -29,7 +29,7 @@ public interface SetEq<K> extends java.util.Set<K> {
   }
 
   @Deprecated
-  interface Immutable<K> extends Set<K> {
+  interface Immutable<K> extends SetEq<K> {
 
     default Set.Immutable<K> __insertEquivalent(final K key, final Comparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Set.");
@@ -57,7 +57,7 @@ public interface SetEq<K> extends java.util.Set<K> {
   }
 
   @Deprecated
-  interface Transient<K> extends Set<K> {
+  interface Transient<K> extends SetEq<K> {
 
     default boolean __insertEquivalent(final K key, final Comparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Set.");
