@@ -7,7 +7,7 @@
  */
 package io.usethesource.capsule.experimental.multimap;
 
-import io.usethesource.capsule.api.deprecated.*;
+import io.usethesource.capsule.api.SetMultimap;
 import io.usethesource.capsule.util.ArrayUtils;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableSet;
 
@@ -154,7 +154,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
   }
 
   @Override
-  public io.usethesource.capsule.api.deprecated.Set.Immutable<V> get(final Object o) {
+  public io.usethesource.capsule.api.Set.Immutable<V> get(final Object o) {
     try {
       @SuppressWarnings("unchecked")
       final K key = (K) o;
@@ -170,7 +170,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
     }
   }
 
-  public io.usethesource.capsule.api.deprecated.Set.Immutable<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Set.Immutable<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
       @SuppressWarnings("unchecked")
       final K key = (K) o;
@@ -2295,7 +2295,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
     }
 
     @Override
-    public io.usethesource.capsule.api.deprecated.Set.Immutable<V> get(final Object o) {
+    public io.usethesource.capsule.api.Set.Immutable<V> get(final Object o) {
       try {
         @SuppressWarnings("unchecked")
         final K key = (K) o;
@@ -2311,7 +2311,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
       }
     }
 
-    public io.usethesource.capsule.api.deprecated.Set.Immutable<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
+    public io.usethesource.capsule.api.Set.Immutable<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
       try {
         @SuppressWarnings("unchecked")
         final K key = (K) o;

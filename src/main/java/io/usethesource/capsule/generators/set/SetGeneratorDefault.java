@@ -8,7 +8,7 @@
 package io.usethesource.capsule.generators.set;
 
 import io.usethesource.capsule.DefaultTrieSet;
-import io.usethesource.capsule.api.deprecated.Set;
+import io.usethesource.capsule.api.Set;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class SetGeneratorDefault<T extends Set.Immutable> extends AbstractSetGenerator<T> {

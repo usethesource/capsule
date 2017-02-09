@@ -17,8 +17,8 @@ import com.pholser.junit.quickcheck.generator.GenerationStatus;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 
 import io.usethesource.capsule.DefaultTrieSetMultimap;
-import io.usethesource.capsule.api.deprecated.ImmutableSetMultimapAsImmutableSetView;
-import io.usethesource.capsule.api.deprecated.SetMultimap;
+import io.usethesource.capsule.api.ImmutableSetMultimapAsImmutableSetView;
+import io.usethesource.capsule.api.SetMultimap;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class SetGeneratorMultimapAsSetView<K, V>

@@ -19,7 +19,7 @@ import java.util.function.BiFunction;
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 @SuppressWarnings("rawtypes")
-public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.deprecated.Map.Immutable<K, V> {
+public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immutable<K, V> {
 
   @SuppressWarnings("unchecked")
   private static final TrieMap_5Bits EMPTY_MAP = new TrieMap_5Bits(CompactMapNode.EMPTY_NODE, 0, 0);
@@ -40,17 +40,17 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.deprecat
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> io.usethesource.capsule.api.deprecated.Map.Immutable<K, V> of() {
+  public static final <K, V> io.usethesource.capsule.api.Map.Immutable<K, V> of() {
     return TrieMap_5Bits.EMPTY_MAP;
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> io.usethesource.capsule.api.deprecated.Map.Immutable<K, V> of(Object... keyValuePairs) {
+  public static final <K, V> io.usethesource.capsule.api.Map.Immutable<K, V> of(Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
       throw new IllegalArgumentException("Length of argument list is uneven: no key/value pairs.");
     }
 
-    io.usethesource.capsule.api.deprecated.Map.Immutable<K, V> result = TrieMap_5Bits.EMPTY_MAP;
+    io.usethesource.capsule.api.Map.Immutable<K, V> result = TrieMap_5Bits.EMPTY_MAP;
 
     for (int i = 0; i < keyValuePairs.length; i += 2) {
       final K key = (K) keyValuePairs[i];
@@ -63,17 +63,17 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.deprecat
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> io.usethesource.capsule.api.deprecated.Map.Transient<K, V> transientOf() {
+  public static final <K, V> io.usethesource.capsule.api.Map.Transient<K, V> transientOf() {
     return TrieMap_5Bits.EMPTY_MAP.asTransient();
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> io.usethesource.capsule.api.deprecated.Map.Transient<K, V> transientOf(Object... keyValuePairs) {
+  public static final <K, V> io.usethesource.capsule.api.Map.Transient<K, V> transientOf(Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
       throw new IllegalArgumentException("Length of argument list is uneven: no key/value pairs.");
     }
 
-    final io.usethesource.capsule.api.deprecated.Map.Transient<K, V> result = TrieMap_5Bits.EMPTY_MAP.asTransient();
+    final io.usethesource.capsule.api.Map.Transient<K, V> result = TrieMap_5Bits.EMPTY_MAP.asTransient();
 
     for (int i = 0; i < keyValuePairs.length; i += 2) {
       final K key = (K) keyValuePairs[i];
@@ -182,7 +182,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.deprecat
   }
 
   @Override
-  public io.usethesource.capsule.api.deprecated.Map.Immutable<K, V> __put(final K key, final V val) {
+  public io.usethesource.capsule.api.Map.Immutable<K, V> __put(final K key, final V val) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -206,8 +206,8 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.deprecat
   }
 
   @Override
-  public io.usethesource.capsule.api.deprecated.Map.Immutable<K, V> __putEquivalent(final K key, final V val,
-                                                                                    final Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Map.Immutable<K, V> __putEquivalent(final K key, final V val,
+                                                                         final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -231,22 +231,22 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.deprecat
   }
 
   @Override
-  public io.usethesource.capsule.api.deprecated.Map.Immutable<K, V> __putAll(final Map<? extends K, ? extends V> map) {
-    final io.usethesource.capsule.api.deprecated.Map.Transient<K, V> tmpTransient = this.asTransient();
+  public io.usethesource.capsule.api.Map.Immutable<K, V> __putAll(final Map<? extends K, ? extends V> map) {
+    final io.usethesource.capsule.api.Map.Transient<K, V> tmpTransient = this.asTransient();
     tmpTransient.__putAll(map);
     return tmpTransient.freeze();
   }
 
   @Override
-  public io.usethesource.capsule.api.deprecated.Map.Immutable<K, V> __putAllEquivalent(final Map<? extends K, ? extends V> map,
-                                                                                       final Comparator<Object> cmp) {
-    final io.usethesource.capsule.api.deprecated.Map.Transient<K, V> tmpTransient = this.asTransient();
+  public io.usethesource.capsule.api.Map.Immutable<K, V> __putAllEquivalent(final Map<? extends K, ? extends V> map,
+                                                                            final Comparator<Object> cmp) {
+    final io.usethesource.capsule.api.Map.Transient<K, V> tmpTransient = this.asTransient();
     tmpTransient.__putAllEquivalent(map, cmp);
     return tmpTransient.freeze();
   }
 
   @Override
-  public io.usethesource.capsule.api.deprecated.Map.Immutable<K, V> __remove(final K key) {
+  public io.usethesource.capsule.api.Map.Immutable<K, V> __remove(final K key) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -263,7 +263,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.deprecat
   }
 
   @Override
-  public io.usethesource.capsule.api.deprecated.Map.Immutable<K, V> __removeEquivalent(final K key, final Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Map.Immutable<K, V> __removeEquivalent(final K key, final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -526,7 +526,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.deprecat
   }
 
   @Override
-  public io.usethesource.capsule.api.deprecated.Map.Transient<K, V> asTransient() {
+  public io.usethesource.capsule.api.Map.Transient<K, V> asTransient() {
     return new TransientTrieMap_5Bits<K, V>(this);
   }
 
@@ -2228,7 +2228,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.deprecat
     }
   }
 
-  static final class TransientTrieMap_5Bits<K, V> implements io.usethesource.capsule.api.deprecated.Map.Transient<K, V> {
+  static final class TransientTrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Transient<K, V> {
     final private AtomicReference<Thread> mutator;
     private AbstractMapNode<K, V> rootNode;
     private int hashCode;
@@ -2825,7 +2825,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.deprecat
     }
 
     @Override
-    public io.usethesource.capsule.api.deprecated.Map.Immutable<K, V> freeze() {
+    public io.usethesource.capsule.api.Map.Immutable<K, V> freeze() {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }

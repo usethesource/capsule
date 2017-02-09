@@ -7,7 +7,7 @@
  */
 package io.usethesource.capsule;
 
-import io.usethesource.capsule.api.deprecated.SetMultimap;
+import io.usethesource.capsule.api.SetMultimap;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP;
 import io.usethesource.capsule.util.EqualityComparator;
 

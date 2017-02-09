@@ -7,7 +7,7 @@
  */
 package io.usethesource.capsule.core;
 
-import io.usethesource.capsule.api.Set;
+import io.usethesource.capsule.api.experimental.Set;
 import io.usethesource.capsule.util.ArrayUtils;
 
 import java.text.DecimalFormat;
@@ -225,8 +225,8 @@ public class TrieSet<K> implements Set.Immutable<K> {
       }
 
       return rootNode.equals(that.rootNode);
-    } else if (other instanceof io.usethesource.capsule.api.Set) {
-      io.usethesource.capsule.api.Set that = (io.usethesource.capsule.api.Set) other;
+    } else if (other instanceof Set) {
+      Set that = (Set) other;
 
       if (this.size() != that.size())
         return false;

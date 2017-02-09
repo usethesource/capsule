@@ -7,94 +7,58 @@
  */
 package io.usethesource.capsule.api;
 
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.Optional;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.function.Function;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
-public interface Set<K> extends Iterable<K>, Function<K, Optional<K>> {
+public interface Set<K> extends java.util.Set<K>, SetEq<K> {
 
-  long size();
+  @Override
+  int size();
 
+  @Override
   boolean isEmpty();
 
-  boolean contains(final Object o);
+  @Override
+  boolean containsAll(Collection<?> c);
 
-  default boolean containsAll(final Set<?> set) {
-    for (Object item : set) {
-      if (!contains(item)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  // K get(final Object o);
+  K get(Object o);
 
   @Override
-  Iterator<K> iterator();
+  boolean contains(Object o);
 
-  /**
-   * The hash code of a set is order independent by combining the hashes of the elements via a
-   * bitwise XOR operation.
-   * 
-   * @return XOR reduction of all hashes of elements
-   */
-  @Override
-  int hashCode();
+  Iterator<K> keyIterator();
 
-  @Override
-  boolean equals(Object other);
+  interface Immutable<K> extends Set<K>, SetEq.Immutable<K> {
 
-  default Spliterator<K> spliterator() {
-    return Spliterators.spliterator(iterator(), size(), 0);
-  }
+    Set.Immutable<K> __insert(final K key);
 
-  default Stream<K> stream() {
-    return StreamSupport.stream(spliterator(), false);
-  }
+    Set.Immutable<K> __remove(final K key);
 
-  default Stream<K> parallelStream() {
-    return StreamSupport.stream(spliterator(), true);
-  }
+    Set.Immutable<K> __insertAll(final java.util.Set<? extends K> set);
 
-  Set.Immutable<K> asImmutable();
+    Set.Immutable<K> __removeAll(final java.util.Set<? extends K> set);
 
-  interface Immutable<K> extends Set<K> {
-
-    Set.Immutable<K> insert(final K key);
-
-    Set.Immutable<K> remove(final K key);
-
-    Set.Immutable<K> insertAll(final Set<? extends K> set);
-
-    Set.Immutable<K> removeAll(final Set<? extends K> set);
-
-    Set.Immutable<K> retainAll(final Set<? extends K> set);
+    Set.Immutable<K> __retainAll(final java.util.Set<? extends K> set);
 
     boolean isTransientSupported();
 
     Set.Transient<K> asTransient();
 
-    java.util.Set<K> asJdkCollection();
-
   }
 
-  interface Transient<K> extends Set<K> {
+  interface Transient<K> extends Set<K>, SetEq.Transient<K> {
 
-    boolean insert(final K key);
+    boolean __insert(final K key);
 
-    boolean remove(final K key);
+    boolean __remove(final K key);
 
-    boolean insertAll(final Set<? extends K> set);
+    boolean __insertAll(final java.util.Set<? extends K> set);
 
-    boolean removeAll(final Set<? extends K> set);
+    boolean __removeAll(final java.util.Set<? extends K> set);
 
-    boolean retainAll(final Set<? extends K> set);
+    boolean __retainAll(final java.util.Set<? extends K> set);
+
+    Set.Immutable<K> freeze();
 
   }
-
 }

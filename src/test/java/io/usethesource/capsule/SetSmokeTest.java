@@ -79,7 +79,7 @@ public class SetSmokeTest {
     input.put(7, 7);
     input.put(8, 7);
 
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> set = TrieSet_5Bits.of();
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> set = TrieSet_5Bits.of();
 
     for (Entry<Integer, Integer> entry : input.entrySet()) {
       set = set.__insert(new DummyValue(entry.getKey(), entry.getValue()));
@@ -102,7 +102,7 @@ public class SetSmokeTest {
     input.put(6, 5);
     input.put(7, 7);
 
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> set = TrieSet_5Bits.of();
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> set = TrieSet_5Bits.of();
 
     for (Entry<Integer, Integer> entry : input.entrySet()) {
       set = set.__insert(new DummyValue(entry.getKey(), entry.getValue()));
@@ -125,7 +125,7 @@ public class SetSmokeTest {
     input.put(6, 5);
     input.put(7, 7);
 
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> set = TrieSet_5Bits.of();
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> set = TrieSet_5Bits.of();
 
     for (Entry<Integer, Integer> entry : input.entrySet()) {
       set = set.__insert(new DummyValue(entry.getKey(), entry.getValue()));
@@ -203,7 +203,7 @@ public class SetSmokeTest {
     todo.add(hash_n2147483648_obj1);
     todo.add(hash_p1073741824_obj2);
 
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> xs = TrieSet_5Bits.of(hash_n2147483648_obj1, hash_p1073741824_obj2);
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> xs = TrieSet_5Bits.of(hash_n2147483648_obj1, hash_p1073741824_obj2);
 
     for (DummyValue x : xs) {
       todo.remove(x);
@@ -217,8 +217,8 @@ public class SetSmokeTest {
     DummyValue hash98304_obj1 = new DummyValue(1, 98304);
     DummyValue hash98304_obj2 = new DummyValue(2, 98304);
 
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> xs = TrieSet_5Bits.of(hash98304_obj1, hash98304_obj2);
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash98304_obj2, hash98304_obj1);
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> xs = TrieSet_5Bits.of(hash98304_obj1, hash98304_obj2);
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash98304_obj2, hash98304_obj1);
 
     assertEquals(xs, ys);
   }
@@ -229,8 +229,8 @@ public class SetSmokeTest {
     DummyValue hash98304_obj2 = new DummyValue(2, 98304);
     DummyValue hash98304_obj3 = new DummyValue(3, 98304);
 
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> xs = TrieSet_5Bits.of(hash98304_obj1, hash98304_obj2, hash98304_obj3);
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash98304_obj3, hash98304_obj2, hash98304_obj1);
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> xs = TrieSet_5Bits.of(hash98304_obj1, hash98304_obj2, hash98304_obj3);
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash98304_obj3, hash98304_obj2, hash98304_obj1);
 
     assertEquals(xs, ys);
   }
@@ -240,8 +240,8 @@ public class SetSmokeTest {
     DummyValue hash98304_obj1 = new DummyValue(1, 98304);
     DummyValue hash98304_obj2 = new DummyValue(2, 98304);
 
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> xs = TrieSet_5Bits.of(hash98304_obj1);
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> ys =
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> xs = TrieSet_5Bits.of(hash98304_obj1);
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> ys =
         TrieSet_5Bits.of(hash98304_obj1, hash98304_obj2).__remove(hash98304_obj2);
 
     assertEquals(xs, ys);
@@ -256,7 +256,7 @@ public class SetSmokeTest {
     todo.add(hash98304_obj1);
     todo.add(hash98304_obj2);
 
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> xs = TrieSet_5Bits.of(hash98304_obj1, hash98304_obj2);
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> xs = TrieSet_5Bits.of(hash98304_obj1, hash98304_obj2);
 
     for (DummyValue x : xs) {
       todo.remove(x);
@@ -272,9 +272,9 @@ public class SetSmokeTest {
 
     DummyValue hash268435456_obj3 = new DummyValue(3, 268435456);
 
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> xs = TrieSet_5Bits
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> xs = TrieSet_5Bits
         .of(hash98304_obj1, hash98304_obj2, hash268435456_obj3).__remove(hash268435456_obj3);
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash98304_obj1, hash98304_obj2);
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash98304_obj1, hash98304_obj2);
 
     assertEquals(xs, ys);
   }
@@ -286,9 +286,9 @@ public class SetSmokeTest {
 
     DummyValue hash268435456_obj3 = new DummyValue(3, 268435456);
 
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> xs =
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> xs =
         TrieSet_5Bits.of(hash8_obj1, hash8_obj2, hash268435456_obj3).__remove(hash268435456_obj3);
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash8_obj1, hash8_obj2);
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash8_obj1, hash8_obj2);
 
     assertEquals(xs, ys);
   }
@@ -300,9 +300,9 @@ public class SetSmokeTest {
 
     DummyValue hash268435456_obj3 = new DummyValue(3, 268435456);
 
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> xs = TrieSet_5Bits
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> xs = TrieSet_5Bits
         .of(hash98304_obj1, hash268435456_obj3, hash98304_obj2).__remove(hash268435456_obj3);
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash98304_obj1, hash98304_obj2);
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash98304_obj1, hash98304_obj2);
 
     assertEquals(xs, ys);
   }
@@ -314,9 +314,9 @@ public class SetSmokeTest {
 
     DummyValue hash268435456_obj3 = new DummyValue(3, 268435456);
 
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> xs =
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> xs =
         TrieSet_5Bits.of(hash8_obj1, hash268435456_obj3, hash8_obj2).__remove(hash268435456_obj3);
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash8_obj1, hash8_obj2);
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash8_obj1, hash8_obj2);
 
     assertEquals(xs, ys);
   }
@@ -328,9 +328,9 @@ public class SetSmokeTest {
 
     DummyValue hash268435456_obj3 = new DummyValue(3, 268435456);
 
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> xs = TrieSet_5Bits
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> xs = TrieSet_5Bits
         .of(hash98304_obj1, hash98304_obj2, hash268435456_obj3).__remove(hash98304_obj2);
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash98304_obj1, hash268435456_obj3);
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash98304_obj1, hash268435456_obj3);
 
     assertEquals(xs, ys);
   }
@@ -342,9 +342,9 @@ public class SetSmokeTest {
 
     DummyValue hash268435456_obj3 = new DummyValue(3, 268435456);
 
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> xs = TrieSet_5Bits
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> xs = TrieSet_5Bits
         .of(hash98304_obj1, hash268435456_obj3, hash98304_obj2).__remove(hash98304_obj2);
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash98304_obj1, hash268435456_obj3);
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash98304_obj1, hash268435456_obj3);
 
     assertEquals(xs, ys);
   }
@@ -356,9 +356,9 @@ public class SetSmokeTest {
 
     DummyValue hash8_obj3 = new DummyValue(3, 8);
 
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> xs =
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> xs =
         TrieSet_5Bits.of(hash98304_obj1, hash98304_obj2, hash8_obj3).__remove(hash8_obj3);
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash98304_obj1, hash98304_obj2);
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash98304_obj1, hash98304_obj2);
 
     assertEquals(xs, ys);
   }
@@ -370,9 +370,9 @@ public class SetSmokeTest {
 
     DummyValue hash8_obj3 = new DummyValue(3, 8);
 
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> xs =
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> xs =
         TrieSet_5Bits.of(hash98304_obj1, hash8_obj3, hash98304_obj2).__remove(hash8_obj3);
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash98304_obj1, hash98304_obj2);
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash98304_obj1, hash98304_obj2);
 
     assertEquals(xs, ys);
   }
@@ -384,9 +384,9 @@ public class SetSmokeTest {
 
     DummyValue hash8_obj3 = new DummyValue(3, 8);
 
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> xs =
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> xs =
         TrieSet_5Bits.of(hash98304_obj1, hash98304_obj2, hash8_obj3).__remove(hash98304_obj2);
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash98304_obj1, hash8_obj3);
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash98304_obj1, hash8_obj3);
 
     assertEquals(xs, ys);
   }
@@ -398,9 +398,9 @@ public class SetSmokeTest {
 
     DummyValue hash8_obj3 = new DummyValue(3, 8);
 
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> xs =
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> xs =
         TrieSet_5Bits.of(hash98304_obj1, hash8_obj3, hash98304_obj2).__remove(hash98304_obj2);
-    io.usethesource.capsule.api.deprecated.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash98304_obj1, hash8_obj3);
+    io.usethesource.capsule.api.Set.Immutable<DummyValue> ys = TrieSet_5Bits.of(hash98304_obj1, hash8_obj3);
 
     assertEquals(xs, ys);
   }

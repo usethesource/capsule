@@ -10,7 +10,7 @@ package io.usethesource.capsule;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import io.usethesource.capsule.api.deprecated.Set;
+import io.usethesource.capsule.api.Set;
 import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
 
 public class DefaultTrieSet {

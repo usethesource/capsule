@@ -9,7 +9,7 @@ package io.usethesource.capsule.util.stream;
 
 import io.usethesource.capsule.DefaultTrieSet;
 import io.usethesource.capsule.DefaultTrieSetMultimap;
-import io.usethesource.capsule.api.deprecated.*;
+import io.usethesource.capsule.api.SetMultimap;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -24,12 +24,12 @@ public class CapsuleCollectors {
   public static final Set<Collector.Characteristics> UNORDERED =
       Collections.unmodifiableSet(EnumSet.of(Collector.Characteristics.UNORDERED));
 
-  public static <T> Collector<T, ?, io.usethesource.capsule.api.deprecated.Set.Immutable<T>> toSet() {
-    return new DefaultCollector<>((Supplier<io.usethesource.capsule.api.deprecated.Set.Transient<T>>) DefaultTrieSet::transientOf,
-        io.usethesource.capsule.api.deprecated.Set.Transient::__insert, (left, right) -> {
+  public static <T> Collector<T, ?, io.usethesource.capsule.api.Set.Immutable<T>> toSet() {
+    return new DefaultCollector<>((Supplier<io.usethesource.capsule.api.Set.Transient<T>>) DefaultTrieSet::transientOf,
+        io.usethesource.capsule.api.Set.Transient::__insert, (left, right) -> {
           left.__insertAll(right);
           return left;
-        }, io.usethesource.capsule.api.deprecated.Set.Transient::freeze, UNORDERED);
+        }, io.usethesource.capsule.api.Set.Transient::freeze, UNORDERED);
   }
 
   public static <T, K, V> Collector<T, ?, SetMultimap.Immutable<K, V>> toSetMultimap(

@@ -7,7 +7,7 @@
  */
 package io.usethesource.capsule.core.converter;
 
-import io.usethesource.capsule.api.Set;
+import io.usethesource.capsule.api.experimental.Set;
 import io.usethesource.capsule.util.collection.AbstractImmutableSet;
 
 import java.util.Collection;
@@ -16,7 +16,7 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public class SetToLegacySetConverter<K> extends AbstractImmutableSet<K> implements io.usethesource.capsule.api.deprecated.Set.Immutable<K> {
+public class SetToLegacySetConverter<K> extends AbstractImmutableSet<K> implements io.usethesource.capsule.api.Set.Immutable<K> {
 
   private final Set.Immutable<K> immutableSet;
 
@@ -24,7 +24,7 @@ public class SetToLegacySetConverter<K> extends AbstractImmutableSet<K> implemen
     this.immutableSet = immutableSet;
   }
 
-  public static final <K> io.usethesource.capsule.api.deprecated.Set.Immutable<K> adapt(final Set.Immutable<K> immutableSet) {
+  public static final <K> io.usethesource.capsule.api.Set.Immutable<K> adapt(final Set.Immutable<K> immutableSet) {
     return new SetToLegacySetConverter<K>(immutableSet);
   }
 
@@ -44,31 +44,31 @@ public class SetToLegacySetConverter<K> extends AbstractImmutableSet<K> implemen
   }
 
   @Override
-  public io.usethesource.capsule.api.deprecated.Set.Immutable<K> __insert(K key) {
+  public io.usethesource.capsule.api.Set.Immutable<K> __insert(K key) {
     return adapt(immutableSet.insert(key));
   }
 
   @Override
-  public io.usethesource.capsule.api.deprecated.Set.Immutable<K> __insertAll(java.util.Set<? extends K> set) {
+  public io.usethesource.capsule.api.Set.Immutable<K> __insertAll(java.util.Set<? extends K> set) {
     final Set.Transient<K> tmp = immutableSet.asTransient();
     set.forEach(tmp::insert);
     return adapt(tmp.asImmutable());
   }
 
   @Override
-  public io.usethesource.capsule.api.deprecated.Set.Immutable<K> __remove(K key) {
+  public io.usethesource.capsule.api.Set.Immutable<K> __remove(K key) {
     return adapt(immutableSet.remove(key));
   }
 
   @Override
-  public io.usethesource.capsule.api.deprecated.Set.Immutable<K> __removeAll(java.util.Set<? extends K> set) {
+  public io.usethesource.capsule.api.Set.Immutable<K> __removeAll(java.util.Set<? extends K> set) {
     final Set.Transient<K> tmp = immutableSet.asTransient();
     set.forEach(tmp::remove);
     return adapt(tmp.asImmutable());
   }
 
   @Override
-  public io.usethesource.capsule.api.deprecated.Set.Immutable<K> __retainAll(java.util.Set<? extends K> set) {
+  public io.usethesource.capsule.api.Set.Immutable<K> __retainAll(java.util.Set<? extends K> set) {
     throw new UnsupportedOperationException("Not yet implemented.");
   }
 
@@ -83,7 +83,7 @@ public class SetToLegacySetConverter<K> extends AbstractImmutableSet<K> implemen
   }
 
   @Override
-  public io.usethesource.capsule.api.deprecated.Set.Transient<K> asTransient() {
+  public io.usethesource.capsule.api.Set.Transient<K> asTransient() {
     return null;
   }
 

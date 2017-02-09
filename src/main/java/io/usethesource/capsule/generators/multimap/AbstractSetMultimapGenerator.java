@@ -19,7 +19,7 @@ import com.pholser.junit.quickcheck.generator.GenerationStatus;
 import com.pholser.junit.quickcheck.generator.Size;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 
-import io.usethesource.capsule.api.deprecated.SetMultimap;
+import io.usethesource.capsule.api.SetMultimap;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class AbstractSetMultimapGenerator<T extends SetMultimap.Immutable>

@@ -10,7 +10,7 @@ package io.usethesource.capsule;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import io.usethesource.capsule.api.deprecated.Map;
+import io.usethesource.capsule.api.Map;
 
 public class MapFactory {
 

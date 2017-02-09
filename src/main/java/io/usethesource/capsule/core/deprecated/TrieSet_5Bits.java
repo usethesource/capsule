@@ -7,7 +7,7 @@
  */
 package io.usethesource.capsule.core.deprecated;
 
-import io.usethesource.capsule.api.deprecated.Set;
+import io.usethesource.capsule.api.Set;
 import io.usethesource.capsule.core.trie.ArrayView;
 import io.usethesource.capsule.core.trie.Node;
 import io.usethesource.capsule.util.ArrayUtils;

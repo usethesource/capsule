@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.usethesource.capsule.SupplierIterator;
-import io.usethesource.capsule.api.Map;
+import io.usethesource.capsule.api.experimental.Map;
 import io.usethesource.capsule.util.ArrayUtils;
 
 /*

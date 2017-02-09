@@ -9,7 +9,7 @@ package io.usethesource.capsule;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.generator.Size;
-import io.usethesource.capsule.api.deprecated.SetMultimap;
+import io.usethesource.capsule.api.SetMultimap;
 
 import java.util.HashSet;
 import java.util.Map;

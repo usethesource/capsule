@@ -14,7 +14,7 @@ import org.junit.runners.Suite;
 
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 
-import io.usethesource.capsule.api.deprecated.ImmutableSetMultimapAsImmutableSetView;
+import io.usethesource.capsule.api.ImmutableSetMultimapAsImmutableSetView;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses(SetMultimapAsSetViewPropertiesTest.PropertiesTest.class)

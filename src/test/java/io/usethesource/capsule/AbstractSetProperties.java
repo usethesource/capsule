@@ -14,7 +14,7 @@ import java.util.HashSet;
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.generator.Size;
 
-import io.usethesource.capsule.api.deprecated.Set;
+import io.usethesource.capsule.api.Set;
 
 public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 

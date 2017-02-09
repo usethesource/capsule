@@ -18,7 +18,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import io.usethesource.capsule.SupplierIterator;
-import io.usethesource.capsule.api.Map;
+import io.usethesource.capsule.api.experimental.Map;
 
 /**
  * Immutable insertion-ordered map implemented as a hash trie.
@@ -1684,13 +1684,13 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
   }
 
   @Override
-  public io.usethesource.capsule.api.Map.Immutable<K, V> insertAll(Map<? extends K, ? extends V> map) {
+  public Map.Immutable<K, V> insertAll(Map<? extends K, ? extends V> map) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public io.usethesource.capsule.api.Map.Immutable<K, V> asImmutable() {
+  public Map.Immutable<K, V> asImmutable() {
     return this;
   }
 
@@ -1700,7 +1700,7 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
   }
 
   @Override
-  public io.usethesource.capsule.api.Map.Transient<K, V> asTransient() {
+  public Map.Transient<K, V> asTransient() {
     throw new UnsupportedOperationException("Transient is not supported.");
   }
 

@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Deprecated
 public abstract class AbstractImmutableMap<K, V> extends AbstractMap<K, V>
-    implements io.usethesource.capsule.api.deprecated.Map.Immutable<K, V> {
+    implements io.usethesource.capsule.api.Map.Immutable<K, V> {
 
   @Override
   public V remove(Object key) {

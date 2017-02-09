@@ -7,82 +7,48 @@
  */
 package io.usethesource.capsule.api;
 
-import io.usethesource.capsule.SupplierIterator;
-
 import java.util.Iterator;
-import java.util.Optional;
-import java.util.function.Function;
 
-public interface Map<K, V> extends Iterable<K>, Function<K, Optional<V>> {
+public interface Map<K, V> extends java.util.Map<K, V>, MapEq<K, V> {
 
-  long size();
+  @Override
+  V get(final Object o);
 
-  boolean isEmpty();
+  @Override
+  boolean containsKey(final Object o);
 
-  boolean contains(final Object o);
-
+  @Override
   boolean containsValue(final Object o);
 
-  // default boolean containsAll(final Set<K> set) {
-  // for (K item : set) {
-  // if (!contains(item)) {
-  // return false;
-  // }
-  // }
-  // return true;
-  //
-  // }
+  Iterator<K> keyIterator();
 
-  // K get(final Object o);
+  Iterator<V> valueIterator();
 
-  @Override
-  SupplierIterator<K, V> iterator();
+  Iterator<Entry<K, V>> entryIterator();
 
-  // Iterator<V> valueIterator();
+  interface Immutable<K, V> extends Map<K, V>, MapEq.Immutable<K, V> {
 
-  // @Deprecated // TODO: replace with SupplierIterator interface
-  Iterator<java.util.Map.Entry<K, V>> entryIterator();
+    Map.Immutable<K, V> __put(final K key, final V val);
 
-  // @Deprecated // TODO: replace with SupplierIterator interface
-  // Set<java.util.Map.Entry<K, V>> entrySet();
+    Map.Immutable<K, V> __remove(final K key);
 
-  /**
-   * The hash code of a map is order independent by combining the hashes of the elements (both keys
-   * and values) via a bitwise XOR operation.
-   *
-   * @return XOR reduction of all hashes of elements
-   */
-  @Override
-  int hashCode();
-
-  @Override
-  boolean equals(Object other);
-
-  Map.Immutable<K, V> asImmutable();
-
-  interface Immutable<K, V> extends Map<K, V> {
-
-    Map.Immutable<K, V> insert(final K key, final V val);
-
-    Map.Immutable<K, V> remove(final K key);
-
-    Map.Immutable<K, V> insertAll(final Map<? extends K, ? extends V> map);
+    Map.Immutable<K, V> __putAll(final java.util.Map<? extends K, ? extends V> map);
 
     boolean isTransientSupported();
 
     Map.Transient<K, V> asTransient();
 
-    java.util.Map<K, V> asJdkCollection();
   }
 
-  interface Transient<K, V> extends Map<K, V> {
+  interface Transient<K, V> extends Map<K, V>, MapEq.Transient<K, V> {
 
-    V insert(final K key, final V val);
+    V __put(final K key, final V val);
 
-    V remove(final K key);
+    V __remove(final K key);
 
-    boolean insertAll(final Map<? extends K, ? extends V> map);
+    boolean __putAll(final java.util.Map<? extends K, ? extends V> map);
+
+    Map.Immutable<K, V> freeze();
 
   }
-
 }
