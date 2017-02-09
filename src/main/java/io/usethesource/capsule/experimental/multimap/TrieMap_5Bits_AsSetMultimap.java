@@ -222,14 +222,14 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
   }
 
   @Override
-  public SetMultimap.Immutable<K, V> __insertAll(final SetMultimap<? extends K, ? extends V> map) {
+  public SetMultimap.Immutable<K, V> union(final SetMultimap<? extends K, ? extends V> map) {
     final SetMultimap.Transient<K, V> tmpTransient = this.asTransient();
-    tmpTransient.__insertAll(map);
+    tmpTransient.union(map);
     return tmpTransient.freeze();
   }
 
   @Override
-  public SetMultimap.Immutable<K, V> __removeEntry(K key, V val) {
+  public SetMultimap.Immutable<K, V> __remove(K key, V val) {
     return __remove(key); // NOTE performs remove all (unchecked of val)
   }
 
@@ -2231,7 +2231,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
     }
 
     @Override
-    public boolean __removeTuple(K key, V val) {
+    public boolean __remove(K key, V val) {
       throw new UnsupportedOperationException();
     }
 
@@ -2418,7 +2418,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
     }
 
     @Override
-    public boolean __insertAll(final SetMultimap<? extends K, ? extends V> map) {
+    public boolean union(final SetMultimap<? extends K, ? extends V> map) {
       boolean modified = false;
 
       for (Map.Entry<? extends K, ? extends V> entry : map.entrySet()) {

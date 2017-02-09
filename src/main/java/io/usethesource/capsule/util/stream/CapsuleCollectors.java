@@ -42,7 +42,7 @@ public class CapsuleCollectors {
     return new DefaultCollector<>(
         (Supplier<SetMultimap.Transient<K, V>>) DefaultTrieSetMultimap::transientOf, accumulator,
         (left, right) -> {
-          left.__insertAll(right);
+          left.union(right);
           return left;
         }, SetMultimap.Transient::freeze, UNORDERED);
   }

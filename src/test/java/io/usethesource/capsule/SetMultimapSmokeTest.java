@@ -32,7 +32,7 @@ public class SetMultimapSmokeTest {
   @Test
   public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyX() {
     SetMultimap.Immutable<Integer, String> map = TrieSetMultimap_HHAMT_Specialized_Path_Interlinked
-        .<Integer, String>of().__insert(1, "x").__insert(1, "y").__removeEntry(1, "x");
+        .<Integer, String>of().__insert(1, "x").__insert(1, "y").__remove(1, "x");
 
     assertEquals(1, map.size());
     assertTrue(map.containsKey(1));
@@ -41,7 +41,7 @@ public class SetMultimapSmokeTest {
   @Test
   public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyY() {
     SetMultimap.Immutable<Integer, String> map = TrieSetMultimap_HHAMT_Specialized_Path_Interlinked
-        .<Integer, String>of().__insert(1, "x").__insert(1, "y").__removeEntry(1, "y");
+        .<Integer, String>of().__insert(1, "x").__insert(1, "y").__remove(1, "y");
 
     assertEquals(1, map.size());
     assertTrue(map.containsKey(1));
@@ -51,7 +51,7 @@ public class SetMultimapSmokeTest {
   public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyXY() {
     SetMultimap.Immutable<Integer, String> map =
         TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.<Integer, String>of().__insert(1, "x").__insert(1, "y")
-            .__removeEntry(1, "x").__removeEntry(1, "y");
+            .__remove(1, "x").__remove(1, "y");
 
     assertEquals(0, map.size());
     assertFalse(map.containsKey(1));

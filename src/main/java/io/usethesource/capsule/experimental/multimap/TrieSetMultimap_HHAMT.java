@@ -223,15 +223,15 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
   }
 
   @Override
-  public SetMultimap.Immutable<K, V> __insertAll(
+  public SetMultimap.Immutable<K, V> union(
       final SetMultimap<? extends K, ? extends V> setMultimap) {
     final SetMultimap.Transient<K, V> tmpTransient = this.asTransient();
-    tmpTransient.__insertAll(setMultimap);
+    tmpTransient.union(setMultimap);
     return tmpTransient.freeze();
   }
 
   @Override
-  public SetMultimap.Immutable<K, V> __removeEntry(final K key, final V val) {
+  public SetMultimap.Immutable<K, V> __remove(final K key, final V val) {
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
@@ -3668,7 +3668,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
     }
 
     @Override
-    public boolean __insertAll(final SetMultimap<? extends K, ? extends V> setMultimap) {
+    public boolean union(final SetMultimap<? extends K, ? extends V> setMultimap) {
       boolean modified = false;
 
       for (Map.Entry<? extends K, ? extends V> entry : setMultimap.entrySet()) {
@@ -3679,7 +3679,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
     }
 
     @Override
-    public boolean __removeTuple(final K key, final V val) {
+    public boolean __remove(final K key, final V val) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -3817,7 +3817,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
       @Override
       public void remove() {
         // TODO: test removal at iteration rigorously
-        collection.__removeTuple(currentKey, currentValue);
+        collection.__remove(currentKey, currentValue);
       }
     }
 

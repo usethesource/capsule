@@ -64,13 +64,13 @@ public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap
 //    Integer value = sourceOfRandomness.choose(values);
 //    SetMultimap.Immutable<Integer, Integer> multimap = toMultimap(key, values);
 //
-//    if (multimap.__removeEntry(key, value).size() + 1 == multimap.size()) {
+//    if (multimap.__remove(key, value).size() + 1 == multimap.size()) {
 //      // succeed
-//      multimap = multimap.__removeEntry(key, value);
+//      multimap = multimap.__remove(key, value);
 //    } else {
 //      // fail
 //      assertTrue(multimap.containsEntry(key, value));
-//      multimap = multimap.__removeEntry(key, value);
+//      multimap = multimap.__remove(key, value);
 //    }
 //
 //    // assertEquals(values.size() - 1, multimap.size());
@@ -135,7 +135,7 @@ public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap
   @Property(trials = DEFAULT_TRIALS)
   public void notContainedAfterInsertRemove(CT input, K item0, V item1) {
     assertFalse(
-        input.__insert(item0, item1).__removeEntry(item0, item1).containsEntry(item0, item1));
+        input.__insert(item0, item1).__remove(item0, item1).containsEntry(item0, item1));
   }
 
   @Property(trials = DEFAULT_TRIALS)

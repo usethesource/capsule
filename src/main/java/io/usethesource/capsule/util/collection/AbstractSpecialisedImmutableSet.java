@@ -59,7 +59,7 @@ public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutab
       return (io.usethesource.capsule.api.Set.Immutable<K>) set;
     } else {
       final io.usethesource.capsule.api.Set.Transient<K> tmp = DefaultTrieSet.transientOf();
-      // TODO check interface definition of Immutable.__insertAll()
+      // TODO check interface definition of Immutable.union()
       for (K item : set) {
         tmp.__insert(item);
       }
