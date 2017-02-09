@@ -18,20 +18,11 @@ import java.util.stream.StreamSupport;
 
 public interface SetMultimap<K, V> {
 
-  Set.Immutable<V> get(final java.lang.Object o);
-
-  boolean containsKey(final Object o);
-
-  boolean containsValue(final Object o);
-
-  boolean containsEntry(final Object o0, final Object o1);
-
-  java.util.Set<K> keySet();
-
-  java.util.Collection<V> values();
-
-  java.util.Set<Map.Entry<K, V>> entrySet();
-
+  /**
+   * Return the number of key-value pairs contained in this multimap.
+   *
+   * @return number of key-value pairs in this multimap
+   */
   int size();
 
   default int sizeDistinct() {
@@ -39,6 +30,20 @@ public interface SetMultimap<K, V> {
   }
 
   boolean isEmpty();
+
+  boolean containsKey(final Object o);
+
+  boolean containsValue(final Object o);
+
+  boolean containsEntry(final Object o0, final Object o1);
+
+  Set.Immutable<V> get(final java.lang.Object o);
+
+  java.util.Set<K> keySet();
+
+  java.util.Collection<V> values();
+
+  java.util.Set<Map.Entry<K, V>> entrySet();
 
   Iterator<K> keyIterator();
 
@@ -73,12 +78,26 @@ public interface SetMultimap<K, V> {
     return StreamSupport.stream(spliterator, false);
   }
 
-  /*
-   * Uses semantic of Set<Map.Entry<K, V>> instead of Map<K, Set<V>>.
+  /**
+   * Returns the hash code for this multimap.
+   *
+   * The hash code is defined to equal the hash of a {@link Set<Map.Entry<K, V>>} view (rather than
+   * to equal the hash code of {@link Map<K, Set<V>>}).
+   *
+   * @return the hash code for this multimap
    */
   @Override
   int hashCode();
 
+  /**
+   * Compares the specified object for equality against this multimap.
+   * 
+   * The notion of equality is equal to the {@link Set<Map.Entry<K, V>>} view of a multimap, i.e.,
+   * all key-value pairs have to equal.
+   *
+   * @param other the object that is checked for equality against this multimap
+   * @return {@code true} if the specified object is equal to this map
+   */
   @Override
   boolean equals(Object other);
 

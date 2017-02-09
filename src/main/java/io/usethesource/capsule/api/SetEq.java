@@ -16,15 +16,15 @@ import java.util.Comparator;
 @Deprecated
 public interface SetEq<K> extends java.util.Set<K> {
 
+  default boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented @ Set.");
+  }
+
   default boolean containsAllEquivalent(final Collection<?> c, final Comparator<Object> cmp) {
     throw new UnsupportedOperationException("Not yet implemented @ Set.");
   }
 
   default K getEquivalent(final Object o, final Comparator<Object> cmp) {
-    throw new UnsupportedOperationException("Not yet implemented @ Set.");
-  }
-
-  default boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
     throw new UnsupportedOperationException("Not yet implemented @ Set.");
   }
 

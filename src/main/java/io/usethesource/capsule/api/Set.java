@@ -19,12 +19,12 @@ public interface Set<K> extends java.util.Set<K>, SetEq<K> {
   boolean isEmpty();
 
   @Override
+  boolean contains(Object o);
+
+  @Override
   boolean containsAll(Collection<?> c);
 
   K get(Object o);
-
-  @Override
-  boolean contains(Object o);
 
   Iterator<K> keyIterator();
 

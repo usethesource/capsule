@@ -12,13 +12,19 @@ import java.util.Iterator;
 public interface Map<K, V> extends java.util.Map<K, V>, MapEq<K, V> {
 
   @Override
-  V get(final Object o);
+  int size();
 
+  @Override
+  boolean isEmpty();
+  
   @Override
   boolean containsKey(final Object o);
 
   @Override
   boolean containsValue(final Object o);
+
+  @Override
+  V get(final Object o);
 
   Iterator<K> keyIterator();
 

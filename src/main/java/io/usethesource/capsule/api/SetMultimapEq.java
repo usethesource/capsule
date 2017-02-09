@@ -17,10 +17,6 @@ import java.util.Comparator;
 @Deprecated
 public interface SetMultimapEq<K, V> extends SetMultimap<K, V> {
 
-  default Set.Immutable<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
-    throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-  }
-
   default boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
     throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
   }
@@ -31,6 +27,10 @@ public interface SetMultimapEq<K, V> extends SetMultimap<K, V> {
 
   default boolean containsEntryEquivalent(final Object o0, final Object o1,
       final Comparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
+  }
+
+  default Set.Immutable<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
     throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
   }
 

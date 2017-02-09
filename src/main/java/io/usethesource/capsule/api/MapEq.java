@@ -15,15 +15,15 @@ import java.util.Comparator;
 @Deprecated
 public interface MapEq<K, V> extends java.util.Map<K, V> {
 
-  default V getEquivalent(final Object o, final Comparator<Object> cmp) {
-    throw new UnsupportedOperationException("Not yet implemented @ Map.");
-  }
-
   default boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
     throw new UnsupportedOperationException("Not yet implemented @ Map.");
   }
 
   default boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented @ Map.");
+  }
+
+  default V getEquivalent(final Object o, final Comparator<Object> cmp) {
     throw new UnsupportedOperationException("Not yet implemented @ Map.");
   }
 
