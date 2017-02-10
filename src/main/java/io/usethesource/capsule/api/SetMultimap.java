@@ -119,7 +119,9 @@ public interface SetMultimap<K, V> {
     }
 
     // removes all mappings with 'key'
-    SetMultimap.Immutable<K, V> __remove(final K key);
+    default SetMultimap.Immutable<K, V> __remove(final K key) {
+      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
+    }
 
     SetMultimap.Immutable<K, V> __remove(final K key, final V val);
 
