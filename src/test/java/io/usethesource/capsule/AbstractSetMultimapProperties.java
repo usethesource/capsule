@@ -7,10 +7,6 @@
  */
 package io.usethesource.capsule;
 
-import com.pholser.junit.quickcheck.Property;
-import com.pholser.junit.quickcheck.generator.Size;
-import io.usethesource.capsule.api.SetMultimap;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Spliterator;
@@ -18,13 +14,19 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static org.junit.Assert.*;
+import com.pholser.junit.quickcheck.Property;
+import com.pholser.junit.quickcheck.generator.Size;
+import io.usethesource.capsule.api.SetMultimap;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap.Immutable<K, V>> {
 
-  private final int DEFAULT_TRIALS = 1_000;
-  private final int MAX_SIZE = 1_000;
-  private final Class<?> type;
+  protected final int DEFAULT_TRIALS = 1_000;
+  protected final int MAX_SIZE = 1_000;
+  protected final Class<?> type;
 
   public AbstractSetMultimapProperties(Class<?> type) {
     this.type = type;
@@ -44,43 +46,43 @@ public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap
     assertEquals(keySet, multimap.keySet());
   }
 
-//  /**
-//   * TODO: replace batch construction by sequence of 'insert' operations
-//   */
-//  @Property // (trials = DEFAULT_TRIALS)
-//  public void testInsertTuplesThatShareSameKey(final Integer key,
-//      @Size(min = 1, max = 100) final java.util.HashSet<Integer> values) {
-//    assertEquals(values.size(), toMultimap(key, values).size());
-//    assertTrue(toMultimap(key, values).containsKey(key));
-//  }
-//
-//  /**
-//   * TODO: replace batch construction by sequence of 'insert' operations followed by a 'remove'
-//   */
-//  @Property(trials = DEFAULT_TRIALS)
-//  public void testInsertTuplesWithOneRemoveThatShareSameKeyX(final Integer key,
-//      @Size(min = 2, max = 100) final java.util.HashSet<Integer> values) {
-//
-//    Integer value = sourceOfRandomness.choose(values);
-//    SetMultimap.Immutable<Integer, Integer> multimap = toMultimap(key, values);
-//
-//    if (multimap.__remove(key, value).size() + 1 == multimap.size()) {
-//      // succeed
-//      multimap = multimap.__remove(key, value);
-//    } else {
-//      // fail
-//      assertTrue(multimap.containsEntry(key, value));
-//      multimap = multimap.__remove(key, value);
-//    }
-//
-//    // assertEquals(values.size() - 1, multimap.size());
-//    // assertTrue(multimap.containsKey(key));
-//    // values.forEach(currentValue -> {
-//    // if (!currentValue.equals(value)) {
-//    // assertTrue(multimap.containsEntry(key, currentValue));
-//    // }
-//    // });
-//  }
+  // /**
+  // * TODO: replace batch construction by sequence of 'insert' operations
+  // */
+  // @Property // (trials = DEFAULT_TRIALS)
+  // public void testInsertTuplesThatShareSameKey(final Integer key,
+  // @Size(min = 1, max = 100) final java.util.HashSet<Integer> values) {
+  // assertEquals(values.size(), toMultimap(key, values).size());
+  // assertTrue(toMultimap(key, values).containsKey(key));
+  // }
+  //
+  // /**
+  // * TODO: replace batch construction by sequence of 'insert' operations followed by a 'remove'
+  // */
+  // @Property(trials = DEFAULT_TRIALS)
+  // public void testInsertTuplesWithOneRemoveThatShareSameKeyX(final Integer key,
+  // @Size(min = 2, max = 100) final java.util.HashSet<Integer> values) {
+  //
+  // Integer value = sourceOfRandomness.choose(values);
+  // SetMultimap.Immutable<Integer, Integer> multimap = toMultimap(key, values);
+  //
+  // if (multimap.__remove(key, value).size() + 1 == multimap.size()) {
+  // // succeed
+  // multimap = multimap.__remove(key, value);
+  // } else {
+  // // fail
+  // assertTrue(multimap.containsEntry(key, value));
+  // multimap = multimap.__remove(key, value);
+  // }
+  //
+  // // assertEquals(values.size() - 1, multimap.size());
+  // // assertTrue(multimap.containsKey(key));
+  // // values.forEach(currentValue -> {
+  // // if (!currentValue.equals(value)) {
+  // // assertTrue(multimap.containsEntry(key, currentValue));
+  // // }
+  // // });
+  // }
 
   /**
    * Inserted tuple by tuple, starting from an empty multimap. Keeps track of all so far inserted
@@ -134,8 +136,7 @@ public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap
 
   @Property(trials = DEFAULT_TRIALS)
   public void notContainedAfterInsertRemove(CT input, K item0, V item1) {
-    assertFalse(
-        input.__insert(item0, item1).__remove(item0, item1).containsEntry(item0, item1));
+    assertFalse(input.__insert(item0, item1).__remove(item0, item1).containsEntry(item0, item1));
   }
 
   @Property(trials = DEFAULT_TRIALS)

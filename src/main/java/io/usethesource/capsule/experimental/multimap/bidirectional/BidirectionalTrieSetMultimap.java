@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
+import io.usethesource.capsule.DefaultTrieSetMultimap;
 import io.usethesource.capsule.api.BinaryRelation;
 import io.usethesource.capsule.api.Set;
 import io.usethesource.capsule.api.SetMultimap;
@@ -26,6 +27,17 @@ public class BidirectionalTrieSetMultimap<K, V> implements BinaryRelation.Immuta
       final SetMultimap.Immutable<V, K> bwd) {
     this.fwd = fwd;
     this.bwd = bwd;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static final <K, V> SetMultimap.Immutable<K, V> of() {
+    /*
+     * NOTE: uses default multi-map to create nested forward and backward maps.
+     *
+     * TODO: make classes of nested multi-maps configurable.
+     */
+    return new BidirectionalTrieSetMultimap<K, V>(DefaultTrieSetMultimap.of(),
+        DefaultTrieSetMultimap.of());
   }
 
   private static <K, V> BinaryRelation.Immutable<K, V> wireTuple(K key, V value,
