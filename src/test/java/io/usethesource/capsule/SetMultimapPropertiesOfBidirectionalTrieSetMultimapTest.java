@@ -8,7 +8,7 @@
 package io.usethesource.capsule;
 
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-import io.usethesource.capsule.experimental.multimap.bidirectional.BidirectionalTrieSetMultimap;
+import io.usethesource.capsule.experimental.relation.BidirectionalTrieSetMultimap;
 import org.junit.runner.RunWith;
 
 @RunWith(JUnitQuickcheck.class)

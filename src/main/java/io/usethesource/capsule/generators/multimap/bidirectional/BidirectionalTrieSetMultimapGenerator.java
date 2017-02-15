@@ -7,7 +7,7 @@
  */
 package io.usethesource.capsule.generators.multimap.bidirectional;
 
-import io.usethesource.capsule.experimental.multimap.bidirectional.BidirectionalTrieSetMultimap;
+import io.usethesource.capsule.experimental.relation.BidirectionalTrieSetMultimap;
 import io.usethesource.capsule.generators.multimap.AbstractSetMultimapGenerator;
 
 @SuppressWarnings({"rawtypes"})

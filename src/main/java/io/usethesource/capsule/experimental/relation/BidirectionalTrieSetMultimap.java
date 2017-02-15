@@ -5,7 +5,7 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.capsule.experimental.multimap.bidirectional;
+package io.usethesource.capsule.experimental.relation;
 
 import java.util.Collection;
 import java.util.Iterator;
