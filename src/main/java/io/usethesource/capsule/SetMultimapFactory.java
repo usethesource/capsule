@@ -17,21 +17,21 @@ public class SetMultimapFactory {
   // private final Class<? extends Immutable<?, ?>> targetClass;
 
   private final Method persistentMapOfEmpty;
-  private final Method persistentMapOfKeyValuePairs;
+  // private final Method persistentMapOfKeyValuePairs;
 
   private final Method transientMapOfEmpty;
-  private final Method transientMapOfKeyValuePairs;
+  // private final Method transientMapOfKeyValuePairs;
 
   public SetMultimapFactory(Class<?> targetClass) {
     // this.targetClass = targetClass;
 
     try {
       persistentMapOfEmpty = targetClass.getMethod("of");
-      persistentMapOfKeyValuePairs = targetClass.getMethod("of", Object.class, Object[].class);
+      // persistentMapOfKeyValuePairs = targetClass.getMethod("of", Object.class, Object[].class);
 
       transientMapOfEmpty = targetClass.getMethod("transientOf");
-      transientMapOfKeyValuePairs =
-          targetClass.getMethod("transientOf", Object.class, Object[].class);
+      // transientMapOfKeyValuePairs = targetClass.getMethod("transientOf", Object.class,
+      // Object[].class);
     } catch (NoSuchMethodException | SecurityException e) {
       e.printStackTrace();
       throw new RuntimeException(e);
@@ -51,14 +51,14 @@ public class SetMultimapFactory {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public final <K, V> SetMultimap.Immutable<K, V> of(K key, V... values) {
-    try {
-      return (SetMultimap.Immutable<K, V>) persistentMapOfKeyValuePairs.invoke(null, key, values);
-    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new RuntimeException(e);
-    }
-  }
+  // @SuppressWarnings("unchecked")
+  // public final <K, V> SetMultimap.Immutable<K, V> of(K key, V... values) {
+  // try {
+  // return (SetMultimap.Immutable<K, V>) persistentMapOfKeyValuePairs.invoke(null, key, values);
+  // } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+  // throw new RuntimeException(e);
+  // }
+  // }
 
   @SuppressWarnings("unchecked")
   public final <K, V> SetMultimap.Transient<K, V> transientOf() {
@@ -69,14 +69,14 @@ public class SetMultimapFactory {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public final <K, V> SetMultimap.Transient<K, V> transientOf(K key, V... values) {
-    try {
-      return (SetMultimap.Transient<K, V>) transientMapOfKeyValuePairs.invoke(null, key, values);
-    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
-    }
-  }
+  // @SuppressWarnings("unchecked")
+  // public final <K, V> SetMultimap.Transient<K, V> transientOf(K key, V... values) {
+  // try {
+  // return (SetMultimap.Transient<K, V>) transientMapOfKeyValuePairs.invoke(null, key, values);
+  // } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+  // e.printStackTrace();
+  // throw new RuntimeException(e);
+  // }
+  // }
 
 }

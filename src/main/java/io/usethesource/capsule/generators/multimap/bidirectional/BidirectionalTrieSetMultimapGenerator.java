@@ -11,7 +11,7 @@ import io.usethesource.capsule.experimental.multimap.bidirectional.Bidirectional
 import io.usethesource.capsule.generators.multimap.AbstractSetMultimapGenerator;
 
 @SuppressWarnings({"rawtypes"})
-public class BidirectionalTrieSetMultimapGenerator<K>
+public class BidirectionalTrieSetMultimapGenerator
     extends AbstractSetMultimapGenerator<BidirectionalTrieSetMultimap> {
 
   public BidirectionalTrieSetMultimapGenerator() {
