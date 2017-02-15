@@ -30,7 +30,7 @@ public class BidirectionalTrieSetMultimap<K, V> implements BinaryRelation.Immuta
   }
 
   @SuppressWarnings("unchecked")
-  public static final <K, V> SetMultimap.Immutable<K, V> of() {
+  public static final <K, V> BinaryRelation.Immutable<K, V> of() {
     /*
      * NOTE: uses default multi-map to create nested forward and backward maps.
      *
@@ -38,6 +38,17 @@ public class BidirectionalTrieSetMultimap<K, V> implements BinaryRelation.Immuta
      */
     return new BidirectionalTrieSetMultimap<K, V>(DefaultTrieSetMultimap.of(),
         DefaultTrieSetMultimap.of());
+  }
+
+  @SuppressWarnings("unchecked")
+  public static final <K, V> BinaryRelation.Transient<K, V> transientOf() {
+    /*
+     * NOTE: uses default multi-map to create nested forward and backward maps.
+     *
+     * TODO: make classes of nested multi-maps configurable.
+     */
+    return new TransientBidirectionalTrieSetMultimap<K, V>(DefaultTrieSetMultimap.transientOf(),
+        DefaultTrieSetMultimap.transientOf());
   }
 
   private static <K, V> BinaryRelation.Immutable<K, V> wireTuple(K key, V value,
