@@ -7,33 +7,31 @@
  */
 package io.usethesource.capsule.generators;
 
-import java.util.Map;
-
 import com.pholser.junit.quickcheck.generator.ComponentizedGenerator;
 import com.pholser.junit.quickcheck.generator.GenerationStatus;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
-
-import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
+import io.usethesource.capsule.api.Triple;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public final class MapEntryGenerator<T extends Map.Entry>
+public final class TripleGenerator<T extends Triple>
     extends ComponentizedGenerator<T> {
 
-  public MapEntryGenerator() {
-    super((Class<T>) Map.Entry.class);
+  public TripleGenerator() {
+    super((Class<T>) Triple.class);
   }
 
   @Override
   public int numberOfNeededComponents() {
-    return 2;
+    return 3;
   }
 
   @Override
   public T generate(SourceOfRandomness random, GenerationStatus status) {
     Object item0 = componentGenerators().get(0).generate(random, status);
     Object item1 = componentGenerators().get(1).generate(random, status);
+    Object item2 = componentGenerators().get(2).generate(random, status);
 
-    return (T) entryOf(item0, item1);
+    return (T) Triple.of(item0, item1, item2);
   }
 
 }
