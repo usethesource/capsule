@@ -31,7 +31,6 @@ public class TernaryTrieSetMultimap<T, U, V, R extends Triple<T, U, V>>
     this.indexV = indexV;
   }
 
-  @SuppressWarnings("unchecked")
   public static final <T, U, V, R extends Triple<T, U, V>> TernaryRelation.Immutable<T, U, V, R> of() {
     /*
      * NOTE: uses default multi-map to create nested forward and backward maps.

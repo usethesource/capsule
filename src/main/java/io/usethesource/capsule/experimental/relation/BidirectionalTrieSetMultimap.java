@@ -29,7 +29,6 @@ public class BidirectionalTrieSetMultimap<K, V> implements BinaryRelation.Immuta
     this.bwd = bwd;
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> BinaryRelation.Immutable<K, V> of() {
     /*
      * NOTE: uses default multi-map to create nested forward and backward maps.
@@ -40,7 +39,6 @@ public class BidirectionalTrieSetMultimap<K, V> implements BinaryRelation.Immuta
         DefaultTrieSetMultimap.of());
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> BinaryRelation.Transient<K, V> transientOf() {
     /*
      * NOTE: uses default multi-map to create nested forward and backward maps.

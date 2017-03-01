@@ -1,94 +1,95 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>io.usethesource</groupId>
-	<artifactId>capsule</artifactId>
-	<version>0.3.0.HETEROGENEOUS-SNAPSHOT</version>
-	<packaging>jar</packaging>
+    <groupId>io.usethesource</groupId>
+    <artifactId>capsule</artifactId>
+    <version>0.3.0.HETEROGENEOUS-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
-	<scm>
-		<developerConnection>scm:git:https://github.com/usethesource/capsule.git</developerConnection>
-		<tag>HEAD</tag>
-	</scm>
+    <scm>
+        <developerConnection>scm:git:https://github.com/usethesource/capsule.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
 
-	<!-- deployment configuration (usethesource) -->
-	<distributionManagement>
-		<repository>
-			<id>usethesource-releases</id>
-			<url>http://nexus.usethesource.io/content/repositories/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>usethesource-snapshots</id>
-			<url>http://nexus.usethesource.io/content/repositories/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
+    <!-- deployment configuration (usethesource) -->
+    <distributionManagement>
+        <repository>
+            <id>usethesource-releases</id>
+            <url>http://nexus.usethesource.io/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>usethesource-snapshots</id>
+            <url>http://nexus.usethesource.io/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
-	<!-- dependency resolution configuration (usethesource) -->
-	<repositories>
-		<repository>
-			<id>usethesource</id>
-			<url>http://nexus.usethesource.io/content/repositories/public/</url>
-		</repository>
-	</repositories>
+    <!-- dependency resolution configuration (usethesource) -->
+    <repositories>
+        <repository>
+            <id>usethesource</id>
+            <url>http://nexus.usethesource.io/content/repositories/public/</url>
+        </repository>
+    </repositories>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<maven.compiler.source>1.8</maven.compiler.source>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+    </properties>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.4</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.3</version>
-			</plugin>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+            </plugin>
 
 
-			<!--
-				Goals (http://code.mycila.com/license-maven-plugin/#goals): 
-					* license:check: verify if some files miss license header. This goal is attached to the verify phase if declared in your pom.xml like above.
-					* license:format: add the license header when missing. If a header is existing, it is updated to the new one.
-					* license:remove: remove existing license header
-			-->
-			<plugin>
-				<groupId>com.mycila</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-				<version>3.0</version>
-				<configuration>
-					<header>${basedir}/LICENSE.header-template</header>
-					<mapping>
-						<rsc>SLASHSTAR_STYLE</rsc>
-					</mapping>
-					<includes>
-						<include>src/**</include>
-					</includes>					
-					<excludes>
-						<!-- nothing so far -->
-					</excludes>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <!--
+                Goals (http://code.mycila.com/license-maven-plugin/#goals):
+                    * license:check: verify if some files miss license header. This goal is attached to the verify phase if declared in your pom.xml like above.
+                    * license:format: add the license header when missing. If a header is existing, it is updated to the new one.
+                    * license:remove: remove existing license header
+            -->
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>3.0</version>
+                <configuration>
+                    <header>${basedir}/LICENSE.header-template</header>
+                    <mapping>
+                        <rsc>SLASHSTAR_STYLE</rsc>
+                    </mapping>
+                    <includes>
+                        <include>src/**</include>
+                    </includes>
+                    <excludes>
+                        <!-- nothing so far -->
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <groupId>eu.somatik.serviceloader-maven-plugin</groupId>
@@ -107,65 +108,65 @@
                     </execution>
                 </executions>
             </plugin>
-		</plugins>
-	</build>
+        </plugins>
+    </build>
 
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<!-- <scope>test</scope> -->
-		</dependency>
-		<dependency>
-			<groupId>com.pholser</groupId>
-			<artifactId>junit-quickcheck-core</artifactId>
-			<version>0.7</version>
-			<!-- <scope>test</scope> -->
-		</dependency>
-		<dependency>
-			<groupId>com.pholser</groupId>
-			<artifactId>junit-quickcheck-generators</artifactId>
-			<version>0.7</version>
-			<!-- <scope>test</scope> -->
-		</dependency>
-		<dependency>
-			<groupId>org.openjdk.jol</groupId>
-			<artifactId>jol-core</artifactId>
-			<version>0.3.2</version>
-		</dependency>		
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <!-- <scope>test</scope> -->
+        </dependency>
+        <dependency>
+            <groupId>com.pholser</groupId>
+            <artifactId>junit-quickcheck-core</artifactId>
+            <version>0.7</version>
+            <!-- <scope>test</scope> -->
+        </dependency>
+        <dependency>
+            <groupId>com.pholser</groupId>
+            <artifactId>junit-quickcheck-generators</artifactId>
+            <version>0.7</version>
+            <!-- <scope>test</scope> -->
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jol</groupId>
+            <artifactId>jol-core</artifactId>
+            <version>0.3.2</version>
+        </dependency>
+    </dependencies>
 
-	<profiles>
-		<profile>
-			<id>jdk9</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-compiler-plugin</artifactId>
-						<version>3.5.1</version>
-						<configuration>
-							<!-- <compilerVersion>1.9</compilerVersion> -->
-							<source>1.9</source>
-							<target>1.9</target>
-							<fork>true</fork>
-							<executable>${JAVA_HOME}/bin/javac</executable>
-							<forceJavacCompilerUse>true</forceJavacCompilerUse>
-							<verbose>true</verbose>
-							<optimize>true</optimize>
-							<compilerArgs>
-								<!-- add-exports java.base/jdk.internal.vm.annotation=ALL-UNNAMED -->
-								<arg>-XaddExports:java.base/jdk.internal.vm.annotation=ALL-UNNAMED</arg>
-							</compilerArgs>
-						</configuration>
-					</plugin>		
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+    <profiles>
+        <profile>
+            <id>jdk9</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.5.1</version>
+                        <configuration>
+                            <!-- <compilerVersion>1.9</compilerVersion> -->
+                            <source>1.9</source>
+                            <target>1.9</target>
+                            <fork>true</fork>
+                            <executable>${JAVA_HOME}/bin/javac</executable>
+                            <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                            <verbose>true</verbose>
+                            <optimize>true</optimize>
+                            <compilerArgs>
+                                <!-- add-exports java.base/jdk.internal.vm.annotation=ALL-UNNAMED -->
+                                <arg>-XaddExports:java.base/jdk.internal.vm.annotation=ALL-UNNAMED</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

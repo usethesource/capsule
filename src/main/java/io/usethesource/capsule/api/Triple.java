@@ -12,7 +12,10 @@ import java.util.Objects;
 public interface Triple<T, U, V> {
 
   static <T, U, V> Triple<T, U, V> of(final T fst, final U snd, final V trd) {
-    return new ImmutableTriple(fst, snd, trd);
+    return new ImmutableTriple(
+        Objects.requireNonNull(fst),
+        Objects.requireNonNull(snd),
+        Objects.requireNonNull(trd));
   }
 
   T _0();
@@ -75,10 +78,12 @@ class ImmutableTriple<T, U, V> implements Triple<T, U, V> {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || getClass() != o.getClass()) {
       return false;
+    }
 
     ImmutableTriple<?, ?, ?> that = (ImmutableTriple<?, ?, ?>) o;
 
