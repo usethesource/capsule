@@ -10,6 +10,8 @@ package io.usethesource.capsule.api;
 import java.util.Collection;
 import java.util.Iterator;
 
+import io.usethesource.capsule.DefaultTrieSet;
+
 public interface Set<K> extends java.util.Set<K>, SetEq<K> {
 
   @Override
@@ -60,5 +62,13 @@ public interface Set<K> extends java.util.Set<K>, SetEq<K> {
 
     Set.Immutable<K> freeze();
 
+  }
+
+  static <K> Set.Immutable<K> of() {
+    return DefaultTrieSet.of();
+  }
+
+  static <K> Set.Transient<K> transientOf() {
+    return DefaultTrieSet.transientOf();
   }
 }

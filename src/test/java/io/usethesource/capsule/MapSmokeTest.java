@@ -7,24 +7,24 @@
  */
 package io.usethesource.capsule;
 
-import static org.junit.Assert.*;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
 import io.usethesource.capsule.api.Map;
+import io.usethesource.capsule.core.PersistentTrieMap;
 import org.junit.Test;
 
-import io.usethesource.capsule.core.TrieMap_5Bits;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class MapSmokeTest {
 
   /*
    * UTILS
    */
-  @SuppressWarnings("rawtypes")
-  private static Class<TrieMap_5Bits> targetMapClass = TrieMap_5Bits.class;
+  private static Class<PersistentTrieMap> targetMapClass = PersistentTrieMap.class;
 
   private static Method persistentMapOfEmpty;
   private static Method persistentMapOfKeyValuePairs;
@@ -32,8 +32,7 @@ public class MapSmokeTest {
   private static Method transientMapOfEmpty;
   private static Method transientMapOfKeyValuePairs;
 
-  @SuppressWarnings("rawtypes")
-  public static Class<TrieMap_5Bits> getTargetMapClass() {
+  public static Class<PersistentTrieMap> getTargetMapClass() {
     return targetMapClass;
   }
 
@@ -50,7 +49,6 @@ public class MapSmokeTest {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> Map.Immutable<K, V> mapOf() {
     try {
       return (Map.Immutable<K, V>) persistentMapOfEmpty.invoke(null);
@@ -59,16 +57,15 @@ public class MapSmokeTest {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> Map.Immutable<K, V> mapOf(Object... keyValuePairs) {
     try {
-      return (Map.Immutable<K, V>) persistentMapOfKeyValuePairs.invoke(null, (Object) keyValuePairs);
+      return (Map.Immutable<K, V>) persistentMapOfKeyValuePairs
+          .invoke(null, (Object) keyValuePairs);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> Map.Transient<K, V> transientMapOf() {
     try {
       return (Map.Transient<K, V>) transientMapOfEmpty.invoke(null);
@@ -77,7 +74,6 @@ public class MapSmokeTest {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> Map.Transient<K, V> transientMapOf(Object... keyValuePairs) {
     try {
       return (Map.Transient<K, V>) transientMapOfKeyValuePairs.invoke(null, (Object) keyValuePairs);
@@ -156,7 +152,6 @@ public class MapSmokeTest {
     getTargetMapClass().cast(map).printStatistics();
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
   @Test
   public void testCheckCompactionFromBeginUponDelete() {
 
@@ -170,7 +165,6 @@ public class MapSmokeTest {
     assert !res1.equals(res2);
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
   @Test
   public void testCheckCompactionFromMiddleUponDelete() {
 
@@ -192,7 +186,6 @@ public class MapSmokeTest {
     return new PureSeparateHashCodeInteger(value, value);
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
   @Test
   public void testCheckCompactionFromBeginUponDelete_HashCollisionNode1() {
 
@@ -218,7 +211,6 @@ public class MapSmokeTest {
     assert !res1.equals(resX);
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
   @Test
   public void testCheckCompactionFromBeginUponDelete_HashCollisionNode2() {
 
@@ -245,7 +237,6 @@ public class MapSmokeTest {
     assertEquals(expected, res3);
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
   @Test
   public void testCheckCompactionFromBeginUponDelete_HashCollisionNode3() {
 
@@ -271,7 +262,6 @@ public class MapSmokeTest {
     assertEquals(res1, res3);
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
   @Test
   public void testCheckCompactionFromBeginUponDelete_HashCollisionNode4() {
 
@@ -323,7 +313,7 @@ public class MapSmokeTest {
     }
 
     throw new RuntimeException("Called with invalid arguments."); // cnt1 !=
-                                                                  // i_th
+    // i_th
   }
 
   // @Test

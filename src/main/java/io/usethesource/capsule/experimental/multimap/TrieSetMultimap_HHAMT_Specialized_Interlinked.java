@@ -58,8 +58,8 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import io.usethesource.capsule.api.SetMultimap;
-import io.usethesource.capsule.core.TrieSet_5Bits.AbstractSetNode;
-import io.usethesource.capsule.core.TrieSet_5Bits.SetResult;
+import io.usethesource.capsule.core.PersistentTrieSet.AbstractSetNode;
+import io.usethesource.capsule.core.PersistentTrieSet.SetResult;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Interlinked.*;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Interlinked.EitherSingletonOrCollection.Type;
 import io.usethesource.capsule.util.EqualityComparator;

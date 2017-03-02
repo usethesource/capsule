@@ -30,9 +30,10 @@ import io.usethesource.capsule.core.trie.ArrayView;
 import io.usethesource.capsule.core.trie.Node;
 import io.usethesource.capsule.util.ArrayUtils;
 
-public class TrieSet_5Bits<K> implements Set.Immutable<K> {
+public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
-  private static final TrieSet_5Bits EMPTY_SET = new TrieSet_5Bits(CompactSetNode.EMPTY_NODE, 0, 0);
+  private static final PersistentTrieSet EMPTY_SET = new PersistentTrieSet(
+      CompactSetNode.EMPTY_NODE, 0, 0);
 
   private static final boolean DEBUG = false;
 
@@ -44,7 +45,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
    * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
    * `protected` when experiments are finished.
    */
-  public /* protected */ TrieSet_5Bits(AbstractSetNode<K> rootNode) {
+  public /* protected */ PersistentTrieSet(AbstractSetNode<K> rootNode) {
     this.rootNode = rootNode;
     this.hashCode = hashCode(rootNode);
     this.cachedSize = size(rootNode);
@@ -54,7 +55,8 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
    * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
    * `protected` when experiments are finished.
    */
-  public /* protected */ TrieSet_5Bits(AbstractSetNode<K> rootNode, int hashCode, int cachedSize) {
+  public /* protected */ PersistentTrieSet(AbstractSetNode<K> rootNode, int hashCode,
+      int cachedSize) {
     this.rootNode = rootNode;
     this.hashCode = hashCode;
     this.cachedSize = cachedSize;
@@ -64,7 +66,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
   }
 
   public static final <K> Set.Immutable<K> of() {
-    return TrieSet_5Bits.EMPTY_SET;
+    return PersistentTrieSet.EMPTY_SET;
   }
 
   public static final <K> Set.Immutable<K> of(K key0) {
@@ -75,7 +77,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
 
     CompactSetNode<K> newRootNode = CompactSetNode.nodeOf(null, nodeMap, dataMap, key0);
 
-    return new TrieSet_5Bits<K>(newRootNode, keyHash0, 1);
+    return new PersistentTrieSet<K>(newRootNode, keyHash0, 1);
   }
 
   public static final <K> Set.Immutable<K> of(K key0, K key1) {
@@ -87,11 +89,11 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
     CompactSetNode<K> newRootNode =
         CompactSetNode.mergeTwoKeyValPairs(key0, keyHash0, key1, keyHash1, 0);
 
-    return new TrieSet_5Bits<K>(newRootNode, keyHash0 + keyHash1, 2);
+    return new PersistentTrieSet<K>(newRootNode, keyHash0 + keyHash1, 2);
   }
 
   public static final <K> Set.Immutable<K> of(K... keys) {
-    Set.Immutable<K> result = TrieSet_5Bits.EMPTY_SET;
+    Set.Immutable<K> result = PersistentTrieSet.EMPTY_SET;
 
     for (final K key : keys) {
       result = result.__insert(key);
@@ -101,11 +103,11 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
   }
 
   public static final <K> Set.Transient<K> transientOf() {
-    return TrieSet_5Bits.EMPTY_SET.asTransient();
+    return PersistentTrieSet.EMPTY_SET.asTransient();
   }
 
   public static final <K> Set.Transient<K> transientOf(K... keys) {
-    final Set.Transient<K> result = TrieSet_5Bits.EMPTY_SET.asTransient();
+    final Set.Transient<K> result = PersistentTrieSet.EMPTY_SET.asTransient();
 
     for (final K key : keys) {
       result.__insert(key);
@@ -213,7 +215,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
         rootNode.updated(null, key, transformHashCode(keyHash), 0, details);
 
     if (details.isModified()) {
-      return new TrieSet_5Bits<K>(newRootNode, hashCode + keyHash, cachedSize + 1);
+      return new PersistentTrieSet<K>(newRootNode, hashCode + keyHash, cachedSize + 1);
     }
 
     return this;
@@ -228,7 +230,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
         rootNode.updated(null, key, transformHashCode(keyHash), 0, details, cmp);
 
     if (details.isModified()) {
-      return new TrieSet_5Bits<K>(newRootNode, hashCode + keyHash, cachedSize + 1);
+      return new PersistentTrieSet<K>(newRootNode, hashCode + keyHash, cachedSize + 1);
     }
 
     return this;
@@ -258,7 +260,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
         rootNode.removed(null, key, transformHashCode(keyHash), 0, details);
 
     if (details.isModified()) {
-      return new TrieSet_5Bits<K>(newRootNode, hashCode - keyHash, cachedSize - 1);
+      return new PersistentTrieSet<K>(newRootNode, hashCode - keyHash, cachedSize - 1);
     }
 
     return this;
@@ -273,7 +275,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
         rootNode.removed(null, key, transformHashCode(keyHash), 0, details, cmp);
 
     if (details.isModified()) {
-      return new TrieSet_5Bits<K>(newRootNode, hashCode - keyHash, cachedSize - 1);
+      return new PersistentTrieSet<K>(newRootNode, hashCode - keyHash, cachedSize - 1);
     }
 
     return this;
@@ -411,8 +413,8 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
       return false;
     }
 
-    if (other instanceof TrieSet_5Bits) {
-      TrieSet_5Bits<?> that = (TrieSet_5Bits<?>) other;
+    if (other instanceof PersistentTrieSet) {
+      PersistentTrieSet<?> that = (PersistentTrieSet<?>) other;
 
       if (this.cachedSize != that.cachedSize) {
         return false;
@@ -2107,7 +2109,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
     private int hashCode;
     private int cachedSize;
 
-    TransientTrieSet_5Bits(TrieSet_5Bits<K> trieSet_5Bits) {
+    TransientTrieSet_5Bits(PersistentTrieSet<K> trieSet_5Bits) {
       this.mutator = new AtomicReference<Thread>(Thread.currentThread());
       this.rootNode = trieSet_5Bits.rootNode;
       this.hashCode = trieSet_5Bits.hashCode;
@@ -2544,7 +2546,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
       }
 
       mutator.set(null);
-      return new TrieSet_5Bits<K>(rootNode, hashCode, cachedSize);
+      return new PersistentTrieSet<K>(rootNode, hashCode, cachedSize);
     }
   }
 

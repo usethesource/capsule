@@ -13,13 +13,13 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.*;
 
+import io.usethesource.capsule.core.PersistentTrieSet;
 import javax.tools.*;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.model.InitializationError;
 
-import io.usethesource.capsule.core.TrieSet_5Bits;
 import io.usethesource.capsule.experimental.lazy.TrieSet_5Bits_LazyHashCode;
 import io.usethesource.capsule.experimental.memoized.TrieSet_5Bits_Memoized_LazyHashCode;
 import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8;
@@ -37,7 +37,7 @@ public class RuntimeCodeGenerationTestSuite extends Suite {
     // @formatter:off
     final List<Class> componentTypes = Arrays.asList(Integer.class);
     final List<Class> setTypes = Arrays.asList(
-        TrieSet_5Bits.class
+        PersistentTrieSet.class
         , TrieSet_5Bits_Spec0To8.class
         , TrieSet_5Bits_LazyHashCode.class
         , TrieSet_5Bits_Memoized_LazyHashCode.class

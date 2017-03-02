@@ -12,7 +12,7 @@
 // import java.util.Stack;
 // import java.util.function.BiFunction;
 //
-// import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
+// import io.usethesource.capsule.core.deprecated.PersistentTrieSet;
 // import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP;
 //
 /// **
@@ -21,11 +21,11 @@
 // */
 // public class BottomUpImmutableNodeTransformer<K, V, MN extends
 /// TrieSetMultimap_HCHAMP.AbstractSetMultimapNode<K, V>, SN extends
-/// TrieSet_5Bits.AbstractSetNode<K>>
+/// PersistentTrieSet.AbstractSetNode<K>>
 // implements Iterator<SN> {
 //
 // static final <K, V, MN extends TrieSetMultimap_HCHAMP.AbstractSetMultimapNode<K, V>, SN extends
-/// TrieSet_5Bits.AbstractSetNode<K>> SN applyNodeTransformation(
+/// PersistentTrieSet.AbstractSetNode<K>> SN applyNodeTransformation(
 // final MN rootNode, final BiFunction<MN, SN[], SN> nodeMapper) {
 //
 // BottomUpImmutableNodeTransformer<K, V, MN, SN> transformer =
@@ -46,8 +46,8 @@
 //
 // final Stack<SN> mappedNodesStack = new Stack<SN>();
 //
-// private final static TrieSet_5Bits.AbstractSetNode[] EMPTY_SN_ARRAY =
-// new TrieSet_5Bits.AbstractSetNode[] {};
+// private final static PersistentTrieSet.AbstractSetNode[] EMPTY_SN_ARRAY =
+// new PersistentTrieSet.AbstractSetNode[] {};
 //
 // BottomUpImmutableNodeTransformer(final MN rootNode, final BiFunction<MN, SN[], SN> nodeMapper) {
 // mappedNodesStack.ensureCapacity(128);
@@ -114,7 +114,7 @@
 // } else {
 // // pop all children
 // assert childNodeLength != 0;
-// SN[] newChildren = (SN[]) new TrieSet_5Bits.AbstractSetNode[childNodeLength];
+// SN[] newChildren = (SN[]) new PersistentTrieSet.AbstractSetNode[childNodeLength];
 // for (int i = childNodeLength - 1; i >= 0; i--) {
 // newChildren[i] = mappedNodesStack.pop();
 // }
@@ -184,10 +184,10 @@
 //
 //// private static final int MAX_DEPTH = 7;
 //// private final static Class<?> MAP_CLASS = AbstractSetMultimapNode.class;
-//// private final static Class<?> SET_CLASS = TrieSet_5Bits.AbstractSetNode.class;
+//// private final static Class<?> SET_CLASS = PersistentTrieSet.AbstractSetNode.class;
 ////
 //// public static final <K, V, MN extends AbstractSetMultimapNode<K, V>, SN extends
-//// TrieSet_5Bits.AbstractSetNode<K>> Optional<SN> applyNodeTransformation(
+//// PersistentTrieSet.AbstractSetNode<K>> Optional<SN> applyNodeTransformation(
 //// final MN mapRootNode, final BiFunction<MN, AtomicReference<Thread>, SN> nodeMapper) {
 ////
 //// final AtomicReference<Thread> mutator = new AtomicReference<>(Thread.currentThread());

@@ -7,13 +7,11 @@
  */
 package io.usethesource.capsule;
 
+import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
+import io.usethesource.capsule.core.PersistentTrieSet;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-
-import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-
-import io.usethesource.capsule.core.TrieSet_5Bits;
 
 /**
  * Static aggregation of set test. Superseeded by {@link RuntimeCodeGenerationTest}.
@@ -27,19 +25,19 @@ public class SetPropertiesTest {
 
   @RunWith(JUnitQuickcheck.class)
   public static class IntegerSetPropertiesTest
-      extends AbstractSetProperties<Integer, TrieSet_5Bits<Integer>> {
+      extends AbstractSetProperties<Integer, PersistentTrieSet<Integer>> {
 
     public IntegerSetPropertiesTest() {
-      super(TrieSet_5Bits.class);
+      super(PersistentTrieSet.class);
     }
   }
 
   @RunWith(JUnitQuickcheck.class)
   public static class StringSetPropertiesTest
-      extends AbstractSetProperties<String, TrieSet_5Bits<String>> {
+      extends AbstractSetProperties<String, PersistentTrieSet<String>> {
 
     public StringSetPropertiesTest() {
-      super(TrieSet_5Bits.class);
+      super(PersistentTrieSet.class);
     }
   }
 

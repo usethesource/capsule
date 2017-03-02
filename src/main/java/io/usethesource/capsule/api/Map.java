@@ -9,6 +9,8 @@ package io.usethesource.capsule.api;
 
 import java.util.Iterator;
 
+import io.usethesource.capsule.DefaultTrieMap;
+
 public interface Map<K, V> extends java.util.Map<K, V>, MapEq<K, V> {
 
   @Override
@@ -16,7 +18,7 @@ public interface Map<K, V> extends java.util.Map<K, V>, MapEq<K, V> {
 
   @Override
   boolean isEmpty();
-  
+
   @Override
   boolean containsKey(final Object o);
 
@@ -56,5 +58,13 @@ public interface Map<K, V> extends java.util.Map<K, V>, MapEq<K, V> {
 
     Map.Immutable<K, V> freeze();
 
+  }
+
+  static <K, V> Map.Immutable<K, V> of() {
+    return DefaultTrieMap.of();
+  }
+
+  static <K, V> Map.Transient<K, V> transientOf() {
+    return DefaultTrieMap.transientOf();
   }
 }

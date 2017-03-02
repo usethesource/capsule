@@ -11,12 +11,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import io.usethesource.capsule.api.Set;
-import io.usethesource.capsule.core.TrieSet_5Bits;
+import io.usethesource.capsule.core.PersistentTrieSet;
 
 public class DefaultTrieSet {
 
-  @SuppressWarnings("rawtypes")
-  private static Class<TrieSet_5Bits> target = TrieSet_5Bits.class;
+  private static Class<PersistentTrieSet> target = PersistentTrieSet.class;
 
   private static Method persistentSetOfEmpty;
   private static Method persistentSetOfKeyValuePairs;
@@ -24,8 +23,7 @@ public class DefaultTrieSet {
   private static Method transientSetOfEmpty;
   private static Method transientSetOfKeyValuePairs;
 
-  @SuppressWarnings("rawtypes")
-  public static Class<TrieSet_5Bits> getTargetClass() {
+  public static Class<PersistentTrieSet> getTargetClass() {
     return target;
   }
 
@@ -42,7 +40,6 @@ public class DefaultTrieSet {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K> Set.Immutable<K> of() {
     try {
       return (Set.Immutable<K>) persistentSetOfEmpty.invoke(null);
@@ -51,7 +48,6 @@ public class DefaultTrieSet {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K> Set.Immutable<K> of(K... keys) {
     try {
       return (Set.Immutable<K>) persistentSetOfKeyValuePairs.invoke(null, (Object) keys);
@@ -60,7 +56,6 @@ public class DefaultTrieSet {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K> Set.Transient<K> transientOf() {
     try {
       return (Set.Transient<K>) transientSetOfEmpty.invoke(null);
@@ -69,7 +64,6 @@ public class DefaultTrieSet {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K> Set.Transient<K> transientOf(K... keys) {
     try {
       return (Set.Transient<K>) transientSetOfKeyValuePairs.invoke(null, (Object) keys);

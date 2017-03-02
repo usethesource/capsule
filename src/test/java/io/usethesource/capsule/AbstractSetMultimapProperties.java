@@ -42,7 +42,7 @@ public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap
     final java.util.Set<K> keySet = new HashSet<>();
     multimap.keyIterator().forEachRemaining(keySet::add);
 
-    // assertEquals(TrieSet_5Bits.class, multimap.keySet().getClass());
+    // assertEquals(PersistentTrieSet.class, multimap.keySet().getClass());
     assertEquals(keySet, multimap.keySet());
   }
 
@@ -88,9 +88,6 @@ public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap
    * Inserted tuple by tuple, starting from an empty multimap. Keeps track of all so far inserted
    * tuples and checks after each insertion if all inserted tuples are contained (quadratic
    * operation).
-   *
-   * @param emptyCollection
-   * @param inputValues
    */
   @Property(trials = DEFAULT_TRIALS)
   public void stepwiseContainsAfterInsert(@Size(min = 0, max = 0) final CT emptyCollection,

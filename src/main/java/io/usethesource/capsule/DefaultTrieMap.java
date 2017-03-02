@@ -7,16 +7,15 @@
  */
 package io.usethesource.capsule;
 
-import io.usethesource.capsule.api.Map;
-import io.usethesource.capsule.core.TrieMap_5Bits;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import io.usethesource.capsule.api.Map;
+import io.usethesource.capsule.core.PersistentTrieMap;
+
 public class DefaultTrieMap {
 
-  @SuppressWarnings("rawtypes")
-  private static Class<TrieMap_5Bits> target = TrieMap_5Bits.class;
+  private static Class<PersistentTrieMap> target = PersistentTrieMap.class;
 
   private static Method persistentMapOfEmpty;
   private static Method persistentMapOfKeyValuePairs;
@@ -24,8 +23,7 @@ public class DefaultTrieMap {
   private static Method transientMapOfEmpty;
   private static Method transientMapOfKeyValuePairs;
 
-  @SuppressWarnings("rawtypes")
-  public static Class<TrieMap_5Bits> getTargetClass() {
+  public static Class<PersistentTrieMap> getTargetClass() {
     return target;
   }
 
@@ -42,7 +40,6 @@ public class DefaultTrieMap {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> Map.Immutable<K, V> of() {
     try {
       return (Map.Immutable<K, V>) persistentMapOfEmpty.invoke(null);
@@ -51,16 +48,15 @@ public class DefaultTrieMap {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> Map.Immutable<K, V> of(Object... keyValuePairs) {
     try {
-      return (Map.Immutable<K, V>) persistentMapOfKeyValuePairs.invoke(null, (Object) keyValuePairs);
+      return (Map.Immutable<K, V>) persistentMapOfKeyValuePairs
+          .invoke(null, (Object) keyValuePairs);
     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V, M extends Map.Transient<K, V>> M transientOf() {
     try {
       return (M) transientMapOfEmpty.invoke(null);
@@ -69,7 +65,6 @@ public class DefaultTrieMap {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> Map.Transient<K, V> transientOf(Object... keyValuePairs) {
     try {
       return (Map.Transient<K, V>) transientMapOfKeyValuePairs.invoke(null, (Object) keyValuePairs);

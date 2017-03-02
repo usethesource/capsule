@@ -38,7 +38,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import io.usethesource.capsule.api.SetMultimap;
-import io.usethesource.capsule.core.TrieSet_5Bits;
+import io.usethesource.capsule.core.PersistentTrieSet;
 import io.usethesource.capsule.core.trie.ArrayView;
 import io.usethesource.capsule.core.trie.Node;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type;
@@ -448,13 +448,13 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
 //   */
 //  @Override
 //  public Set<K> keySet() {
-//    final BottomUpTransientNodeTransformer<AbstractSetMultimapNode<K, V>, TrieSet_5Bits.AbstractSetNode<K>> transformer =
+//    final BottomUpTransientNodeTransformer<AbstractSetMultimapNode<K, V>, PersistentTrieSet.AbstractSetNode<K>> transformer =
 //        new BottomUpTransientNodeTransformer<>(rootNode,
 //            (node, mutator) -> node.toSetNode(mutator));
 //
-//    final TrieSet_5Bits.AbstractSetNode<K> newRootNode = transformer.apply();
+//    final PersistentTrieSet.AbstractSetNode<K> newRootNode = transformer.apply();
 //
-//    return new TrieSet_5Bits<>(newRootNode, cachedKeySetHashCode, cachedKeySetSize);
+//    return new PersistentTrieSet<>(newRootNode, cachedKeySetHashCode, cachedKeySetSize);
 //  }
 
   @Override
@@ -896,12 +896,12 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
 
     /***** CONVERISONS *****/
 
-    abstract TrieSet_5Bits.AbstractSetNode<K> toSetNode(AtomicReference<Thread> mutator);
+    abstract PersistentTrieSet.AbstractSetNode<K> toSetNode(AtomicReference<Thread> mutator);
 
-    // abstract TrieSet_5Bits.AbstractSetNode<K> toSetNode(
-    // TrieSet_5Bits.AbstractSetNode<K>... newChildren);
+    // abstract PersistentTrieSet.AbstractSetNode<K> toSetNode(
+    // PersistentTrieSet.AbstractSetNode<K>... newChildren);
 
-    // TrieSet_5Bits.AbstractSetNode<K> toSetNode() {
+    // PersistentTrieSet.AbstractSetNode<K> toSetNode() {
     // throw new UnsupportedOperationException(
     // "Not yet implemented ~ structural conversion of multimap to set.");
     // }
@@ -1981,7 +1981,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
     }
 
     @Override
-    TrieSet_5Bits.AbstractSetNode<K> toSetNode(final AtomicReference<Thread> mutator) {
+    PersistentTrieSet.AbstractSetNode<K> toSetNode(final AtomicReference<Thread> mutator) {
       final int mergedPayloadMap = rawMap2();
 
       final ArrayView<K> dataArray0 = dataArray(0, 0);
@@ -1997,7 +1997,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
         content[i] = iterator.next();
       }
 
-      return TrieSet_5Bits.AbstractSetNode.newBitmapIndexedNode(mutator, nodeMap(),
+      return PersistentTrieSet.AbstractSetNode.newBitmapIndexedNode(mutator, nodeMap(),
           mergedPayloadMap, content);
     }
 
@@ -2033,7 +2033,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
     }
 
     // @Override
-    // TrieSet_5Bits.AbstractSetNode<K> toSetNode(final AtomicReference<Thread> mutator) {
+    // PersistentTrieSet.AbstractSetNode<K> toSetNode(final AtomicReference<Thread> mutator) {
     // final int mergedPayloadMap = rawMap2();
     //
     // // allocate an array that can hold the keys + empty placeholder slots for sub-nodes
@@ -2061,12 +2061,12 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
     // slidingMap2 = slidingMap2 >> 1;
     // }
     //
-    // return TrieSet_5Bits.AbstractSetNode.newBitmapIndexedNode(mutator, nodeMap(),
+    // return PersistentTrieSet.AbstractSetNode.newBitmapIndexedNode(mutator, nodeMap(),
     // mergedPayloadMap, setContent);
     // }
 
     // @Override
-    // TrieSet_5Bits.AbstractSetNode<K> toSetNode(TrieSet_5Bits.AbstractSetNode<K>[] newChildren) {
+    // PersistentTrieSet.AbstractSetNode<K> toSetNode(PersistentTrieSet.AbstractSetNode<K>[] newChildren) {
     // final K[] keys = (K[]) new Object[arity(rawMap2())];
     //
     // int dataMap = dataMap();
@@ -2090,7 +2090,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
     // collMap = collMap >> 1;
     // }
     //
-    // return TrieSet_5Bits.AbstractSetNode.newBitmapIndexedNode(null, nodeMap(), rawMap2(), keys,
+    // return PersistentTrieSet.AbstractSetNode.newBitmapIndexedNode(null, nodeMap(), rawMap2(), keys,
     // newChildren);
     // }
 
@@ -2615,16 +2615,16 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
         () -> new UnsupportedOperationException("Not yet implemented @ HashCollisionNode.");
 
     @Override
-    TrieSet_5Bits.AbstractSetNode<K> toSetNode(AtomicReference<Thread> mutator) {
+    PersistentTrieSet.AbstractSetNode<K> toSetNode(AtomicReference<Thread> mutator) {
       // is leaf; ignore mutator
-      return TrieSet_5Bits.AbstractSetNode.newHashCollisonNode(hash,
+      return PersistentTrieSet.AbstractSetNode.newHashCollisonNode(hash,
           (K[]) collisionContent.stream().map(Map.Entry::getKey).toArray());
     }
 
     // @Override
-    // TrieSet_5Bits.AbstractSetNode<K> toSetNode(TrieSet_5Bits.AbstractSetNode<K>[] newChildren) {
+    // PersistentTrieSet.AbstractSetNode<K> toSetNode(PersistentTrieSet.AbstractSetNode<K>[] newChildren) {
     // // is leaf; ignore newChildren
-    // return TrieSet_5Bits.AbstractSetNode.newHashCollisonNode(hash,
+    // return PersistentTrieSet.AbstractSetNode.newHashCollisonNode(hash,
     // (K[]) collisionContent.stream().map(Map.Entry::getKey).toArray());
     // }
 
