@@ -18,7 +18,8 @@ import io.usethesource.capsule.api.BinaryRelation;
 import io.usethesource.capsule.api.Set;
 import io.usethesource.capsule.api.SetMultimap;
 
-public class PersistentBidirectionalTrieSetMultimap<K, V> implements BinaryRelation.Immutable<K, V> {
+public class PersistentBidirectionalTrieSetMultimap<K, V> implements
+    BinaryRelation.Immutable<K, V> {
 
   private final SetMultimap.Immutable<K, V> fwd;
   private final SetMultimap.Immutable<V, K> bwd;

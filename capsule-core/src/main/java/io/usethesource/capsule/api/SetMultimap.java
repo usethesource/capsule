@@ -16,6 +16,8 @@ import java.util.function.BiFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import io.usethesource.capsule.core.PersistentTrieSetMultimap;
+
 /**
  * Experimental interface for a multimap data type.
  */
@@ -186,4 +188,21 @@ public interface SetMultimap<K, V> {
     SetMultimap.Immutable<K, V> freeze();
 
   }
+
+  static <K, V> SetMultimap.Immutable<K, V> of() {
+    return PersistentTrieSetMultimap.of();
+  }
+
+  static <K, V> SetMultimap.Immutable<K, V> of(K key, V value) {
+    return PersistentTrieSetMultimap.of(key, value);
+  }
+
+  static <K, V> SetMultimap.Immutable<K, V> of(K key0, V value0, K key1, V value1) {
+    return PersistentTrieSetMultimap.of(key0, value0, key1, value1);
+  }
+
+  static <K, V> SetMultimap.Transient<K, V> transientOf() {
+    return PersistentTrieSetMultimap.transientOf();
+  }
+
 }

@@ -98,6 +98,13 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     return result;
   }
 
+  public static final <K, V> SetMultimap.Immutable<K, V> of(K key0, V value0, K key1, V value1) {
+    SetMultimap.Transient<K, V> result = PersistentTrieSetMultimap.EMPTY_SETMULTIMAP.asTransient();
+    result.__insert(key0, value0);
+    result.__insert(key1, value1);
+    return result.freeze();
+  }
+
   public static final <K, V> SetMultimap.Transient<K, V> transientOf() {
     return PersistentTrieSetMultimap.EMPTY_SETMULTIMAP.asTransient();
   }
