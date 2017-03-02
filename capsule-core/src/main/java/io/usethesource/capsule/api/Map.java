@@ -9,7 +9,7 @@ package io.usethesource.capsule.api;
 
 import java.util.Iterator;
 
-import io.usethesource.capsule.DefaultTrieMap;
+import io.usethesource.capsule.core.PersistentTrieMap;
 
 public interface Map<K, V> extends java.util.Map<K, V>, MapEq<K, V> {
 
@@ -61,10 +61,18 @@ public interface Map<K, V> extends java.util.Map<K, V>, MapEq<K, V> {
   }
 
   static <K, V> Map.Immutable<K, V> of() {
-    return DefaultTrieMap.of();
+    return PersistentTrieMap.of();
+  }
+
+  static <K, V> Map.Immutable<K, V> of(K key, V value) {
+    return PersistentTrieMap.of(key, value);
+  }
+
+  static <K, V> Map.Immutable<K, V> of(K key0, V value0, K key1, V value1) {
+    return PersistentTrieMap.of(key0, value0, key1, value1);
   }
 
   static <K, V> Map.Transient<K, V> transientOf() {
-    return DefaultTrieMap.transientOf();
+    return PersistentTrieMap.transientOf();
   }
 }

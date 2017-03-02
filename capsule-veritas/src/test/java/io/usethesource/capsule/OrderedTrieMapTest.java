@@ -5,14 +5,18 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.capsule.experimental.ordered;
-
-import static java.lang.System.out;
-import static org.junit.Assert.*;
+package io.usethesource.capsule;
 
 import java.util.Iterator;
 
+import io.usethesource.capsule.experimental.ordered.OrderedTrieMap;
+import org.junit.Assert;
 import org.junit.Test;
+
+import static java.lang.System.out;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class OrderedTrieMapTest {
 
@@ -106,7 +110,7 @@ public class OrderedTrieMapTest {
 
   @Test
   public void basicReplaceRetainsSize() {
-    assertEquals(createBasicMap().size(), createBasicMap().insert("-1", -1).size());
+    Assert.assertEquals(createBasicMap().size(), createBasicMap().insert("-1", -1).size());
   }
 
   @Test

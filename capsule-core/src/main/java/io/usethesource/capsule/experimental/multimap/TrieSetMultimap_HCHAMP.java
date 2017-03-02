@@ -7,12 +7,6 @@
  */
 package io.usethesource.capsule.experimental.multimap;
 
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setOf;
-import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type.COLLECTION;
-import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type.SINGLETON;
-import static io.usethesource.capsule.util.RangecopyUtils.isBitInBitmap;
-import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
-
 import java.util.AbstractCollection;
 import java.util.AbstractSet;
 import java.util.ArrayDeque;
@@ -44,6 +38,11 @@ import io.usethesource.capsule.core.trie.Node;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type;
 import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
+
+import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type.COLLECTION;
+import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type.SINGLETON;
+import static io.usethesource.capsule.util.RangecopyUtils.isBitInBitmap;
+import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V> {
 
@@ -1035,7 +1034,9 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
       // assert !(cmp.equals(key0, key1));
 
       if (shift >= HASH_CODE_LENGTH) {
-        return AbstractHashCollisionNode.of(keyHash0, key0, setOf(val0), key1, setOf(val1));
+        return AbstractHashCollisionNode
+            .of(keyHash0, key0, io.usethesource.capsule.api.Set.of(val0), key1,
+                io.usethesource.capsule.api.Set.of(val1));
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -1069,7 +1070,8 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
       // assert !(cmp.equals(key0, key1));
 
       if (shift >= HASH_CODE_LENGTH) {
-        return AbstractHashCollisionNode.of(keyHash0, key1, setOf(val1), key0, valColl0);
+        return AbstractHashCollisionNode
+            .of(keyHash0, key1, io.usethesource.capsule.api.Set.of(val1), key0, valColl0);
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -1223,7 +1225,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
         if (cmp.equals(currentKey, key)) {
 
           final V currentVal = getSingletonValue(index);
-          return Optional.of(setOf(currentVal));
+          return Optional.of(io.usethesource.capsule.api.Set.of(currentVal));
         }
 
         return Optional.empty();
@@ -1280,7 +1282,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
           } else {
             // migrate from singleton to collection
             final io.usethesource.capsule.api.Set.Immutable<V> valColl =
-                setOf(currentVal, val);
+                io.usethesource.capsule.api.Set.of(currentVal, val);
 
             details.modified();
             return copyAndMigrateFromSingletonToCollection(mutator, bitpos, currentKey, valColl);
@@ -2797,7 +2799,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
 
         Stream.Builder<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> builder =
             Stream.<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>>builder()
-                .add(entryOf(key, setOf(val)));
+                .add(entryOf(key, io.usethesource.capsule.api.Set.of(val)));
 
         collisionContent.forEach(builder::accept);
 
@@ -2809,7 +2811,8 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
         assert updatedCollisionContent.containsAll(collisionContent);
         // assert updatedCollisionContent.contains(entryOf(key, setOf(val)));
         assert updatedCollisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())
-            && Objects.equals(setOf(val), entry.getValue())).findAny().isPresent();
+            && Objects.equals(io.usethesource.capsule.api.Set.of(val), entry.getValue())).findAny()
+            .isPresent();
 
         details.modified();
         return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
@@ -2854,7 +2857,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
 
         Stream.Builder<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> builder =
             Stream.<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>>builder()
-                .add(entryOf(key, setOf(val)));
+                .add(entryOf(key, io.usethesource.capsule.api.Set.of(val)));
 
         collisionContent.forEach(builder::accept);
 
@@ -3079,7 +3082,8 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
       } else {
         // TODO: check case distinction
         if (currentValueSingletonCursor < currentValueSingletonLength) {
-          return setOf(currentValueNode.getSingletonValue(currentValueSingletonCursor++));
+          return io.usethesource.capsule.api.Set
+              .of(currentValueNode.getSingletonValue(currentValueSingletonCursor++));
         } else {
           return currentValueNode.getCollectionValue(currentValueCollectionCursor++);
         }

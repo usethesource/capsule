@@ -10,7 +10,7 @@ package io.usethesource.capsule.api;
 import java.util.Collection;
 import java.util.Iterator;
 
-import io.usethesource.capsule.DefaultTrieSet;
+import io.usethesource.capsule.core.PersistentTrieSet;
 
 public interface Set<K> extends java.util.Set<K>, SetEq<K> {
 
@@ -65,10 +65,18 @@ public interface Set<K> extends java.util.Set<K>, SetEq<K> {
   }
 
   static <K> Set.Immutable<K> of() {
-    return DefaultTrieSet.of();
+    return PersistentTrieSet.of();
+  }
+
+  static <K> Set.Immutable<K> of(K item) {
+    return PersistentTrieSet.of(item);
+  }
+
+  static <K> Set.Immutable<K> of(K item0, K item1) {
+    return PersistentTrieSet.of(item0, item1);
   }
 
   static <K> Set.Transient<K> transientOf() {
-    return DefaultTrieSet.transientOf();
+    return PersistentTrieSet.transientOf();
   }
 }

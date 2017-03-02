@@ -10,12 +10,20 @@
   </parent>
 
   <groupId>io.usethesource</groupId>
-  <artifactId>capsule</artifactId>
+  <artifactId>capsule-experimental</artifactId>
   <version>0.3.0.HETEROGENEOUS-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <properties>
     <topleveldir>${project.parent.basedir}</topleveldir>
   </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.usethesource</groupId>
+      <artifactId>capsule</artifactId>
+      <version>0.3.0.HETEROGENEOUS-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
 
 </project>

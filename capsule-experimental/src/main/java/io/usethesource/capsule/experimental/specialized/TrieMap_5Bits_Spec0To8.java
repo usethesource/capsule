@@ -7,8 +7,6 @@
  */
 package io.usethesource.capsule.experimental.specialized;
 
-import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
-
 import java.text.DecimalFormat;
 import java.util.AbstractCollection;
 import java.util.AbstractSet;
@@ -25,10 +23,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-@SuppressWarnings("rawtypes")
-public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api.Map.Immutable<K, V> {
+import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
-  @SuppressWarnings("unchecked")
+public class TrieMap_5Bits_Spec0To8<K, V> implements
+    io.usethesource.capsule.api.Map.Immutable<K, V> {
+
   private static final TrieMap_5Bits_Spec0To8 EMPTY_MAP =
       new TrieMap_5Bits_Spec0To8(CompactMapNode.EMPTY_NODE, 0, 0);
 
@@ -47,13 +46,12 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> io.usethesource.capsule.api.Map.Immutable<K, V> of() {
     return TrieMap_5Bits_Spec0To8.EMPTY_MAP;
   }
 
-  @SuppressWarnings("unchecked")
-  public static final <K, V> io.usethesource.capsule.api.Map.Immutable<K, V> of(Object... keyValuePairs) {
+  public static final <K, V> io.usethesource.capsule.api.Map.Immutable<K, V> of(
+      Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
       throw new IllegalArgumentException("Length of argument list is uneven: no key/value pairs.");
     }
@@ -70,18 +68,18 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
     return result;
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> io.usethesource.capsule.api.Map.Transient<K, V> transientOf() {
     return TrieMap_5Bits_Spec0To8.EMPTY_MAP.asTransient();
   }
 
-  @SuppressWarnings("unchecked")
-  public static final <K, V> io.usethesource.capsule.api.Map.Transient<K, V> transientOf(Object... keyValuePairs) {
+  public static final <K, V> io.usethesource.capsule.api.Map.Transient<K, V> transientOf(
+      Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
       throw new IllegalArgumentException("Length of argument list is uneven: no key/value pairs.");
     }
 
-    final io.usethesource.capsule.api.Map.Transient<K, V> result = TrieMap_5Bits_Spec0To8.EMPTY_MAP.asTransient();
+    final io.usethesource.capsule.api.Map.Transient<K, V> result = TrieMap_5Bits_Spec0To8.EMPTY_MAP
+        .asTransient();
 
     for (int i = 0; i < keyValuePairs.length; i += 2) {
       final K key = (K) keyValuePairs[i];
@@ -97,7 +95,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
     int hash = 0;
     int size = 0;
 
-    for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
+    for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext(); ) {
       final Map.Entry<K, V> entry = it.next();
       final K key = entry.getKey();
       final V val = entry.getValue();
@@ -113,9 +111,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
     return hash;
   }
 
+  @Override
   public boolean containsKey(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0);
     } catch (ClassCastException unused) {
@@ -123,9 +121,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
     }
   }
 
+  @Override
   public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0, cmp);
     } catch (ClassCastException unused) {
@@ -133,8 +131,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
     }
   }
 
+  @Override
   public boolean containsValue(final Object o) {
-    for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
+    for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
       if (iterator.next().equals(o)) {
         return true;
       }
@@ -142,8 +141,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
     return false;
   }
 
+  @Override
   public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
-    for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
+    for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
       if (cmp.compare(iterator.next(), o) == 0) {
         return true;
       }
@@ -151,9 +151,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
     return false;
   }
 
+  @Override
   public V get(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       final Optional<V> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
@@ -167,9 +167,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
     }
   }
 
+  @Override
   public V getEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       final Optional<V> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
@@ -183,6 +183,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
     }
   }
 
+  @Override
   public io.usethesource.capsule.api.Map.Immutable<K, V> __put(final K key, final V val) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
@@ -207,8 +208,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
     return this;
   }
 
+  @Override
   public io.usethesource.capsule.api.Map.Immutable<K, V> __putEquivalent(final K key, final V val,
-                                                                         final Comparator<Object> cmp) {
+      final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -232,19 +234,24 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
     return this;
   }
 
-  public io.usethesource.capsule.api.Map.Immutable<K, V> __putAll(final Map<? extends K, ? extends V> map) {
+  @Override
+  public io.usethesource.capsule.api.Map.Immutable<K, V> __putAll(
+      final Map<? extends K, ? extends V> map) {
     final io.usethesource.capsule.api.Map.Transient<K, V> tmpTransient = this.asTransient();
     tmpTransient.__putAll(map);
     return tmpTransient.freeze();
   }
 
-  public io.usethesource.capsule.api.Map.Immutable<K, V> __putAllEquivalent(final Map<? extends K, ? extends V> map,
-                                                                            final Comparator<Object> cmp) {
+  @Override
+  public io.usethesource.capsule.api.Map.Immutable<K, V> __putAllEquivalent(
+      final Map<? extends K, ? extends V> map,
+      final Comparator<Object> cmp) {
     final io.usethesource.capsule.api.Map.Transient<K, V> tmpTransient = this.asTransient();
     tmpTransient.__putAllEquivalent(map, cmp);
     return tmpTransient.freeze();
   }
 
+  @Override
   public io.usethesource.capsule.api.Map.Immutable<K, V> __remove(final K key) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
@@ -262,7 +269,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
     return this;
   }
 
-  public io.usethesource.capsule.api.Map.Immutable<K, V> __removeEquivalent(final K key, final Comparator<Object> cmp) {
+  @Override
+  public io.usethesource.capsule.api.Map.Immutable<K, V> __removeEquivalent(final K key,
+      final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -279,38 +288,47 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
     return this;
   }
 
+  @Override
   public V put(final K key, final V val) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void putAll(final Map<? extends K, ? extends V> m) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void clear() {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public V remove(final Object key) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public int size() {
     return cachedSize;
   }
 
+  @Override
   public boolean isEmpty() {
     return cachedSize == 0;
   }
 
+  @Override
   public Iterator<K> keyIterator() {
     return new MapKeyIterator<>(rootNode);
   }
 
+  @Override
   public Iterator<V> valueIterator() {
     return new MapValueIterator<>(rootNode);
   }
 
+  @Override
   public Iterator<Map.Entry<K, V>> entryIterator() {
     return new MapEntryIterator<>(rootNode);
   }
@@ -464,22 +482,21 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
     } else if (other instanceof Map) {
       Map that = (Map) other;
 
-      if (this.size() != that.size())
+      if (this.size() != that.size()) {
         return false;
+      }
 
-      for (@SuppressWarnings("unchecked")
-      Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
+      for (
+          Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext(); ) {
         Map.Entry entry = it.next();
 
         try {
-          @SuppressWarnings("unchecked")
           final K key = (K) entry.getKey();
           final Optional<V> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
           if (!result.isPresent()) {
             return false;
           } else {
-            @SuppressWarnings("unchecked")
             final V val = (V) entry.getValue();
 
             if (!result.get().equals(val)) {
@@ -617,6 +634,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
   }
 
   abstract static class Optional<T> {
+
     private static final Optional EMPTY = new Optional() {
       @Override
       boolean isPresent() {
@@ -629,7 +647,6 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       }
     };
 
-    @SuppressWarnings("unchecked")
     static <T> Optional<T> empty() {
       return EMPTY;
     }
@@ -643,6 +660,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
     abstract T get();
 
     private static final class Value<T> extends Optional<T> {
+
       private final T value;
 
       private Value(T value) {
@@ -662,6 +680,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
   }
 
   static final class MapResult<K, V> {
+
     private V replacedValue;
     private boolean isModified;
     private boolean isReplaced;
@@ -682,7 +701,8 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return new MapResult<>();
     }
 
-    private MapResult() {}
+    private MapResult() {
+    }
 
     public boolean isModified() {
       return isModified;
@@ -698,6 +718,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
   }
 
   protected static interface INode<K, V> {
+
   }
 
   protected static abstract class AbstractMapNode<K, V> implements INode<K, V> {
@@ -752,8 +773,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
 
         @Override
         public AbstractMapNode<K, V> next() {
-          if (!hasNext())
+          if (!hasNext()) {
             throw new NoSuchElementException();
+          }
           return AbstractMapNode.this.getNode(nextIndex++);
         }
 
@@ -783,7 +805,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
 
     /**
      * The arity of this trie node (i.e. number of values and nodes stored on this level).
-     * 
+     *
      * @return sum of nodes and values stored within
      */
 
@@ -830,7 +852,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
     /**
      * Abstract predicate over a node's size. Value can be either {@value #SIZE_EMPTY},
      * {@value #SIZE_ONE}, or {@value #SIZE_MORE_THAN_ONE}.
-     * 
+     *
      * @return size predicate
      */
     abstract byte sizePredicate();
@@ -881,8 +903,8 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       if (shift >= HASH_CODE_LENGTH) {
         // throw new
         // IllegalStateException("Hash collision not yet fixed.");
-        return new HashCollisionMapNode_5Bits_Spec0To8<>(keyHash0, (K[]) new Object[] {key0, key1},
-            (V[]) new Object[] {val0, val1});
+        return new HashCollisionMapNode_5Bits_Spec0To8<>(keyHash0, (K[]) new Object[]{key0, key1},
+            (V[]) new Object[]{val0, val1});
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -913,14 +935,15 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
 
       EMPTY_NODE = new Map0To0Node_5Bits_Spec0To8<>(null, (int) 0, (int) 0);
 
-    };
+    }
+
+    ;
 
     static final <K, V> CompactMapNode<K, V> nodeOf(final AtomicReference<Thread> mutator,
         final int nodeMap, final int dataMap, final Object[] nodes) {
       return new BitmapIndexedMapNode<>(mutator, nodeMap, dataMap, nodes);
     }
 
-    @SuppressWarnings("unchecked")
     static final <K, V> CompactMapNode<K, V> nodeOf(AtomicReference<Thread> mutator) {
       return EMPTY_NODE;
     }
@@ -999,7 +1022,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
         final CompactMapNode<K, V> node8, final CompactMapNode<K, V> node9) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {node9, node8, node7, node6, node5, node4, node3, node2, node1});
+          new Object[]{node9, node8, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final <K, V> CompactMapNode<K, V> nodeOf(final AtomicReference<Thread> mutator,
@@ -1071,7 +1094,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
         final CompactMapNode<K, V> node7, final CompactMapNode<K, V> node8) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, val1, node8, node7, node6, node5, node4, node3, node2, node1});
+          new Object[]{key1, val1, node8, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final <K, V> CompactMapNode<K, V> nodeOf(final AtomicReference<Thread> mutator,
@@ -1136,7 +1159,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
         final CompactMapNode<K, V> node7) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, val1, key2, val2, node7, node6, node5, node4, node3, node2, node1});
+          new Object[]{key1, val1, key2, val2, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final <K, V> CompactMapNode<K, V> nodeOf(final AtomicReference<Thread> mutator,
@@ -1194,7 +1217,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
         final CompactMapNode<K, V> node4, final CompactMapNode<K, V> node5,
         final CompactMapNode<K, V> node6) {
       // NOTE: reversed node argument list due to CHAMP encoding
-      return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
+      return nodeOf(mutator, nodeMap, dataMap, new Object[]{key1, val1, key2, val2, key3, val3,
           node6, node5, node4, node3, node2, node1});
     }
 
@@ -1246,7 +1269,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
         final CompactMapNode<K, V> node3, final CompactMapNode<K, V> node4,
         final CompactMapNode<K, V> node5) {
       // NOTE: reversed node argument list due to CHAMP encoding
-      return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
+      return nodeOf(mutator, nodeMap, dataMap, new Object[]{key1, val1, key2, val2, key3, val3,
           key4, val4, node5, node4, node3, node2, node1});
     }
 
@@ -1289,7 +1312,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
         final V val5, final CompactMapNode<K, V> node1, final CompactMapNode<K, V> node2,
         final CompactMapNode<K, V> node3, final CompactMapNode<K, V> node4) {
       // NOTE: reversed node argument list due to CHAMP encoding
-      return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
+      return nodeOf(mutator, nodeMap, dataMap, new Object[]{key1, val1, key2, val2, key3, val3,
           key4, val4, key5, val5, node4, node3, node2, node1});
     }
 
@@ -1324,7 +1347,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
         final V val5, final K key6, final V val6, final CompactMapNode<K, V> node1,
         final CompactMapNode<K, V> node2, final CompactMapNode<K, V> node3) {
       // NOTE: reversed node argument list due to CHAMP encoding
-      return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
+      return nodeOf(mutator, nodeMap, dataMap, new Object[]{key1, val1, key2, val2, key3, val3,
           key4, val4, key5, val5, key6, val6, node3, node2, node1});
     }
 
@@ -1351,7 +1374,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
         final V val5, final K key6, final V val6, final K key7, final V val7,
         final CompactMapNode<K, V> node1, final CompactMapNode<K, V> node2) {
       // NOTE: reversed node argument list due to CHAMP encoding
-      return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
+      return nodeOf(mutator, nodeMap, dataMap, new Object[]{key1, val1, key2, val2, key3, val3,
           key4, val4, key5, val5, key6, val6, key7, val7, node2, node1});
     }
 
@@ -1370,7 +1393,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
         final V val5, final K key6, final V val6, final K key7, final V val7, final K key8,
         final V val8, final CompactMapNode<K, V> node1) {
       // NOTE: reversed node argument list due to CHAMP encoding
-      return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
+      return nodeOf(mutator, nodeMap, dataMap, new Object[]{key1, val1, key2, val2, key3, val3,
           key4, val4, key5, val5, key6, val6, key7, val7, key8, val8, node1});
     }
 
@@ -1379,7 +1402,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
         final V val2, final K key3, final V val3, final K key4, final V val4, final K key5,
         final V val5, final K key6, final V val6, final K key7, final V val7, final K key8,
         final V val8, final K key9, final V val9) {
-      return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
+      return nodeOf(mutator, nodeMap, dataMap, new Object[]{key1, val1, key2, val2, key3, val3,
           key4, val4, key5, val5, key6, val6, key7, val7, key8, val8, key9, val9});
     }
 
@@ -1403,6 +1426,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return getNode(nodeIndex(bitpos));
     }
 
+    @Override
     boolean containsKey(final K key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -1422,6 +1446,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return false;
     }
 
+    @Override
     boolean containsKey(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -1442,6 +1467,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return false;
     }
 
+    @Override
     Optional<V> findByKey(final K key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -1466,6 +1492,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return Optional.empty();
     }
 
+    @Override
     Optional<V> findByKey(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -1491,6 +1518,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return Optional.empty();
     }
 
+    @Override
     CompactMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
         final int keyHash, final int shift, final MapResult<K, V> details) {
       final int mask = mask(keyHash, shift);
@@ -1536,6 +1564,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       }
     }
 
+    @Override
     CompactMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
         final int keyHash, final int shift, final MapResult<K, V> details,
         final Comparator<Object> cmp) {
@@ -1582,6 +1611,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       }
     }
 
+    @Override
     CompactMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final MapResult<K, V> details) {
       final int mask = mask(keyHash, shift);
@@ -1645,6 +1675,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return this;
     }
 
+    @Override
     CompactMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final MapResult<K, V> details,
         final Comparator<Object> cmp) {
@@ -1837,7 +1868,8 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
   protected static abstract class CompactEmptyMapNode<K, V> extends CompactMapNode<K, V> {
 
     CompactEmptyMapNode(final AtomicReference<Thread> mutator, final int nodeMap,
-        final int dataMap) {}
+        final int dataMap) {
+    }
 
     @Override
     public int nodeMap() {
@@ -1880,23 +1912,21 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       assert nodeInvariant();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     K getKey(final int index) {
       return (K) nodes[TUPLE_LENGTH * index];
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     V getValue(final int index) {
       return (V) nodes[TUPLE_LENGTH * index + 1];
     }
 
+    @Override
     Map.Entry<K, V> getKeyValueEntry(final int index) {
       return entryOf((K) nodes[TUPLE_LENGTH * index], (V) nodes[TUPLE_LENGTH * index + 1]);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     CompactMapNode<K, V> getNode(final int index) {
       return (CompactMapNode<K, V>) nodes[nodes.length - 1 - index];
@@ -2986,6 +3016,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
 
   private static final class HashCollisionMapNode_5Bits_Spec0To8<K, V>
       extends CompactMapNode<K, V> {
+
     private final K[] keys;
     private final V[] vals;
     private final int hash;
@@ -2998,6 +3029,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       assert payloadArity() >= 2;
     }
 
+    @Override
     boolean containsKey(final K key, final int keyHash, final int shift) {
       if (this.hash == keyHash) {
         for (K k : keys) {
@@ -3009,6 +3041,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return false;
     }
 
+    @Override
     boolean containsKey(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       if (this.hash == keyHash) {
@@ -3021,6 +3054,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return false;
     }
 
+    @Override
     Optional<V> findByKey(final K key, final int keyHash, final int shift) {
       for (int i = 0; i < keys.length; i++) {
         final K _key = keys[i];
@@ -3032,6 +3066,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return Optional.empty();
     }
 
+    @Override
     Optional<V> findByKey(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       for (int i = 0; i < keys.length; i++) {
@@ -3044,6 +3079,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return Optional.empty();
     }
 
+    @Override
     CompactMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
         final int keyHash, final int shift, final MapResult<K, V> details) {
       assert this.hash == keyHash;
@@ -3057,7 +3093,6 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
           } else {
             // add new mapping
             final V[] src = this.vals;
-            @SuppressWarnings("unchecked")
             final V[] dst = (V[]) new Object[src.length];
 
             // copy 'src' and set 1 element(s) at position 'idx'
@@ -3073,7 +3108,6 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
         }
       }
 
-      @SuppressWarnings("unchecked")
       final K[] keysNew = (K[]) new Object[this.keys.length + 1];
 
       // copy 'this.keys' and insert 1 element(s) at position
@@ -3083,7 +3117,6 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       System.arraycopy(this.keys, keys.length, keysNew, keys.length + 1,
           this.keys.length - keys.length);
 
-      @SuppressWarnings("unchecked")
       final V[] valsNew = (V[]) new Object[this.vals.length + 1];
 
       // copy 'this.vals' and insert 1 element(s) at position
@@ -3097,6 +3130,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return new HashCollisionMapNode_5Bits_Spec0To8<>(keyHash, keysNew, valsNew);
     }
 
+    @Override
     CompactMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
         final int keyHash, final int shift, final MapResult<K, V> details,
         final Comparator<Object> cmp) {
@@ -3111,7 +3145,6 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
           } else {
             // add new mapping
             final V[] src = this.vals;
-            @SuppressWarnings("unchecked")
             final V[] dst = (V[]) new Object[src.length];
 
             // copy 'src' and set 1 element(s) at position 'idx'
@@ -3127,7 +3160,6 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
         }
       }
 
-      @SuppressWarnings("unchecked")
       final K[] keysNew = (K[]) new Object[this.keys.length + 1];
 
       // copy 'this.keys' and insert 1 element(s) at position
@@ -3137,7 +3169,6 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       System.arraycopy(this.keys, keys.length, keysNew, keys.length + 1,
           this.keys.length - keys.length);
 
-      @SuppressWarnings("unchecked")
       final V[] valsNew = (V[]) new Object[this.vals.length + 1];
 
       // copy 'this.vals' and insert 1 element(s) at position
@@ -3151,6 +3182,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return new HashCollisionMapNode_5Bits_Spec0To8<>(keyHash, keysNew, valsNew);
     }
 
+    @Override
     CompactMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final MapResult<K, V> details) {
       for (int idx = 0; idx < keys.length; idx++) {
@@ -3170,7 +3202,6 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
             return CompactMapNode.<K, V>nodeOf(mutator).updated(mutator, theOtherKey, theOtherVal,
                 keyHash, 0, details);
           } else {
-            @SuppressWarnings("unchecked")
             final K[] keysNew = (K[]) new Object[this.keys.length - 1];
 
             // copy 'this.keys' and remove 1 element(s) at position
@@ -3178,7 +3209,6 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
             System.arraycopy(this.keys, 0, keysNew, 0, idx);
             System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
 
-            @SuppressWarnings("unchecked")
             final V[] valsNew = (V[]) new Object[this.vals.length - 1];
 
             // copy 'this.vals' and remove 1 element(s) at position
@@ -3193,6 +3223,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return this;
     }
 
+    @Override
     CompactMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final MapResult<K, V> details,
         final Comparator<Object> cmp) {
@@ -3213,7 +3244,6 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
             return CompactMapNode.<K, V>nodeOf(mutator).updated(mutator, theOtherKey, theOtherVal,
                 keyHash, 0, details, cmp);
           } else {
-            @SuppressWarnings("unchecked")
             final K[] keysNew = (K[]) new Object[this.keys.length - 1];
 
             // copy 'this.keys' and remove 1 element(s) at position
@@ -3221,7 +3251,6 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
             System.arraycopy(this.keys, 0, keysNew, 0, idx);
             System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
 
-            @SuppressWarnings("unchecked")
             final V[] valsNew = (V[]) new Object[this.vals.length - 1];
 
             // copy 'this.vals' and remove 1 element(s) at position
@@ -3276,6 +3305,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return vals[index];
     }
 
+    @Override
     Map.Entry<K, V> getKeyValueEntry(final int index) {
       return entryOf(keys[index], vals[index]);
     }
@@ -3336,7 +3366,8 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       /*
        * Linear scan for each key, because of arbitrary element order.
        */
-      outerLoop: for (int i = 0; i < that.payloadArity(); i++) {
+      outerLoop:
+      for (int i = 0; i < that.payloadArity(); i++) {
         final Object otherKey = that.getKey(i);
         final Object otherVal = that.getValue(i);
 
@@ -3422,7 +3453,6 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
     private int currentStackLevel = -1;
     private final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
 
-    @SuppressWarnings("unchecked")
     AbstractMapNode<K, V>[] nodes = new AbstractMapNode[MAX_DEPTH];
 
     AbstractMapIterator(AbstractMapNode<K, V> rootNode) {
@@ -3603,7 +3633,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
     }
   }
 
-  static final class TransientTrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api.Map.Transient<K, V> {
+  static final class TransientTrieMap_5Bits_Spec0To8<K, V> implements
+      io.usethesource.capsule.api.Map.Transient<K, V> {
+
     final private AtomicReference<Thread> mutator;
     private AbstractMapNode<K, V> rootNode;
     private int hashCode;
@@ -3623,7 +3655,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       int hash = 0;
       int size = 0;
 
-      for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
+      for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext(); ) {
         final Map.Entry<K, V> entry = it.next();
         final K key = entry.getKey();
         final V val = entry.getValue();
@@ -3635,25 +3667,29 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return hash == targetHash && size == targetSize;
     }
 
+    @Override
     public V put(final K key, final V val) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public void putAll(final Map<? extends K, ? extends V> m) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public void clear() {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public V remove(final Object key) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean containsKey(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0);
       } catch (ClassCastException unused) {
@@ -3661,9 +3697,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       }
     }
 
+    @Override
     public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0, cmp);
       } catch (ClassCastException unused) {
@@ -3671,8 +3707,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       }
     }
 
+    @Override
     public boolean containsValue(final Object o) {
-      for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
+      for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
         if (iterator.next().equals(o)) {
           return true;
         }
@@ -3680,8 +3717,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return false;
     }
 
+    @Override
     public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
-      for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
+      for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
         if (cmp.compare(iterator.next(), o) == 0) {
           return true;
         }
@@ -3689,9 +3727,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return false;
     }
 
+    @Override
     public V get(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         final Optional<V> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
@@ -3705,9 +3743,9 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       }
     }
 
+    @Override
     public V getEquivalent(final Object o, final Comparator<Object> cmp) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         final Optional<V> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
@@ -3722,6 +3760,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       }
     }
 
+    @Override
     public V __put(final K key, final V val) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -3766,6 +3805,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return null;
     }
 
+    @Override
     public V __putEquivalent(final K key, final V val, final Comparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -3810,6 +3850,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return null;
     }
 
+    @Override
     public boolean __putAll(final Map<? extends K, ? extends V> map) {
       boolean modified = false;
 
@@ -3825,6 +3866,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return modified;
     }
 
+    @Override
     public boolean __putAllEquivalent(final Map<? extends K, ? extends V> map,
         final Comparator<Object> cmp) {
       boolean modified = false;
@@ -3841,6 +3883,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return modified;
     }
 
+    @Override
     public V __remove(final K key) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -3873,6 +3916,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return null;
     }
 
+    @Override
     public V __removeEquivalent(final K key, final Comparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -3905,27 +3949,33 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       return null;
     }
 
+    @Override
     public int size() {
       return cachedSize;
     }
 
+    @Override
     public boolean isEmpty() {
       return cachedSize == 0;
     }
 
+    @Override
     public Iterator<K> keyIterator() {
       return new TransientMapKeyIterator<>(this);
     }
 
+    @Override
     public Iterator<V> valueIterator() {
       return new TransientMapValueIterator<>(this);
     }
 
+    @Override
     public Iterator<Map.Entry<K, V>> entryIterator() {
       return new TransientMapEntryIterator<>(this);
     }
 
     public static class TransientMapKeyIterator<K, V> extends MapKeyIterator<K, V> {
+
       final TransientTrieMap_5Bits_Spec0To8<K, V> collection;
       K lastKey;
 
@@ -3934,10 +3984,12 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
         this.collection = collection;
       }
 
+      @Override
       public K next() {
         return lastKey = super.next();
       }
 
+      @Override
       public void remove() {
         // TODO: test removal at iteration rigorously
         collection.__remove(lastKey);
@@ -3945,6 +3997,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
     }
 
     public static class TransientMapValueIterator<K, V> extends MapValueIterator<K, V> {
+
       final TransientTrieMap_5Bits_Spec0To8<K, V> collection;
 
       public TransientMapValueIterator(final TransientTrieMap_5Bits_Spec0To8<K, V> collection) {
@@ -3952,16 +4005,19 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
         this.collection = collection;
       }
 
+      @Override
       public V next() {
         return super.next();
       }
 
+      @Override
       public void remove() {
         throw new UnsupportedOperationException();
       }
     }
 
     public static class TransientMapEntryIterator<K, V> extends MapEntryIterator<K, V> {
+
       final TransientTrieMap_5Bits_Spec0To8<K, V> collection;
 
       public TransientMapEntryIterator(final TransientTrieMap_5Bits_Spec0To8<K, V> collection) {
@@ -3969,10 +4025,12 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
         this.collection = collection;
       }
 
+      @Override
       public Map.Entry<K, V> next() {
         return super.next();
       }
 
+      @Override
       public void remove() {
         throw new UnsupportedOperationException();
       }
@@ -4127,15 +4185,15 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
       } else if (other instanceof Map) {
         Map that = (Map) other;
 
-        if (this.size() != that.size())
+        if (this.size() != that.size()) {
           return false;
+        }
 
-        for (@SuppressWarnings("unchecked")
-        Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
+        for (
+            Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext(); ) {
           Map.Entry entry = it.next();
 
           try {
-            @SuppressWarnings("unchecked")
             final K key = (K) entry.getKey();
             final Optional<V> result =
                 rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
@@ -4143,7 +4201,6 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements io.usethesource.capsule.api
             if (!result.isPresent()) {
               return false;
             } else {
-              @SuppressWarnings("unchecked")
               final V val = (V) entry.getValue();
 
               if (!result.get().equals(val)) {
