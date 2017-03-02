@@ -19,7 +19,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.model.InitializationError;
 
-import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
+import io.usethesource.capsule.core.TrieSet_5Bits;
 import io.usethesource.capsule.experimental.lazy.TrieSet_5Bits_LazyHashCode;
 import io.usethesource.capsule.experimental.memoized.TrieSet_5Bits_Memoized_LazyHashCode;
 import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8;

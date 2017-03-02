@@ -5,23 +5,31 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.capsule.core.deprecated;
+package io.usethesource.capsule.core;
 
-import io.usethesource.capsule.util.ArrayUtils;
+import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.AbstractCollection;
+import java.util.AbstractSet;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Deque;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 
-import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
+import io.usethesource.capsule.util.ArrayUtils;
 
-@SuppressWarnings("rawtypes")
 public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immutable<K, V> {
 
-  @SuppressWarnings("unchecked")
   private static final TrieMap_5Bits EMPTY_MAP = new TrieMap_5Bits(CompactMapNode.EMPTY_NODE, 0, 0);
 
   private static final boolean DEBUG = false;
@@ -39,13 +47,12 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> io.usethesource.capsule.api.Map.Immutable<K, V> of() {
     return TrieMap_5Bits.EMPTY_MAP;
   }
 
-  @SuppressWarnings("unchecked")
-  public static final <K, V> io.usethesource.capsule.api.Map.Immutable<K, V> of(Object... keyValuePairs) {
+  public static final <K, V> io.usethesource.capsule.api.Map.Immutable<K, V> of(
+      Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
       throw new IllegalArgumentException("Length of argument list is uneven: no key/value pairs.");
     }
@@ -62,18 +69,18 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
     return result;
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> io.usethesource.capsule.api.Map.Transient<K, V> transientOf() {
     return TrieMap_5Bits.EMPTY_MAP.asTransient();
   }
 
-  @SuppressWarnings("unchecked")
-  public static final <K, V> io.usethesource.capsule.api.Map.Transient<K, V> transientOf(Object... keyValuePairs) {
+  public static final <K, V> io.usethesource.capsule.api.Map.Transient<K, V> transientOf(
+      Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
       throw new IllegalArgumentException("Length of argument list is uneven: no key/value pairs.");
     }
 
-    final io.usethesource.capsule.api.Map.Transient<K, V> result = TrieMap_5Bits.EMPTY_MAP.asTransient();
+    final io.usethesource.capsule.api.Map.Transient<K, V> result = TrieMap_5Bits.EMPTY_MAP
+        .asTransient();
 
     for (int i = 0; i < keyValuePairs.length; i += 2) {
       final K key = (K) keyValuePairs[i];
@@ -89,7 +96,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
     int hash = 0;
     int size = 0;
 
-    for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
+    for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext(); ) {
       final Map.Entry<K, V> entry = it.next();
       final K key = entry.getKey();
       final V val = entry.getValue();
@@ -108,7 +115,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
   @Override
   public boolean containsKey(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0);
     } catch (ClassCastException unused) {
@@ -119,7 +125,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
   @Override
   public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0, cmp);
     } catch (ClassCastException unused) {
@@ -129,7 +134,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
 
   @Override
   public boolean containsValue(final Object o) {
-    for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
+    for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
       if (iterator.next().equals(o)) {
         return true;
       }
@@ -139,7 +144,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
 
   @Override
   public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
-    for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
+    for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
       if (cmp.compare(iterator.next(), o) == 0) {
         return true;
       }
@@ -150,7 +155,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
   @Override
   public V get(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       final Optional<V> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
@@ -167,7 +171,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
   @Override
   public V getEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       final Optional<V> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
@@ -207,7 +210,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
 
   @Override
   public io.usethesource.capsule.api.Map.Immutable<K, V> __putEquivalent(final K key, final V val,
-                                                                         final Comparator<Object> cmp) {
+      final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -231,15 +234,17 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
   }
 
   @Override
-  public io.usethesource.capsule.api.Map.Immutable<K, V> __putAll(final Map<? extends K, ? extends V> map) {
+  public io.usethesource.capsule.api.Map.Immutable<K, V> __putAll(
+      final Map<? extends K, ? extends V> map) {
     final io.usethesource.capsule.api.Map.Transient<K, V> tmpTransient = this.asTransient();
     tmpTransient.__putAll(map);
     return tmpTransient.freeze();
   }
 
   @Override
-  public io.usethesource.capsule.api.Map.Immutable<K, V> __putAllEquivalent(final Map<? extends K, ? extends V> map,
-                                                                            final Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Map.Immutable<K, V> __putAllEquivalent(
+      final Map<? extends K, ? extends V> map,
+      final Comparator<Object> cmp) {
     final io.usethesource.capsule.api.Map.Transient<K, V> tmpTransient = this.asTransient();
     tmpTransient.__putAllEquivalent(map, cmp);
     return tmpTransient.freeze();
@@ -263,7 +268,8 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
   }
 
   @Override
-  public io.usethesource.capsule.api.Map.Immutable<K, V> __removeEquivalent(final K key, final Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Map.Immutable<K, V> __removeEquivalent(final K key,
+      final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -477,19 +483,17 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
         return false;
       }
 
-      for (@SuppressWarnings("unchecked")
-      Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
+      for (
+          Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext(); ) {
         Map.Entry entry = it.next();
 
         try {
-          @SuppressWarnings("unchecked")
           final K key = (K) entry.getKey();
           final Optional<V> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
           if (!result.isPresent()) {
             return false;
           } else {
-            @SuppressWarnings("unchecked")
             final V val = (V) entry.getValue();
 
             if (!result.get().equals(val)) {
@@ -635,6 +639,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
   }
 
   abstract static class Optional<T> {
+
     private static final Optional EMPTY = new Optional() {
       @Override
       boolean isPresent() {
@@ -647,7 +652,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
       }
     };
 
-    @SuppressWarnings("unchecked")
     static <T> Optional<T> empty() {
       return EMPTY;
     }
@@ -661,6 +665,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
     abstract T get();
 
     private static final class Value<T> extends Optional<T> {
+
       private final T value;
 
       private Value(T value) {
@@ -680,6 +685,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
   }
 
   static final class MapResult<K, V> {
+
     private V replacedValue;
     private boolean isModified;
     private boolean isReplaced;
@@ -700,7 +706,8 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
       return new MapResult<>();
     }
 
-    private MapResult() {}
+    private MapResult() {
+    }
 
     public boolean isModified() {
       return isModified;
@@ -716,6 +723,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
   }
 
   protected static interface INode<K, V> {
+
   }
 
   protected static abstract class AbstractMapNode<K, V> implements INode<K, V> {
@@ -895,8 +903,8 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
       if (shift >= HASH_CODE_LENGTH) {
         // throw new
         // IllegalStateException("Hash collision not yet fixed.");
-        return new HashCollisionMapNode_5Bits<>(keyHash0, (K[]) new Object[] {key0, key1},
-            (V[]) new Object[] {val0, val1});
+        return new HashCollisionMapNode_5Bits<>(keyHash0, (K[]) new Object[]{key0, key1},
+            (V[]) new Object[]{val0, val1});
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -907,9 +915,9 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
         final int dataMap = bitpos(mask0) | bitpos(mask1);
 
         if (mask0 < mask1) {
-          return nodeOf(null, (0), dataMap, new Object[] {key0, val0, key1, val1});
+          return nodeOf(null, (0), dataMap, new Object[]{key0, val0, key1, val1});
         } else {
-          return nodeOf(null, (0), dataMap, new Object[] {key1, val1, key0, val0});
+          return nodeOf(null, (0), dataMap, new Object[]{key1, val1, key0, val0});
         }
       } else {
         final CompactMapNode<K, V> node = mergeTwoKeyValPairs(key0, val0, keyHash0, key1, val1,
@@ -917,7 +925,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
         // values fit on next level
 
         final int nodeMap = bitpos(mask0);
-        return nodeOf(null, nodeMap, (0), new Object[] {node});
+        return nodeOf(null, nodeMap, (0), new Object[]{node});
       }
     }
 
@@ -925,16 +933,17 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
 
     static {
 
-      EMPTY_NODE = new BitmapIndexedMapNode<>(null, (0), (0), new Object[] {});
+      EMPTY_NODE = new BitmapIndexedMapNode<>(null, (0), (0), new Object[]{});
 
-    };
+    }
+
+    ;
 
     static final <K, V> CompactMapNode<K, V> nodeOf(final AtomicReference<Thread> mutator,
         final int nodeMap, final int dataMap, final Object[] nodes) {
       return new BitmapIndexedMapNode<>(mutator, nodeMap, dataMap, nodes);
     }
 
-    @SuppressWarnings("unchecked")
     static final <K, V> CompactMapNode<K, V> nodeOf(AtomicReference<Thread> mutator) {
       return EMPTY_NODE;
     }
@@ -942,7 +951,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
     static final <K, V> CompactMapNode<K, V> nodeOf(AtomicReference<Thread> mutator,
         final int nodeMap, final int dataMap, final K key, final V val) {
       assert nodeMap == 0;
-      return nodeOf(mutator, (0), dataMap, new Object[] {key, val});
+      return nodeOf(mutator, (0), dataMap, new Object[]{key, val});
     }
 
     static final int index(final int bitmap, final int bitpos) {
@@ -1381,13 +1390,11 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
       }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     K getKey(final int index) {
       return (K) nodes[TUPLE_LENGTH * index];
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     V getValue(final int index) {
       return (V) nodes[TUPLE_LENGTH * index + 1];
@@ -1398,7 +1405,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
       return entryOf((K) nodes[TUPLE_LENGTH * index], (V) nodes[TUPLE_LENGTH * index + 1]);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     CompactMapNode<K, V> getNode(final int index) {
       return (CompactMapNode<K, V>) nodes[nodes.length - 1 - index];
@@ -1610,6 +1616,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
   }
 
   private static final class HashCollisionMapNode_5Bits<K, V> extends CompactMapNode<K, V> {
+
     private final K[] keys;
     private final V[] vals;
     private final int hash;
@@ -1686,7 +1693,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
           } else {
             // add new mapping
             final V[] src = this.vals;
-            @SuppressWarnings("unchecked")
             final V[] dst = (V[]) new Object[src.length];
 
             // copy 'src' and set 1 element(s) at position 'idx'
@@ -1702,7 +1708,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
         }
       }
 
-      @SuppressWarnings("unchecked")
       final K[] keysNew = (K[]) new Object[this.keys.length + 1];
 
       // copy 'this.keys' and insert 1 element(s) at position
@@ -1712,7 +1717,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
       System.arraycopy(this.keys, keys.length, keysNew, keys.length + 1,
           this.keys.length - keys.length);
 
-      @SuppressWarnings("unchecked")
       final V[] valsNew = (V[]) new Object[this.vals.length + 1];
 
       // copy 'this.vals' and insert 1 element(s) at position
@@ -1741,7 +1745,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
           } else {
             // add new mapping
             final V[] src = this.vals;
-            @SuppressWarnings("unchecked")
             final V[] dst = (V[]) new Object[src.length];
 
             // copy 'src' and set 1 element(s) at position 'idx'
@@ -1757,7 +1760,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
         }
       }
 
-      @SuppressWarnings("unchecked")
       final K[] keysNew = (K[]) new Object[this.keys.length + 1];
 
       // copy 'this.keys' and insert 1 element(s) at position
@@ -1767,7 +1769,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
       System.arraycopy(this.keys, keys.length, keysNew, keys.length + 1,
           this.keys.length - keys.length);
 
-      @SuppressWarnings("unchecked")
       final V[] valsNew = (V[]) new Object[this.vals.length + 1];
 
       // copy 'this.vals' and insert 1 element(s) at position
@@ -1801,7 +1802,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
             return CompactMapNode.<K, V>nodeOf(mutator).updated(mutator, theOtherKey, theOtherVal,
                 keyHash, 0, details);
           } else {
-            @SuppressWarnings("unchecked")
             final K[] keysNew = (K[]) new Object[this.keys.length - 1];
 
             // copy 'this.keys' and remove 1 element(s) at position
@@ -1809,7 +1809,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
             System.arraycopy(this.keys, 0, keysNew, 0, idx);
             System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
 
-            @SuppressWarnings("unchecked")
             final V[] valsNew = (V[]) new Object[this.vals.length - 1];
 
             // copy 'this.vals' and remove 1 element(s) at position
@@ -1845,7 +1844,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
             return CompactMapNode.<K, V>nodeOf(mutator).updated(mutator, theOtherKey, theOtherVal,
                 keyHash, 0, details, cmp);
           } else {
-            @SuppressWarnings("unchecked")
             final K[] keysNew = (K[]) new Object[this.keys.length - 1];
 
             // copy 'this.keys' and remove 1 element(s) at position
@@ -1853,7 +1851,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
             System.arraycopy(this.keys, 0, keysNew, 0, idx);
             System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
 
-            @SuppressWarnings("unchecked")
             final V[] valsNew = (V[]) new Object[this.vals.length - 1];
 
             // copy 'this.vals' and remove 1 element(s) at position
@@ -1968,7 +1965,8 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
       /*
        * Linear scan for each key, because of arbitrary element order.
        */
-      outerLoop: for (int i = 0; i < that.payloadArity(); i++) {
+      outerLoop:
+      for (int i = 0; i < that.payloadArity(); i++) {
         final Object otherKey = that.getKey(i);
         final Object otherVal = that.getValue(i);
 
@@ -2048,7 +2046,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
     private int currentStackLevel = -1;
     private final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
 
-    @SuppressWarnings("unchecked")
     AbstractMapNode<K, V>[] nodes = new AbstractMapNode[MAX_DEPTH];
 
     AbstractMapIterator(AbstractMapNode<K, V> rootNode) {
@@ -2228,7 +2225,9 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
     }
   }
 
-  static final class TransientTrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Transient<K, V> {
+  static final class TransientTrieMap_5Bits<K, V> implements
+      io.usethesource.capsule.api.Map.Transient<K, V> {
+
     final private AtomicReference<Thread> mutator;
     private AbstractMapNode<K, V> rootNode;
     private int hashCode;
@@ -2248,7 +2247,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
       int hash = 0;
       int size = 0;
 
-      for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
+      for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext(); ) {
         final Map.Entry<K, V> entry = it.next();
         final K key = entry.getKey();
         final V val = entry.getValue();
@@ -2288,7 +2287,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
     @Override
     public boolean containsKey(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0);
       } catch (ClassCastException unused) {
@@ -2299,7 +2297,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
     @Override
     public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0, cmp);
       } catch (ClassCastException unused) {
@@ -2309,7 +2306,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
 
     @Override
     public boolean containsValue(final Object o) {
-      for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
+      for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
         if (iterator.next().equals(o)) {
           return true;
         }
@@ -2319,7 +2316,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
 
     @Override
     public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
-      for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
+      for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
         if (cmp.compare(iterator.next(), o) == 0) {
           return true;
         }
@@ -2330,7 +2327,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
     @Override
     public V get(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         final Optional<V> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
@@ -2347,7 +2343,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
     @Override
     public V getEquivalent(final Object o, final Comparator<Object> cmp) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         final Optional<V> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
@@ -2577,6 +2572,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
     }
 
     public static class TransientMapKeyIterator<K, V> extends MapKeyIterator<K, V> {
+
       final TransientTrieMap_5Bits<K, V> collection;
       K lastKey;
 
@@ -2598,6 +2594,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
     }
 
     public static class TransientMapValueIterator<K, V> extends MapValueIterator<K, V> {
+
       final TransientTrieMap_5Bits<K, V> collection;
 
       public TransientMapValueIterator(final TransientTrieMap_5Bits<K, V> collection) {
@@ -2617,6 +2614,7 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
     }
 
     public static class TransientMapEntryIterator<K, V> extends MapEntryIterator<K, V> {
+
       final TransientTrieMap_5Bits<K, V> collection;
 
       public TransientMapEntryIterator(final TransientTrieMap_5Bits<K, V> collection) {
@@ -2788,12 +2786,11 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
           return false;
         }
 
-        for (@SuppressWarnings("unchecked")
-        Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
+        for (
+            Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext(); ) {
           Map.Entry entry = it.next();
 
           try {
-            @SuppressWarnings("unchecked")
             final K key = (K) entry.getKey();
             final Optional<V> result =
                 rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
@@ -2801,7 +2798,6 @@ public class TrieMap_5Bits<K, V> implements io.usethesource.capsule.api.Map.Immu
             if (!result.isPresent()) {
               return false;
             } else {
-              @SuppressWarnings("unchecked")
               final V val = (V) entry.getValue();
 
               if (!result.get().equals(val)) {

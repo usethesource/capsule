@@ -8,7 +8,7 @@
 package io.usethesource.capsule;
 
 import io.usethesource.capsule.api.Map;
-import io.usethesource.capsule.core.deprecated.TrieMap_5Bits;
+import io.usethesource.capsule.core.TrieMap_5Bits;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

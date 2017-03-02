@@ -16,7 +16,7 @@ import java.util.Random;
 import io.usethesource.capsule.api.Map;
 import org.junit.Test;
 
-import io.usethesource.capsule.core.deprecated.TrieMap_5Bits;
+import io.usethesource.capsule.core.TrieMap_5Bits;
 
 public class MapSmokeTest {
 

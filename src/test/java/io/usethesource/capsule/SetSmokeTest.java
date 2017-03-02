@@ -18,7 +18,7 @@ import java.util.Set;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
+import io.usethesource.capsule.core.TrieSet_5Bits;
 
 public class SetSmokeTest {
 

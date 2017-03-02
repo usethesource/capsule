@@ -5,57 +5,44 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.capsule.core.deprecated;
-
-import io.usethesource.capsule.api.Set;
-import io.usethesource.capsule.core.trie.ArrayView;
-import io.usethesource.capsule.core.trie.Node;
-import io.usethesource.capsule.util.ArrayUtils;
+package io.usethesource.capsule.core.experimental;
 
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
-@SuppressWarnings("rawtypes")
-public class TrieSet_5Bits<K> implements Set.Immutable<K> {
+import io.usethesource.capsule.api.experimental.Set;
+import io.usethesource.capsule.util.ArrayUtils;
 
-  @SuppressWarnings("unchecked")
-  private static final TrieSet_5Bits EMPTY_SET = new TrieSet_5Bits(CompactSetNode.EMPTY_NODE, 0, 0);
+public class TrieSet<K> implements Set.Immutable<K> {
+
+  private static final TrieSet EMPTY_SET = new TrieSet(CompactSetNode.EMPTY_NODE, 0, 0);
 
   private static final boolean DEBUG = false;
 
   private final AbstractSetNode<K> rootNode;
-  private final int hashCode;
+  private final int cachedHashCode;
   private final int cachedSize;
 
-  /*
-   * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-   * `protected` when experiments are finished.
-   */
-  public /* protected */ TrieSet_5Bits(AbstractSetNode<K> rootNode) {
+  TrieSet(AbstractSetNode<K> rootNode, int hashCode, int cachedSize) {
     this.rootNode = rootNode;
-    this.hashCode = hashCode(rootNode);
-    this.cachedSize = size(rootNode);
-  }
-
-  /*
-   * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-   * `protected` when experiments are finished.
-   */
-  public /* protected */ TrieSet_5Bits(AbstractSetNode<K> rootNode, int hashCode, int cachedSize) {
-    this.rootNode = rootNode;
-    this.hashCode = hashCode;
+    this.cachedHashCode = hashCode;
     this.cachedSize = cachedSize;
     if (DEBUG) {
       assert checkHashCodeAndSize(hashCode, cachedSize);
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K> Set.Immutable<K> of() {
-    return TrieSet_5Bits.EMPTY_SET;
+    return TrieSet.EMPTY_SET;
   }
 
   public static final <K> Set.Immutable<K> of(K key0) {
@@ -66,7 +53,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
 
     CompactSetNode<K> newRootNode = CompactSetNode.nodeOf(null, nodeMap, dataMap, key0);
 
-    return new TrieSet_5Bits<K>(newRootNode, keyHash0, 1);
+    return new TrieSet<K>(newRootNode, keyHash0, 1);
   }
 
   public static final <K> Set.Immutable<K> of(K key0, K key1) {
@@ -78,61 +65,38 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
     CompactSetNode<K> newRootNode =
         CompactSetNode.mergeTwoKeyValPairs(key0, keyHash0, key1, keyHash1, 0);
 
-    return new TrieSet_5Bits<K>(newRootNode, keyHash0 + keyHash1, 2);
+    return new TrieSet<K>(newRootNode, keyHash0 + keyHash1, 2);
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K> Set.Immutable<K> of(K... keys) {
-    Set.Immutable<K> result = TrieSet_5Bits.EMPTY_SET;
+    Set.Immutable<K> result = TrieSet.EMPTY_SET;
 
     for (final K key : keys) {
-      result = result.__insert(key);
+      result = result.insert(key);
     }
 
     return result;
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K> Set.Transient<K> transientOf() {
-    return TrieSet_5Bits.EMPTY_SET.asTransient();
+    return TrieSet.EMPTY_SET.asTransient();
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K> Set.Transient<K> transientOf(K... keys) {
-    final Set.Transient<K> result = TrieSet_5Bits.EMPTY_SET.asTransient();
+    final Set.Transient<K> result = TrieSet.EMPTY_SET.asTransient();
 
     for (final K key : keys) {
-      result.__insert(key);
+      result.insert(key);
     }
 
     return result;
-  }
-
-  private static <K> int hashCode(AbstractSetNode<K> rootNode) {
-    int hash = 0;
-
-    for (Iterator<K> it = new SetKeyIterator<>(rootNode); it.hasNext();) {
-      hash += it.next().hashCode();
-    }
-
-    return hash;
-  }
-
-  private static <K> int size(AbstractSetNode<K> rootNode) {
-    int size = 0;
-
-    for (Iterator<K> it = new SetKeyIterator<>(rootNode); it.hasNext(); it.next()) {
-      size += 1;
-    }
-
-    return size;
   }
 
   private boolean checkHashCodeAndSize(final int targetHash, final int targetSize) {
     int hash = 0;
     int size = 0;
 
-    for (Iterator<K> it = keyIterator(); it.hasNext();) {
+    for (Iterator<K> it = keyIterator(); it.hasNext(); ) {
       final K key = it.next();
 
       hash += key.hashCode();
@@ -142,14 +106,13 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
     return hash == targetHash && size == targetSize;
   }
 
-  public static final int transformHashCode(final int hash) {
+  private static final int transformHashCode(final int hash) {
     return hash;
   }
 
   @Override
   public boolean contains(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       return rootNode.contains(key, transformHashCode(key.hashCode()), 0);
     } catch (ClassCastException unused) {
@@ -158,52 +121,21 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
   }
 
   @Override
-  public boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
-    try {
-      @SuppressWarnings("unchecked")
-      final K key = (K) o;
-      return rootNode.contains(key, transformHashCode(key.hashCode()), 0, cmp);
-    } catch (ClassCastException unused) {
-      return false;
-    }
+  public Optional<K> apply(K key) {
+    return rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
   }
 
-  @Override
   public K get(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
-      final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
-
-      if (result.isPresent()) {
-        return result.get();
-      } else {
-        return null;
-      }
+      return apply(key).orElse(null);
     } catch (ClassCastException unused) {
       return null;
     }
   }
 
   @Override
-  public K getEquivalent(final Object o, final Comparator<Object> cmp) {
-    try {
-      @SuppressWarnings("unchecked")
-      final K key = (K) o;
-      final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
-
-      if (result.isPresent()) {
-        return result.get();
-      } else {
-        return null;
-      }
-    } catch (ClassCastException unused) {
-      return null;
-    }
-  }
-
-  @Override
-  public Set.Immutable<K> __insert(final K key) {
+  public Set.Immutable<K> insert(final K key) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -211,44 +143,14 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
         rootNode.updated(null, key, transformHashCode(keyHash), 0, details);
 
     if (details.isModified()) {
-      return new TrieSet_5Bits<K>(newRootNode, hashCode + keyHash, cachedSize + 1);
+      return new TrieSet<K>(newRootNode, cachedHashCode ^ keyHash, cachedSize + 1);
     }
 
     return this;
   }
 
   @Override
-  public Set.Immutable<K> __insertEquivalent(final K key, final Comparator<Object> cmp) {
-    final int keyHash = key.hashCode();
-    final SetResult<K> details = SetResult.unchanged();
-
-    final CompactSetNode<K> newRootNode =
-        rootNode.updated(null, key, transformHashCode(keyHash), 0, details, cmp);
-
-    if (details.isModified()) {
-      return new TrieSet_5Bits<K>(newRootNode, hashCode + keyHash, cachedSize + 1);
-    }
-
-    return this;
-  }
-
-  @Override
-  public Set.Immutable<K> __insertAll(final java.util.Set<? extends K> set) {
-    final Set.Transient<K> tmpTransient = this.asTransient();
-    tmpTransient.__insertAll(set);
-    return tmpTransient.freeze();
-  }
-
-  @Override
-  public Set.Immutable<K> __insertAllEquivalent(final java.util.Set<? extends K> set,
-                                                final Comparator<Object> cmp) {
-    final Set.Transient<K> tmpTransient = this.asTransient();
-    tmpTransient.__insertAllEquivalent(set, cmp);
-    return tmpTransient.freeze();
-  }
-
-  @Override
-  public Set.Immutable<K> __remove(final K key) {
+  public Set.Immutable<K> remove(final K key) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -256,109 +158,35 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
         rootNode.removed(null, key, transformHashCode(keyHash), 0, details);
 
     if (details.isModified()) {
-      return new TrieSet_5Bits<K>(newRootNode, hashCode - keyHash, cachedSize - 1);
+      return new TrieSet<K>(newRootNode, cachedHashCode ^ keyHash, cachedSize - 1);
     }
 
     return this;
   }
 
   @Override
-  public Set.Immutable<K> __removeEquivalent(final K key, final Comparator<Object> cmp) {
-    final int keyHash = key.hashCode();
-    final SetResult<K> details = SetResult.unchanged();
-
-    final CompactSetNode<K> newRootNode =
-        rootNode.removed(null, key, transformHashCode(keyHash), 0, details, cmp);
-
-    if (details.isModified()) {
-      return new TrieSet_5Bits<K>(newRootNode, hashCode - keyHash, cachedSize - 1);
-    }
-
-    return this;
-  }
-
-  @Override
-  public Set.Immutable<K> __removeAll(final java.util.Set<? extends K> set) {
+  public Set.Immutable<K> insertAll(final Set<? extends K> set) {
     final Set.Transient<K> tmpTransient = this.asTransient();
-    tmpTransient.__removeAll(set);
-    return tmpTransient.freeze();
+    tmpTransient.insertAll(set);
+    return tmpTransient.asImmutable();
   }
 
   @Override
-  public Set.Immutable<K> __removeAllEquivalent(final java.util.Set<? extends K> set,
-                                                final Comparator<Object> cmp) {
+  public Set.Immutable<K> removeAll(final Set<? extends K> set) {
     final Set.Transient<K> tmpTransient = this.asTransient();
-    tmpTransient.__removeAllEquivalent(set, cmp);
-    return tmpTransient.freeze();
+    tmpTransient.removeAll(set);
+    return tmpTransient.asImmutable();
   }
 
   @Override
-  public Set.Immutable<K> __retainAll(final java.util.Set<? extends K> set) {
+  public Set.Immutable<K> retainAll(final Set<? extends K> set) {
     final Set.Transient<K> tmpTransient = this.asTransient();
-    tmpTransient.__retainAll(set);
-    return tmpTransient.freeze();
+    tmpTransient.retainAll(set);
+    return tmpTransient.asImmutable();
   }
 
   @Override
-  public Set.Immutable<K> __retainAllEquivalent(final Set.Transient<? extends K> transientSet,
-                                                final Comparator<Object> cmp) {
-    final Set.Transient<K> tmpTransient = this.asTransient();
-    tmpTransient.__retainAllEquivalent(transientSet, cmp);
-    return tmpTransient.freeze();
-  }
-
-  @Override
-  public boolean add(final K key) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean addAll(final Collection<? extends K> c) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void clear() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean remove(final Object key) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean removeAll(final Collection<?> c) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean retainAll(final Collection<?> c) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean containsAll(final Collection<?> c) {
-    for (Object item : c) {
-      if (!contains(item)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public boolean containsAllEquivalent(final Collection<?> c, final Comparator<Object> cmp) {
-    for (Object item : c) {
-      if (!containsEquivalent(item, cmp)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public int size() {
+  public long size() {
     return cachedSize;
   }
 
@@ -372,32 +200,8 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
     return keyIterator();
   }
 
-  @Override
-  public Iterator<K> keyIterator() {
+  private Iterator<K> keyIterator() {
     return new SetKeyIterator<>(rootNode);
-  }
-
-  @Override
-  public Object[] toArray() {
-    Object[] array = new Object[cachedSize];
-
-    int idx = 0;
-    for (K key : this) {
-      array[idx++] = key;
-    }
-
-    return array;
-  }
-
-  @Override
-  public <T> T[] toArray(final T[] a) {
-    List<K> list = new ArrayList<K>(cachedSize);
-
-    for (K key : this) {
-      list.add(key);
-    }
-
-    return list.toArray(a);
   }
 
   @Override
@@ -409,20 +213,20 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
       return false;
     }
 
-    if (other instanceof TrieSet_5Bits) {
-      TrieSet_5Bits<?> that = (TrieSet_5Bits<?>) other;
+    if (other instanceof TrieSet) {
+      TrieSet<?> that = (TrieSet<?>) other;
 
       if (this.cachedSize != that.cachedSize) {
         return false;
       }
 
-      if (this.hashCode != that.hashCode) {
+      if (this.cachedHashCode != that.cachedHashCode) {
         return false;
       }
 
       return rootNode.equals(that.rootNode);
-    } else if (other instanceof java.util.Set) {
-      java.util.Set that = (java.util.Set) other;
+    } else if (other instanceof Set) {
+      Set that = (Set) other;
 
       if (this.size() != that.size()) {
         return false;
@@ -436,13 +240,12 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
 
   @Override
   public int hashCode() {
-    return hashCode;
+    return cachedHashCode;
   }
 
   @Override
-  public String toString() {
-    String body = stream().map(k -> k.toString()).reduce((o1, o2) -> String.join(", ", o1, o2)).orElse("");
-    return String.format("{%s}", body);
+  public java.util.Set<K> asJdkCollection() {
+    return new TrieSetAsImmutableJdkCollection<>(this);
   }
 
   @Override
@@ -452,16 +255,18 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
 
   @Override
   public Set.Transient<K> asTransient() {
-    return new TransientTrieSet_5Bits<K>(this);
+    return new TransientTrieSet<K>(this);
+  }
+
+  @Override
+  public Set.Immutable<K> asImmutable() {
+    return this;
   }
 
   /*
    * For analysis purposes only.
-   *
-   * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-   * `protected` when experiments are finished.
    */
-  public /* protected */ AbstractSetNode<K> getRootNode() {
+  protected AbstractSetNode<K> getRootNode() {
     return rootNode;
   }
 
@@ -469,7 +274,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
    * For analysis purposes only.
    */
   protected Iterator<AbstractSetNode<K>> nodeIterator() {
-    return new TrieSet_5BitsNodeIterator<>(rootNode);
+    return new SetNodeIterator<>(rootNode);
   }
 
   /*
@@ -562,56 +367,8 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
     }
   }
 
-  abstract static class Optional<T> {
-    private static final Optional EMPTY = new Optional() {
-      @Override
-      boolean isPresent() {
-        return false;
-      }
+  static final class SetResult<K> {
 
-      @Override
-      Object get() {
-        return null;
-      }
-    };
-
-    @SuppressWarnings("unchecked")
-    static <T> Optional<T> empty() {
-      return EMPTY;
-    }
-
-    static <T> Optional<T> of(T value) {
-      return new Value<T>(value);
-    }
-
-    abstract boolean isPresent();
-
-    abstract T get();
-
-    private static final class Value<T> extends Optional<T> {
-      private final T value;
-
-      private Value(T value) {
-        this.value = value;
-      }
-
-      @Override
-      boolean isPresent() {
-        return true;
-      }
-
-      @Override
-      T get() {
-        return value;
-      }
-    }
-  }
-
-  /*
-   * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-   * `protected` when experiments are finished.
-   */
-  public static final class SetResult<K> {
     private K replacedValue;
     private boolean isModified;
     private boolean isReplaced;
@@ -632,7 +389,8 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
       return new SetResult<>();
     }
 
-    private SetResult() {}
+    private SetResult() {
+    }
 
     public boolean isModified() {
       return isModified;
@@ -647,33 +405,15 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
     }
   }
 
-  /*
-   * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-   * `protected` when experiments are finished.
-   */
-  public /* protected */ static abstract class AbstractSetNode<K> implements Node, Iterable<K> {
+  protected static interface INode<K, V> {
+
+  }
+
+  protected static abstract class AbstractSetNode<K> implements INode<K, java.lang.Void> {
 
     static final int TUPLE_LENGTH = 1;
 
-    // factory method to construct trie from outer classes
-    // TODO: find alternative solution that does not violate information hiding
-    public static <K> AbstractSetNode<K> newHashCollisonNode(final int hash, K... keys) {
-      return new HashCollisionSetNode_5Bits<>(hash, keys);
-    }
-
-    // factory method to construct trie from outer classes
-    // TODO: find alternative solution that does not violate information hiding
-    public static <K> AbstractSetNode<K> newBitmapIndexedNode(final AtomicReference<Thread> mutator,
-        final int nodeMap, final int dataMap, final Object[] content) {
-      // content is assumed to be effectivle immutable to avoid defensive copying
-      return new BitmapIndexedSetNode<>(mutator, nodeMap, dataMap, content);
-    }
-
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
-    public abstract boolean contains(final K key, final int keyHash, final int shift);
+    abstract boolean contains(final K key, final int keyHash, final int shift);
 
     abstract boolean contains(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp);
@@ -683,51 +423,29 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
     abstract Optional<K> findByKey(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp);
 
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
-    public /* protected */ abstract CompactSetNode<K> updated(final AtomicReference<Thread> mutator,
-        final K key, final int keyHash, final int shift, final SetResult<K> details);
+    abstract CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key,
+        final int keyHash, final int shift, final SetResult<K> details);
 
     abstract CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final SetResult<K> details,
         final Comparator<Object> cmp);
 
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
-    public /* protected */ abstract CompactSetNode<K> removed(final AtomicReference<Thread> mutator,
-        final K key, final int keyHash, final int shift, final SetResult<K> details);
+    abstract CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key,
+        final int keyHash, final int shift, final SetResult<K> details);
 
     abstract CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final SetResult<K> details,
         final Comparator<Object> cmp);
 
-    // static final <T> boolean isAllowedToEdit(AtomicReference<T> x, AtomicReference<T> y) {
-    // return x != null && y != null && (x == y || x.get() == y.get());
-    // }
-
-    static final <T> boolean isAllowedToEdit(AtomicReference<?> x, AtomicReference<?> y) {
+    static final boolean isAllowedToEdit(AtomicReference<Thread> x, AtomicReference<Thread> y) {
       return x != null && y != null && (x == y || x.get() == y.get());
     }
-
-    @Override
-    public abstract ArrayView<AbstractSetNode<K>> nodeArray();
 
     abstract boolean hasNodes();
 
     abstract int nodeArity();
 
     abstract AbstractSetNode<K> getNode(final int index);
-
-//    /*
-//     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-//     * `protected` when experiments are finished.
-//     */
-//    public /* protected */ abstract void setNode(final AtomicReference<Thread> mutator,
-//        final int index, final AbstractSetNode<K> node);
 
     @Deprecated
     Iterator<? extends AbstractSetNode<K>> nodeIterator() {
@@ -779,11 +497,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
       return payloadArity() + nodeArity();
     }
 
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
-    public /* protected */ int size() {
+    int size() {
       final Iterator<K> it = new SetKeyIterator<>(this);
 
       int size = 0;
@@ -794,21 +508,6 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
 
       return size;
     }
-
-    @Override
-    public Iterator<K> iterator() {
-      return new SetKeyIterator<>(this);
-    }
-
-    @Override
-    public Spliterator<K> spliterator() {
-      return Spliterators.spliteratorUnknownSize(iterator(), Spliterator.DISTINCT);
-    }
-
-    public Stream<K> stream() {
-      return StreamSupport.stream(spliterator(), false);
-    }
-
   }
 
   protected static abstract class CompactSetNode<K> extends AbstractSetNode<K> {
@@ -878,9 +577,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
       assert !(key0.equals(key1));
 
       if (shift >= HASH_CODE_LENGTH) {
-        // throw new
-        // IllegalStateException("Hash collision not yet fixed.");
-        return new HashCollisionSetNode_5Bits<>(keyHash0, (K[]) new Object[] {key0, key1});
+        return new HashCollisionSetNode<>(keyHash0, (K[]) new Object[]{key0, key1});
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -891,9 +588,9 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
         final int dataMap = bitpos(mask0) | bitpos(mask1);
 
         if (mask0 < mask1) {
-          return nodeOf(null, (0), dataMap, new Object[] {key0, key1});
+          return nodeOf(null, (0), dataMap, new Object[]{key0, key1});
         } else {
-          return nodeOf(null, (0), dataMap, new Object[] {key1, key0});
+          return nodeOf(null, (0), dataMap, new Object[]{key1, key0});
         }
       } else {
         final CompactSetNode<K> node =
@@ -901,7 +598,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
         // values fit on next level
 
         final int nodeMap = bitpos(mask0);
-        return nodeOf(null, nodeMap, (0), new Object[] {node});
+        return nodeOf(null, nodeMap, (0), new Object[]{node});
       }
     }
 
@@ -909,16 +606,17 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
 
     static {
 
-      EMPTY_NODE = new BitmapIndexedSetNode<>(null, (0), (0), new Object[] {});
+      EMPTY_NODE = new BitmapIndexedSetNode<>(null, (0), (0), new Object[]{});
 
-    };
+    }
+
+    ;
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
         final int nodeMap, final int dataMap, final Object[] nodes) {
       return new BitmapIndexedSetNode<>(mutator, nodeMap, dataMap, nodes);
     }
 
-    @SuppressWarnings("unchecked")
     static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator) {
       return EMPTY_NODE;
     }
@@ -926,7 +624,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
     static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator, final int nodeMap,
         final int dataMap, final K key) {
       assert nodeMap == 0;
-      return nodeOf(mutator, (0), dataMap, new Object[] {key});
+      return nodeOf(mutator, (0), dataMap, new Object[]{key});
     }
 
     static final int index(final int bitmap, final int bitpos) {
@@ -949,12 +647,8 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
       return getNode(nodeIndex(bitpos));
     }
 
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
     @Override
-    public /* protected */ boolean contains(final K key, final int keyHash, final int shift) {
+    boolean contains(final K key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1041,13 +735,9 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
       return Optional.empty();
     }
 
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
     @Override
-    public /* protected */ CompactSetNode<K> updated(final AtomicReference<Thread> mutator,
-        final K key, final int keyHash, final int shift, final SetResult<K> details) {
+    CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key, final int keyHash,
+        final int shift, final SetResult<K> details) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1117,13 +807,9 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
       }
     }
 
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
     @Override
-    public /* protected */ CompactSetNode<K> removed(final AtomicReference<Thread> mutator,
-        final K key, final int keyHash, final int shift, final SetResult<K> details) {
+    CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key, final int keyHash,
+        final int shift, final SetResult<K> details) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1318,12 +1004,12 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
     }
 
     @Override
-    final int nodeMap() {
+    public int nodeMap() {
       return nodeMap;
     }
 
     @Override
-    final int dataMap() {
+    public int dataMap() {
       return dataMap;
     }
 
@@ -1342,6 +1028,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
       this.nodes = nodes;
 
       if (DEBUG) {
+
         assert (TUPLE_LENGTH * java.lang.Integer.bitCount(dataMap)
             + java.lang.Integer.bitCount(nodeMap) == nodes.length);
 
@@ -1351,66 +1038,20 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
         for (int i = TUPLE_LENGTH * payloadArity(); i < nodes.length; i++) {
           assert ((nodes[i] instanceof CompactSetNode) == true);
         }
-
-        assert nodeInvariant();
       }
+
+      assert nodeInvariant();
     }
 
-    @Override
-    public ArrayView<AbstractSetNode<K>> nodeArray() {
-      return new ArrayView<AbstractSetNode<K>>() {
-        @Override
-        public int size() {
-          return BitmapIndexedSetNode.this.nodeArity();
-        }
-
-        @Override
-        public AbstractSetNode<K> get(int index) {
-          return BitmapIndexedSetNode.this.getNode(index);
-        }
-
-        @Override
-        public void set(int index, AbstractSetNode<K> item) {
-          // if (!isAllowedToEdit(BitmapIndexedSetNode.this.mutator, writeCapabilityToken)) {
-          // throw new IllegalStateException();
-          // }
-
-          nodes[nodes.length - 1 - index] = item;
-        }
-
-        @Override
-        public void set(int index, AbstractSetNode<K> item,
-            AtomicReference<?> writeCapabilityToken) {
-          if (!isAllowedToEdit(BitmapIndexedSetNode.this.mutator, writeCapabilityToken)) {
-            throw new IllegalStateException();
-          }
-
-          nodes[nodes.length - 1 - index] = item;
-        }
-      };
-    }
-
-    @SuppressWarnings("unchecked")
     @Override
     K getKey(final int index) {
       return (K) nodes[TUPLE_LENGTH * index];
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     CompactSetNode<K> getNode(final int index) {
       return (CompactSetNode<K>) nodes[nodes.length - 1 - index];
     }
-
-//    @Override
-//    public void setNode(final AtomicReference<Thread> mutator, final int index,
-//        final AbstractSetNode<K> node) {
-//      if (isAllowedToEdit(this.mutator, mutator)) {
-//        nodes[nodes.length - 1 - index] = node;
-//      } else {
-//        throw new IllegalStateException();
-//      }
-//    }
 
     @Override
     boolean hasPayload() {
@@ -1593,12 +1234,13 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
 
   }
 
-  private static final class HashCollisionSetNode_5Bits<K> extends CompactSetNode<K> {
+  private static final class HashCollisionSetNode<K> extends CompactSetNode<K> {
+
     private final K[] keys;
 
     private final int hash;
 
-    HashCollisionSetNode_5Bits(final int hash, final K[] keys) {
+    HashCollisionSetNode(final int hash, final K[] keys) {
       this.keys = keys;
 
       this.hash = hash;
@@ -1607,16 +1249,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
     }
 
     @Override
-    public ArrayView<AbstractSetNode<K>> nodeArray() {
-      return ArrayView.empty();
-    }
-
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
-    @Override
-    public /* protected */ boolean contains(final K key, final int keyHash, final int shift) {
+    boolean contains(final K key, final int keyHash, final int shift) {
       if (this.hash == keyHash) {
         for (K k : keys) {
           if (k.equals(key)) {
@@ -1663,12 +1296,9 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
       return Optional.empty();
     }
 
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
-    public /* protected */ CompactSetNode<K> updated(final AtomicReference<Thread> mutator,
-        final K key, final int keyHash, final int shift, final SetResult<K> details) {
+    @Override
+    CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key, final int keyHash,
+        final int shift, final SetResult<K> details) {
       assert this.hash == keyHash;
 
       for (int idx = 0; idx < keys.length; idx++) {
@@ -1677,7 +1307,6 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
         }
       }
 
-      @SuppressWarnings("unchecked")
       final K[] keysNew = (K[]) new Object[this.keys.length + 1];
 
       // copy 'this.keys' and insert 1 element(s) at position
@@ -1688,7 +1317,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
           this.keys.length - keys.length);
 
       details.modified();
-      return new HashCollisionSetNode_5Bits<>(keyHash, keysNew);
+      return new HashCollisionSetNode<>(keyHash, keysNew);
     }
 
     @Override
@@ -1702,7 +1331,6 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
         }
       }
 
-      @SuppressWarnings("unchecked")
       final K[] keysNew = (K[]) new Object[this.keys.length + 1];
 
       // copy 'this.keys' and insert 1 element(s) at position
@@ -1713,16 +1341,12 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
           this.keys.length - keys.length);
 
       details.modified();
-      return new HashCollisionSetNode_5Bits<>(keyHash, keysNew);
+      return new HashCollisionSetNode<>(keyHash, keysNew);
     }
 
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
     @Override
-    public /* protected */ CompactSetNode<K> removed(final AtomicReference<Thread> mutator,
-        final K key, final int keyHash, final int shift, final SetResult<K> details) {
+    CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key, final int keyHash,
+        final int shift, final SetResult<K> details) {
       for (int idx = 0; idx < keys.length; idx++) {
         if (keys[idx].equals(key)) {
           details.modified();
@@ -1739,7 +1363,6 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
             return CompactSetNode.<K>nodeOf(mutator).updated(mutator, theOtherKey, keyHash, 0,
                 details);
           } else {
-            @SuppressWarnings("unchecked")
             final K[] keysNew = (K[]) new Object[this.keys.length - 1];
 
             // copy 'this.keys' and remove 1 element(s) at position
@@ -1747,7 +1370,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
             System.arraycopy(this.keys, 0, keysNew, 0, idx);
             System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
 
-            return new HashCollisionSetNode_5Bits<>(keyHash, keysNew);
+            return new HashCollisionSetNode<>(keyHash, keysNew);
           }
         }
       }
@@ -1773,7 +1396,6 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
             return CompactSetNode.<K>nodeOf(mutator).updated(mutator, theOtherKey, keyHash, 0,
                 details, cmp);
           } else {
-            @SuppressWarnings("unchecked")
             final K[] keysNew = (K[]) new Object[this.keys.length - 1];
 
             // copy 'this.keys' and remove 1 element(s) at position
@@ -1781,7 +1403,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
             System.arraycopy(this.keys, 0, keysNew, 0, idx);
             System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
 
-            return new HashCollisionSetNode_5Bits<>(keyHash, keysNew);
+            return new HashCollisionSetNode<>(keyHash, keysNew);
           }
         }
       }
@@ -1828,11 +1450,6 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
       throw new IllegalStateException("Is leaf node.");
     }
 
-//    @Override
-//    public void setNode(AtomicReference<Thread> mutator, int index, AbstractSetNode<K> node) {
-//      throw new IllegalStateException("Is leaf node.");
-//    }
-
     @Override
     Object getSlot(final int index) {
       throw new UnsupportedOperationException();
@@ -1869,7 +1486,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
         return false;
       }
 
-      HashCollisionSetNode_5Bits<?> that = (HashCollisionSetNode_5Bits<?>) other;
+      HashCollisionSetNode<?> that = (HashCollisionSetNode<?>) other;
 
       if (hash != that.hash) {
         return false;
@@ -1882,7 +1499,8 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
       /*
        * Linear scan for each key, because of arbitrary element order.
        */
-      outerLoop: for (int i = 0; i < that.payloadArity(); i++) {
+      outerLoop:
+      for (int i = 0; i < that.payloadArity(); i++) {
         final Object otherKey = that.getKey(i);
 
         for (int j = 0; j < keys.length; j++) {
@@ -1929,12 +1547,12 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
     }
 
     @Override
-    final int nodeMap() {
+    int nodeMap() {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    final int dataMap() {
+    int dataMap() {
       throw new UnsupportedOperationException();
     }
 
@@ -1954,7 +1572,6 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
     private int currentStackLevel = -1;
     private final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
 
-    @SuppressWarnings("unchecked")
     AbstractSetNode<K>[] nodes = new AbstractSetNode[MAX_DEPTH];
 
     AbstractSetIterator(AbstractSetNode<K> rootNode) {
@@ -2051,11 +1668,11 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
   /**
    * Iterator that first iterates over inlined-values and then continues depth first recursively.
    */
-  private static class TrieSet_5BitsNodeIterator<K> implements Iterator<AbstractSetNode<K>> {
+  private static class SetNodeIterator<K> implements Iterator<AbstractSetNode<K>> {
 
     final Deque<Iterator<? extends AbstractSetNode<K>>> nodeIteratorStack;
 
-    TrieSet_5BitsNodeIterator(AbstractSetNode<K> rootNode) {
+    SetNodeIterator(AbstractSetNode<K> rootNode) {
       nodeIteratorStack = new ArrayDeque<>();
       nodeIteratorStack.push(Collections.singleton(rootNode).iterator());
     }
@@ -2097,19 +1714,20 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
     }
   }
 
-  static final class TransientTrieSet_5Bits<K> implements Set.Transient<K> {
+  static final class TransientTrieSet<K> implements Set.Transient<K> {
+
     final private AtomicReference<Thread> mutator;
     private AbstractSetNode<K> rootNode;
-    private int hashCode;
+    private int cachedHashCode;
     private int cachedSize;
 
-    TransientTrieSet_5Bits(TrieSet_5Bits<K> trieSet_5Bits) {
+    TransientTrieSet(TrieSet<K> trieSet) {
       this.mutator = new AtomicReference<Thread>(Thread.currentThread());
-      this.rootNode = trieSet_5Bits.rootNode;
-      this.hashCode = trieSet_5Bits.hashCode;
-      this.cachedSize = trieSet_5Bits.cachedSize;
+      this.rootNode = trieSet.rootNode;
+      this.cachedHashCode = trieSet.cachedHashCode;
+      this.cachedSize = trieSet.cachedSize;
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
     }
 
@@ -2117,7 +1735,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
       int hash = 0;
       int size = 0;
 
-      for (Iterator<K> it = keyIterator(); it.hasNext();) {
+      for (Iterator<K> it = keyIterator(); it.hasNext(); ) {
         final K key = it.next();
 
         hash += key.hashCode();
@@ -2128,39 +1746,8 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
     }
 
     @Override
-    public boolean add(final K key) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean addAll(final Collection<? extends K> c) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void clear() {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean remove(final Object key) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean removeAll(final Collection<?> c) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean retainAll(final Collection<?> c) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
     public boolean contains(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         return rootNode.contains(key, transformHashCode(key.hashCode()), 0);
       } catch (ClassCastException unused) {
@@ -2169,53 +1756,21 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
     }
 
     @Override
-    public boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
-      try {
-        @SuppressWarnings("unchecked")
-        final K key = (K) o;
-        return rootNode.contains(key, transformHashCode(key.hashCode()), 0, cmp);
-      } catch (ClassCastException unused) {
-        return false;
-      }
+    public Optional<K> apply(K key) {
+      return rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
     }
 
-    @Override
     public K get(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
-        final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
-
-        if (result.isPresent()) {
-          return result.get();
-        } else {
-          return null;
-        }
+        return apply(key).orElse(null);
       } catch (ClassCastException unused) {
         return null;
       }
     }
 
     @Override
-    public K getEquivalent(final Object o, final Comparator<Object> cmp) {
-      try {
-        @SuppressWarnings("unchecked")
-        final K key = (K) o;
-        final Optional<K> result =
-            rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
-
-        if (result.isPresent()) {
-          return result.get();
-        } else {
-          return null;
-        }
-      } catch (ClassCastException unused) {
-        return null;
-      }
-    }
-
-    @Override
-    public boolean __insert(final K key) {
+    public boolean insert(final K key) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -2229,78 +1784,24 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
       if (details.isModified()) {
 
         rootNode = newRootNode;
-        hashCode += keyHash;
+        cachedHashCode ^= keyHash;
         cachedSize += 1;
 
         if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
+          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
         }
         return true;
 
       }
 
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
       return false;
     }
 
     @Override
-    public boolean __insertEquivalent(final K key, final Comparator<Object> cmp) {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
-      final int keyHash = key.hashCode();
-      final SetResult<K> details = SetResult.unchanged();
-
-      final CompactSetNode<K> newRootNode =
-          rootNode.updated(mutator, key, transformHashCode(keyHash), 0, details, cmp);
-
-      if (details.isModified()) {
-
-        rootNode = newRootNode;
-        hashCode += keyHash;
-        cachedSize += 1;
-
-        if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
-        }
-        return true;
-
-      }
-
-      if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
-      }
-      return false;
-    }
-
-    @Override
-    public boolean __insertAll(final java.util.Set<? extends K> set) {
-      boolean modified = false;
-
-      for (final K key : set) {
-        modified |= this.__insert(key);
-      }
-
-      return modified;
-    }
-
-    @Override
-    public boolean __insertAllEquivalent(final java.util.Set<? extends K> set,
-        final Comparator<Object> cmp) {
-      boolean modified = false;
-
-      for (final K key : set) {
-        modified |= this.__insertEquivalent(key, cmp);
-      }
-
-      return modified;
-    }
-
-    @Override
-    public boolean __remove(final K key) {
+    public boolean remove(final K key) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -2313,77 +1814,46 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
 
       if (details.isModified()) {
         rootNode = newRootNode;
-        hashCode = hashCode - keyHash;
+        cachedHashCode = cachedHashCode ^ keyHash;
         cachedSize = cachedSize - 1;
 
         if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
+          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
         }
         return true;
       }
 
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
 
       return false;
     }
 
     @Override
-    public boolean __removeEquivalent(final K key, final Comparator<Object> cmp) {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
-      final int keyHash = key.hashCode();
-      final SetResult<K> details = SetResult.unchanged();
-
-      final CompactSetNode<K> newRootNode =
-          rootNode.removed(mutator, key, transformHashCode(keyHash), 0, details, cmp);
-
-      if (details.isModified()) {
-        rootNode = newRootNode;
-        hashCode = hashCode - keyHash;
-        cachedSize = cachedSize - 1;
-
-        if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
-        }
-        return true;
-      }
-
-      if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
-      }
-
-      return false;
-    }
-
-    @Override
-    public boolean __removeAll(final java.util.Set<? extends K> set) {
+    public boolean insertAll(final Set<? extends K> set) {
       boolean modified = false;
 
       for (final K key : set) {
-        modified |= this.__remove(key);
+        modified |= this.insert(key);
       }
 
       return modified;
     }
 
     @Override
-    public boolean __removeAllEquivalent(final java.util.Set<? extends K> set,
-        final Comparator<Object> cmp) {
+    public boolean removeAll(final Set<? extends K> set) {
       boolean modified = false;
 
       for (final K key : set) {
-        modified |= this.__removeEquivalent(key, cmp);
+        modified |= this.remove(key);
       }
 
       return modified;
     }
 
     @Override
-    public boolean __retainAll(final java.util.Set<? extends K> set) {
+    public boolean retainAll(final Set<? extends K> set) {
       boolean modified = false;
 
       Iterator<K> thisIterator = iterator();
@@ -2398,43 +1868,7 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
     }
 
     @Override
-    public boolean __retainAllEquivalent(final Set.Transient<? extends K> transientSet,
-        final Comparator<Object> cmp) {
-      boolean modified = false;
-
-      Iterator<K> thisIterator = iterator();
-      while (thisIterator.hasNext()) {
-        if (!transientSet.containsEquivalent(thisIterator.next(), cmp)) {
-          thisIterator.remove();
-          modified = true;
-        }
-      }
-
-      return modified;
-    }
-
-    @Override
-    public boolean containsAll(Collection<?> c) {
-      for (Object item : c) {
-        if (!contains(item)) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    @Override
-    public boolean containsAllEquivalent(Collection<?> c, Comparator<Object> cmp) {
-      for (Object item : c) {
-        if (!containsEquivalent(item, cmp)) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    @Override
-    public int size() {
+    public long size() {
       return cachedSize;
     }
 
@@ -2448,16 +1882,16 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
       return keyIterator();
     }
 
-    @Override
-    public Iterator<K> keyIterator() {
+    private Iterator<K> keyIterator() {
       return new TransientSetKeyIterator<>(this);
     }
 
     public static class TransientSetKeyIterator<K> extends SetKeyIterator<K> {
-      final TransientTrieSet_5Bits<K> collection;
+
+      final TransientTrieSet<K> collection;
       K lastKey;
 
-      public TransientSetKeyIterator(final TransientTrieSet_5Bits<K> collection) {
+      public TransientSetKeyIterator(final TransientTrieSet<K> collection) {
         super(collection.rootNode);
         this.collection = collection;
       }
@@ -2470,31 +1904,8 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
       @Override
       public void remove() {
         // TODO: test removal at iteration rigorously
-        collection.__remove(lastKey);
+        collection.remove(lastKey);
       }
-    }
-
-    @Override
-    public Object[] toArray() {
-      Object[] array = new Object[cachedSize];
-
-      int idx = 0;
-      for (K key : this) {
-        array[idx++] = key;
-      }
-
-      return array;
-    }
-
-    @Override
-    public <T> T[] toArray(final T[] a) {
-      List<K> list = new ArrayList<K>(cachedSize);
-
-      for (K key : this) {
-        list.add(key);
-      }
-
-      return list.toArray(a);
     }
 
     @Override
@@ -2506,26 +1917,26 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
         return false;
       }
 
-      if (other instanceof TransientTrieSet_5Bits) {
-        TransientTrieSet_5Bits<?> that = (TransientTrieSet_5Bits<?>) other;
+      if (other instanceof TransientTrieSet) {
+        TransientTrieSet<?> that = (TransientTrieSet<?>) other;
 
         if (this.cachedSize != that.cachedSize) {
           return false;
         }
 
-        if (this.hashCode != that.hashCode) {
+        if (this.cachedHashCode != that.cachedHashCode) {
           return false;
         }
 
         return rootNode.equals(that.rootNode);
-      } else if (other instanceof java.util.Set) {
-        java.util.Set that = (java.util.Set) other;
+      } else if (other instanceof Set) {
+        Set that = (Set) other;
 
         if (this.size() != that.size()) {
           return false;
         }
 
-        return containsAll(that);
+        return contains(that);
       }
 
       return false;
@@ -2533,17 +1944,58 @@ public class TrieSet_5Bits<K> implements Set.Immutable<K> {
 
     @Override
     public int hashCode() {
-      return hashCode;
+      return cachedHashCode;
     }
 
+    // @Override
+    // public java.util.Set<K> asJdkCollection() {
+    // throw new UnsupportedOperationException("Not yet implemented.");
+    // }
+
     @Override
-    public Set.Immutable<K> freeze() {
+    public Set.Immutable<K> asImmutable() {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
 
       mutator.set(null);
-      return new TrieSet_5Bits<K>(rootNode, hashCode, cachedSize);
+      return new TrieSet<K>(rootNode, cachedHashCode, cachedSize);
+    }
+  }
+
+  private static class TrieSetAsImmutableJdkCollection<K> extends java.util.AbstractSet<K> {
+
+    private final AbstractSetNode<K> rootNode;
+    private final int cachedSize;
+
+    private TrieSetAsImmutableJdkCollection(TrieSet<K> original) {
+      this.rootNode = original.rootNode;
+      this.cachedSize = original.cachedSize;
+    }
+
+    private TrieSetAsImmutableJdkCollection(TransientTrieSet<K> original) {
+      this.rootNode = original.rootNode;
+      this.cachedSize = original.cachedSize;
+    }
+
+    @Override
+    public boolean contains(final Object o) {
+      try {
+        final K key = (K) o;
+        return rootNode.contains(key, transformHashCode(key.hashCode()), 0);
+      } catch (ClassCastException unused) {
+        return false;
+      }
+    }
+
+    @Override
+    public Iterator<K> iterator() {
+      return new SetKeyIterator<>(rootNode);
+    }
+
+    @Override
+    public int size() {
+      return cachedSize;
     }
   }
 

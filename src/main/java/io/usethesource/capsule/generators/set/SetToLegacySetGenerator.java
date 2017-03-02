@@ -10,7 +10,7 @@ package io.usethesource.capsule.generators.set;
 import com.pholser.junit.quickcheck.generator.GenerationStatus;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 
-import io.usethesource.capsule.core.TrieSet;
+import io.usethesource.capsule.core.experimental.TrieSet;
 import io.usethesource.capsule.core.converter.SetToLegacySetConverter;
 
 @SuppressWarnings({"rawtypes", "unchecked"})

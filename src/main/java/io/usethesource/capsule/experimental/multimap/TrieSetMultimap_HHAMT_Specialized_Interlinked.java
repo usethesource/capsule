@@ -7,19 +7,48 @@
  */
 package io.usethesource.capsule.experimental.multimap;
 
-import io.usethesource.capsule.api.SetMultimap;
-import io.usethesource.capsule.core.deprecated.TrieSet_5Bits.AbstractSetNode;
-import io.usethesource.capsule.core.deprecated.TrieSet_5Bits.SetResult;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Interlinked.*;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Interlinked.EitherSingletonOrCollection.Type;
-import io.usethesource.capsule.util.EqualityComparator;
-import io.usethesource.capsule.util.RangecopyUtils;
-import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_COLLECTION;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_SINGLETON;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_EMPTY;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_NODE;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setBitPattern;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setFromNode;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setNodeOf;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setOf;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setToNode;
+import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Interlinked.EitherSingletonOrCollection.Type.COLLECTION;
+import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Interlinked.EitherSingletonOrCollection.Type.SINGLETON;
+import static io.usethesource.capsule.util.BitmapUtils.filter;
+import static io.usethesource.capsule.util.BitmapUtils.index;
+import static io.usethesource.capsule.util.DataLayoutHelper.addressSize;
+import static io.usethesource.capsule.util.DataLayoutHelper.arrayOffsets;
+import static io.usethesource.capsule.util.DataLayoutHelper.fieldOffset;
+import static io.usethesource.capsule.util.DataLayoutHelper.unsafe;
+import static io.usethesource.capsule.util.RangecopyUtils._do_rangecompareObjectRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.getFromObjectRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.getFromObjectRegionAndCast;
+import static io.usethesource.capsule.util.RangecopyUtils.rangecopyObjectRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.setInObjectRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.setInObjectRegionVarArgs;
+import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
-import java.util.*;
+import java.util.AbstractCollection;
+import java.util.AbstractSet;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -28,16 +57,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.*;
-import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Interlinked.EitherSingletonOrCollection.Type.COLLECTION;
-import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Interlinked.EitherSingletonOrCollection.Type.SINGLETON;
-import static io.usethesource.capsule.util.BitmapUtils.filter;
-import static io.usethesource.capsule.util.BitmapUtils.index;
-import static io.usethesource.capsule.util.DataLayoutHelper.*;
-import static io.usethesource.capsule.util.RangecopyUtils.*;
-import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
+import io.usethesource.capsule.api.SetMultimap;
+import io.usethesource.capsule.core.TrieSet_5Bits.AbstractSetNode;
+import io.usethesource.capsule.core.TrieSet_5Bits.SetResult;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Interlinked.*;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Interlinked.EitherSingletonOrCollection.Type;
+import io.usethesource.capsule.util.EqualityComparator;
+import io.usethesource.capsule.util.RangecopyUtils;
+import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
 
-@SuppressWarnings({"rawtypes", "restriction"})
 public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
     implements SetMultimap.Immutable<K, V> {
 
@@ -45,7 +73,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
 
   protected static final CompactSetMultimapNode EMPTY_NODE = new SetMultimap0To0Node<>(null, 0L);
 
-  @SuppressWarnings("unchecked")
   private static final TrieSetMultimap_HHAMT_Specialized_Interlinked EMPTY_SETMULTIMAP =
       new TrieSetMultimap_HHAMT_Specialized_Interlinked(EqualityComparator.EQUALS, EMPTY_NODE, 0,
           0);
@@ -67,18 +94,15 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> SetMultimap.Immutable<K, V> of() {
     return TrieSetMultimap_HHAMT_Specialized_Interlinked.EMPTY_SETMULTIMAP;
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> SetMultimap.Immutable<K, V> of(EqualityComparator<Object> cmp) {
     // TODO: unify with `of()`
     return new TrieSetMultimap_HHAMT_Specialized_Interlinked(cmp, EMPTY_NODE, 0, 0);
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> SetMultimap.Immutable<K, V> of(K key, V... values) {
     SetMultimap.Immutable<K, V> result =
         TrieSetMultimap_HHAMT_Specialized_Interlinked.EMPTY_SETMULTIMAP;
@@ -90,12 +114,10 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
     return result;
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> SetMultimap.Transient<K, V> transientOf() {
     return TrieSetMultimap_HHAMT_Specialized_Interlinked.EMPTY_SETMULTIMAP.asTransient();
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> SetMultimap.Transient<K, V> transientOf(K key, V... values) {
     final SetMultimap.Transient<K, V> result =
         TrieSetMultimap_HHAMT_Specialized_Interlinked.EMPTY_SETMULTIMAP.asTransient();
@@ -111,7 +133,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
     int hash = 0;
     int size = 0;
 
-    for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
+    for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext(); ) {
       final Map.Entry<K, V> entry = it.next();
       final K key = entry.getKey();
       final V val = entry.getValue();
@@ -130,7 +152,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
   @Override
   public boolean containsKey(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0, cmp);
     } catch (ClassCastException unused) {
@@ -140,7 +161,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
 
   @Override
   public boolean containsValue(final Object o) {
-    for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
+    for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
       if (cmp.equals(iterator.next(), o)) {
         return true;
       }
@@ -151,9 +172,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
   @Override
   public boolean containsEntry(final Object o0, final Object o1) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o0;
-      @SuppressWarnings("unchecked")
       final V val = (V) o1;
       return rootNode.containsTuple(key, val, transformHashCode(key.hashCode()), 0, cmp);
     } catch (ClassCastException unused) {
@@ -164,7 +183,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
   @Override
   public io.usethesource.capsule.api.Set.Immutable<V> get(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       final Optional<AbstractSetNode<V>> result =
           rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
@@ -493,15 +511,15 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
     } else if (other instanceof SetMultimap) {
       SetMultimap that = (SetMultimap) other;
 
-      if (this.size() != that.size())
+      if (this.size() != that.size()) {
         return false;
+      }
 
-      for (@SuppressWarnings("unchecked")
-      Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
+      for (
+          Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext(); ) {
         Map.Entry entry = it.next();
 
         try {
-          @SuppressWarnings("unchecked")
           final K key = (K) entry.getKey();
           final Optional<AbstractSetNode<V>> result =
               rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
@@ -509,7 +527,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
           if (!result.isPresent()) {
             return false;
           } else {
-            @SuppressWarnings("unchecked")
             final AbstractSetNode<V> valColl = (AbstractSetNode<V>) entry.getValue();
 
             if (!cmp.equals(result.get(), valColl)) {
@@ -647,6 +664,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
   // }
 
   static abstract class EitherSingletonOrCollection<T> {
+
     public enum Type {
       SINGLETON, COLLECTION
     }
@@ -667,6 +685,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
   }
 
   static final class SomeSingleton<T> extends EitherSingletonOrCollection<T> {
+
     private final T value;
 
     private SomeSingleton(T value) {
@@ -691,6 +710,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
   }
 
   static final class SomeCollection<T> extends EitherSingletonOrCollection<T> {
+
     private final AbstractSetNode<T> value;
 
     private SomeCollection(AbstractSetNode<T> value) {
@@ -715,6 +735,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
   }
 
   static final class SetMultimapResult<K, V> {
+
     private V replacedValue;
     private AbstractSetNode<V> replacedValueCollection;
     private EitherSingletonOrCollection.Type replacedType;
@@ -746,7 +767,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
       return new SetMultimapResult<>();
     }
 
-    private SetMultimapResult() {}
+    private SetMultimapResult() {
+    }
 
     public boolean isModified() {
       return isModified;
@@ -772,6 +794,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
   }
 
   protected static interface INode<K, V> {
+
   }
 
   protected static abstract class AbstractSetMultimapNode<K, V> implements INode<K, V> {
@@ -827,8 +850,9 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
 
         @Override
         public AbstractSetMultimapNode<K, V> next() {
-          if (!hasNext())
+          if (!hasNext()) {
             throw new NoSuchElementException();
+          }
           return AbstractSetMultimapNode.this.getNode(nextIndex++);
         }
 
@@ -1136,28 +1160,24 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
     }
 
     // TODO: remove final modifier when collision node does not depend on compact node anymore
-    @SuppressWarnings("unchecked")
     @Override
     K getSingletonKey(final int index) {
       return (K) getFromObjectRegion(this, arrayBase, TUPLE_LENGTH * index);
     }
 
     // TODO: remove final modifier when collision node does not depend on compact node anymore
-    @SuppressWarnings("unchecked")
     @Override
     V getSingletonValue(final int index) {
       return (V) getFromObjectRegion(this, arrayBase, TUPLE_LENGTH * index + 1);
     }
 
     // TODO: remove final modifier when collision node does not depend on compact node anymore
-    @SuppressWarnings("unchecked")
     @Override
     K getCollectionKey(final int index) {
       return (K) getFromObjectRegion(this, staticRareBase(), TUPLE_LENGTH * index);
     }
 
     // TODO: remove final modifier when collision node does not depend on compact node anymore
-    @SuppressWarnings("unchecked")
     @Override
     AbstractSetNode<V> getCollectionValue(final int index) {
       return (AbstractSetNode<V>) getFromObjectRegion(this, staticRareBase(),
@@ -1319,7 +1339,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
     }
 
     // TODO: remove final modifier when collision node does not depend on compact node anymore
-    @SuppressWarnings("unchecked")
     @Override
     CompactSetMultimapNode<K, V> getNode(final int index) {
       final int pIndex = slotArity() - 1 - index;
@@ -1356,8 +1375,10 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
       for (int i = 0; i < arities[PATTERN_DATA_SINGLETON]; i++) {
         int offset = i * TUPLE_LENGTH;
 
-        assert ((getSlot(offset + 0) instanceof io.usethesource.capsule.api.Set.Immutable) == false);
-        assert ((getSlot(offset + 1) instanceof io.usethesource.capsule.api.Set.Immutable) == false);
+        assert ((getSlot(offset + 0) instanceof io.usethesource.capsule.api.Set.Immutable)
+            == false);
+        assert ((getSlot(offset + 1) instanceof io.usethesource.capsule.api.Set.Immutable)
+            == false);
 
         assert ((getSlot(offset + 0) instanceof CompactSetMultimapNode) == false);
         assert ((getSlot(offset + 1) instanceof CompactSetMultimapNode) == false);
@@ -1366,7 +1387,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
       for (int i = 0; i < arities[PATTERN_DATA_COLLECTION]; i++) {
         int offset = (i + arities[PATTERN_DATA_SINGLETON]) * TUPLE_LENGTH;
 
-        assert ((getSlot(offset + 0) instanceof io.usethesource.capsule.api.Set.Immutable) == false);
+        assert ((getSlot(offset + 0) instanceof io.usethesource.capsule.api.Set.Immutable)
+            == false);
         assert ((getSlot(offset + 1) instanceof io.usethesource.capsule.api.Set.Immutable) == true);
 
         assert ((getSlot(offset + 0) instanceof CompactSetMultimapNode) == false);
@@ -1377,7 +1399,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
         int offset =
             (arities[PATTERN_DATA_SINGLETON] + arities[PATTERN_DATA_COLLECTION]) * TUPLE_LENGTH;
 
-        assert ((getSlot(offset + i) instanceof io.usethesource.capsule.api.Set.Immutable) == false);
+        assert ((getSlot(offset + i) instanceof io.usethesource.capsule.api.Set.Immutable)
+            == false);
 
         assert ((getSlot(offset + i) instanceof CompactSetMultimapNode) == true);
       }
@@ -1447,7 +1470,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
       return dst;
     }
 
-    @SuppressWarnings("unchecked")
     static final <K, V> CompactSetMultimapNode<K, V> allocateHeapRegionAndSetBitmap(
         final Class<? extends CompactSetMultimapNode> clazz, final long bitmap) {
       try {
@@ -1460,7 +1482,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
       }
     }
 
-    @SuppressWarnings("unchecked")
     CompactSetMultimapNode<K, V> copyAndSetNode(final AtomicReference<Thread> mutator,
         final int index, final CompactSetMultimapNode<K, V> node) {
       final Class<? extends CompactSetMultimapNode> srcClass = this.getClass();
@@ -1516,7 +1537,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
       return dst;
     }
 
-    @SuppressWarnings("unchecked")
     CompactSetMultimapNode<K, V> copyAndMigrateFromSingletonToCollection(
         final AtomicReference<Thread> mutator, final long doubledBitpos, final int indexOld,
         final K key, final AbstractSetNode<V> valColl) {
@@ -1556,7 +1576,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
       return dst;
     }
 
-    @SuppressWarnings("unchecked")
     CompactSetMultimapNode<K, V> copyAndRemoveSingleton(final AtomicReference<Thread> mutator,
         final long doubledBitpos) {
       final int indexOld = dataIndex(doubledBitpos);
@@ -1704,7 +1723,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
       return dst;
     }
 
-    @SuppressWarnings("unchecked")
     CompactSetMultimapNode<K, V> copyAndMigrateFromNodeToSingleton(
         final AtomicReference<Thread> mutator, final long doubledBitpos,
         final CompactSetMultimapNode<K, V> node) { // node get's unwrapped inside method
@@ -1791,7 +1809,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
           slotArity - pIndexOld - 1);
     }
 
-    @SuppressWarnings("unchecked")
     CompactSetMultimapNode<K, V> copyAndMigrateFromCollectionToSingleton(
         final AtomicReference<Thread> mutator, final long doubledBitpos, final K key, final V val) {
 
@@ -1872,7 +1889,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
       assert !(cmp.equals(key0, key1));
 
       if (shift >= HASH_CODE_LENGTH) {
-        return AbstractHashCollisionNode.of(keyHash0, key0, setFromNode(valColl0), key1, setOf(val1));
+        return AbstractHashCollisionNode
+            .of(keyHash0, key0, setFromNode(valColl0), key1, setOf(val1));
       }
 
       final int mask0 = doubledMask(keyHash0, shift);
@@ -2662,13 +2680,13 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
 
     @Override
     CompactSetMultimapNode<K, V> copyAndSetSingletonValue(AtomicReference<Thread> mutator,
-                                                          long doubledBitpos, V val) {
+        long doubledBitpos, V val) {
       throw UOE_FACTORY.get();
     }
 
     @Override
     CompactSetMultimapNode<K, V> copyAndSetCollectionValue(AtomicReference<Thread> mutator,
-                                                           long doubledBitpos, AbstractSetNode<V> valColl) {
+        long doubledBitpos, AbstractSetNode<V> valColl) {
       throw UOE_FACTORY.get();
     }
 
@@ -2680,7 +2698,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
 
     @Override
     CompactSetMultimapNode<K, V> copyAndInsertSingleton(AtomicReference<Thread> mutator,
-                                                        long doubledBitpos, K key, V val) {
+        long doubledBitpos, K key, V val) {
       throw UOE_FACTORY.get();
     }
 
@@ -2692,13 +2710,13 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
 
     @Override
     CompactSetMultimapNode<K, V> copyAndRemoveSingleton(AtomicReference<Thread> mutator,
-                                                        long doubledBitpos) {
+        long doubledBitpos) {
       throw UOE_FACTORY.get();
     }
 
     @Override
     CompactSetMultimapNode<K, V> copyAndRemoveCollection(AtomicReference<Thread> mutator,
-                                                         long doubledBitpos) {
+        long doubledBitpos) {
       throw UOE_FACTORY.get();
     }
 
@@ -2710,7 +2728,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
 
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromNodeToSingleton(AtomicReference<Thread> mutator,
-                                                                   long doubledBitpos, CompactSetMultimapNode<K, V> node) {
+        long doubledBitpos, CompactSetMultimapNode<K, V> node) {
       throw UOE_FACTORY.get();
     }
 
@@ -2722,13 +2740,13 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
 
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromNodeToCollection(AtomicReference<Thread> mutator,
-                                                                    long doubledBitpos, CompactSetMultimapNode<K, V> node) {
+        long doubledBitpos, CompactSetMultimapNode<K, V> node) {
       throw UOE_FACTORY.get();
     }
 
     @Override
     CompactSetMultimapNode<K, V> copyAndUpdateBitmaps(AtomicReference<Thread> mutator,
-                                                      long bitmap) {
+        long bitmap) {
       throw UOE_FACTORY.get();
     }
 
@@ -2776,12 +2794,14 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
     private final int hash;
     private final List<Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> collisionContent;
 
-    HashCollisionNode(final int hash, final K key0, final io.usethesource.capsule.api.Set.Immutable<V> valColl0, final K key1,
-                      final io.usethesource.capsule.api.Set.Immutable<V> valColl1) {
+    HashCollisionNode(final int hash, final K key0,
+        final io.usethesource.capsule.api.Set.Immutable<V> valColl0, final K key1,
+        final io.usethesource.capsule.api.Set.Immutable<V> valColl1) {
       this(hash, Arrays.asList(entryOf(key0, valColl0), entryOf(key1, valColl1)));
     }
 
-    HashCollisionNode(final int hash, final List<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> collisionContent) {
+    HashCollisionNode(final int hash,
+        final List<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> collisionContent) {
       this.hash = hash;
       this.collisionContent = collisionContent;
     }
@@ -2904,13 +2924,13 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
 
     @Override
     Optional<AbstractSetNode<V>> findByKey(K key, int keyHash, int shift,
-                                           EqualityComparator<Object> cmp) {
+        EqualityComparator<Object> cmp) {
       throw UOE_NOT_YET_IMPLEMENTED_FACTORY.get();
     }
 
     @Override
     CompactSetMultimapNode<K, V> inserted(AtomicReference<Thread> mutator, K key, V val,
-                                          int keyHash, int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
+        int keyHash, int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
       Optional<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> optionalTuple =
           collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
 
@@ -2959,7 +2979,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
         // does not contain key
 
         Stream.Builder<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> builder =
-            Stream.<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>>builder().add(entryOf(key, setOf(val)));
+            Stream.<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>>builder()
+                .add(entryOf(key, setOf(val)));
 
         collisionContent.forEach(builder::accept);
 
@@ -2980,7 +3001,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
 
     @Override
     CompactSetMultimapNode<K, V> updated(AtomicReference<Thread> mutator, K key, V val, int keyHash,
-                                         int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
+        int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
       Optional<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> optionalTuple =
           collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
 
@@ -2992,7 +3013,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
         Function<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>, Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> substitutionMapper =
             (kImmutableSetEntry) -> {
               if (kImmutableSetEntry == optionalTuple.get()) {
-                io.usethesource.capsule.api.Set.Immutable<V> updatedValues = values.__insertEquivalent(val, cmp.toComparator());
+                io.usethesource.capsule.api.Set.Immutable<V> updatedValues = values
+                    .__insertEquivalent(val, cmp.toComparator());
                 return entryOf(key, updatedValues);
               } else {
                 return kImmutableSetEntry;
@@ -3013,7 +3035,8 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
         // does not contain key
 
         Stream.Builder<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> builder =
-            Stream.<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>>builder().add(entryOf(key, setOf(val)));
+            Stream.<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>>builder()
+                .add(entryOf(key, setOf(val)));
 
         collisionContent.forEach(builder::accept);
 
@@ -3027,7 +3050,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
 
     @Override
     CompactSetMultimapNode<K, V> removed(AtomicReference<Thread> mutator, K key, V val, int keyHash,
-                                         int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
+        int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
       Optional<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> optionalTuple =
           collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
 
@@ -3093,7 +3116,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
     private int currentStackLevel = -1;
     private final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
 
-    @SuppressWarnings("unchecked")
     AbstractSetMultimapNode<K, V>[] nodes = new AbstractSetMultimapNode[MAX_DEPTH];
 
     AbstractSetMultimapIterator(AbstractSetMultimapNode<K, V> rootNode) {
@@ -3208,7 +3230,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
   /**
    * Iterator skeleton that uses a fixed stack in depth.
    */
-  @SuppressWarnings("unchecked")
   private static abstract class AbstractSetMultimapIteratorLowLevel<K, V> {
 
     private static final int MAX_DEPTH = 7;
@@ -3333,7 +3354,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
   /**
    * Iterator skeleton that uses a fixed stack in depth.
    */
-  @SuppressWarnings("unchecked")
   private static abstract class AbstractSetMultimapIteratorHistogram<K, V> {
 
     private static final int MAX_DEPTH = 7;
@@ -3385,7 +3405,9 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
     }
 
     private boolean searchNextPayloadCategory() {
-      while (histogram[++payloadCursorX] == 0);
+      while (histogram[++payloadCursorX] == 0) {
+        ;
+      }
       payloadCursorY = 0;
 
       return true;
@@ -3569,7 +3591,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
       }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Entry<K, V> next() {
       assert hasNext();
@@ -3784,7 +3805,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
       int hash = 0;
       int size = 0;
 
-      for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
+      for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext(); ) {
         final Map.Entry<K, V> entry = it.next();
         final K key = entry.getKey();
         final V val = entry.getValue();
@@ -3799,7 +3820,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
     @Override
     public boolean containsKey(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0, cmp);
       } catch (ClassCastException unused) {
@@ -3809,7 +3829,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
 
     @Override
     public boolean containsValue(final Object o) {
-      for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
+      for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
         if (cmp.equals(iterator.next(), o)) {
           return true;
         }
@@ -3820,9 +3840,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
     @Override
     public boolean containsEntry(final Object o0, final Object o1) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o0;
-        @SuppressWarnings("unchecked")
         final V val = (V) o1;
         final Optional<AbstractSetNode<V>> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
@@ -3840,7 +3858,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
     @Override
     public io.usethesource.capsule.api.Set.Immutable<V> get(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         final Optional<AbstractSetNode<V>> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
@@ -3977,6 +3994,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
     }
 
     public static class TransientSetMultimapKeyIterator<K, V> extends SetMultimapKeyIterator<K, V> {
+
       final TransientTrieSetMultimap_BleedingEdge<K, V> collection;
       K lastKey;
 
@@ -3999,6 +4017,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
 
     public static class TransientSetMultimapValueIterator<K, V>
         extends SetMultimapValueIterator<K, V> {
+
       final TransientTrieSetMultimap_BleedingEdge<K, V> collection;
 
       public TransientSetMultimapValueIterator(
@@ -4020,6 +4039,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
 
     public static class TransientSetMultimapTupleIterator<K, V, T>
         extends SetMultimapTupleIterator<K, V, T> {
+
       final TransientTrieSetMultimap_BleedingEdge<K, V> collection;
 
       public TransientSetMultimapTupleIterator(
@@ -4191,15 +4211,15 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
       } else if (other instanceof SetMultimap) {
         SetMultimap that = (SetMultimap) other;
 
-        if (this.size() != that.size())
+        if (this.size() != that.size()) {
           return false;
+        }
 
-        for (@SuppressWarnings("unchecked")
-        Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
+        for (
+            Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext(); ) {
           Map.Entry entry = it.next();
 
           try {
-            @SuppressWarnings("unchecked")
             final K key = (K) entry.getKey();
             final Optional<AbstractSetNode<V>> result =
                 rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
@@ -4207,7 +4227,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
             if (!result.isPresent()) {
               return false;
             } else {
-              @SuppressWarnings("unchecked")
               final AbstractSetNode<V> valColl = (AbstractSetNode<V>) entry.getValue();
 
               if (!cmp.equals(result.get(), valColl)) {
@@ -4245,7 +4264,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
   private abstract static class DataLayoutHelper extends CompactSetMultimapNode<Object, Object> {
 
     private static final long[] arrayOffsets =
-        arrayOffsets(DataLayoutHelper.class, new String[] {"slot0", "slot1"});
+        arrayOffsets(DataLayoutHelper.class, new String[]{"slot0", "slot1"});
 
     public final Object slot0 = null;
 

@@ -13,7 +13,7 @@ import org.junit.runners.Suite;
 
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 
-import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
+import io.usethesource.capsule.core.TrieSet_5Bits;
 
 /**
  * Static aggregation of set test. Superseeded by {@link RuntimeCodeGenerationTest}.

@@ -7,6 +7,12 @@
  */
 package io.usethesource.capsule.experimental.multimap;
 
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setOf;
+import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type.COLLECTION;
+import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type.SINGLETON;
+import static io.usethesource.capsule.util.RangecopyUtils.isBitInBitmap;
+import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
+
 import java.util.AbstractCollection;
 import java.util.AbstractSet;
 import java.util.ArrayDeque;
@@ -32,25 +38,17 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import io.usethesource.capsule.api.SetMultimap;
-import io.usethesource.capsule.core.deprecated.TrieSet_5Bits;
+import io.usethesource.capsule.core.TrieSet_5Bits;
 import io.usethesource.capsule.core.trie.ArrayView;
 import io.usethesource.capsule.core.trie.Node;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type;
 import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
 
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setOf;
-import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type.COLLECTION;
-import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type.SINGLETON;
-import static io.usethesource.capsule.util.RangecopyUtils.isBitInBitmap;
-import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
-
-@SuppressWarnings("rawtypes")
 public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V> {
 
   private final EqualityComparator<Object> cmp;
 
-  @SuppressWarnings("unchecked")
   private static final TrieSetMultimap_HCHAMP EMPTY_SETMULTIMAP = new TrieSetMultimap_HCHAMP(
       EqualityComparator.EQUALS, CompactSetMultimapNode.EMPTY_NODE, 0, 0, 0, 0);
 
@@ -80,18 +78,15 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> SetMultimap.Immutable<K, V> of() {
     return TrieSetMultimap_HCHAMP.EMPTY_SETMULTIMAP;
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> SetMultimap.Immutable<K, V> of(EqualityComparator<Object> cmp) {
     // TODO: unify with `of()`
     return new TrieSetMultimap_HCHAMP(cmp, CompactSetMultimapNode.EMPTY_NODE, 0, 0, 0, 0);
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> SetMultimap.Immutable<K, V> of(K key, V... values) {
     SetMultimap.Immutable<K, V> result = TrieSetMultimap_HCHAMP.EMPTY_SETMULTIMAP;
 
@@ -102,19 +97,16 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
     return result;
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> SetMultimap.Transient<K, V> transientOf() {
     return TrieSetMultimap_HCHAMP.EMPTY_SETMULTIMAP.asTransient();
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> SetMultimap.Transient<K, V> transientOf(
       EqualityComparator<Object> cmp) {
     // TODO: unify with `of()`
     return (SetMultimap.Transient<K, V>) of(cmp).asTransient();
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> SetMultimap.Transient<K, V> transientOf(K key, V... values) {
     final SetMultimap.Transient<K, V> result =
         TrieSetMultimap_HCHAMP.EMPTY_SETMULTIMAP.asTransient();
@@ -165,7 +157,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
   @Override
   public boolean containsKey(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0, cmp);
     } catch (ClassCastException unused) {
@@ -175,7 +166,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
 
   @Override
   public boolean containsValue(final Object o) {
-    for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
+    for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
       if (cmp.equals(iterator.next(), o)) {
         return true;
       }
@@ -186,9 +177,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
   @Override
   public boolean containsEntry(final Object o0, final Object o1) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o0;
-      @SuppressWarnings("unchecked")
       final V val = (V) o1;
       return rootNode.containsTuple(key, val, transformHashCode(key.hashCode()), 0, cmp);
     } catch (ClassCastException unused) {
@@ -199,7 +188,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
   @Override
   public io.usethesource.capsule.api.Set.Immutable<V> get(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       final Optional<io.usethesource.capsule.api.Set.Immutable<V>> result =
           rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
@@ -582,15 +570,15 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
     } else if (other instanceof SetMultimap) {
       SetMultimap that = (SetMultimap) other;
 
-      if (this.size() != that.size())
+      if (this.size() != that.size()) {
         return false;
+      }
 
-      for (@SuppressWarnings("unchecked")
-      Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
+      for (
+          Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext(); ) {
         Map.Entry entry = it.next();
 
         try {
-          @SuppressWarnings("unchecked")
           final K key = (K) entry.getKey();
           final Optional<io.usethesource.capsule.api.Set.Immutable<V>> result =
               rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
@@ -598,7 +586,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
           if (!result.isPresent()) {
             return false;
           } else {
-            @SuppressWarnings("unchecked")
             final io.usethesource.capsule.api.Set.Immutable<V> valColl =
                 (io.usethesource.capsule.api.Set.Immutable<V>) entry.getValue();
 
@@ -669,6 +656,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
   }
 
   static abstract class EitherSingletonOrCollection<T> {
+
     public enum Type {
       SINGLETON, COLLECTION
     }
@@ -690,6 +678,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
   }
 
   static final class SomeSingleton<T> extends EitherSingletonOrCollection<T> {
+
     private final T value;
 
     private SomeSingleton(T value) {
@@ -714,6 +703,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
   }
 
   static final class SomeCollection<T> extends EitherSingletonOrCollection<T> {
+
     private final io.usethesource.capsule.api.Set.Immutable<T> value;
 
     private SomeCollection(io.usethesource.capsule.api.Set.Immutable<T> value) {
@@ -738,6 +728,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
   }
 
   static final class SetMultimapResult<K, V> {
+
     private V replacedValue;
     private io.usethesource.capsule.api.Set.Immutable<V> replacedValueCollection;
     private EitherSingletonOrCollection.Type replacedType;
@@ -770,7 +761,8 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
       return new SetMultimapResult<>();
     }
 
-    private SetMultimapResult() {}
+    private SetMultimapResult() {
+    }
 
     public boolean isModified() {
       return isModified;
@@ -851,8 +843,9 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
 
         @Override
         public AbstractSetMultimapNode<K, V> next() {
-          if (!hasNext())
+          if (!hasNext()) {
             throw new NoSuchElementException();
+          }
           return AbstractSetMultimapNode.this.getNode(nextIndex++);
         }
 
@@ -1054,9 +1047,9 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
         final int rawMap2 = bitpos(mask0) | bitpos(mask1);
 
         if (mask0 < mask1) {
-          return nodeOf(null, rawMap1, rawMap2, new Object[] {key0, val0, key1, val1});
+          return nodeOf(null, rawMap1, rawMap2, new Object[]{key0, val0, key1, val1});
         } else {
-          return nodeOf(null, rawMap1, rawMap2, new Object[] {key1, val1, key0, val0});
+          return nodeOf(null, rawMap1, rawMap2, new Object[]{key1, val1, key0, val0});
         }
       } else {
         final CompactSetMultimapNode<K, V> node = mergeTwoSingletonPairs(key0, val0, keyHash0, key1,
@@ -1065,14 +1058,14 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
 
         final int rawMap1 = bitpos(mask0);
         final int rawMap2 = 0;
-        return nodeOf(null, rawMap1, rawMap2, new Object[] {node});
+        return nodeOf(null, rawMap1, rawMap2, new Object[]{node});
       }
     }
 
     static final <K, V> CompactSetMultimapNode<K, V> mergeCollectionAndSingletonPairs(final K key0,
-                                                                                      final io.usethesource.capsule.api.Set.Immutable<V> valColl0, final int keyHash0,
-                                                                                      final K key1, final V val1, final int keyHash1, final int shift,
-                                                                                      EqualityComparator<Object> cmp) {
+        final io.usethesource.capsule.api.Set.Immutable<V> valColl0, final int keyHash0,
+        final K key1, final V val1, final int keyHash1, final int shift,
+        EqualityComparator<Object> cmp) {
       // assert !(cmp.equals(key0, key1));
 
       if (shift >= HASH_CODE_LENGTH) {
@@ -1088,7 +1081,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
         final int rawMap2 = bitpos(mask0) | bitpos(mask1);
 
         // singleton before collection
-        return nodeOf(null, rawMap1, rawMap2, new Object[] {key1, val1, key0, valColl0});
+        return nodeOf(null, rawMap1, rawMap2, new Object[]{key1, val1, key0, valColl0});
       } else {
         final CompactSetMultimapNode<K, V> node = mergeCollectionAndSingletonPairs(key0, valColl0,
             keyHash0, key1, val1, keyHash1, shift + BIT_PARTITION_SIZE, cmp);
@@ -1096,14 +1089,14 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
 
         final int rawMap1 = bitpos(mask0);
         final int rawMap2 = 0;
-        return nodeOf(null, rawMap1, rawMap2, new Object[] {node});
+        return nodeOf(null, rawMap1, rawMap2, new Object[]{node});
       }
     }
 
     static final CompactSetMultimapNode EMPTY_NODE;
 
     static {
-      EMPTY_NODE = new BitmapIndexedSetMultimapNode<>(null, (0), (0), new Object[] {});
+      EMPTY_NODE = new BitmapIndexedSetMultimapNode<>(null, (0), (0), new Object[]{});
     }
 
     ;
@@ -1113,7 +1106,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
       return new BitmapIndexedSetMultimapNode<>(mutator, nodeMap, dataMap, nodes);
     }
 
-    @SuppressWarnings("unchecked")
     static final <K, V> CompactSetMultimapNode<K, V> nodeOf(AtomicReference<Thread> mutator) {
       return EMPTY_NODE;
     }
@@ -1122,7 +1114,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
         final int nodeMap, final int dataMap, final K key,
         final io.usethesource.capsule.api.Set.Immutable<V> valColl) {
       assert nodeMap == 0;
-      return nodeOf(mutator, (0), dataMap, new Object[] {key, valColl});
+      return nodeOf(mutator, (0), dataMap, new Object[]{key, valColl});
     }
 
     static final int index(final int bitmap, final int bitpos) {
@@ -1213,7 +1205,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
 
     @Override
     Optional<io.usethesource.capsule.api.Set.Immutable<V>> findByKey(final K key,
-                                                                     final int keyHash, final int shift, EqualityComparator<Object> cmp) {
+        final int keyHash, final int shift, EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1920,19 +1912,16 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
       };
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     K getSingletonKey(final int index) {
       return (K) nodes[TUPLE_LENGTH * index];
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     V getSingletonValue(int index) {
       return (V) nodes[TUPLE_LENGTH * index + 1];
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     K getCollectionKey(int index) {
       // TODO: improve on offset calculation (caching it, etc)
@@ -1940,7 +1929,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
       return (K) nodes[offset];
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     io.usethesource.capsule.api.Set.Immutable<V> getCollectionValue(final int index) {
       // TODO: improve on offset calculation (caching it, etc)
@@ -1948,7 +1936,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
       return (io.usethesource.capsule.api.Set.Immutable<V>) nodes[offset];
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     CompactSetMultimapNode<K, V> getNode(final int index) {
       return (CompactSetMultimapNode<K, V>) nodes[nodes.length - 1 - index];
@@ -2606,8 +2593,8 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
     private final List<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> collisionContent;
 
     HashCollisionNode(final int hash, final K key0,
-                      final io.usethesource.capsule.api.Set.Immutable<V> valColl0, final K key1,
-                      final io.usethesource.capsule.api.Set.Immutable<V> valColl1) {
+        final io.usethesource.capsule.api.Set.Immutable<V> valColl0, final K key1,
+        final io.usethesource.capsule.api.Set.Immutable<V> valColl1) {
       this(hash, Arrays.asList(entryOf(key0, valColl0), entryOf(key1, valColl1)));
     }
 
@@ -2752,7 +2739,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
 
     @Override
     Optional<io.usethesource.capsule.api.Set.Immutable<V>> findByKey(K key, int keyHash,
-                                                                     int shift, EqualityComparator<Object> cmp) {
+        int shift, EqualityComparator<Object> cmp) {
       return collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny()
           .map(Map.Entry::getValue);
     }
@@ -2973,7 +2960,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
     private int currentStackLevel = -1;
     private final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
 
-    @SuppressWarnings("unchecked")
     AbstractSetMultimapNode<K, V>[] nodes = new AbstractSetMultimapNode[MAX_DEPTH];
 
     AbstractSetMultimapIterator(AbstractSetMultimapNode<K, V> rootNode) {
@@ -3269,7 +3255,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
     @Override
     public boolean containsKey(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0, cmp);
       } catch (ClassCastException unused) {
@@ -3279,7 +3264,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
 
     @Override
     public boolean containsValue(final Object o) {
-      for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
+      for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
         if (cmp.equals(iterator.next(), o)) {
           return true;
         }
@@ -3290,9 +3275,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
     @Override
     public boolean containsEntry(final Object o0, final Object o1) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o0;
-        @SuppressWarnings("unchecked")
         final V val = (V) o1;
         final Optional<io.usethesource.capsule.api.Set.Immutable<V>> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
@@ -3310,7 +3293,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
     @Override
     public io.usethesource.capsule.api.Set.Immutable<V> get(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         final Optional<io.usethesource.capsule.api.Set.Immutable<V>> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
@@ -3566,6 +3548,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
     }
 
     public static class TransientSetMultimapKeyIterator<K, V> extends SetMultimapKeyIterator<K, V> {
+
       final TransientTrieSetMultimap_BleedingEdge<K, V> collection;
       K lastKey;
 
@@ -3588,6 +3571,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
 
     public static class TransientSetMultimapValueIterator<K, V>
         extends SetMultimapValueIterator<K, V> {
+
       final TransientTrieSetMultimap_BleedingEdge<K, V> collection;
 
       public TransientSetMultimapValueIterator(
@@ -3609,6 +3593,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
 
     public static class TransientSetMultimapTupleIterator<K, V, T>
         extends SetMultimapTupleIterator<K, V, T> {
+
       final TransientTrieSetMultimap_BleedingEdge<K, V> collection;
 
       public TransientSetMultimapTupleIterator(
@@ -3780,15 +3765,15 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
       } else if (other instanceof SetMultimap) {
         SetMultimap that = (SetMultimap) other;
 
-        if (this.size() != that.size())
+        if (this.size() != that.size()) {
           return false;
+        }
 
-        for (@SuppressWarnings("unchecked")
-        Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
+        for (
+            Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext(); ) {
           Map.Entry entry = it.next();
 
           try {
-            @SuppressWarnings("unchecked")
             final K key = (K) entry.getKey();
             final Optional<io.usethesource.capsule.api.Set.Immutable<V>> result =
                 rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
@@ -3796,7 +3781,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
             if (!result.isPresent()) {
               return false;
             } else {
-              @SuppressWarnings("unchecked")
               final io.usethesource.capsule.api.Set.Immutable<V> valColl =
                   (io.usethesource.capsule.api.Set.Immutable<V>) entry.getValue();
 
