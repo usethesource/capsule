@@ -8,6 +8,8 @@
 package io.usethesource.capsule;
 
 import java.util.Iterator;
+import java.util.function.Supplier;
 
 public interface SupplierIterator<K, V> extends Iterator<K>, Supplier<V> {
+
 }
