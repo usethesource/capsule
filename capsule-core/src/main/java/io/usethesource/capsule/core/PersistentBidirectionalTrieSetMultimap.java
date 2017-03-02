@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
-import io.usethesource.capsule.DefaultTrieSetMultimap;
 import io.usethesource.capsule.api.BinaryRelation;
 import io.usethesource.capsule.api.Set;
 import io.usethesource.capsule.api.SetMultimap;
@@ -36,8 +35,8 @@ public class PersistentBidirectionalTrieSetMultimap<K, V> implements
      *
      * TODO: make classes of nested multi-maps configurable.
      */
-    return new PersistentBidirectionalTrieSetMultimap<K, V>(DefaultTrieSetMultimap.of(),
-        DefaultTrieSetMultimap.of());
+    return new PersistentBidirectionalTrieSetMultimap<K, V>(SetMultimap.of(),
+        SetMultimap.of());
   }
 
   public static final <K, V> BinaryRelation.Transient<K, V> transientOf() {
@@ -46,8 +45,8 @@ public class PersistentBidirectionalTrieSetMultimap<K, V> implements
      *
      * TODO: make classes of nested multi-maps configurable.
      */
-    return new TransientBidirectionalTrieSetMultimap<K, V>(DefaultTrieSetMultimap.transientOf(),
-        DefaultTrieSetMultimap.transientOf());
+    return new TransientBidirectionalTrieSetMultimap<K, V>(SetMultimap.transientOf(),
+        SetMultimap.transientOf());
   }
 
   private static <K, V> BinaryRelation.Immutable<K, V> wireTuple(K key, V value,

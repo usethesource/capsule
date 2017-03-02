@@ -79,4 +79,68 @@ public interface Set<K> extends java.util.Set<K>, SetEq<K> {
   static <K> Set.Transient<K> transientOf() {
     return PersistentTrieSet.transientOf();
   }
+
+  static <K> Set.Transient<K> transientOf(K key0) {
+    final Set.Transient<K> tmp = Set.transientOf();
+
+    tmp.__insert(key0);
+
+    return tmp;
+  }
+
+  static <K> Set.Transient<K> transientOf(K key0, K key1) {
+    final Set.Transient<K> tmp = Set.transientOf();
+
+    tmp.__insert(key0);
+    tmp.__insert(key1);
+
+    return tmp;
+  }
+
+  static <K> Set.Transient<K> transientOf(K key0, K key1, K key2) {
+    final Set.Transient<K> tmp = Set.transientOf();
+
+    tmp.__insert(key0);
+    tmp.__insert(key1);
+    tmp.__insert(key2);
+
+    return tmp;
+  }
+
+  static <K> Set.Transient<K> transientOf(K key0, K key1, K key2, K key3) {
+    final Set.Transient<K> tmp = Set.transientOf();
+
+    tmp.__insert(key0);
+    tmp.__insert(key1);
+    tmp.__insert(key2);
+    tmp.__insert(key3);
+
+    return tmp;
+  }
+
+  static <K> Set.Transient<K> transientOf(K key0, K key1, K key2, K key3, K key4) {
+    final Set.Transient<K> tmp = Set.transientOf();
+
+    tmp.__insert(key0);
+    tmp.__insert(key1);
+    tmp.__insert(key2);
+    tmp.__insert(key3);
+    tmp.__insert(key4);
+
+    return tmp;
+  }
+
+  static <K> Set.Transient<K> transientOf(K key0, K key1, K key2, K key3, K key4, K key5) {
+    final Set.Transient<K> tmp = Set.transientOf();
+
+    tmp.__insert(key0);
+    tmp.__insert(key1);
+    tmp.__insert(key2);
+    tmp.__insert(key3);
+    tmp.__insert(key4);
+    tmp.__insert(key5);
+
+    return tmp;
+  }
+
 }

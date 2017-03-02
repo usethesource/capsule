@@ -14,17 +14,14 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 
-import io.usethesource.capsule.DefaultTrieSet;
 import io.usethesource.capsule.SupplierIterator;
 import io.usethesource.capsule.util.iterator.EmptySupplierIterator;
 
 public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutableSet<K>
     implements io.usethesource.capsule.api.Set.Immutable<K>, Cloneable {
 
-  @SuppressWarnings("rawtypes")
   private static io.usethesource.capsule.api.Set.Immutable EMPTY_SET = new Set0();
 
-  @SuppressWarnings("unchecked")
   public static <K> io.usethesource.capsule.api.Set.Immutable<K> setOf() {
     return EMPTY_SET;
   }
@@ -41,16 +38,20 @@ public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutab
     return new Set3<K>(key1, key2, key3);
   }
 
-  public static <K> io.usethesource.capsule.api.Set.Immutable<K> setOf(K key1, K key2, K key3, K key4) {
+  public static <K> io.usethesource.capsule.api.Set.Immutable<K> setOf(K key1, K key2, K key3,
+      K key4) {
     return new Set4<K>(key1, key2, key3, key4);
   }
 
-  public static <K> io.usethesource.capsule.api.Set.Immutable<K> setOf(K key1, K key2, K key3, K key4, K key5) {
+  public static <K> io.usethesource.capsule.api.Set.Immutable<K> setOf(K key1, K key2, K key3,
+      K key4, K key5) {
     return new Set5<K>(key1, key2, key3, key4, key5);
   }
 
-  public static <K> io.usethesource.capsule.api.Set.Immutable<K> setOf(K key1, K key2, K key3, K key4, K key5, K key6) {
-    final io.usethesource.capsule.api.Set.Transient<K> tmp = DefaultTrieSet.transientOf(key1, key2, key3, key4, key5, key6);
+  public static <K> io.usethesource.capsule.api.Set.Immutable<K> setOf(K key1, K key2, K key3,
+      K key4, K key5, K key6) {
+    final io.usethesource.capsule.api.Set.Transient<K> tmp = io.usethesource.capsule.api.Set
+        .transientOf(key1, key2, key3, key4, key5, key6);
     return tmp.freeze();
   }
 
@@ -58,7 +59,8 @@ public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutab
     if (set instanceof AbstractSpecialisedImmutableSet) {
       return (io.usethesource.capsule.api.Set.Immutable<K>) set;
     } else {
-      final io.usethesource.capsule.api.Set.Transient<K> tmp = DefaultTrieSet.transientOf();
+      final io.usethesource.capsule.api.Set.Transient<K> tmp = io.usethesource.capsule.api.Set
+          .transientOf();
       // TODO check interface definition of Immutable.union()
       for (K item : set) {
         tmp.__insert(item);
@@ -118,7 +120,6 @@ public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutab
 
     if (other instanceof Set) {
       try {
-        @SuppressWarnings("unchecked")
         Set<K> that = (Set<K>) other;
 
         if (this.size() == that.size()) {
@@ -158,7 +159,8 @@ public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutab
   }
 
   @Override
-  public io.usethesource.capsule.api.Set.Immutable<K> __insertAllEquivalent(Set<? extends K> set, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Set.Immutable<K> __insertAllEquivalent(Set<? extends K> set,
+      Comparator<Object> cmp) {
     io.usethesource.capsule.api.Set.Transient<K> tmp = asTransient();
     if (tmp.__insertAllEquivalent(set, cmp)) {
       return tmp.freeze();
@@ -178,8 +180,9 @@ public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutab
   }
 
   @Override
-  public io.usethesource.capsule.api.Set.Immutable<K> __retainAllEquivalent(io.usethesource.capsule.api.Set.Transient<? extends K> set,
-                                                                            Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Set.Immutable<K> __retainAllEquivalent(
+      io.usethesource.capsule.api.Set.Transient<? extends K> set,
+      Comparator<Object> cmp) {
     io.usethesource.capsule.api.Set.Transient<K> tmp = asTransient();
     if (tmp.__retainAllEquivalent(set, cmp)) {
       return tmp.freeze();
@@ -199,7 +202,8 @@ public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutab
   }
 
   @Override
-  public io.usethesource.capsule.api.Set.Immutable<K> __removeAllEquivalent(Set<? extends K> set, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Set.Immutable<K> __removeAllEquivalent(Set<? extends K> set,
+      Comparator<Object> cmp) {
     io.usethesource.capsule.api.Set.Transient<K> tmp = asTransient();
     if (tmp.__removeAllEquivalent(set, cmp)) {
       return tmp.freeze();
@@ -252,7 +256,8 @@ class Set0<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public io.usethesource.capsule.api.Set.Immutable<K> __insertEquivalent(K key, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Set.Immutable<K> __insertEquivalent(K key,
+      Comparator<Object> cmp) {
     return setOf(key);
   }
 
@@ -262,13 +267,14 @@ class Set0<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public io.usethesource.capsule.api.Set.Immutable<K> __removeEquivalent(K key, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Set.Immutable<K> __removeEquivalent(K key,
+      Comparator<Object> cmp) {
     return this;
   }
 
   @Override
   public io.usethesource.capsule.api.Set.Transient<K> asTransient() {
-    return DefaultTrieSet.transientOf();
+    return io.usethesource.capsule.api.Set.transientOf();
   }
 
   @Override
@@ -388,7 +394,8 @@ class Set1<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public io.usethesource.capsule.api.Set.Immutable<K> __insertEquivalent(K key, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Set.Immutable<K> __insertEquivalent(K key,
+      Comparator<Object> cmp) {
     if (cmp.compare(key, key1) == 0) {
       return setOf(key);
     } else {
@@ -406,7 +413,8 @@ class Set1<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public io.usethesource.capsule.api.Set.Immutable<K> __removeEquivalent(K key, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Set.Immutable<K> __removeEquivalent(K key,
+      Comparator<Object> cmp) {
     if (cmp.compare(key, key1) == 0) {
       return setOf();
     } else {
@@ -416,7 +424,7 @@ class Set1<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.api.Set.Transient<K> asTransient() {
-    return DefaultTrieSet.transientOf(key1);
+    return io.usethesource.capsule.api.Set.transientOf(key1);
   }
 
   @Override
@@ -557,7 +565,8 @@ class Set2<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public io.usethesource.capsule.api.Set.Immutable<K> __insertEquivalent(K key, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Set.Immutable<K> __insertEquivalent(K key,
+      Comparator<Object> cmp) {
     if (cmp.compare(key, key1) == 0) {
       return setOf(key, key2);
     } else if (cmp.compare(key, key2) == 0) {
@@ -579,7 +588,8 @@ class Set2<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public io.usethesource.capsule.api.Set.Immutable<K> __removeEquivalent(K key, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Set.Immutable<K> __removeEquivalent(K key,
+      Comparator<Object> cmp) {
     if (cmp.compare(key, key1) == 0) {
       return setOf(key2);
     } else if (cmp.compare(key, key2) == 0) {
@@ -591,7 +601,7 @@ class Set2<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.api.Set.Transient<K> asTransient() {
-    return DefaultTrieSet.transientOf(key1, key2);
+    return io.usethesource.capsule.api.Set.transientOf(key1, key2);
   }
 
   @Override
@@ -749,7 +759,8 @@ class Set3<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public io.usethesource.capsule.api.Set.Immutable<K> __insertEquivalent(K key, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Set.Immutable<K> __insertEquivalent(K key,
+      Comparator<Object> cmp) {
     if (cmp.compare(key, key1) == 0) {
       return setOf(key, key2, key3);
     } else if (cmp.compare(key, key2) == 0) {
@@ -775,7 +786,8 @@ class Set3<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public io.usethesource.capsule.api.Set.Immutable<K> __removeEquivalent(K key, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Set.Immutable<K> __removeEquivalent(K key,
+      Comparator<Object> cmp) {
     if (cmp.compare(key, key1) == 0) {
       return setOf(key2, key3);
     } else if (cmp.compare(key, key2) == 0) {
@@ -789,7 +801,7 @@ class Set3<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.api.Set.Transient<K> asTransient() {
-    return DefaultTrieSet.transientOf(key1, key2, key3);
+    return io.usethesource.capsule.api.Set.transientOf(key1, key2, key3);
   }
 
   @Override
@@ -965,7 +977,8 @@ class Set4<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public io.usethesource.capsule.api.Set.Immutable<K> __insertEquivalent(K key, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Set.Immutable<K> __insertEquivalent(K key,
+      Comparator<Object> cmp) {
     if (cmp.compare(key, key1) == 0) {
       return setOf(key, key2, key3, key4);
     } else if (cmp.compare(key, key2) == 0) {
@@ -995,7 +1008,8 @@ class Set4<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public io.usethesource.capsule.api.Set.Immutable<K> __removeEquivalent(K key, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Set.Immutable<K> __removeEquivalent(K key,
+      Comparator<Object> cmp) {
     if (cmp.compare(key, key1) == 0) {
       return setOf(key2, key3, key4);
     } else if (cmp.compare(key, key2) == 0) {
@@ -1011,7 +1025,7 @@ class Set4<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.api.Set.Transient<K> asTransient() {
-    return DefaultTrieSet.transientOf(key1, key2, key3, key4);
+    return io.usethesource.capsule.api.Set.transientOf(key1, key2, key3, key4);
   }
 
   @Override
@@ -1206,7 +1220,8 @@ class Set5<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public io.usethesource.capsule.api.Set.Immutable<K> __insertEquivalent(K key, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Set.Immutable<K> __insertEquivalent(K key,
+      Comparator<Object> cmp) {
     if (cmp.compare(key, key1) == 0) {
       return setOf(key, key2, key3, key4, key5);
     } else if (cmp.compare(key, key2) == 0) {
@@ -1240,7 +1255,8 @@ class Set5<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public io.usethesource.capsule.api.Set.Immutable<K> __removeEquivalent(K key, Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Set.Immutable<K> __removeEquivalent(K key,
+      Comparator<Object> cmp) {
     if (cmp.compare(key, key1) == 0) {
       return setOf(key2, key3, key4, key5);
     } else if (cmp.compare(key, key2) == 0) {
@@ -1258,7 +1274,7 @@ class Set5<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.api.Set.Transient<K> asTransient() {
-    return DefaultTrieSet.transientOf(key1, key2, key3, key4, key5);
+    return io.usethesource.capsule.api.Set.transientOf(key1, key2, key3, key4, key5);
   }
 
   @Override

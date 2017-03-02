@@ -10,7 +10,6 @@ package io.usethesource.capsule.experimental.relation;
 import java.util.Iterator;
 import java.util.function.BiFunction;
 
-import io.usethesource.capsule.DefaultTrieSetMultimap;
 import io.usethesource.capsule.api.Set;
 import io.usethesource.capsule.api.SetMultimap;
 import io.usethesource.capsule.api.TernaryRelation;
@@ -37,8 +36,8 @@ public class TernaryTrieSetMultimap<T, U, V, R extends Triple<T, U, V>>
      *
      * TODO: make classes of nested multi-maps configurable.
      */
-    return new TernaryTrieSetMultimap<>(DefaultTrieSetMultimap.of(), DefaultTrieSetMultimap.of(),
-        DefaultTrieSetMultimap.of());
+    return new TernaryTrieSetMultimap<>(SetMultimap.of(), SetMultimap.of(),
+        SetMultimap.of());
   }
 
   // @SuppressWarnings("unchecked")
@@ -49,8 +48,8 @@ public class TernaryTrieSetMultimap<T, U, V, R extends Triple<T, U, V>>
   // *
   // * TODO: make classes of nested multi-maps configurable.
   // */
-  // return new TransientTernaryTrieSetMultimap<>(DefaultTrieSetMultimap.transientOf(),
-  // DefaultTrieSetMultimap.transientOf(), DefaultTrieSetMultimap.transientOf());
+  // return new TransientTernaryTrieSetMultimap<>(SetMultimap.transientOf(),
+  // SetMultimap.transientOf(), SetMultimap.transientOf());
   // }
 
   private static <T, U, V, R extends Triple<T, U, V>> TernaryTrieSetMultimap<T, U, V, R> wireTuple(

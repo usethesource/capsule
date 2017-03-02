@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import io.usethesource.capsule.core.PersistentTrieSetMultimap;
+import io.usethesource.capsule.util.EqualityComparator;
 
 /**
  * Experimental interface for a multimap data type.
@@ -203,6 +204,16 @@ public interface SetMultimap<K, V> {
 
   static <K, V> SetMultimap.Transient<K, V> transientOf() {
     return PersistentTrieSetMultimap.transientOf();
+  }
+
+  @Deprecated
+  static <K, V> SetMultimap.Immutable<K, V> of(EqualityComparator<Object> cmp) {
+    return PersistentTrieSetMultimap.of(cmp);
+  }
+
+  @Deprecated
+  static <K, V> SetMultimap.Transient<K, V> transientOf(EqualityComparator<Object> cmp) {
+    return PersistentTrieSetMultimap.transientOf(cmp);
   }
 
 }

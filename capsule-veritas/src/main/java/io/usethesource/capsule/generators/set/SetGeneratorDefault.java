@@ -7,14 +7,13 @@
  */
 package io.usethesource.capsule.generators.set;
 
-import io.usethesource.capsule.DefaultTrieSet;
 import io.usethesource.capsule.api.Set;
+import io.usethesource.capsule.core.PersistentTrieSet;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
 public class SetGeneratorDefault<T extends Set.Immutable> extends AbstractSetGenerator<T> {
 
   public SetGeneratorDefault() {
-    super((Class<T>) DefaultTrieSet.getTargetClass());
+    super((Class<T>) PersistentTrieSet.class);
   }
 
 }
