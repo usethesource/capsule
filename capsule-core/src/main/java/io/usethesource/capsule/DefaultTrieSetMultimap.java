@@ -7,20 +7,18 @@
  */
 package io.usethesource.capsule;
 
-import io.usethesource.capsule.api.SetMultimap;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP;
-import io.usethesource.capsule.util.EqualityComparator;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import io.usethesource.capsule.api.SetMultimap;
+import io.usethesource.capsule.core.PersistentTrieSetMultimap;
+import io.usethesource.capsule.util.EqualityComparator;
+
 public class DefaultTrieSetMultimap {
 
-  @SuppressWarnings("rawtypes")
-  private static Class<TrieSetMultimap_HCHAMP> target = TrieSetMultimap_HCHAMP.class;
+  private static Class<PersistentTrieSetMultimap> target = PersistentTrieSetMultimap.class;
 
-  @SuppressWarnings("rawtypes")
-  public static Class<TrieSetMultimap_HCHAMP> getTargetClass() {
+  public static Class<PersistentTrieSetMultimap> getTargetClass() {
     return target;
   }
 
@@ -43,7 +41,6 @@ public class DefaultTrieSetMultimap {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> SetMultimap.Immutable<K, V> of() {
     try {
       return (SetMultimap.Immutable<K, V>) persistentSetMultimapOfEmpty.invoke(null);
@@ -52,7 +49,6 @@ public class DefaultTrieSetMultimap {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> SetMultimap.Immutable<K, V> of(EqualityComparator<Object> cmp) {
     try {
       return (SetMultimap.Immutable<K, V>) persistentSetMultimapOfEmptyEq.invoke(null, cmp);
@@ -61,7 +57,6 @@ public class DefaultTrieSetMultimap {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> SetMultimap.Transient<K, V> transientOf() {
     try {
       return (SetMultimap.Transient<K, V>) transientSetMultimapOfEmpty.invoke(null);
@@ -70,7 +65,6 @@ public class DefaultTrieSetMultimap {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> SetMultimap.Transient<K, V> transientOf(
       EqualityComparator<Object> cmp) {
     try {

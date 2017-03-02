@@ -7,14 +7,13 @@
  */
 package io.usethesource.capsule.generators.multimap;
 
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP;
+import io.usethesource.capsule.core.PersistentTrieSetMultimap;
 
-@SuppressWarnings({"rawtypes"})
 public class SetMultimapGenerator_HCHAMP<K>
-    extends AbstractSetMultimapGenerator<TrieSetMultimap_HCHAMP> {
+    extends AbstractSetMultimapGenerator<PersistentTrieSetMultimap> {
 
   public SetMultimapGenerator_HCHAMP() {
-    super(TrieSetMultimap_HCHAMP.class);
+    super(PersistentTrieSetMultimap.class);
   }
 
 }

@@ -8,15 +8,15 @@
 package io.usethesource.capsule;
 
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-import io.usethesource.capsule.experimental.relation.BidirectionalTrieSetMultimap;
+import io.usethesource.capsule.core.PersistentBidirectionalTrieSetMultimap;
 import org.junit.runner.RunWith;
 
 @RunWith(JUnitQuickcheck.class)
-public class SetMultimapPropertiesOfBidirectionalTrieSetMultimapTest extends
-    AbstractBinaryRelationProperties<Integer, Integer, BidirectionalTrieSetMultimap<Integer, Integer>> {
+public class SetMultimapPropertiesOfPersistentBidirectionalTrieSetMultimapTest extends
+    AbstractBinaryRelationProperties<Integer, Integer, PersistentBidirectionalTrieSetMultimap<Integer, Integer>> {
 
-  public SetMultimapPropertiesOfBidirectionalTrieSetMultimapTest() {
-    super(BidirectionalTrieSetMultimap.class);
+  public SetMultimapPropertiesOfPersistentBidirectionalTrieSetMultimapTest() {
+    super(PersistentBidirectionalTrieSetMultimap.class);
   }
 
 }

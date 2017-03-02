@@ -7,18 +7,16 @@
  */
 package io.usethesource.capsule;
 
-import org.junit.runner.RunWith;
-
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP;
+import io.usethesource.capsule.core.PersistentTrieSetMultimap;
+import org.junit.runner.RunWith;
 
 @RunWith(JUnitQuickcheck.class)
 public class SetMultimapPropertiesOfHchampTest extends
-    AbstractSetMultimapProperties<Integer, Integer, TrieSetMultimap_HCHAMP<Integer, Integer>> {
+    AbstractSetMultimapProperties<Integer, Integer, PersistentTrieSetMultimap<Integer, Integer>> {
 
   public SetMultimapPropertiesOfHchampTest() {
-    super(TrieSetMultimap_HCHAMP.class);
+    super(PersistentTrieSetMultimap.class);
   }
 
 }

@@ -13,24 +13,24 @@
 // import java.util.function.BiFunction;
 //
 // import io.usethesource.capsule.core.deprecated.PersistentTrieSet;
-// import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP;
+// import io.usethesource.capsule.core.PersistentTrieSetMultimap;
 //
 /// **
 // * Basic support for both PUSH- and PULL-based data processing. Still needs tweaking of the
 // * interface and implementation, but the the functionality is there.
 // */
 // public class BottomUpImmutableNodeTransformer<K, V, MN extends
-/// TrieSetMultimap_HCHAMP.AbstractSetMultimapNode<K, V>, SN extends
+/// PersistentTrieSetMultimap.AbstractSetMultimapNode<K, V>, SN extends
 /// PersistentTrieSet.AbstractSetNode<K>>
 // implements Iterator<SN> {
 //
-// static final <K, V, MN extends TrieSetMultimap_HCHAMP.AbstractSetMultimapNode<K, V>, SN extends
+// static final <K, V, MN extends PersistentTrieSetMultimap.AbstractSetMultimapNode<K, V>, SN extends
 /// PersistentTrieSet.AbstractSetNode<K>> SN applyNodeTransformation(
 // final MN rootNode, final BiFunction<MN, SN[], SN> nodeMapper) {
 //
 // BottomUpImmutableNodeTransformer<K, V, MN, SN> transformer =
 // new BottomUpImmutableNodeTransformer<>(rootNode, nodeMapper);
-// transformer.applyNodeTranformation(TrieSetMultimap_HCHAMP.StreamType.PUSH);
+// transformer.applyNodeTranformation(PersistentTrieSetMultimap.StreamType.PUSH);
 // return transformer.mappedNodesStack.peek();
 // }
 //
@@ -42,7 +42,7 @@
 // private int currentStackLevel;
 // private final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
 //
-// final MN[] nodes = (MN[]) new TrieSetMultimap_HCHAMP.AbstractSetMultimapNode[MAX_DEPTH];
+// final MN[] nodes = (MN[]) new PersistentTrieSetMultimap.AbstractSetMultimapNode[MAX_DEPTH];
 //
 // final Stack<SN> mappedNodesStack = new Stack<SN>();
 //
@@ -77,7 +77,7 @@
 // /*
 // * search for next node that can be mapped
 // */
-// private boolean applyNodeTranformation(final TrieSetMultimap_HCHAMP.StreamType streamType) {
+// private boolean applyNodeTranformation(final PersistentTrieSetMultimap.StreamType streamType) {
 // while (currentStackLevel >= 0) {
 // final int currentCursorIndex = currentStackLevel * 2;
 // final int currentLengthIndex = currentCursorIndex + 1;
@@ -107,7 +107,7 @@
 // // mappedNodesStack.size()));
 // // MAX_STACK_SIZE = Math.max(MAX_STACK_SIZE, mappedNodesStack.size());
 //
-// if (streamType == TrieSetMultimap_HCHAMP.StreamType.PULL) {
+// if (streamType == PersistentTrieSetMultimap.StreamType.PULL) {
 // return true;
 // }
 // }
@@ -127,14 +127,14 @@
 // // MAX_STACK_SIZE = Math.max(MAX_STACK_SIZE, mappedNodesStack.size());
 // currentStackLevel--;
 //
-// if (streamType == TrieSetMultimap_HCHAMP.StreamType.PULL) {
+// if (streamType == PersistentTrieSetMultimap.StreamType.PULL) {
 // return true;
 // }
 // }
 // }
 //
 // // TODO: this is mind tangling; rework
-// if (streamType == TrieSetMultimap_HCHAMP.StreamType.PUSH) {
+// if (streamType == PersistentTrieSetMultimap.StreamType.PUSH) {
 // return true;
 // } else {
 // return false;
@@ -146,7 +146,7 @@
 // if (currentStackLevel >= -1 && isNextAvailable) {
 // return true;
 // } else {
-// return isNextAvailable = applyNodeTranformation(TrieSetMultimap_HCHAMP.StreamType.PULL);
+// return isNextAvailable = applyNodeTranformation(PersistentTrieSetMultimap.StreamType.PULL);
 // }
 // }
 //

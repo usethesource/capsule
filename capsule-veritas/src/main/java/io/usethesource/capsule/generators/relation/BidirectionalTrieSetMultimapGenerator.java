@@ -7,15 +7,14 @@
  */
 package io.usethesource.capsule.generators.relation;
 
-import io.usethesource.capsule.experimental.relation.BidirectionalTrieSetMultimap;
+import io.usethesource.capsule.core.PersistentBidirectionalTrieSetMultimap;
 import io.usethesource.capsule.generators.multimap.AbstractSetMultimapGenerator;
 
-@SuppressWarnings({"rawtypes"})
 public class BidirectionalTrieSetMultimapGenerator
-    extends AbstractSetMultimapGenerator<BidirectionalTrieSetMultimap> {
+    extends AbstractSetMultimapGenerator<PersistentBidirectionalTrieSetMultimap> {
 
   public BidirectionalTrieSetMultimapGenerator() {
-    super(BidirectionalTrieSetMultimap.class);
+    super(PersistentBidirectionalTrieSetMultimap.class);
   }
 
 }

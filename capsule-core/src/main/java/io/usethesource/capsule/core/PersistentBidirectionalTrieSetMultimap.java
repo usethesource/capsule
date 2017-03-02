@@ -5,7 +5,7 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.capsule.experimental.relation;
+package io.usethesource.capsule.core;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -18,12 +18,12 @@ import io.usethesource.capsule.api.BinaryRelation;
 import io.usethesource.capsule.api.Set;
 import io.usethesource.capsule.api.SetMultimap;
 
-public class BidirectionalTrieSetMultimap<K, V> implements BinaryRelation.Immutable<K, V> {
+public class PersistentBidirectionalTrieSetMultimap<K, V> implements BinaryRelation.Immutable<K, V> {
 
   private final SetMultimap.Immutable<K, V> fwd;
   private final SetMultimap.Immutable<V, K> bwd;
 
-  public BidirectionalTrieSetMultimap(final SetMultimap.Immutable<K, V> fwd,
+  public PersistentBidirectionalTrieSetMultimap(final SetMultimap.Immutable<K, V> fwd,
       final SetMultimap.Immutable<V, K> bwd) {
     this.fwd = fwd;
     this.bwd = bwd;
@@ -35,7 +35,7 @@ public class BidirectionalTrieSetMultimap<K, V> implements BinaryRelation.Immuta
      *
      * TODO: make classes of nested multi-maps configurable.
      */
-    return new BidirectionalTrieSetMultimap<K, V>(DefaultTrieSetMultimap.of(),
+    return new PersistentBidirectionalTrieSetMultimap<K, V>(DefaultTrieSetMultimap.of(),
         DefaultTrieSetMultimap.of());
   }
 
@@ -53,13 +53,13 @@ public class BidirectionalTrieSetMultimap<K, V> implements BinaryRelation.Immuta
       final BiFunction<K, V, ? extends SetMultimap.Immutable<K, V>> fwdMerger,
       final BiFunction<V, K, ? extends SetMultimap.Immutable<V, K>> bwdMerger) {
 
-    return new BidirectionalTrieSetMultimap(fwdMerger.apply(key, value),
+    return new PersistentBidirectionalTrieSetMultimap(fwdMerger.apply(key, value),
         bwdMerger.apply(value, key));
   }
 
   @Override
   public BinaryRelation<V, K> inverse() {
-    return new BidirectionalTrieSetMultimap<>(bwd, fwd);
+    return new PersistentBidirectionalTrieSetMultimap<>(bwd, fwd);
   }
 
   @Override
@@ -335,6 +335,6 @@ class TransientBidirectionalTrieSetMultimap<K, V> implements BinaryRelation.Tran
 
   @Override
   public BinaryRelation.Immutable<K, V> freeze() {
-    return new BidirectionalTrieSetMultimap<>(fwd.freeze(), bwd.freeze());
+    return new PersistentBidirectionalTrieSetMultimap<>(fwd.freeze(), bwd.freeze());
   }
 }
