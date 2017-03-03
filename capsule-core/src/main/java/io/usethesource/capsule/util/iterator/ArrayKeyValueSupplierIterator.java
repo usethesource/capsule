@@ -9,8 +9,6 @@ package io.usethesource.capsule.util.iterator;
 
 import java.util.NoSuchElementException;
 
-import io.usethesource.capsule.SupplierIterator;
-
 public class ArrayKeyValueSupplierIterator<K, V> implements SupplierIterator<K, V> {
 
   final Object[] values;
@@ -32,7 +30,6 @@ public class ArrayKeyValueSupplierIterator<K, V> implements SupplierIterator<K, 
     return currentIndex < end;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public K next() {
     if (!hasNext()) {

@@ -14,8 +14,8 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 
-import io.usethesource.capsule.SupplierIterator;
 import io.usethesource.capsule.util.iterator.EmptySupplierIterator;
+import io.usethesource.capsule.util.iterator.SupplierIterator;
 
 public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutableSet<K>
     implements io.usethesource.capsule.api.Set.Immutable<K>, Cloneable {

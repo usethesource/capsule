@@ -17,8 +17,8 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 
-import io.usethesource.capsule.SupplierIterator;
 import io.usethesource.capsule.util.iterator.EmptySupplierIterator;
+import io.usethesource.capsule.util.iterator.SupplierIterator;
 
 public abstract class AbstractSpecialisedImmutableMap<K, V>
     implements io.usethesource.capsule.api.Map.Immutable<K, V>, Cloneable {

@@ -7,8 +7,6 @@
  */
 package io.usethesource.capsule.core.experimental;
 
-import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
-
 import java.text.DecimalFormat;
 import java.util.AbstractSet;
 import java.util.ArrayDeque;
@@ -22,9 +20,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
-import io.usethesource.capsule.SupplierIterator;
 import io.usethesource.capsule.api.experimental.Map;
 import io.usethesource.capsule.util.ArrayUtils;
+import io.usethesource.capsule.util.iterator.SupplierIterator;
+
+import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 /*
  * TODO: fix hash code implementation

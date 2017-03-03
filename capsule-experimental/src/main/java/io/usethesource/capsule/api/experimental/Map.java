@@ -11,7 +11,7 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Function;
 
-import io.usethesource.capsule.SupplierIterator;
+import io.usethesource.capsule.util.iterator.SupplierIterator;
 
 public interface Map<K, V> extends Iterable<K>, Function<K, Optional<V>> {
 

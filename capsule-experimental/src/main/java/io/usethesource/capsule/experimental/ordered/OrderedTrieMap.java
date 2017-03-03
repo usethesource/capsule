@@ -7,8 +7,6 @@
  */
 package io.usethesource.capsule.experimental.ordered;
 
-import static java.lang.System.arraycopy;
-
 import java.lang.ref.SoftReference;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -17,20 +15,20 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 
-import io.usethesource.capsule.SupplierIterator;
 import io.usethesource.capsule.api.experimental.Map;
+import io.usethesource.capsule.util.iterator.SupplierIterator;
+
+import static java.lang.System.arraycopy;
 
 /**
  * Immutable insertion-ordered map implemented as a hash trie.
- * 
+ *
  * NOTE: this is currently the sketch of an implementation that is not yet fully implemented.
  */
 public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
 
-  @SuppressWarnings("rawtypes")
-  private static final Node EMPTY_NODE = new BitmapIndexedNode(0, 0, new Object[] {});
+  private static final Node EMPTY_NODE = new BitmapIndexedNode(0, 0, new Object[]{});
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
   private static final OrderedTrieMap EMPTY_MAP = new OrderedTrieMap(EMPTY_NODE, 0, 0);
 
   private static final boolean DEBUG = false;
@@ -60,7 +58,6 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> OrderedTrieMap<K, V> of() {
     return (OrderedTrieMap<K, V>) EMPTY_MAP;
   }
@@ -101,7 +98,7 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
 
   @Override
   public boolean containsValue(final Object o) {
-    for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
+    for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
       if (iterator.next().equals(o)) {
         return true;
       }
@@ -197,7 +194,6 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
     return new ValueIterator<>(rootNode);
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
   @Override
   public Iterator<java.util.Map.Entry<K, V>> entryIterator() {
     return (Iterator) new EntryIterator<>(rootNode);
@@ -343,7 +339,7 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
   public int hashCode() {
     int hash = 0;
 
-    for (Iterator<java.util.Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
+    for (Iterator<java.util.Map.Entry<K, V>> it = entryIterator(); it.hasNext(); ) {
       final java.util.Map.Entry<K, V> entry = it.next();
       hash += entry.hashCode();
     }
@@ -363,7 +359,6 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
       return false;
     }
 
-    @SuppressWarnings("rawtypes")
     OrderedTrieMap that = (OrderedTrieMap) other;
 
     if (this.cachedSize != that.cachedSize) {
@@ -396,7 +391,6 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
   }
 
   private ImmutablePayloadTuple<K, V>[] toSortedEntryArray() {
-    @SuppressWarnings("unchecked")
     final ImmutablePayloadTuple<K, V>[] arr = new ImmutablePayloadTuple[cachedSize];
 
     Iterator<ImmutablePayloadTuple<K, V>> it = unorderedTupleIterator();
@@ -534,27 +528,27 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
 
     static final <K, V> BitmapIndexedNode<K, V> newElementSingleton(int dataMap,
         java.util.Map.Entry<K, V> element0) {
-      return new BitmapIndexedNode<>(0, dataMap, new Object[] {element0});
+      return new BitmapIndexedNode<>(0, dataMap, new Object[]{element0});
     }
 
     static final <K, V> BitmapIndexedNode<K, V> newElementTuple(int dataMap,
         java.util.Map.Entry<K, V> element0, java.util.Map.Entry<K, V> element1) {
-      return new BitmapIndexedNode<>(0, dataMap, new Object[] {element0, element1});
+      return new BitmapIndexedNode<>(0, dataMap, new Object[]{element0, element1});
     }
 
     static final <K, V> BitmapIndexedNode<K, V> newSubnodeSingleton(int nodeMap,
         Node<K, V> subNode) {
-      return new BitmapIndexedNode<>(nodeMap, 0, new Object[] {subNode});
+      return new BitmapIndexedNode<>(nodeMap, 0, new Object[]{subNode});
     }
 
     @Deprecated
-    // Only used in nodeInvariant()
+      // Only used in nodeInvariant()
     int arity() {
       return elementArity() + nodeArity();
     }
 
     @Deprecated
-    // Only used in nodeInvariant()
+      // Only used in nodeInvariant()
     int size() {
       final Iterator<?> it = new ValueIterator<>(this);
 
@@ -580,7 +574,6 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
       return inv1 && inv2 && inv3 && inv4 && inv5;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public ImmutablePayloadTuple<K, V> getElement(final int index) {
       return (ImmutablePayloadTuple<K, V>) nodes[index];
@@ -596,7 +589,6 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
       return getElement(index).sequenceId;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Node<K, V> getNode(final int index) {
       return (Node<K, V>) nodes[nodes.length - 1 - index];
@@ -643,7 +635,6 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
       if (getClass() != other.getClass()) {
         return false;
       }
-      @SuppressWarnings("rawtypes")
       BitmapIndexedNode that = (BitmapIndexedNode) other;
       if (nodeMap != that.nodeMap) {
         return false;
@@ -1076,7 +1067,6 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
     /*
      * TODO: find a right place for this utility method.
      */
-    @SuppressWarnings("unchecked")
     private static final <K, V> ImmutablePayloadTuple<K, V>[] newElementArray(int size) {
       return new ImmutablePayloadTuple[size];
     }
@@ -1084,9 +1074,11 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
     @Override
     public boolean containsKey(final Object key, final int keyHash, final int shift) {
       if (this.hash == keyHash) {
-        for (ImmutablePayloadTuple<K, V> e : elements)
-          if (extractKey(e).equals(key))
+        for (ImmutablePayloadTuple<K, V> e : elements) {
+          if (extractKey(e).equals(key)) {
             return true;
+          }
+        }
       }
       return false;
     }
@@ -1105,9 +1097,11 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
     public Optional<java.util.Map.Entry<K, V>> find(final Object key, final int keyHash,
         final int shift) {
       if (this.hash == keyHash) {
-        for (ImmutablePayloadTuple<K, V> e : elements)
-          if (extractKey(e).equals(key))
+        for (ImmutablePayloadTuple<K, V> e : elements) {
+          if (extractKey(e).equals(key)) {
             return Optional.of(e);
+          }
+        }
       }
       return Optional.empty();
     }
@@ -1243,7 +1237,6 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
       return result;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public boolean equals(Object other) {
       if (null == other) {
@@ -1256,7 +1249,6 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
         return false;
       }
 
-      @SuppressWarnings("rawtypes")
       HashCollisionNode that = (HashCollisionNode) other;
 
       if (hash != that.hash) {
@@ -1270,10 +1262,13 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
       /*
        * Linear scan for each element, because of arbitrary element order.
        */
-      outerLoop: for (ImmutablePayloadTuple<K, V> e1 : elements) {
-        innerLoop: for (ImmutablePayloadTuple<K, V> e2 : that.elements) {
-          if (e1.equals(e2))
+      outerLoop:
+      for (ImmutablePayloadTuple<K, V> e1 : elements) {
+        innerLoop:
+        for (ImmutablePayloadTuple<K, V> e2 : that.elements) {
+          if (e1.equals(e2)) {
             continue outerLoop;
+          }
         }
         return false;
       }
@@ -1296,7 +1291,6 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
     private int currentStackLevel = -1;
     private final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
 
-    @SuppressWarnings("unchecked")
     Node<K, V>[] nodes = new Node[MAX_DEPTH];
 
     AbstractIterator(Node<K, V> rootNode) {
@@ -1491,7 +1485,6 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
         return false;
       }
 
-      @SuppressWarnings("rawtypes")
       ImmutablePayloadTuple that = (ImmutablePayloadTuple) other;
 
       return Objects.equals(key, that.key) && Objects.equals(val, that.val);
@@ -1511,6 +1504,7 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
   }
 
   private static abstract class AbstractForwardOrderArrayIterator<E, R> implements Iterator<R> {
+
     final E[] values;
     final int end;
     int currentIndex;
@@ -1586,6 +1580,7 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
   }
 
   private static abstract class AbstractReversedOrderArrayIterator<E, R> implements Iterator<R> {
+
     final E[] values;
     final int end;
     int currentIndex;

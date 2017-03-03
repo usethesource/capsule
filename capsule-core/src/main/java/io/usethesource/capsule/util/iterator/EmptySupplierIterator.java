@@ -9,14 +9,10 @@ package io.usethesource.capsule.util.iterator;
 
 import java.util.NoSuchElementException;
 
-import io.usethesource.capsule.SupplierIterator;
-
 public class EmptySupplierIterator<K, V> implements SupplierIterator<K, V> {
 
-  @SuppressWarnings("rawtypes")
   private static final SupplierIterator EMPTY_ITERATOR = new EmptySupplierIterator();
 
-  @SuppressWarnings("unchecked")
   public static <K, V> SupplierIterator<K, V> emptyIterator() {
     return EMPTY_ITERATOR;
   }
