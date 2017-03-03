@@ -17,7 +17,7 @@ node {
   sh "mvn -B clean install"
 
   stage 'Deploy'
-  sh "mvn -s ${env.HOME}/usethesource-maven-settings.xml -B deploy"
+  sh "mvn -s ${env.HOME}/usethesource-maven-settings.xml -B deploy -DskipTests"
 
   stage 'Archive'
   step([$class: 'ArtifactArchiver', artifacts: '**/target/*.jar', fingerprint: true])
