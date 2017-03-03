@@ -1,17 +1,15 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>io.usethesource</groupId>
     <artifactId>capsule-pom-parent</artifactId>
-    <version>0.3.0.HETEROGENEOUS-SNAPSHOT</version>
+    <version>0.3.0</version>
   </parent>
 
   <groupId>io.usethesource</groupId>
   <artifactId>capsule-veritas</artifactId>
-  <version>0.3.0.HETEROGENEOUS-SNAPSHOT</version>
+  <version>0.3.0</version>
   <packaging>jar</packaging>
 
   <properties>
@@ -44,12 +42,12 @@
     <dependency>
       <groupId>io.usethesource</groupId>
       <artifactId>capsule</artifactId>
-      <version>0.3.0.HETEROGENEOUS-SNAPSHOT</version>
+      <version>0.3.0</version>
     </dependency>
     <dependency>
       <groupId>io.usethesource</groupId>
       <artifactId>capsule-experimental</artifactId>
-      <version>0.3.0.HETEROGENEOUS-SNAPSHOT</version>
+      <version>0.3.0</version>
     </dependency>
     <dependency>
       <groupId>com.pholser</groupId>
