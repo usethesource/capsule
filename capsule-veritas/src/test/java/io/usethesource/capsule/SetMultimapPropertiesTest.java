@@ -7,7 +7,6 @@
  */
 package io.usethesource.capsule;
 
-import io.usethesource.capsule.api.SetMultimap;
 import org.junit.runner.RunWith;
 
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;

@@ -118,13 +118,13 @@ public class SetMultimapUtils {
   }
 
   @Deprecated
-  public static final <T> io.usethesource.capsule.api.Set.Immutable<T> setFromNode(
+  public static final <T> io.usethesource.capsule.Set.Immutable<T> setFromNode(
       PersistentTrieSet.AbstractSetNode<T> rootNode) {
     return new PersistentTrieSet<>(rootNode);
   }
 
   @Deprecated
-  public static final <T> io.usethesource.capsule.api.Set.Immutable<T> setFromNode(
+  public static final <T> io.usethesource.capsule.Set.Immutable<T> setFromNode(
       io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8.AbstractSetNode<T> rootNode) {
     return new TrieSet_5Bits_Spec0To8<>(rootNode);
   }
@@ -149,13 +149,13 @@ public class SetMultimapUtils {
 
   @Deprecated
   public static final <T> PersistentTrieSet.AbstractSetNode<T> setToNode(
-      io.usethesource.capsule.api.Set.Immutable<T> set) {
+      io.usethesource.capsule.Set.Immutable<T> set) {
     return ((PersistentTrieSet) set).getRootNode();
   }
 
   @Deprecated
   public static final <T> io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8.AbstractSetNode<T> specSetToNode(
-      io.usethesource.capsule.api.Set.Immutable<T> set) {
+      io.usethesource.capsule.Set.Immutable<T> set) {
     return ((TrieSet_5Bits_Spec0To8) set).getRootNode();
   }
 
@@ -167,22 +167,22 @@ public class SetMultimapUtils {
   }
 
   @Deprecated
-  public static final <T> io.usethesource.capsule.api.Set.Immutable<T> setOf(T key1) {
+  public static final <T> io.usethesource.capsule.Set.Immutable<T> setOf(T key1) {
     return PersistentTrieSet.of(key1);
   }
 
   @Deprecated
-  public static final <T> io.usethesource.capsule.api.Set.Immutable<T> setOf(T key1, T key2) {
+  public static final <T> io.usethesource.capsule.Set.Immutable<T> setOf(T key1, T key2) {
     return PersistentTrieSet.of(key1, key2);
   }
 
   @Deprecated
-  public static final <T> io.usethesource.capsule.api.Set.Immutable<T> specSetOf(T key1) {
+  public static final <T> io.usethesource.capsule.Set.Immutable<T> specSetOf(T key1) {
     return TrieSet_5Bits_Spec0To8.of(key1);
   }
 
   @Deprecated
-  public static final <T> io.usethesource.capsule.api.Set.Immutable<T> specSetOf(T key1, T key2) {
+  public static final <T> io.usethesource.capsule.Set.Immutable<T> specSetOf(T key1, T key2) {
     return TrieSet_5Bits_Spec0To8.of(key1, key2);
   }
 

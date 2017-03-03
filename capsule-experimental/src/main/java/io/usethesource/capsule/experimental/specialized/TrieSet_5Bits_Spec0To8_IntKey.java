@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 @SuppressWarnings("rawtypes")
-public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.api.Set.Immutable<Integer> {
+public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Set.Immutable<Integer> {
 
   @SuppressWarnings("unchecked")
   private static final TrieSet_5Bits_Spec0To8_IntKey EMPTY_SET =
@@ -45,13 +45,13 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.ap
   }
 
   @SuppressWarnings("unchecked")
-  public static final io.usethesource.capsule.api.Set.Immutable<Integer> of() {
+  public static final io.usethesource.capsule.Set.Immutable<Integer> of() {
     return TrieSet_5Bits_Spec0To8_IntKey.EMPTY_SET;
   }
 
   @SuppressWarnings("unchecked")
-  public static final io.usethesource.capsule.api.Set.Immutable<Integer> of(int... keys) {
-    io.usethesource.capsule.api.Set.Immutable<Integer> result = TrieSet_5Bits_Spec0To8_IntKey.EMPTY_SET;
+  public static final io.usethesource.capsule.Set.Immutable<Integer> of(int... keys) {
+    io.usethesource.capsule.Set.Immutable<Integer> result = TrieSet_5Bits_Spec0To8_IntKey.EMPTY_SET;
 
     for (final int key : keys) {
       result = result.__insert(key);
@@ -61,13 +61,13 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.ap
   }
 
   @SuppressWarnings("unchecked")
-  public static final io.usethesource.capsule.api.Set.Transient<Integer> transientOf() {
+  public static final io.usethesource.capsule.Set.Transient<Integer> transientOf() {
     return TrieSet_5Bits_Spec0To8_IntKey.EMPTY_SET.asTransient();
   }
 
   @SuppressWarnings("unchecked")
-  public static final io.usethesource.capsule.api.Set.Transient<Integer> transientOf(int... keys) {
-    final io.usethesource.capsule.api.Set.Transient<Integer> result =
+  public static final io.usethesource.capsule.Set.Transient<Integer> transientOf(int... keys) {
+    final io.usethesource.capsule.Set.Transient<Integer> result =
         TrieSet_5Bits_Spec0To8_IntKey.EMPTY_SET.asTransient();
 
     for (final int key : keys) {
@@ -148,7 +148,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.ap
     }
   }
 
-  public io.usethesource.capsule.api.Set.Immutable<Integer> __insert(final java.lang.Integer key) {
+  public io.usethesource.capsule.Set.Immutable<Integer> __insert(final java.lang.Integer key) {
     final int keyHash = key.hashCode();
     final SetResult details = SetResult.unchanged();
 
@@ -162,7 +162,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.ap
     return this;
   }
 
-  public io.usethesource.capsule.api.Set.Immutable<Integer> __insertEquivalent(final java.lang.Integer key,
+  public io.usethesource.capsule.Set.Immutable<Integer> __insertEquivalent(final java.lang.Integer key,
                                                                                final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult details = SetResult.unchanged();
@@ -177,20 +177,20 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.ap
     return this;
   }
 
-  public io.usethesource.capsule.api.Set.Immutable<Integer> __insertAll(final Set<? extends java.lang.Integer> set) {
-    final io.usethesource.capsule.api.Set.Transient<Integer> tmpTransient = this.asTransient();
+  public io.usethesource.capsule.Set.Immutable<Integer> __insertAll(final Set<? extends java.lang.Integer> set) {
+    final io.usethesource.capsule.Set.Transient<Integer> tmpTransient = this.asTransient();
     tmpTransient.__insertAll(set);
     return tmpTransient.freeze();
   }
 
-  public io.usethesource.capsule.api.Set.Immutable<Integer> __insertAllEquivalent(
+  public io.usethesource.capsule.Set.Immutable<Integer> __insertAllEquivalent(
       final Set<? extends java.lang.Integer> set, final Comparator<Object> cmp) {
-    final io.usethesource.capsule.api.Set.Transient<Integer> tmpTransient = this.asTransient();
+    final io.usethesource.capsule.Set.Transient<Integer> tmpTransient = this.asTransient();
     tmpTransient.__insertAllEquivalent(set, cmp);
     return tmpTransient.freeze();
   }
 
-  public io.usethesource.capsule.api.Set.Immutable<Integer> __remove(final java.lang.Integer key) {
+  public io.usethesource.capsule.Set.Immutable<Integer> __remove(final java.lang.Integer key) {
     final int keyHash = key.hashCode();
     final SetResult details = SetResult.unchanged();
 
@@ -204,7 +204,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.ap
     return this;
   }
 
-  public io.usethesource.capsule.api.Set.Immutable<Integer> __removeEquivalent(final java.lang.Integer key,
+  public io.usethesource.capsule.Set.Immutable<Integer> __removeEquivalent(final java.lang.Integer key,
                                                                                final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult details = SetResult.unchanged();
@@ -219,28 +219,28 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.ap
     return this;
   }
 
-  public io.usethesource.capsule.api.Set.Immutable<Integer> __removeAll(final Set<? extends java.lang.Integer> set) {
-    final io.usethesource.capsule.api.Set.Transient<Integer> tmpTransient = this.asTransient();
+  public io.usethesource.capsule.Set.Immutable<Integer> __removeAll(final Set<? extends java.lang.Integer> set) {
+    final io.usethesource.capsule.Set.Transient<Integer> tmpTransient = this.asTransient();
     tmpTransient.__removeAll(set);
     return tmpTransient.freeze();
   }
 
-  public io.usethesource.capsule.api.Set.Immutable<Integer> __removeAllEquivalent(
+  public io.usethesource.capsule.Set.Immutable<Integer> __removeAllEquivalent(
       final Set<? extends java.lang.Integer> set, final Comparator<Object> cmp) {
-    final io.usethesource.capsule.api.Set.Transient<Integer> tmpTransient = this.asTransient();
+    final io.usethesource.capsule.Set.Transient<Integer> tmpTransient = this.asTransient();
     tmpTransient.__removeAllEquivalent(set, cmp);
     return tmpTransient.freeze();
   }
 
-  public io.usethesource.capsule.api.Set.Immutable<Integer> __retainAll(final Set<? extends java.lang.Integer> set) {
-    final io.usethesource.capsule.api.Set.Transient<Integer> tmpTransient = this.asTransient();
+  public io.usethesource.capsule.Set.Immutable<Integer> __retainAll(final Set<? extends java.lang.Integer> set) {
+    final io.usethesource.capsule.Set.Transient<Integer> tmpTransient = this.asTransient();
     tmpTransient.__retainAll(set);
     return tmpTransient.freeze();
   }
 
-  public io.usethesource.capsule.api.Set.Immutable<Integer> __retainAllEquivalent(
-      final io.usethesource.capsule.api.Set.Transient<? extends Integer> transientSet, final Comparator<Object> cmp) {
-    final io.usethesource.capsule.api.Set.Transient<Integer> tmpTransient = this.asTransient();
+  public io.usethesource.capsule.Set.Immutable<Integer> __retainAllEquivalent(
+      final io.usethesource.capsule.Set.Transient<? extends Integer> transientSet, final Comparator<Object> cmp) {
+    final io.usethesource.capsule.Set.Transient<Integer> tmpTransient = this.asTransient();
     tmpTransient.__retainAllEquivalent(transientSet, cmp);
     return tmpTransient.freeze();
   }
@@ -372,7 +372,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.ap
   }
 
   @Override
-  public io.usethesource.capsule.api.Set.Transient<Integer> asTransient() {
+  public io.usethesource.capsule.Set.Transient<Integer> asTransient() {
     return new TransientTrieSet_5Bits_Spec0To8_IntKey(this);
   }
 
@@ -3153,7 +3153,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.ap
   }
 
   static final class TransientTrieSet_5Bits_Spec0To8_IntKey
-      implements io.usethesource.capsule.api.Set.Transient<Integer> {
+      implements io.usethesource.capsule.Set.Transient<Integer> {
     final private AtomicReference<Thread> mutator;
     private AbstractSetNode rootNode;
     private int hashCode;
@@ -3437,7 +3437,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.ap
     }
 
     public boolean __retainAllEquivalent(
-        final io.usethesource.capsule.api.Set.Transient<? extends Integer> transientSet,
+        final io.usethesource.capsule.Set.Transient<? extends Integer> transientSet,
         final Comparator<Object> cmp) {
       boolean modified = false;
 
@@ -3570,7 +3570,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.ap
     }
 
     @Override
-    public io.usethesource.capsule.api.Set.Immutable<Integer> freeze() {
+    public io.usethesource.capsule.Set.Immutable<Integer> freeze() {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }

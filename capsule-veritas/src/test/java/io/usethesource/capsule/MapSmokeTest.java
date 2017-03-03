@@ -11,7 +11,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import io.usethesource.capsule.api.Map;
 import io.usethesource.capsule.core.PersistentTrieMap;
 import org.junit.Test;
 

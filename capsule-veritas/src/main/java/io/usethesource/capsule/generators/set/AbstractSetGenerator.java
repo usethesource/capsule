@@ -27,7 +27,7 @@ import com.pholser.junit.quickcheck.generator.Shrink;
 import com.pholser.junit.quickcheck.generator.Size;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 
-import io.usethesource.capsule.api.Set;
+import io.usethesource.capsule.Set;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class AbstractSetGenerator<T extends Set.Immutable>

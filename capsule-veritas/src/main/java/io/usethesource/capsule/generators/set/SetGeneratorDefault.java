@@ -7,7 +7,7 @@
  */
 package io.usethesource.capsule.generators.set;
 
-import io.usethesource.capsule.api.Set;
+import io.usethesource.capsule.Set;
 import io.usethesource.capsule.core.PersistentTrieSet;
 
 public class SetGeneratorDefault<T extends Set.Immutable> extends AbstractSetGenerator<T> {

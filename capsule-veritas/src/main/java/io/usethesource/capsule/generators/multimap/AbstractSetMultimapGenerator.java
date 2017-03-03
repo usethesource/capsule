@@ -14,7 +14,7 @@ import com.pholser.junit.quickcheck.generator.ComponentizedGenerator;
 import com.pholser.junit.quickcheck.generator.GenerationStatus;
 import com.pholser.junit.quickcheck.generator.Size;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
-import io.usethesource.capsule.api.SetMultimap;
+import io.usethesource.capsule.SetMultimap;
 
 import static com.pholser.junit.quickcheck.internal.Ranges.Type.INTEGRAL;
 import static com.pholser.junit.quickcheck.internal.Ranges.checkRange;

@@ -15,36 +15,36 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
-import io.usethesource.capsule.api.SetMultimap;
+import io.usethesource.capsule.SetMultimap;
 
 public class CapsuleCollectors {
 
   public static final Set<Collector.Characteristics> UNORDERED =
       Collections.unmodifiableSet(EnumSet.of(Collector.Characteristics.UNORDERED));
 
-  public static <T> Collector<T, ?, io.usethesource.capsule.api.Set.Immutable<T>> toSet() {
+  public static <T> Collector<T, ?, io.usethesource.capsule.Set.Immutable<T>> toSet() {
     return new DefaultCollector<>(
-        (Supplier<io.usethesource.capsule.api.Set.Transient<T>>) io.usethesource.capsule.api.Set::transientOf,
-        io.usethesource.capsule.api.Set.Transient::__insert, (left, right) -> {
+        (Supplier<io.usethesource.capsule.Set.Transient<T>>) io.usethesource.capsule.Set::transientOf,
+        io.usethesource.capsule.Set.Transient::__insert, (left, right) -> {
       left.__insertAll(right);
       return left;
-    }, io.usethesource.capsule.api.Set.Transient::freeze, UNORDERED);
+    }, io.usethesource.capsule.Set.Transient::freeze, UNORDERED);
   }
 
-//  public static <T, K, V> Collector<T, ?, io.usethesource.capsule.api.Map.Immutable<K, V>> toMap(
+//  public static <T, K, V> Collector<T, ?, io.usethesource.capsule.Map.Immutable<K, V>> toMap(
 //      Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends V> valueMapper) {
 //
 //    /** extract key/value from type {@code T} and insert into multimap */
-//    final BiConsumer<io.usethesource.capsule.api.Map.Transient<K, V>, T> accumulator =
+//    final BiConsumer<io.usethesource.capsule.Map.Transient<K, V>, T> accumulator =
 //        (map, element) -> map.__put(keyMapper.apply(element), valueMapper.apply(element));
 //
 //    return new DefaultCollector<>(
-//        io.usethesource.capsule.api.Map::transientOf,
+//        io.usethesource.capsule.Map::transientOf,
 //        accumulator,
 //        (left, right) -> {
 //          left.union(right);
 //          return left;
-//        }, io.usethesource.capsule.api.Map.Transient::freeze, UNORDERED);
+//        }, io.usethesource.capsule.Map.Transient::freeze, UNORDERED);
 //  }
 
   public static <T, K, V> Collector<T, ?, SetMultimap.Immutable<K, V>> toSetMultimap(
@@ -55,7 +55,7 @@ public class CapsuleCollectors {
         (map, element) -> map.__insert(keyMapper.apply(element), valueMapper.apply(element));
 
     return new DefaultCollector<>(
-        io.usethesource.capsule.api.SetMultimap::transientOf,
+        SetMultimap::transientOf,
         accumulator,
         (left, right) -> {
           left.union(right);

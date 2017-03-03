@@ -11,7 +11,6 @@ import static org.junit.Assert.*;
 
 import java.util.Collection;
 
-import io.usethesource.capsule.api.SetMultimap;
 import org.junit.Test;
 
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked;

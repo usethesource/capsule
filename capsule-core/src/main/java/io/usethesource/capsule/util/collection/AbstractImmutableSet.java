@@ -11,7 +11,7 @@ import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Comparator;
 
-import io.usethesource.capsule.api.Set;
+import io.usethesource.capsule.Set;
 
 @Deprecated
 public abstract class AbstractImmutableSet<E> extends AbstractSet<E> implements Set.Immutable<E> {

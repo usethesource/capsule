@@ -16,7 +16,6 @@ import java.util.stream.StreamSupport;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.generator.Size;
-import io.usethesource.capsule.api.SetMultimap;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

@@ -7,6 +7,8 @@
  */
 package io.usethesource.capsule.api;
 
+import io.usethesource.capsule.Set;
+
 public interface TernaryRelation<T, U, V, R extends Triple<T, U, V>> extends Set<R> {
 
   // TernaryRelation<U, T> inverse();

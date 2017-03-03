@@ -28,7 +28,7 @@ import io.usethesource.capsule.util.ArrayUtils;
 
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
-public class PersistentTrieMap<K, V> implements io.usethesource.capsule.api.Map.Immutable<K, V> {
+public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immutable<K, V> {
 
   private static final PersistentTrieMap EMPTY_MAP = new PersistentTrieMap(
       CompactMapNode.EMPTY_NODE, 0, 0);
@@ -48,17 +48,17 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.api.Map.
     }
   }
 
-  public static final <K, V> io.usethesource.capsule.api.Map.Immutable<K, V> of() {
+  public static final <K, V> io.usethesource.capsule.Map.Immutable<K, V> of() {
     return PersistentTrieMap.EMPTY_MAP;
   }
 
-  public static final <K, V> io.usethesource.capsule.api.Map.Immutable<K, V> of(
+  public static final <K, V> io.usethesource.capsule.Map.Immutable<K, V> of(
       Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
       throw new IllegalArgumentException("Length of argument list is uneven: no key/value pairs.");
     }
 
-    io.usethesource.capsule.api.Map.Immutable<K, V> result = PersistentTrieMap.EMPTY_MAP;
+    io.usethesource.capsule.Map.Immutable<K, V> result = PersistentTrieMap.EMPTY_MAP;
 
     for (int i = 0; i < keyValuePairs.length; i += 2) {
       final K key = (K) keyValuePairs[i];
@@ -70,17 +70,17 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.api.Map.
     return result;
   }
 
-  public static final <K, V> io.usethesource.capsule.api.Map.Transient<K, V> transientOf() {
+  public static final <K, V> io.usethesource.capsule.Map.Transient<K, V> transientOf() {
     return PersistentTrieMap.EMPTY_MAP.asTransient();
   }
 
-  public static final <K, V> io.usethesource.capsule.api.Map.Transient<K, V> transientOf(
+  public static final <K, V> io.usethesource.capsule.Map.Transient<K, V> transientOf(
       Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
       throw new IllegalArgumentException("Length of argument list is uneven: no key/value pairs.");
     }
 
-    final io.usethesource.capsule.api.Map.Transient<K, V> result = PersistentTrieMap.EMPTY_MAP
+    final io.usethesource.capsule.Map.Transient<K, V> result = PersistentTrieMap.EMPTY_MAP
         .asTransient();
 
     for (int i = 0; i < keyValuePairs.length; i += 2) {
@@ -186,7 +186,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.api.Map.
   }
 
   @Override
-  public io.usethesource.capsule.api.Map.Immutable<K, V> __put(final K key, final V val) {
+  public io.usethesource.capsule.Map.Immutable<K, V> __put(final K key, final V val) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -211,7 +211,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.api.Map.
   }
 
   @Override
-  public io.usethesource.capsule.api.Map.Immutable<K, V> __putEquivalent(final K key, final V val,
+  public io.usethesource.capsule.Map.Immutable<K, V> __putEquivalent(final K key, final V val,
       final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
@@ -237,24 +237,24 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.api.Map.
   }
 
   @Override
-  public io.usethesource.capsule.api.Map.Immutable<K, V> __putAll(
+  public io.usethesource.capsule.Map.Immutable<K, V> __putAll(
       final Map<? extends K, ? extends V> map) {
-    final io.usethesource.capsule.api.Map.Transient<K, V> tmpTransient = this.asTransient();
+    final io.usethesource.capsule.Map.Transient<K, V> tmpTransient = this.asTransient();
     tmpTransient.__putAll(map);
     return tmpTransient.freeze();
   }
 
   @Override
-  public io.usethesource.capsule.api.Map.Immutable<K, V> __putAllEquivalent(
+  public io.usethesource.capsule.Map.Immutable<K, V> __putAllEquivalent(
       final Map<? extends K, ? extends V> map,
       final Comparator<Object> cmp) {
-    final io.usethesource.capsule.api.Map.Transient<K, V> tmpTransient = this.asTransient();
+    final io.usethesource.capsule.Map.Transient<K, V> tmpTransient = this.asTransient();
     tmpTransient.__putAllEquivalent(map, cmp);
     return tmpTransient.freeze();
   }
 
   @Override
-  public io.usethesource.capsule.api.Map.Immutable<K, V> __remove(final K key) {
+  public io.usethesource.capsule.Map.Immutable<K, V> __remove(final K key) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -272,7 +272,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.api.Map.
   }
 
   @Override
-  public io.usethesource.capsule.api.Map.Immutable<K, V> __removeEquivalent(final K key,
+  public io.usethesource.capsule.Map.Immutable<K, V> __removeEquivalent(final K key,
       final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
@@ -535,7 +535,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.api.Map.
   }
 
   @Override
-  public io.usethesource.capsule.api.Map.Transient<K, V> asTransient() {
+  public io.usethesource.capsule.Map.Transient<K, V> asTransient() {
     return new TransientTrieMap_5Bits<K, V>(this);
   }
 
@@ -2231,7 +2231,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.api.Map.
   }
 
   static final class TransientTrieMap_5Bits<K, V> implements
-      io.usethesource.capsule.api.Map.Transient<K, V> {
+      io.usethesource.capsule.Map.Transient<K, V> {
 
     final private AtomicReference<Thread> mutator;
     private AbstractMapNode<K, V> rootNode;
@@ -2826,7 +2826,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.api.Map.
     }
 
     @Override
-    public io.usethesource.capsule.api.Map.Immutable<K, V> freeze() {
+    public io.usethesource.capsule.Map.Immutable<K, V> freeze() {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }

@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 
-import io.usethesource.capsule.api.SetMultimap;
+import io.usethesource.capsule.SetMultimap;
 import io.usethesource.capsule.util.ArrayUtils;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableSet;
 
@@ -164,7 +164,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
   }
 
   @Override
-  public io.usethesource.capsule.api.Set.Immutable<V> get(final Object o) {
+  public io.usethesource.capsule.Set.Immutable<V> get(final Object o) {
     try {
       @SuppressWarnings("unchecked")
       final K key = (K) o;
@@ -180,7 +180,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
     }
   }
 
-  public io.usethesource.capsule.api.Set.Immutable<V> getEquivalent(final Object o,
+  public io.usethesource.capsule.Set.Immutable<V> getEquivalent(final Object o,
       final Comparator<Object> cmp) {
     try {
       @SuppressWarnings("unchecked")
@@ -2306,7 +2306,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
     }
 
     @Override
-    public io.usethesource.capsule.api.Set.Immutable<V> get(final Object o) {
+    public io.usethesource.capsule.Set.Immutable<V> get(final Object o) {
       try {
         @SuppressWarnings("unchecked")
         final K key = (K) o;
@@ -2322,7 +2322,7 @@ public class TrieMap_5Bits_AsSetMultimap<K, V> implements SetMultimap.Immutable<
       }
     }
 
-    public io.usethesource.capsule.api.Set.Immutable<V> getEquivalent(final Object o,
+    public io.usethesource.capsule.Set.Immutable<V> getEquivalent(final Object o,
         final Comparator<Object> cmp) {
       try {
         @SuppressWarnings("unchecked")

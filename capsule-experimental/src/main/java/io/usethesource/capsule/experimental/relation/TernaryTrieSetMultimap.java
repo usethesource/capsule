@@ -10,8 +10,8 @@ package io.usethesource.capsule.experimental.relation;
 import java.util.Iterator;
 import java.util.function.BiFunction;
 
-import io.usethesource.capsule.api.Set;
-import io.usethesource.capsule.api.SetMultimap;
+import io.usethesource.capsule.Set;
+import io.usethesource.capsule.SetMultimap;
 import io.usethesource.capsule.api.TernaryRelation;
 import io.usethesource.capsule.api.Triple;
 import io.usethesource.capsule.util.collection.AbstractImmutableSet;

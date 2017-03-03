@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import com.pholser.junit.quickcheck.Property;
-import io.usethesource.capsule.api.BinaryRelation;
 
 import static org.junit.Assert.assertTrue;
 

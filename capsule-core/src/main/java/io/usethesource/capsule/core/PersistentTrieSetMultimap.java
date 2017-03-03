@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import io.usethesource.capsule.api.SetMultimap;
+import io.usethesource.capsule.SetMultimap;
 import io.usethesource.capsule.core.PersistentTrieSetMultimap.EitherSingletonOrCollection.Type;
 import io.usethesource.capsule.core.trie.ArrayView;
 import io.usethesource.capsule.core.trie.Node;
@@ -194,10 +194,10 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
   }
 
   @Override
-  public io.usethesource.capsule.api.Set.Immutable<V> get(final Object o) {
+  public io.usethesource.capsule.Set.Immutable<V> get(final Object o) {
     try {
       final K key = (K) o;
-      final Optional<io.usethesource.capsule.api.Set.Immutable<V>> result =
+      final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
           rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
       if (result.isPresent()) {
@@ -400,7 +400,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     return new SetMultimapTupleIterator<>(rootNode, tupleOf);
   }
 
-  private Spliterator<io.usethesource.capsule.api.Set.Immutable<V>> valueCollectionsSpliterator() {
+  private Spliterator<io.usethesource.capsule.Set.Immutable<V>> valueCollectionsSpliterator() {
     /*
      * TODO: specialize between mutable / SetMultimap.Immutable<K, V> ({@see Spliterator.IMMUTABLE})
      */
@@ -409,7 +409,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
         characteristics);
   }
 
-  private Stream<io.usethesource.capsule.api.Set.Immutable<V>> valueCollectionsStream() {
+  private Stream<io.usethesource.capsule.Set.Immutable<V>> valueCollectionsStream() {
     boolean isParallel = false;
     return StreamSupport.stream(valueCollectionsSpliterator(), isParallel);
   }
@@ -589,14 +589,14 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
 
         try {
           final K key = (K) entry.getKey();
-          final Optional<io.usethesource.capsule.api.Set.Immutable<V>> result =
+          final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
               rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
           if (!result.isPresent()) {
             return false;
           } else {
-            final io.usethesource.capsule.api.Set.Immutable<V> valColl =
-                (io.usethesource.capsule.api.Set.Immutable<V>) entry.getValue();
+            final io.usethesource.capsule.Set.Immutable<V> valColl =
+                (io.usethesource.capsule.Set.Immutable<V>) entry.getValue();
 
             if (!cmp.equals(result.get(), valColl)) {
               return false;
@@ -675,7 +675,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     }
 
     public static final <T> EitherSingletonOrCollection of(
-        io.usethesource.capsule.api.Set.Immutable<T> value) {
+        io.usethesource.capsule.Set.Immutable<T> value) {
       return new SomeCollection<>(value);
     }
 
@@ -683,7 +683,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
 
     abstract T getSingleton();
 
-    abstract io.usethesource.capsule.api.Set.Immutable<T> getCollection();
+    abstract io.usethesource.capsule.Set.Immutable<T> getCollection();
   }
 
   static final class SomeSingleton<T> extends EitherSingletonOrCollection<T> {
@@ -705,7 +705,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     }
 
     @Override
-    io.usethesource.capsule.api.Set.Immutable<T> getCollection() {
+    io.usethesource.capsule.Set.Immutable<T> getCollection() {
       throw new UnsupportedOperationException(String
           .format("Requested type %s but actually found %s.", Type.COLLECTION, Type.SINGLETON));
     }
@@ -713,9 +713,9 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
 
   static final class SomeCollection<T> extends EitherSingletonOrCollection<T> {
 
-    private final io.usethesource.capsule.api.Set.Immutable<T> value;
+    private final io.usethesource.capsule.Set.Immutable<T> value;
 
-    private SomeCollection(io.usethesource.capsule.api.Set.Immutable<T> value) {
+    private SomeCollection(io.usethesource.capsule.Set.Immutable<T> value) {
       this.value = value;
     }
 
@@ -731,7 +731,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     }
 
     @Override
-    io.usethesource.capsule.api.Set.Immutable<T> getCollection() {
+    io.usethesource.capsule.Set.Immutable<T> getCollection() {
       return value;
     }
   }
@@ -739,7 +739,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
   static final class SetMultimapResult<K, V> {
 
     private V replacedValue;
-    private io.usethesource.capsule.api.Set.Immutable<V> replacedValueCollection;
+    private io.usethesource.capsule.Set.Immutable<V> replacedValueCollection;
     private EitherSingletonOrCollection.Type replacedType;
 
     private boolean isModified;
@@ -758,7 +758,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     }
 
     public void updated(
-        io.usethesource.capsule.api.Set.Immutable<V> replacedValueCollection) {
+        io.usethesource.capsule.Set.Immutable<V> replacedValueCollection) {
       this.replacedValueCollection = replacedValueCollection;
       this.isModified = true;
       this.isReplaced = true;
@@ -790,7 +790,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
       return replacedValue;
     }
 
-    public io.usethesource.capsule.api.Set.Immutable<V> getReplacedCollection() {
+    public io.usethesource.capsule.Set.Immutable<V> getReplacedCollection() {
       assert getType() == COLLECTION;
       return replacedValueCollection;
     }
@@ -806,7 +806,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     abstract boolean containsTuple(final K key, final V val, final int keyHash, final int shift,
         EqualityComparator<Object> cmp);
 
-    abstract Optional<io.usethesource.capsule.api.Set.Immutable<V>> findByKey(
+    abstract Optional<io.usethesource.capsule.Set.Immutable<V>> findByKey(
         final K key, final int keyHash, final int shift, EqualityComparator<Object> cmp);
 
     abstract CompactSetMultimapNode<K, V> inserted(final AtomicReference<Thread> mutator,
@@ -875,7 +875,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
 
     abstract K getCollectionKey(final int index);
 
-    abstract io.usethesource.capsule.api.Set.Immutable<V> getCollectionValue(
+    abstract io.usethesource.capsule.Set.Immutable<V> getCollectionValue(
         final int index);
 
     abstract boolean hasSlots();
@@ -998,7 +998,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
 
     abstract CompactSetMultimapNode<K, V> copyAndSetCollectionValue(
         final AtomicReference<Thread> mutator, final int bitpos,
-        final io.usethesource.capsule.api.Set.Immutable<V> valColl);
+        final io.usethesource.capsule.Set.Immutable<V> valColl);
 
     abstract CompactSetMultimapNode<K, V> copyAndSetNode(final AtomicReference<Thread> mutator,
         final int bitpos, final CompactSetMultimapNode<K, V> node);
@@ -1008,7 +1008,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
 
     abstract CompactSetMultimapNode<K, V> copyAndMigrateFromSingletonToCollection(
         final AtomicReference<Thread> mutator, final int bitpos, final K key,
-        final io.usethesource.capsule.api.Set.Immutable<V> valColl);
+        final io.usethesource.capsule.Set.Immutable<V> valColl);
 
     abstract CompactSetMultimapNode<K, V> copyAndRemoveSingleton(
         final AtomicReference<Thread> mutator, final int bitpos);
@@ -1045,8 +1045,8 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
 
       if (shift >= HASH_CODE_LENGTH) {
         return AbstractHashCollisionNode
-            .of(keyHash0, key0, io.usethesource.capsule.api.Set.of(val0), key1,
-                io.usethesource.capsule.api.Set.of(val1));
+            .of(keyHash0, key0, io.usethesource.capsule.Set.of(val0), key1,
+                io.usethesource.capsule.Set.of(val1));
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -1074,14 +1074,14 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     }
 
     static final <K, V> CompactSetMultimapNode<K, V> mergeCollectionAndSingletonPairs(final K key0,
-        final io.usethesource.capsule.api.Set.Immutable<V> valColl0, final int keyHash0,
+        final io.usethesource.capsule.Set.Immutable<V> valColl0, final int keyHash0,
         final K key1, final V val1, final int keyHash1, final int shift,
         EqualityComparator<Object> cmp) {
       // assert !(cmp.equals(key0, key1));
 
       if (shift >= HASH_CODE_LENGTH) {
         return AbstractHashCollisionNode
-            .of(keyHash0, key1, io.usethesource.capsule.api.Set.of(val1), key0, valColl0);
+            .of(keyHash0, key1, io.usethesource.capsule.Set.of(val1), key0, valColl0);
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -1124,7 +1124,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
 
     static final <K, V> CompactSetMultimapNode<K, V> nodeOf(AtomicReference<Thread> mutator,
         final int nodeMap, final int dataMap, final K key,
-        final io.usethesource.capsule.api.Set.Immutable<V> valColl) {
+        final io.usethesource.capsule.Set.Immutable<V> valColl) {
       assert nodeMap == 0;
       return nodeOf(mutator, (0), dataMap, new Object[]{key, valColl});
     }
@@ -1216,7 +1216,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     }
 
     @Override
-    Optional<io.usethesource.capsule.api.Set.Immutable<V>> findByKey(final K key,
+    Optional<io.usethesource.capsule.Set.Immutable<V>> findByKey(final K key,
         final int keyHash, final int shift, EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -1235,7 +1235,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
         if (cmp.equals(currentKey, key)) {
 
           final V currentVal = getSingletonValue(index);
-          return Optional.of(io.usethesource.capsule.api.Set.of(currentVal));
+          return Optional.of(io.usethesource.capsule.Set.of(currentVal));
         }
 
         return Optional.empty();
@@ -1247,7 +1247,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
         final K currentKey = getCollectionKey(index);
         if (cmp.equals(currentKey, key)) {
 
-          final io.usethesource.capsule.api.Set.Immutable<V> currentValColl =
+          final io.usethesource.capsule.Set.Immutable<V> currentValColl =
               getCollectionValue(index);
           return Optional.of(currentValColl);
         }
@@ -1291,8 +1291,8 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
             return this;
           } else {
             // migrate from singleton to collection
-            final io.usethesource.capsule.api.Set.Immutable<V> valColl =
-                io.usethesource.capsule.api.Set.of(currentVal, val);
+            final io.usethesource.capsule.Set.Immutable<V> valColl =
+                io.usethesource.capsule.Set.of(currentVal, val);
 
             details.modified();
             return copyAndMigrateFromSingletonToCollection(mutator, bitpos, currentKey, valColl);
@@ -1315,14 +1315,14 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
         final K currentCollKey = getCollectionKey(collIndex);
 
         if (cmp.equals(currentCollKey, key)) {
-          final io.usethesource.capsule.api.Set.Immutable<V> currentCollVal =
+          final io.usethesource.capsule.Set.Immutable<V> currentCollVal =
               getCollectionValue(collIndex);
 
           if (currentCollVal.contains(val)) {
             return this;
           } else {
             // add new mapping
-            final io.usethesource.capsule.api.Set.Immutable<V> newCollVal =
+            final io.usethesource.capsule.Set.Immutable<V> newCollVal =
                 currentCollVal.__insert(val);
 
             details.modified();
@@ -1330,7 +1330,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
           }
         } else {
           // prefix-collision (case: collection x singleton)
-          final io.usethesource.capsule.api.Set.Immutable<V> currentValNode =
+          final io.usethesource.capsule.Set.Immutable<V> currentValNode =
               getCollectionValue(collIndex);
           final CompactSetMultimapNode<K, V> subNodeNew = mergeCollectionAndSingletonPairs(
               currentCollKey, currentValNode, transformHashCode(currentCollKey.hashCode()), key,
@@ -1400,7 +1400,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
         final K currentCollKey = getCollectionKey(collIndex);
 
         if (cmp.equals(currentCollKey, key)) {
-          final io.usethesource.capsule.api.Set.Immutable<V> currentCollVal =
+          final io.usethesource.capsule.Set.Immutable<V> currentCollVal =
               getCollectionValue(collIndex);
 
           // migrate from collection to singleton
@@ -1408,7 +1408,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
           return copyAndMigrateFromCollectionToSingleton(mutator, bitpos, currentCollKey, val);
         } else {
           // prefix-collision (case: collection x singleton)
-          final io.usethesource.capsule.api.Set.Immutable<V> currentValNode =
+          final io.usethesource.capsule.Set.Immutable<V> currentValNode =
               getCollectionValue(collIndex);
           final CompactSetMultimapNode<K, V> subNodeNew = mergeCollectionAndSingletonPairs(
               currentCollKey, currentValNode, transformHashCode(currentCollKey.hashCode()), key,
@@ -1477,14 +1477,14 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
         final K currentKey = getCollectionKey(collIndex);
         if (cmp.equals(currentKey, key)) {
 
-          final io.usethesource.capsule.api.Set.Immutable<V> currentValColl =
+          final io.usethesource.capsule.Set.Immutable<V> currentValColl =
               getCollectionValue(collIndex);
           if (currentValColl.contains(val)) {
 
             // remove mapping
             details.updated(val);
 
-            final io.usethesource.capsule.api.Set.Immutable<V> newValColl =
+            final io.usethesource.capsule.Set.Immutable<V> newValColl =
                 currentValColl.__remove(val);
 
             if (newValColl.size() == 1) {
@@ -1585,7 +1585,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
         final K currentKey = getCollectionKey(collIndex);
         if (cmp.equals(currentKey, key)) {
 
-          final io.usethesource.capsule.api.Set.Immutable<V> currentValColl =
+          final io.usethesource.capsule.Set.Immutable<V> currentValColl =
               getCollectionValue(collIndex);
           // if (currentValColl.contains(val)) {
           //
@@ -1814,9 +1814,9 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
           int offset = i * TUPLE_LENGTH;
 
           assert ((nodes[offset
-              + 0] instanceof io.usethesource.capsule.api.Set.Immutable) == false);
+              + 0] instanceof io.usethesource.capsule.Set.Immutable) == false);
           assert ((nodes[offset
-              + 1] instanceof io.usethesource.capsule.api.Set.Immutable) == false);
+              + 1] instanceof io.usethesource.capsule.Set.Immutable) == false);
 
           assert ((nodes[offset + 0] instanceof CompactSetMultimapNode) == false);
           assert ((nodes[offset + 1] instanceof CompactSetMultimapNode) == false);
@@ -1826,9 +1826,9 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
           int offset = (i + arity(dataMap)) * TUPLE_LENGTH;
 
           assert ((nodes[offset
-              + 0] instanceof io.usethesource.capsule.api.Set.Immutable) == false);
+              + 0] instanceof io.usethesource.capsule.Set.Immutable) == false);
           assert ((nodes[offset
-              + 1] instanceof io.usethesource.capsule.api.Set.Immutable) == true);
+              + 1] instanceof io.usethesource.capsule.Set.Immutable) == true);
 
           assert ((nodes[offset + 0] instanceof CompactSetMultimapNode) == false);
           assert ((nodes[offset + 1] instanceof CompactSetMultimapNode) == false);
@@ -1838,7 +1838,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
           int offset = (arity(dataMap) + arity(collMap)) * TUPLE_LENGTH;
 
           assert ((nodes[offset
-              + i] instanceof io.usethesource.capsule.api.Set.Immutable) == false);
+              + i] instanceof io.usethesource.capsule.Set.Immutable) == false);
 
           assert ((nodes[offset + i] instanceof CompactSetMultimapNode) == true);
         }
@@ -1942,10 +1942,10 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     }
 
     @Override
-    io.usethesource.capsule.api.Set.Immutable<V> getCollectionValue(final int index) {
+    io.usethesource.capsule.Set.Immutable<V> getCollectionValue(final int index) {
       // TODO: improve on offset calculation (caching it, etc)
       int offset = TUPLE_LENGTH * (arity(dataMap()) + index) + 1;
-      return (io.usethesource.capsule.api.Set.Immutable<V>) nodes[offset];
+      return (io.usethesource.capsule.Set.Immutable<V>) nodes[offset];
     }
 
     @Override
@@ -2178,7 +2178,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
 
     @Override
     CompactSetMultimapNode<K, V> copyAndSetCollectionValue(final AtomicReference<Thread> mutator,
-        final int bitpos, final io.usethesource.capsule.api.Set.Immutable<V> valColl) {
+        final int bitpos, final io.usethesource.capsule.Set.Immutable<V> valColl) {
 
       final int idx = TUPLE_LENGTH * (arity(dataMap()) + collIndex(bitpos)) + 1;
       final CompactSetMultimapNode<K, V> updatedNode = copyAndSetXxxValue(mutator, idx, valColl);
@@ -2248,7 +2248,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromSingletonToCollection(
         AtomicReference<Thread> mutator, int bitpos, K key,
-        io.usethesource.capsule.api.Set.Immutable<V> valColl) {
+        io.usethesource.capsule.Set.Immutable<V> valColl) {
 
       final int idxOld = TUPLE_LENGTH * index(dataMap(), bitpos);
       final int idxNew = TUPLE_LENGTH * (arity(dataMap()) - 1 + index(collMap(), bitpos));
@@ -2466,7 +2466,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
   private static abstract class AbstractHashCollisionNode<K, V>
       extends CompactSetMultimapNode<K, V> {
 
-    static final <K, V, VS extends io.usethesource.capsule.api.Set.Immutable<V>> AbstractHashCollisionNode<K, V> of(
+    static final <K, V, VS extends io.usethesource.capsule.Set.Immutable<V>> AbstractHashCollisionNode<K, V> of(
         final int hash, final K key0, final VS valColl0, final K key1, final VS valColl1) {
       return new HashCollisionNode<>(hash, key0, valColl0, key1, valColl1);
     }
@@ -2522,7 +2522,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
 
     @Override
     CompactSetMultimapNode<K, V> copyAndSetCollectionValue(AtomicReference<Thread> mutator,
-        int bitpos, io.usethesource.capsule.api.Set.Immutable<V> valColl) {
+        int bitpos, io.usethesource.capsule.Set.Immutable<V> valColl) {
       throw UOE_FACTORY.get();
     }
 
@@ -2541,7 +2541,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromSingletonToCollection(
         AtomicReference<Thread> mutator, int bitpos, K key,
-        io.usethesource.capsule.api.Set.Immutable<V> valColl) {
+        io.usethesource.capsule.Set.Immutable<V> valColl) {
       throw UOE_FACTORY.get();
     }
 
@@ -2602,16 +2602,16 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
   private static final class HashCollisionNode<K, V> extends AbstractHashCollisionNode<K, V> {
 
     private final int hash;
-    private final List<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> collisionContent;
+    private final List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> collisionContent;
 
     HashCollisionNode(final int hash, final K key0,
-        final io.usethesource.capsule.api.Set.Immutable<V> valColl0, final K key1,
-        final io.usethesource.capsule.api.Set.Immutable<V> valColl1) {
+        final io.usethesource.capsule.Set.Immutable<V> valColl0, final K key1,
+        final io.usethesource.capsule.Set.Immutable<V> valColl1) {
       this(hash, Arrays.asList(entryOf(key0, valColl0), entryOf(key1, valColl1)));
     }
 
     HashCollisionNode(final int hash,
-        final List<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> collisionContent) {
+        final List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> collisionContent) {
       this.hash = hash;
       this.collisionContent = collisionContent;
     }
@@ -2710,7 +2710,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     }
 
     @Override
-    io.usethesource.capsule.api.Set.Immutable<V> getCollectionValue(int index) {
+    io.usethesource.capsule.Set.Immutable<V> getCollectionValue(int index) {
       return collisionContent.stream()
           .filter(kImmutableSetEntry -> kImmutableSetEntry.getValue().size() >= 2).skip(index)
           .findAny().get().getValue();
@@ -2750,7 +2750,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     }
 
     @Override
-    Optional<io.usethesource.capsule.api.Set.Immutable<V>> findByKey(K key, int keyHash,
+    Optional<io.usethesource.capsule.Set.Immutable<V>> findByKey(K key, int keyHash,
         int shift, EqualityComparator<Object> cmp) {
       return collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny()
           .map(Map.Entry::getValue);
@@ -2759,13 +2759,13 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     @Override
     CompactSetMultimapNode<K, V> inserted(AtomicReference<Thread> mutator, K key, V val,
         int keyHash, int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
-      Optional<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> optionalTuple =
+      Optional<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> optionalTuple =
           collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
 
       if (optionalTuple.isPresent()) {
         // contains key
 
-        io.usethesource.capsule.api.Set.Immutable<V> values =
+        io.usethesource.capsule.Set.Immutable<V> values =
             optionalTuple.get().getValue();
 
         if (values.containsEquivalent(val, cmp.toComparator())) {
@@ -2776,10 +2776,10 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
         } else {
           // contains key but not value
 
-          Function<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>, Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> substitutionMapper =
+          Function<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>, Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> substitutionMapper =
               (kImmutableSetEntry) -> {
                 if (kImmutableSetEntry == optionalTuple.get()) {
-                  io.usethesource.capsule.api.Set.Immutable<V> updatedValues =
+                  io.usethesource.capsule.Set.Immutable<V> updatedValues =
                       values.__insertEquivalent(val, cmp.toComparator());
                   return entryOf(key, updatedValues);
                 } else {
@@ -2787,7 +2787,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
                 }
               };
 
-          List<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> updatedCollisionContent =
+          List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> updatedCollisionContent =
               collisionContent.stream().map(substitutionMapper).collect(Collectors.toList());
 
           // TODO not all API uses EqualityComparator
@@ -2807,13 +2807,13 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
       } else {
         // does not contain key
 
-        Stream.Builder<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> builder =
-            Stream.<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>>builder()
-                .add(entryOf(key, io.usethesource.capsule.api.Set.of(val)));
+        Stream.Builder<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> builder =
+            Stream.<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>>builder()
+                .add(entryOf(key, io.usethesource.capsule.Set.of(val)));
 
         collisionContent.forEach(builder::accept);
 
-        List<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> updatedCollisionContent =
+        List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> updatedCollisionContent =
             builder.build().collect(Collectors.toList());
 
         // TODO not all API uses EqualityComparator
@@ -2821,7 +2821,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
         assert updatedCollisionContent.containsAll(collisionContent);
         // assert updatedCollisionContent.contains(entryOf(key, setOf(val)));
         assert updatedCollisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())
-            && Objects.equals(io.usethesource.capsule.api.Set.of(val), entry.getValue())).findAny()
+            && Objects.equals(io.usethesource.capsule.Set.of(val), entry.getValue())).findAny()
             .isPresent();
 
         details.modified();
@@ -2832,19 +2832,19 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     @Override
     CompactSetMultimapNode<K, V> updated(AtomicReference<Thread> mutator, K key, V val, int keyHash,
         int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
-      Optional<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> optionalTuple =
+      Optional<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> optionalTuple =
           collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
 
       if (optionalTuple.isPresent()) {
         // contains key -> replace val anyways
 
-        io.usethesource.capsule.api.Set.Immutable<V> values =
+        io.usethesource.capsule.Set.Immutable<V> values =
             optionalTuple.get().getValue();
 
-        Function<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>, Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> substitutionMapper =
+        Function<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>, Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> substitutionMapper =
             (kImmutableSetEntry) -> {
               if (kImmutableSetEntry == optionalTuple.get()) {
-                io.usethesource.capsule.api.Set.Immutable<V> updatedValues =
+                io.usethesource.capsule.Set.Immutable<V> updatedValues =
                     values.__insertEquivalent(val, cmp.toComparator());
                 return entryOf(key, updatedValues);
               } else {
@@ -2852,7 +2852,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
               }
             };
 
-        List<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> updatedCollisionContent =
+        List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> updatedCollisionContent =
             collisionContent.stream().map(substitutionMapper).collect(Collectors.toList());
 
         if (values.size() == 1) {
@@ -2865,13 +2865,13 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
       } else {
         // does not contain key
 
-        Stream.Builder<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> builder =
-            Stream.<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>>builder()
-                .add(entryOf(key, io.usethesource.capsule.api.Set.of(val)));
+        Stream.Builder<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> builder =
+            Stream.<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>>builder()
+                .add(entryOf(key, io.usethesource.capsule.Set.of(val)));
 
         collisionContent.forEach(builder::accept);
 
-        List<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> updatedCollisionContent =
+        List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> updatedCollisionContent =
             builder.build().collect(Collectors.toList());
 
         details.modified();
@@ -2882,29 +2882,29 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     @Override
     CompactSetMultimapNode<K, V> removed(AtomicReference<Thread> mutator, K key, V val, int keyHash,
         int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
-      Optional<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> optionalTuple =
+      Optional<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> optionalTuple =
           collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
 
       if (optionalTuple.isPresent()) {
         // contains key
 
-        io.usethesource.capsule.api.Set.Immutable<V> values =
+        io.usethesource.capsule.Set.Immutable<V> values =
             optionalTuple.get().getValue();
 
         if (values.containsEquivalent(val, cmp.toComparator())) {
           // contains key and value -> remove mapping
 
-          final List<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> updatedCollisionContent;
+          final List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> updatedCollisionContent;
 
           if (values.size() == 1) {
             updatedCollisionContent = collisionContent.stream()
                 .filter(kImmutableSetEntry -> kImmutableSetEntry != optionalTuple.get())
                 .collect(Collectors.toList());
           } else {
-            Function<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>, Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> substitutionMapper =
+            Function<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>, Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> substitutionMapper =
                 (kImmutableSetEntry) -> {
                   if (kImmutableSetEntry == optionalTuple.get()) {
-                    io.usethesource.capsule.api.Set.Immutable<V> updatedValues =
+                    io.usethesource.capsule.Set.Immutable<V> updatedValues =
                         values.__removeEquivalent(val, cmp.toComparator());
                     return entryOf(key, updatedValues);
                   } else {
@@ -2928,16 +2928,16 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     @Override
     CompactSetMultimapNode<K, V> removedAll(AtomicReference<Thread> mutator, K key, int keyHash,
         int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
-      final Optional<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> optionalTuple =
+      final Optional<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> optionalTuple =
           collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
 
       if (optionalTuple.isPresent()) {
         // contains key
 
-        io.usethesource.capsule.api.Set.Immutable<V> values =
+        io.usethesource.capsule.Set.Immutable<V> values =
             optionalTuple.get().getValue();
 
-        final List<Map.Entry<K, io.usethesource.capsule.api.Set.Immutable<V>>> updatedCollisionContent;
+        final List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> updatedCollisionContent;
 
         updatedCollisionContent = collisionContent.stream()
             .filter(kImmutableSetEntry -> kImmutableSetEntry != optionalTuple.get())
@@ -3079,20 +3079,20 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
   }
 
   protected static class SetMultimapValueIterator<K, V> extends AbstractSetMultimapIterator<K, V>
-      implements Iterator<io.usethesource.capsule.api.Set.Immutable<V>> {
+      implements Iterator<io.usethesource.capsule.Set.Immutable<V>> {
 
     SetMultimapValueIterator(AbstractSetMultimapNode<K, V> rootNode) {
       super(rootNode);
     }
 
     @Override
-    public io.usethesource.capsule.api.Set.Immutable<V> next() {
+    public io.usethesource.capsule.Set.Immutable<V> next() {
       if (!hasNext()) {
         throw new NoSuchElementException();
       } else {
         // TODO: check case distinction
         if (currentValueSingletonCursor < currentValueSingletonLength) {
-          return io.usethesource.capsule.api.Set
+          return io.usethesource.capsule.Set
               .of(currentValueNode.getSingletonValue(currentValueSingletonCursor++));
         } else {
           return currentValueNode.getCollectionValue(currentValueCollectionCursor++);
@@ -3291,7 +3291,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
       try {
         final K key = (K) o0;
         final V val = (V) o1;
-        final Optional<io.usethesource.capsule.api.Set.Immutable<V>> result =
+        final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
         if (result.isPresent()) {
@@ -3305,10 +3305,10 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     }
 
     @Override
-    public io.usethesource.capsule.api.Set.Immutable<V> get(final Object o) {
+    public io.usethesource.capsule.Set.Immutable<V> get(final Object o) {
       try {
         final K key = (K) o;
-        final Optional<io.usethesource.capsule.api.Set.Immutable<V>> result =
+        final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
         if (result.isPresent()) {
@@ -3546,7 +3546,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
       return new TransientSetMultimapTupleIterator<>(this, tupleOf);
     }
 
-    private Spliterator<io.usethesource.capsule.api.Set.Immutable<V>> valueCollectionsSpliterator() {
+    private Spliterator<io.usethesource.capsule.Set.Immutable<V>> valueCollectionsSpliterator() {
       /*
        * TODO: specialize between mutable / SetMultimap.Immutable<K, V> ({@see
        * Spliterator.IMMUTABLE})
@@ -3556,7 +3556,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
           characteristics);
     }
 
-    private Stream<io.usethesource.capsule.api.Set.Immutable<V>> valueCollectionsStream() {
+    private Stream<io.usethesource.capsule.Set.Immutable<V>> valueCollectionsStream() {
       boolean isParallel = false;
       return StreamSupport.stream(valueCollectionsSpliterator(), isParallel);
     }
@@ -3595,7 +3595,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
       }
 
       @Override
-      public io.usethesource.capsule.api.Set.Immutable<V> next() {
+      public io.usethesource.capsule.Set.Immutable<V> next() {
         return super.next();
       }
 
@@ -3789,14 +3789,14 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
 
           try {
             final K key = (K) entry.getKey();
-            final Optional<io.usethesource.capsule.api.Set.Immutable<V>> result =
+            final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
                 rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
             if (!result.isPresent()) {
               return false;
             } else {
-              final io.usethesource.capsule.api.Set.Immutable<V> valColl =
-                  (io.usethesource.capsule.api.Set.Immutable<V>) entry.getValue();
+              final io.usethesource.capsule.Set.Immutable<V> valColl =
+                  (io.usethesource.capsule.Set.Immutable<V>) entry.getValue();
 
               if (!cmp.equals(result.get(), valColl)) {
                 return false;

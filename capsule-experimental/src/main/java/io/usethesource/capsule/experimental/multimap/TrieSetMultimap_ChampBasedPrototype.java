@@ -7,7 +7,7 @@
  */
 package io.usethesource.capsule.experimental.multimap;
 
-import io.usethesource.capsule.api.SetMultimap;
+import io.usethesource.capsule.SetMultimap;
 import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableSet;
@@ -84,8 +84,8 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
     int hash = 0;
     int size = 0;
 
-    for (Iterator<io.usethesource.capsule.api.Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
-      final io.usethesource.capsule.api.Map.Entry<K, V> entry = it.next();
+    for (Iterator<io.usethesource.capsule.Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
+      final io.usethesource.capsule.Map.Entry<K, V> entry = it.next();
       final K key = entry.getKey();
       final V val = entry.getValue();
 
@@ -147,7 +147,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
       final K key = (K) o0;
       @SuppressWarnings("unchecked")
       final V val = (V) o1;
-      final Optional<io.usethesource.capsule.api.Set.Immutable<V>> result =
+      final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
           rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
       if (result.isPresent()) {
@@ -167,7 +167,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
       final K key = (K) o0;
       @SuppressWarnings("unchecked")
       final V val = (V) o1;
-      final Optional<io.usethesource.capsule.api.Set.Immutable<V>> result =
+      final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
           rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
       if (result.isPresent()) {
@@ -181,11 +181,11 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
   }
 
   @Override
-  public io.usethesource.capsule.api.Set.Immutable<V> get(final Object o) {
+  public io.usethesource.capsule.Set.Immutable<V> get(final Object o) {
     try {
       @SuppressWarnings("unchecked")
       final K key = (K) o;
-      final Optional<io.usethesource.capsule.api.Set.Immutable<V>> result =
+      final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
           rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
       if (result.isPresent()) {
@@ -198,11 +198,11 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
     }
   }
 
-  public io.usethesource.capsule.api.Set.Immutable<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
+  public io.usethesource.capsule.Set.Immutable<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
       @SuppressWarnings("unchecked")
       final K key = (K) o;
-      final Optional<io.usethesource.capsule.api.Set.Immutable<V>> result =
+      final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
           rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
       if (result.isPresent()) {
@@ -319,12 +319,12 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
   }
 
   @Override
-  public Iterator<io.usethesource.capsule.api.Map.Entry<K, V>> entryIterator() {
+  public Iterator<io.usethesource.capsule.Map.Entry<K, V>> entryIterator() {
     return new SetMultimapTupleIterator<>(rootNode, AbstractSpecialisedImmutableMap::entryOf);
   }
 
   @Override
-  public Iterator<io.usethesource.capsule.api.Map.Entry<K, Object>> nativeEntryIterator() {
+  public Iterator<io.usethesource.capsule.Map.Entry<K, Object>> nativeEntryIterator() {
     throw new UnsupportedOperationException();
   }
 
@@ -333,7 +333,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
     return new SetMultimapTupleIterator<>(rootNode, tupleOf);
   }
 
-  private Spliterator<io.usethesource.capsule.api.Set.Immutable<V>> valueCollectionsSpliterator() {
+  private Spliterator<io.usethesource.capsule.Set.Immutable<V>> valueCollectionsSpliterator() {
     /*
      * TODO: specialize between mutable / SetMultimap.Immutable<K, V> ({@see Spliterator.IMMUTABLE})
      */
@@ -342,7 +342,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         characteristics);
   }
 
-  private Stream<io.usethesource.capsule.api.Set.Immutable<V>> valueCollectionsStream() {
+  private Stream<io.usethesource.capsule.Set.Immutable<V>> valueCollectionsStream() {
     boolean isParallel = false;
     return StreamSupport.stream(valueCollectionsSpliterator(), isParallel);
   }
@@ -427,8 +427,8 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
       entrySet = new AbstractSet<java.util.Map.Entry<K, V>>() {
         @Override
         public Iterator<java.util.Map.Entry<K, V>> iterator() {
-          return new Iterator<io.usethesource.capsule.api.Map.Entry<K, V>>() {
-            private final Iterator<io.usethesource.capsule.api.Map.Entry<K, V>> i = entryIterator();
+          return new Iterator<io.usethesource.capsule.Map.Entry<K, V>>() {
+            private final Iterator<io.usethesource.capsule.Map.Entry<K, V>> i = entryIterator();
 
             @Override
             public boolean hasNext() {
@@ -436,7 +436,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
             }
 
             @Override
-            public io.usethesource.capsule.api.Map.Entry<K, V> next() {
+            public io.usethesource.capsule.Map.Entry<K, V> next() {
               return i.next();
             }
 
@@ -501,20 +501,20 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         return false;
 
       for (@SuppressWarnings("unchecked")
-           Iterator<io.usethesource.capsule.api.Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
-        io.usethesource.capsule.api.Map.Entry entry = it.next();
+           Iterator<io.usethesource.capsule.Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
+        io.usethesource.capsule.Map.Entry entry = it.next();
 
         try {
           @SuppressWarnings("unchecked")
           final K key = (K) entry.getKey();
-          final Optional<io.usethesource.capsule.api.Set.Immutable<V>> result =
+          final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
               rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
           if (!result.isPresent()) {
             return false;
           } else {
             @SuppressWarnings("unchecked")
-            final io.usethesource.capsule.api.Set.Immutable<V> valColl = (io.usethesource.capsule.api.Set.Immutable<V>) entry.getValue();
+            final io.usethesource.capsule.Set.Immutable<V> valColl = (io.usethesource.capsule.Set.Immutable<V>) entry.getValue();
 
             if (!result.get().equals(valColl)) {
               return false;
@@ -743,9 +743,9 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
     abstract boolean containsKey(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp);
 
-    abstract Optional<io.usethesource.capsule.api.Set.Immutable<V>> findByKey(final K key, final int keyHash, final int shift);
+    abstract Optional<io.usethesource.capsule.Set.Immutable<V>> findByKey(final K key, final int keyHash, final int shift);
 
-    abstract Optional<io.usethesource.capsule.api.Set.Immutable<V>> findByKey(final K key, final int keyHash, final int shift,
+    abstract Optional<io.usethesource.capsule.Set.Immutable<V>> findByKey(final K key, final int keyHash, final int shift,
                                                                               final Comparator<Object> cmp);
 
     abstract CompactSetMultimapNode<K, V> updated(final AtomicReference<Thread> mutator,
@@ -806,7 +806,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
 
     abstract K getKey(final int index);
 
-    abstract io.usethesource.capsule.api.Set.Immutable<V> getValue(final int index);
+    abstract io.usethesource.capsule.Set.Immutable<V> getValue(final int index);
 
     @Deprecated
     abstract boolean hasSlots();
@@ -887,10 +887,10 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
     }
 
     abstract CompactSetMultimapNode<K, V> copyAndSetValue(final AtomicReference<Thread> mutator,
-        final int bitpos, final io.usethesource.capsule.api.Set.Immutable<V> valColl);
+        final int bitpos, final io.usethesource.capsule.Set.Immutable<V> valColl);
 
     abstract CompactSetMultimapNode<K, V> copyAndInsertValue(final AtomicReference<Thread> mutator,
-        final int bitpos, final K key, final io.usethesource.capsule.api.Set.Immutable<V> valColl);
+        final int bitpos, final K key, final io.usethesource.capsule.Set.Immutable<V> valColl);
 
     abstract CompactSetMultimapNode<K, V> copyAndRemoveValue(final AtomicReference<Thread> mutator,
         final int bitpos);
@@ -907,8 +907,8 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         final CompactSetMultimapNode<K, V> node);
 
     static final <K, V> CompactSetMultimapNode<K, V> mergeTwoKeyValPairs(final K key0,
-                                                                         final io.usethesource.capsule.api.Set.Immutable<V> valColl0, final int keyHash0, final K key1,
-                                                                         final io.usethesource.capsule.api.Set.Immutable<V> valColl1, final int keyHash1, final int shift) {
+                                                                         final io.usethesource.capsule.Set.Immutable<V> valColl0, final int keyHash0, final K key1,
+                                                                         final io.usethesource.capsule.Set.Immutable<V> valColl1, final int keyHash1, final int shift) {
       assert !(key0.equals(key1));
 
       if (shift >= HASH_CODE_LENGTH) {
@@ -916,7 +916,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         // IllegalStateException("Hash collision not yet fixed.");
         return new HashCollisionSetMultimapNode_BleedingEdge<>(keyHash0,
             (K[]) new Object[] {key0, key1},
-            (io.usethesource.capsule.api.Set.Immutable<V>[]) new io.usethesource.capsule.api.Set.Immutable[] {valColl0, valColl1});
+            (io.usethesource.capsule.Set.Immutable<V>[]) new io.usethesource.capsule.Set.Immutable[] {valColl0, valColl1});
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -960,7 +960,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
     }
 
     static final <K, V> CompactSetMultimapNode<K, V> nodeOf(AtomicReference<Thread> mutator,
-        final int nodeMap, final int dataMap, final K key, final io.usethesource.capsule.api.Set.Immutable<V> valColl) {
+        final int nodeMap, final int dataMap, final K key, final io.usethesource.capsule.Set.Immutable<V> valColl) {
       assert nodeMap == 0;
       return nodeOf(mutator, (0), dataMap, new Object[] {key, valColl});
     }
@@ -1027,14 +1027,14 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
     }
 
     @Override
-    Optional<io.usethesource.capsule.api.Set.Immutable<V>> findByKey(final K key, final int keyHash, final int shift) {
+    Optional<io.usethesource.capsule.Set.Immutable<V>> findByKey(final K key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
       if ((dataMap() & bitpos) != 0) { // inplace value
         final int index = dataIndex(bitpos);
         if (getKey(index).equals(key)) {
-          final io.usethesource.capsule.api.Set.Immutable<V> result = getValue(index);
+          final io.usethesource.capsule.Set.Immutable<V> result = getValue(index);
 
           return Optional.of(result);
         }
@@ -1052,7 +1052,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
     }
 
     @Override
-    Optional<io.usethesource.capsule.api.Set.Immutable<V>> findByKey(final K key, final int keyHash, final int shift,
+    Optional<io.usethesource.capsule.Set.Immutable<V>> findByKey(final K key, final int keyHash, final int shift,
                                                                      final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -1060,7 +1060,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
       if ((dataMap() & bitpos) != 0) { // inplace value
         final int index = dataIndex(bitpos);
         if (cmp.compare(getKey(index), key) == 0) {
-          final io.usethesource.capsule.api.Set.Immutable<V> result = getValue(index);
+          final io.usethesource.capsule.Set.Immutable<V> result = getValue(index);
 
           return Optional.of(result);
         }
@@ -1088,7 +1088,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         final K currentKey = getKey(dataIndex);
 
         if (currentKey.equals(key)) {
-          final io.usethesource.capsule.api.Set.Immutable<V> valColl = getValue(dataIndex);
+          final io.usethesource.capsule.Set.Immutable<V> valColl = getValue(dataIndex);
 
           final int valHash = val.hashCode();
           // if(valColl.contains(val, transformHashCode(valHash), 0))
@@ -1100,7 +1100,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
             // final Immutable<V> valCollNew =
             // valColl.updated(null, val,
             // transformHashCode(valHash), 0, details);
-            final io.usethesource.capsule.api.Set.Immutable<V> valCollNew = valColl.__insert(val);
+            final io.usethesource.capsule.Set.Immutable<V> valCollNew = valColl.__insert(val);
 
             details.modified();
             return copyAndSetValue(mutator, bitpos, valCollNew);
@@ -1110,9 +1110,9 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
           // final Immutable<V> valColl =
           // CompactSetNode.EMPTY_NODE.updated(null, val,
           // transformHashCode(valHash), 0, details);
-          final io.usethesource.capsule.api.Set.Immutable<V> valColl = AbstractSpecialisedImmutableSet.setOf(val);
+          final io.usethesource.capsule.Set.Immutable<V> valColl = AbstractSpecialisedImmutableSet.setOf(val);
 
-          final io.usethesource.capsule.api.Set.Immutable<V> currentValNode = getValue(dataIndex);
+          final io.usethesource.capsule.Set.Immutable<V> currentValNode = getValue(dataIndex);
           final CompactSetMultimapNode<K, V> subNodeNew = mergeTwoKeyValPairs(currentKey,
               currentValNode, transformHashCode(currentKey.hashCode()), key, valColl, keyHash,
               shift + BIT_PARTITION_SIZE);
@@ -1136,7 +1136,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         // final Immutable<V> valColl =
         // CompactSetNode.EMPTY_NODE.updated(null, val,
         // transformHashCode(valHash), 0, details);
-        final io.usethesource.capsule.api.Set.Immutable<V> valColl = AbstractSpecialisedImmutableSet.setOf(val);
+        final io.usethesource.capsule.Set.Immutable<V> valColl = AbstractSpecialisedImmutableSet.setOf(val);
 
         details.modified();
         return copyAndInsertValue(mutator, bitpos, key, valColl);
@@ -1155,7 +1155,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         final K currentKey = getKey(dataIndex);
 
         if (cmp.compare(currentKey, key) == 0) {
-          final io.usethesource.capsule.api.Set.Immutable<V> valColl = getValue(dataIndex);
+          final io.usethesource.capsule.Set.Immutable<V> valColl = getValue(dataIndex);
 
           final int valHash = val.hashCode();
           // if(valColl.contains(val, transformHashCode(valHash), 0))
@@ -1167,7 +1167,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
             // final Immutable<V> valCollNew =
             // valColl.updated(null, val,
             // transformHashCode(valHash), 0, details);
-            final io.usethesource.capsule.api.Set.Immutable<V> valCollNew = valColl.__insert(val);
+            final io.usethesource.capsule.Set.Immutable<V> valCollNew = valColl.__insert(val);
 
             details.modified();
             return copyAndSetValue(mutator, bitpos, valCollNew);
@@ -1177,9 +1177,9 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
           // final Immutable<V> valColl =
           // CompactSetNode.EMPTY_NODE.updated(null, val,
           // transformHashCode(valHash), 0, details);
-          final io.usethesource.capsule.api.Set.Immutable<V> valColl = AbstractSpecialisedImmutableSet.setOf(val);
+          final io.usethesource.capsule.Set.Immutable<V> valColl = AbstractSpecialisedImmutableSet.setOf(val);
 
-          final io.usethesource.capsule.api.Set.Immutable<V> currentValNode = getValue(dataIndex);
+          final io.usethesource.capsule.Set.Immutable<V> currentValNode = getValue(dataIndex);
           final CompactSetMultimapNode<K, V> subNodeNew = mergeTwoKeyValPairs(currentKey,
               currentValNode, transformHashCode(currentKey.hashCode()), key, valColl, keyHash,
               shift + BIT_PARTITION_SIZE);
@@ -1203,7 +1203,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         // final Immutable<V> valColl =
         // CompactSetNode.EMPTY_NODE.updated(null, val,
         // transformHashCode(valHash), 0, details);
-        final io.usethesource.capsule.api.Set.Immutable<V> valColl = AbstractSpecialisedImmutableSet.setOf(val);
+        final io.usethesource.capsule.Set.Immutable<V> valColl = AbstractSpecialisedImmutableSet.setOf(val);
 
         details.modified();
         return copyAndInsertValue(mutator, bitpos, key, valColl);
@@ -1220,7 +1220,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         final int dataIndex = dataIndex(bitpos);
 
         if (getKey(dataIndex).equals(key)) {
-          final io.usethesource.capsule.api.Set.Immutable<V> valColl = getValue(dataIndex);
+          final io.usethesource.capsule.Set.Immutable<V> valColl = getValue(dataIndex);
 
           final int valHash = val.hashCode();
           // if(valColl.contains(val, transformHashCode(valHash), 0))
@@ -1232,7 +1232,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
             // final Immutable<V> valCollNew =
             // valColl.removed(null, val,
             // transformHashCode(valHash), 0, details);
-            final io.usethesource.capsule.api.Set.Immutable<V> valCollNew = valColl.__remove(val);
+            final io.usethesource.capsule.Set.Immutable<V> valCollNew = valColl.__remove(val);
 
             if (valCollNew.size() == 0) { // earlier: arity() == 0
               if (this.payloadArity() == 2 && this.nodeArity() == 0) {
@@ -1305,7 +1305,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         final int dataIndex = dataIndex(bitpos);
 
         if (cmp.compare(getKey(dataIndex), key) == 0) {
-          final io.usethesource.capsule.api.Set.Immutable<V> valColl = getValue(dataIndex);
+          final io.usethesource.capsule.Set.Immutable<V> valColl = getValue(dataIndex);
 
           final int valHash = val.hashCode();
           // if(valColl.contains(val, transformHashCode(valHash), 0))
@@ -1317,7 +1317,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
             // final Immutable<V> valCollNew =
             // valColl.removed(null, val,
             // transformHashCode(valHash), 0, details);
-            final io.usethesource.capsule.api.Set.Immutable<V> valCollNew = valColl.__remove(val);
+            final io.usethesource.capsule.Set.Immutable<V> valCollNew = valColl.__remove(val);
 
             if (valCollNew.size() == 0) { // earlier: arity() == 0
               if (this.payloadArity() == 2 && this.nodeArity() == 0) {
@@ -1489,7 +1489,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         }
 
         for (int i = 1; i < TUPLE_LENGTH * payloadArity(); i += 2) {
-          assert ((nodes[i] instanceof io.usethesource.capsule.api.Set.Immutable) == true);
+          assert ((nodes[i] instanceof io.usethesource.capsule.Set.Immutable) == true);
         }
       }
 
@@ -1504,8 +1504,8 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
 
     @SuppressWarnings("unchecked")
     @Override
-    io.usethesource.capsule.api.Set.Immutable<V> getValue(final int index) {
-      return (io.usethesource.capsule.api.Set.Immutable<V>) nodes[TUPLE_LENGTH * index + 1];
+    io.usethesource.capsule.Set.Immutable<V> getValue(final int index) {
+      return (io.usethesource.capsule.Set.Immutable<V>) nodes[TUPLE_LENGTH * index + 1];
     }
 
     @SuppressWarnings("unchecked")
@@ -1601,7 +1601,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
 
     @Override
     CompactSetMultimapNode<K, V> copyAndSetValue(final AtomicReference<Thread> mutator,
-        final int bitpos, final io.usethesource.capsule.api.Set.Immutable<V> valColl) {
+        final int bitpos, final io.usethesource.capsule.Set.Immutable<V> valColl) {
       final int idx = TUPLE_LENGTH * dataIndex(bitpos) + 1;
 
       if (isAllowedToEdit(this.mutator, mutator)) {
@@ -1644,7 +1644,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
 
     @Override
     CompactSetMultimapNode<K, V> copyAndInsertValue(final AtomicReference<Thread> mutator,
-        final int bitpos, final K key, final io.usethesource.capsule.api.Set.Immutable<V> valColl) {
+        final int bitpos, final K key, final io.usethesource.capsule.Set.Immutable<V> valColl) {
       final int idx = TUPLE_LENGTH * dataIndex(bitpos);
 
       final Object[] src = this.nodes;
@@ -1724,11 +1724,11 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
   private static final class HashCollisionSetMultimapNode_BleedingEdge<K, V>
       extends CompactSetMultimapNode<K, V> {
     private final K[] keys;
-    private final io.usethesource.capsule.api.Set.Immutable<V>[] vals;
+    private final io.usethesource.capsule.Set.Immutable<V>[] vals;
     private final int hash;
 
     HashCollisionSetMultimapNode_BleedingEdge(final int hash, final K[] keys,
-        final io.usethesource.capsule.api.Set.Immutable<V>[] vals) {
+        final io.usethesource.capsule.Set.Immutable<V>[] vals) {
       this.keys = keys;
       this.vals = vals;
       this.hash = hash;
@@ -1762,11 +1762,11 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
     }
 
     @Override
-    Optional<io.usethesource.capsule.api.Set.Immutable<V>> findByKey(final K key, final int keyHash, final int shift) {
+    Optional<io.usethesource.capsule.Set.Immutable<V>> findByKey(final K key, final int keyHash, final int shift) {
       for (int i = 0; i < keys.length; i++) {
         final K _key = keys[i];
         if (key.equals(_key)) {
-          final io.usethesource.capsule.api.Set.Immutable<V> valColl = vals[i];
+          final io.usethesource.capsule.Set.Immutable<V> valColl = vals[i];
           return Optional.of(valColl);
         }
       }
@@ -1774,12 +1774,12 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
     }
 
     @Override
-    Optional<io.usethesource.capsule.api.Set.Immutable<V>> findByKey(final K key, final int keyHash, final int shift,
+    Optional<io.usethesource.capsule.Set.Immutable<V>> findByKey(final K key, final int keyHash, final int shift,
                                                                      final Comparator<Object> cmp) {
       for (int i = 0; i < keys.length; i++) {
         final K _key = keys[i];
         if (cmp.compare(key, _key) == 0) {
-          final io.usethesource.capsule.api.Set.Immutable<V> valColl = vals[i];
+          final io.usethesource.capsule.Set.Immutable<V> valColl = vals[i];
           return Optional.of(valColl);
         }
       }
@@ -1793,17 +1793,17 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
 
       for (int idx = 0; idx < keys.length; idx++) {
         if (keys[idx].equals(key)) {
-          final io.usethesource.capsule.api.Set.Immutable<V> currentValColl = vals[idx];
+          final io.usethesource.capsule.Set.Immutable<V> currentValColl = vals[idx];
 
           if (currentValColl.contains(val)) {
             return this;
           } else {
             // add new mapping
-            final io.usethesource.capsule.api.Set.Immutable<V> valCollNew = currentValColl.__insert(val);
+            final io.usethesource.capsule.Set.Immutable<V> valCollNew = currentValColl.__insert(val);
 
-            final io.usethesource.capsule.api.Set.Immutable<V>[] src = this.vals;
+            final io.usethesource.capsule.Set.Immutable<V>[] src = this.vals;
             @SuppressWarnings("unchecked")
-            final io.usethesource.capsule.api.Set.Immutable<V>[] dst = new io.usethesource.capsule.api.Set.Immutable[src.length];
+            final io.usethesource.capsule.Set.Immutable<V>[] dst = new io.usethesource.capsule.Set.Immutable[src.length];
 
             // copy 'src' and set 1 element(s) at position 'idx'
             System.arraycopy(src, 0, dst, 0, src.length);
@@ -1819,7 +1819,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
       }
 
       // add new tuple
-      final io.usethesource.capsule.api.Set.Immutable<V> valCollNew = AbstractSpecialisedImmutableSet.setOf(val);
+      final io.usethesource.capsule.Set.Immutable<V> valCollNew = AbstractSpecialisedImmutableSet.setOf(val);
 
       @SuppressWarnings("unchecked")
       final K[] keysNew = (K[]) new Object[this.keys.length + 1];
@@ -1832,7 +1832,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
           this.keys.length - keys.length);
 
       @SuppressWarnings("unchecked")
-      final io.usethesource.capsule.api.Set.Immutable<V>[] valsNew = new io.usethesource.capsule.api.Set.Immutable[this.vals.length + 1];
+      final io.usethesource.capsule.Set.Immutable<V>[] valsNew = new io.usethesource.capsule.Set.Immutable[this.vals.length + 1];
 
       // copy 'this.vals' and insert 1 element(s) at position
       // 'vals.length'
@@ -1853,17 +1853,17 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
 
       for (int idx = 0; idx < keys.length; idx++) {
         if (cmp.compare(keys[idx], key) == 0) {
-          final io.usethesource.capsule.api.Set.Immutable<V> currentValColl = vals[idx];
+          final io.usethesource.capsule.Set.Immutable<V> currentValColl = vals[idx];
 
           if (currentValColl.containsEquivalent(val, cmp)) {
             return this;
           } else {
             // add new mapping
-            final io.usethesource.capsule.api.Set.Immutable<V> valCollNew = currentValColl.__insert(val);
+            final io.usethesource.capsule.Set.Immutable<V> valCollNew = currentValColl.__insert(val);
 
-            final io.usethesource.capsule.api.Set.Immutable<V>[] src = this.vals;
+            final io.usethesource.capsule.Set.Immutable<V>[] src = this.vals;
             @SuppressWarnings("unchecked")
-            final io.usethesource.capsule.api.Set.Immutable<V>[] dst = new io.usethesource.capsule.api.Set.Immutable[src.length];
+            final io.usethesource.capsule.Set.Immutable<V>[] dst = new io.usethesource.capsule.Set.Immutable[src.length];
 
             // copy 'src' and set 1 element(s) at position 'idx'
             System.arraycopy(src, 0, dst, 0, src.length);
@@ -1879,7 +1879,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
       }
 
       // add new tuple
-      final io.usethesource.capsule.api.Set.Immutable<V> valCollNew = AbstractSpecialisedImmutableSet.setOf(val);
+      final io.usethesource.capsule.Set.Immutable<V> valCollNew = AbstractSpecialisedImmutableSet.setOf(val);
 
       @SuppressWarnings("unchecked")
       final K[] keysNew = (K[]) new Object[this.keys.length + 1];
@@ -1892,7 +1892,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
           this.keys.length - keys.length);
 
       @SuppressWarnings("unchecked")
-      final io.usethesource.capsule.api.Set.Immutable<V>[] valsNew = new io.usethesource.capsule.api.Set.Immutable[this.vals.length + 1];
+      final io.usethesource.capsule.Set.Immutable<V>[] valsNew = new io.usethesource.capsule.Set.Immutable[this.vals.length + 1];
 
       // copy 'this.vals' and insert 1 element(s) at position
       // 'vals.length'
@@ -1910,18 +1910,18 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details) {
       for (int idx = 0; idx < keys.length; idx++) {
         if (keys[idx].equals(key)) {
-          final io.usethesource.capsule.api.Set.Immutable<V> currentValColl = getValue(idx);
+          final io.usethesource.capsule.Set.Immutable<V> currentValColl = getValue(idx);
 
           if (currentValColl.contains(val)) {
             details.updated(val);
 
             // remove tuple
-            final io.usethesource.capsule.api.Set.Immutable<V> valCollNew = currentValColl.__remove(val);
+            final io.usethesource.capsule.Set.Immutable<V> valCollNew = currentValColl.__remove(val);
 
             if (valCollNew.size() != 0) {
               // update mapping
               @SuppressWarnings("unchecked")
-              final io.usethesource.capsule.api.Set.Immutable<V>[] valsNew = new io.usethesource.capsule.api.Set.Immutable[this.vals.length];
+              final io.usethesource.capsule.Set.Immutable<V>[] valsNew = new io.usethesource.capsule.Set.Immutable[this.vals.length];
 
               // copy 'this.vals' and set 1 element(s) at position
               // 'idx'
@@ -1937,7 +1937,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
                  * root returned, or b) unwrapped and inlined.
                  */
                 final K theOtherKey = (idx == 0) ? keys[1] : keys[0];
-                final io.usethesource.capsule.api.Set.Immutable<V> theOtherVal = (idx == 0) ? vals[1] : vals[0];
+                final io.usethesource.capsule.Set.Immutable<V> theOtherVal = (idx == 0) ? vals[1] : vals[0];
 
                 final int nodeMap = 0;
                 final int dataMap = bitpos(mask(hash, 0));
@@ -1954,7 +1954,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
                 System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
 
                 @SuppressWarnings("unchecked")
-                final io.usethesource.capsule.api.Set.Immutable<V>[] valsNew = new io.usethesource.capsule.api.Set.Immutable[this.vals.length - 1];
+                final io.usethesource.capsule.Set.Immutable<V>[] valsNew = new io.usethesource.capsule.Set.Immutable[this.vals.length - 1];
 
                 // copy 'this.vals' and remove 1 element(s) at
                 // position 'idx'
@@ -1978,18 +1978,18 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         final Comparator<Object> cmp) {
       for (int idx = 0; idx < keys.length; idx++) {
         if (cmp.compare(keys[idx], key) == 0) {
-          final io.usethesource.capsule.api.Set.Immutable<V> currentValColl = getValue(idx);
+          final io.usethesource.capsule.Set.Immutable<V> currentValColl = getValue(idx);
 
           if (currentValColl.contains(val)) {
             details.updated(val);
 
             // remove tuple
-            final io.usethesource.capsule.api.Set.Immutable<V> valCollNew = currentValColl.__removeEquivalent(val, cmp);
+            final io.usethesource.capsule.Set.Immutable<V> valCollNew = currentValColl.__removeEquivalent(val, cmp);
 
             if (valCollNew.size() != 0) {
               // update mapping
               @SuppressWarnings("unchecked")
-              final io.usethesource.capsule.api.Set.Immutable<V>[] valsNew = new io.usethesource.capsule.api.Set.Immutable[this.vals.length];
+              final io.usethesource.capsule.Set.Immutable<V>[] valsNew = new io.usethesource.capsule.Set.Immutable[this.vals.length];
 
               // copy 'this.vals' and set 1 element(s) at position
               // 'idx'
@@ -2005,7 +2005,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
                  * root returned, or b) unwrapped and inlined.
                  */
                 final K theOtherKey = (idx == 0) ? keys[1] : keys[0];
-                final io.usethesource.capsule.api.Set.Immutable<V> theOtherVal = (idx == 0) ? vals[1] : vals[0];
+                final io.usethesource.capsule.Set.Immutable<V> theOtherVal = (idx == 0) ? vals[1] : vals[0];
 
                 final int nodeMap = 0;
                 final int dataMap = bitpos(mask(hash, 0));
@@ -2022,7 +2022,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
                 System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
 
                 @SuppressWarnings("unchecked")
-                final io.usethesource.capsule.api.Set.Immutable<V>[] valsNew = new io.usethesource.capsule.api.Set.Immutable[this.vals.length - 1];
+                final io.usethesource.capsule.Set.Immutable<V>[] valsNew = new io.usethesource.capsule.Set.Immutable[this.vals.length - 1];
 
                 // copy 'this.vals' and remove 1 element(s) at
                 // position 'idx'
@@ -2076,7 +2076,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
     }
 
     @Override
-    io.usethesource.capsule.api.Set.Immutable<V> getValue(final int index) {
+    io.usethesource.capsule.Set.Immutable<V> getValue(final int index) {
       return vals[index];
     }
 
@@ -2142,7 +2142,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
 
         for (int j = 0; j < keys.length; j++) {
           final K key = keys[j];
-          final io.usethesource.capsule.api.Set.Immutable<V> valColl = vals[j];
+          final io.usethesource.capsule.Set.Immutable<V> valColl = vals[j];
 
           if (key.equals(otherKey) && valColl.equals(otherVal)) {
             continue outerLoop;
@@ -2156,13 +2156,13 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
 
     @Override
     CompactSetMultimapNode<K, V> copyAndSetValue(final AtomicReference<Thread> mutator,
-        final int bitpos, final io.usethesource.capsule.api.Set.Immutable<V> valColl) {
+        final int bitpos, final io.usethesource.capsule.Set.Immutable<V> valColl) {
       throw new UnsupportedOperationException();
     }
 
     @Override
     CompactSetMultimapNode<K, V> copyAndInsertValue(final AtomicReference<Thread> mutator,
-        final int bitpos, final K key, final io.usethesource.capsule.api.Set.Immutable<V> valColl) {
+        final int bitpos, final K key, final io.usethesource.capsule.Set.Immutable<V> valColl) {
       throw new UnsupportedOperationException();
     }
 
@@ -2315,14 +2315,14 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
   }
 
   protected static class SetMultimapValueIterator<K, V> extends AbstractSetMultimapIterator<K, V>
-      implements Iterator<io.usethesource.capsule.api.Set.Immutable<V>> {
+      implements Iterator<io.usethesource.capsule.Set.Immutable<V>> {
 
     SetMultimapValueIterator(AbstractSetMultimapNode<K, V> rootNode) {
       super(rootNode);
     }
 
     @Override
-    public io.usethesource.capsule.api.Set.Immutable<V> next() {
+    public io.usethesource.capsule.Set.Immutable<V> next() {
       if (!hasNext()) {
         throw new NoSuchElementException();
       } else {
@@ -2448,8 +2448,8 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
       int hash = 0;
       int size = 0;
 
-      for (Iterator<io.usethesource.capsule.api.Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
-        final io.usethesource.capsule.api.Map.Entry<K, V> entry = it.next();
+      for (Iterator<io.usethesource.capsule.Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
+        final io.usethesource.capsule.Map.Entry<K, V> entry = it.next();
         final K key = entry.getKey();
         final V val = entry.getValue();
 
@@ -2507,7 +2507,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         final K key = (K) o0;
         @SuppressWarnings("unchecked")
         final V val = (V) o1;
-        final Optional<io.usethesource.capsule.api.Set.Immutable<V>> result =
+        final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
         if (result.isPresent()) {
@@ -2527,7 +2527,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         final K key = (K) o0;
         @SuppressWarnings("unchecked")
         final V val = (V) o1;
-        final Optional<io.usethesource.capsule.api.Set.Immutable<V>> result =
+        final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
         if (result.isPresent()) {
@@ -2541,11 +2541,11 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
     }
 
     @Override
-    public io.usethesource.capsule.api.Set.Immutable<V> get(final Object o) {
+    public io.usethesource.capsule.Set.Immutable<V> get(final Object o) {
       try {
         @SuppressWarnings("unchecked")
         final K key = (K) o;
-        final Optional<io.usethesource.capsule.api.Set.Immutable<V>> result =
+        final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
         if (result.isPresent()) {
@@ -2558,11 +2558,11 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
       }
     }
 
-    public io.usethesource.capsule.api.Set.Immutable<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
+    public io.usethesource.capsule.Set.Immutable<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
       try {
         @SuppressWarnings("unchecked")
         final K key = (K) o;
-        final Optional<io.usethesource.capsule.api.Set.Immutable<V>> result =
+        final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
         if (result.isPresent()) {
@@ -2642,7 +2642,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
     public boolean union(final SetMultimap<? extends K, ? extends V> setMultimap) {
       boolean modified = false;
 
-      for (io.usethesource.capsule.api.Map.Entry<? extends K, ? extends V> entry : setMultimap.entrySet()) {
+      for (io.usethesource.capsule.Map.Entry<? extends K, ? extends V> entry : setMultimap.entrySet()) {
         modified |= this.__insert(entry.getKey(), entry.getValue());
       }
 
@@ -2653,7 +2653,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         final Comparator<Object> cmp) {
       boolean modified = false;
 
-      for (io.usethesource.capsule.api.Map.Entry<? extends K, ? extends V> entry : setMultimap.entrySet()) {
+      for (io.usethesource.capsule.Map.Entry<? extends K, ? extends V> entry : setMultimap.entrySet()) {
         modified |= this.__insertEquivalent(entry.getKey(), entry.getValue(), cmp);
       }
 
@@ -2746,7 +2746,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
     }
 
     @Override
-    public Iterator<io.usethesource.capsule.api.Map.Entry<K, V>> entryIterator() {
+    public Iterator<io.usethesource.capsule.Map.Entry<K, V>> entryIterator() {
       return new TransientSetMultimapTupleIterator<>(this,
           AbstractSpecialisedImmutableMap::entryOf);
     }
@@ -2756,7 +2756,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
       return new TransientSetMultimapTupleIterator<>(this, tupleOf);
     }
 
-    private Spliterator<io.usethesource.capsule.api.Set.Immutable<V>> valueCollectionsSpliterator() {
+    private Spliterator<io.usethesource.capsule.Set.Immutable<V>> valueCollectionsSpliterator() {
       /*
        * TODO: specialize between mutable / SetMultimap.Immutable<K, V> ({@see Spliterator.IMMUTABLE})
        */
@@ -2765,7 +2765,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
           characteristics);
     }
 
-    private Stream<io.usethesource.capsule.api.Set.Immutable<V>> valueCollectionsStream() {
+    private Stream<io.usethesource.capsule.Set.Immutable<V>> valueCollectionsStream() {
       boolean isParallel = false;
       return StreamSupport.stream(valueCollectionsSpliterator(), isParallel);
     }
@@ -2802,7 +2802,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
       }
 
       @Override
-      public io.usethesource.capsule.api.Set.Immutable<V> next() {
+      public io.usethesource.capsule.Set.Immutable<V> next() {
         return super.next();
       }
 
@@ -2915,8 +2915,8 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         entrySet = new AbstractSet<java.util.Map.Entry<K, V>>() {
           @Override
           public Iterator<java.util.Map.Entry<K, V>> iterator() {
-            return new Iterator<io.usethesource.capsule.api.Map.Entry<K, V>>() {
-              private final Iterator<io.usethesource.capsule.api.Map.Entry<K, V>> i = entryIterator();
+            return new Iterator<io.usethesource.capsule.Map.Entry<K, V>>() {
+              private final Iterator<io.usethesource.capsule.Map.Entry<K, V>> i = entryIterator();
 
               @Override
               public boolean hasNext() {
@@ -2924,7 +2924,7 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
               }
 
               @Override
-              public io.usethesource.capsule.api.Map.Entry<K, V> next() {
+              public io.usethesource.capsule.Map.Entry<K, V> next() {
                 return i.next();
               }
 
@@ -2989,20 +2989,20 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
           return false;
 
         for (@SuppressWarnings("unchecked")
-             Iterator<io.usethesource.capsule.api.Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
-          io.usethesource.capsule.api.Map.Entry entry = it.next();
+             Iterator<io.usethesource.capsule.Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
+          io.usethesource.capsule.Map.Entry entry = it.next();
 
           try {
             @SuppressWarnings("unchecked")
             final K key = (K) entry.getKey();
-            final Optional<io.usethesource.capsule.api.Set.Immutable<V>> result =
+            final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
                 rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
             if (!result.isPresent()) {
               return false;
             } else {
               @SuppressWarnings("unchecked")
-              final io.usethesource.capsule.api.Set.Immutable<V> valColl = (io.usethesource.capsule.api.Set.Immutable<V>) entry.getValue();
+              final io.usethesource.capsule.Set.Immutable<V> valColl = (io.usethesource.capsule.Set.Immutable<V>) entry.getValue();
 
               if (!result.get().equals(valColl)) {
                 return false;

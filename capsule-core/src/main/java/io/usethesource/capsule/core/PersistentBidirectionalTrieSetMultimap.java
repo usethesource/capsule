@@ -13,9 +13,9 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
-import io.usethesource.capsule.api.BinaryRelation;
-import io.usethesource.capsule.api.Set;
-import io.usethesource.capsule.api.SetMultimap;
+import io.usethesource.capsule.BinaryRelation;
+import io.usethesource.capsule.Set;
+import io.usethesource.capsule.SetMultimap;
 
 public class PersistentBidirectionalTrieSetMultimap<K, V> implements
     BinaryRelation.Immutable<K, V> {
