@@ -148,4 +148,13 @@ public final class BitmapUtils {
     return c;
   }
 
+  public static boolean isBitInBitmap(byte bitmap, byte bitpos) {
+    return (bitmap != 0 && (bitmap == -1 || (bitmap & bitpos) != 0));
+    // return (bitmap & bitpos) != 0;
+  }
+
+  public static boolean isBitInBitmap(int bitmap, int bitpos) {
+    return (bitmap != 0 && (bitmap == -1 || (bitmap & bitpos) != 0));
+    // return (bitmap & bitpos) != 0;
+  }
 }

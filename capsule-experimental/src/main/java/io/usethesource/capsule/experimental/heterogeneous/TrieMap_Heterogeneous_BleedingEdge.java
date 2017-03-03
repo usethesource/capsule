@@ -7,17 +7,6 @@
  */
 package io.usethesource.capsule.experimental.heterogeneous;
 
-import static io.usethesource.capsule.util.RangecopyUtils.getFromObjectRegion;
-import static io.usethesource.capsule.util.RangecopyUtils.isBitInBitmap;
-import static io.usethesource.capsule.util.RangecopyUtils.rangecopyIntRegion;
-import static io.usethesource.capsule.util.RangecopyUtils.rangecopyObjectRegion;
-import static io.usethesource.capsule.util.RangecopyUtils.setInIntRegion;
-import static io.usethesource.capsule.util.RangecopyUtils.setInIntRegionVarArgs;
-import static io.usethesource.capsule.util.RangecopyUtils.setInObjectRegion;
-import static io.usethesource.capsule.util.RangecopyUtils.setInObjectRegionVarArgs;
-import static io.usethesource.capsule.util.RangecopyUtils.sizeOfObject;
-import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
-
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.util.AbstractCollection;
@@ -47,13 +36,23 @@ import io.usethesource.capsule.experimental.heterogeneous.TrieMap_Heterogeneous_
 import io.usethesource.capsule.util.RangecopyUtils.Companion;
 import io.usethesource.capsule.util.RangecopyUtils.EitherIntOrObject;
 
-@SuppressWarnings({"rawtypes", "restriction"})
-public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsule.api.Map.Immutable<Object, Object> {
+import static io.usethesource.capsule.util.BitmapUtils.isBitInBitmap;
+import static io.usethesource.capsule.util.RangecopyUtils.getFromObjectRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.rangecopyIntRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.rangecopyObjectRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.setInIntRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.setInIntRegionVarArgs;
+import static io.usethesource.capsule.util.RangecopyUtils.setInObjectRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.setInObjectRegionVarArgs;
+import static io.usethesource.capsule.util.RangecopyUtils.sizeOfObject;
+import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
+
+public class TrieMap_Heterogeneous_BleedingEdge implements
+    io.usethesource.capsule.api.Map.Immutable<Object, Object> {
 
   protected static final AbstractMapNode EMPTY_NODE =
       new Map0To0Node_Heterogeneous_BleedingEdge(null, (byte) 0, (byte) 0);
 
-  @SuppressWarnings("unchecked")
   private static final TrieMap_Heterogeneous_BleedingEdge EMPTY_MAP =
       new TrieMap_Heterogeneous_BleedingEdge(EMPTY_NODE, 0, 0);
 
@@ -72,13 +71,12 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final io.usethesource.capsule.api.Map.Immutable<Object, Object> of() {
     return TrieMap_Heterogeneous_BleedingEdge.EMPTY_MAP;
   }
 
-  @SuppressWarnings("unchecked")
-  public static final io.usethesource.capsule.api.Map.Immutable<Object, Object> of(Object... keyValuePairs) {
+  public static final io.usethesource.capsule.api.Map.Immutable<Object, Object> of(
+      Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
       throw new IllegalArgumentException("Length of argument list is uneven: no key/value pairs.");
     }
@@ -95,13 +93,12 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     return result;
   }
 
-  @SuppressWarnings("unchecked")
   public static final io.usethesource.capsule.api.Map.Transient<Object, Object> transientOf() {
     return TrieMap_Heterogeneous_BleedingEdge.EMPTY_MAP.asTransient();
   }
 
-  @SuppressWarnings("unchecked")
-  public static final io.usethesource.capsule.api.Map.Transient<Object, Object> transientOf(Object... keyValuePairs) {
+  public static final io.usethesource.capsule.api.Map.Transient<Object, Object> transientOf(
+      Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
       throw new IllegalArgumentException("Length of argument list is uneven: no key/value pairs.");
     }
@@ -123,7 +120,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     int hash = 0;
     int size = 0;
 
-    for (Iterator<Map.Entry<Object, Object>> it = entryIterator(); it.hasNext();) {
+    for (Iterator<Map.Entry<Object, Object>> it = entryIterator(); it.hasNext(); ) {
       final Map.Entry<Object, Object> entry = it.next();
       final Object key = entry.getKey();
       final Object val = entry.getValue();
@@ -147,9 +144,9 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     return rootNode.containsKeyEquivalent(key, transformHashCode(key), 0, cmp);
   }
 
+  @Override
   public boolean containsKey(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final Object key = (Object) o;
       return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0);
     } catch (ClassCastException unused) {
@@ -157,9 +154,9 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     }
   }
 
+  @Override
   public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
-      @SuppressWarnings("unchecked")
       final Object key = (Object) o;
       return rootNode.containsKeyEquivalent(key, transformHashCode(key.hashCode()), 0, cmp);
     } catch (ClassCastException unused) {
@@ -167,8 +164,9 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     }
   }
 
+  @Override
   public boolean containsValue(final Object o) {
-    for (Iterator<Object> iterator = valueIterator(); iterator.hasNext();) {
+    for (Iterator<Object> iterator = valueIterator(); iterator.hasNext(); ) {
       if (iterator.next().equals(o)) {
         return true;
       }
@@ -176,8 +174,9 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     return false;
   }
 
+  @Override
   public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
-    for (Iterator<Object> iterator = valueIterator(); iterator.hasNext();) {
+    for (Iterator<Object> iterator = valueIterator(); iterator.hasNext(); ) {
       if (cmp.compare(iterator.next(), o) == 0) {
         return true;
       }
@@ -185,9 +184,9 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     return false;
   }
 
+  @Override
   public Object get(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final int key = (int) o;
       final Optional<Object> result = rootNode.findByKey(key, transformHashCode(key), 0);
 
@@ -201,9 +200,9 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     }
   }
 
+  @Override
   public Object getEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
-      @SuppressWarnings("unchecked")
       final int key = (int) o;
       final Optional<Object> result = rootNode.findByKey(key, transformHashCode(key), 0, cmp);
 
@@ -217,7 +216,8 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     }
   }
 
-  public io.usethesource.capsule.api.Map.Immutable<Object, Object> __put(final int key, final int val) {
+  public io.usethesource.capsule.api.Map.Immutable<Object, Object> __put(final int key,
+      final int val) {
     final int keyHash = (int) key;
     final MapResult details = MapResult.unchanged();
 
@@ -242,8 +242,9 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     return this;
   }
 
-  public io.usethesource.capsule.api.Map.Immutable<Object, Object> __putEquivalent(final int key, final int val,
-                                                                                   final Comparator<Object> cmp) {
+  public io.usethesource.capsule.api.Map.Immutable<Object, Object> __putEquivalent(final int key,
+      final int val,
+      final Comparator<Object> cmp) {
     final int keyHash = (int) key;
     final MapResult details = MapResult.unchanged();
 
@@ -268,7 +269,9 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     return this;
   }
 
-  public io.usethesource.capsule.api.Map.Immutable<Object, Object> __put(final Object key, final Object val) {
+  @Override
+  public io.usethesource.capsule.api.Map.Immutable<Object, Object> __put(final Object key,
+      final Object val) {
     final int keyHash = key.hashCode();
     final MapResult details = MapResult.unchanged();
 
@@ -293,8 +296,10 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     return this;
   }
 
-  public io.usethesource.capsule.api.Map.Immutable<Object, Object> __putEquivalent(final Object key, final Object val,
-                                                                                   final Comparator<Object> cmp) {
+  @Override
+  public io.usethesource.capsule.api.Map.Immutable<Object, Object> __putEquivalent(final Object key,
+      final Object val,
+      final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult details = MapResult.unchanged();
 
@@ -319,15 +324,20 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     return this;
   }
 
-  public io.usethesource.capsule.api.Map.Immutable<Object, Object> __putAll(final Map<? extends Object, ? extends Object> map) {
-    final io.usethesource.capsule.api.Map.Transient<Object, Object> tmpTransient = this.asTransient();
+  @Override
+  public io.usethesource.capsule.api.Map.Immutable<Object, Object> __putAll(
+      final Map<? extends Object, ? extends Object> map) {
+    final io.usethesource.capsule.api.Map.Transient<Object, Object> tmpTransient = this
+        .asTransient();
     tmpTransient.__putAll(map);
     return tmpTransient.freeze();
   }
 
+  @Override
   public io.usethesource.capsule.api.Map.Immutable<Object, Object> __putAllEquivalent(
       final Map<? extends Object, ? extends Object> map, final Comparator<Object> cmp) {
-    final io.usethesource.capsule.api.Map.Transient<Object, Object> tmpTransient = this.asTransient();
+    final io.usethesource.capsule.api.Map.Transient<Object, Object> tmpTransient = this
+        .asTransient();
     tmpTransient.__putAllEquivalent(map, cmp);
     return tmpTransient.freeze();
   }
@@ -350,7 +360,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
   }
 
   public io.usethesource.capsule.api.Map.Immutable<Object, Object> __removeEquivalent(final int key,
-                                                                                      final Comparator<Object> cmp) {
+      final Comparator<Object> cmp) {
     final int keyHash = (int) key;
     final MapResult details = MapResult.unchanged();
 
@@ -367,6 +377,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     return this;
   }
 
+  @Override
   public io.usethesource.capsule.api.Map.Immutable<Object, Object> __remove(final Object key) {
     final int keyHash = key.hashCode();
     final MapResult details = MapResult.unchanged();
@@ -384,8 +395,10 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     return this;
   }
 
-  public io.usethesource.capsule.api.Map.Immutable<Object, Object> __removeEquivalent(final Object key,
-                                                                                      final Comparator<Object> cmp) {
+  @Override
+  public io.usethesource.capsule.api.Map.Immutable<Object, Object> __removeEquivalent(
+      final Object key,
+      final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult details = MapResult.unchanged();
 
@@ -402,38 +415,47 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     return this;
   }
 
+  @Override
   public Object put(final Object key, final Object val) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void putAll(final Map<? extends Object, ? extends Object> m) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void clear() {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public Object remove(final Object key) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public int size() {
     return cachedSize;
   }
 
+  @Override
   public boolean isEmpty() {
     return cachedSize == 0;
   }
 
+  @Override
   public Iterator<Object> keyIterator() {
     return new MapKeyIterator(rootNode);
   }
 
+  @Override
   public Iterator<Object> valueIterator() {
     return new MapValueIterator(rootNode);
   }
 
+  @Override
   public Iterator<Map.Entry<Object, Object>> entryIterator() {
     return new MapEntryIterator(rootNode);
   }
@@ -587,15 +609,15 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     } else if (other instanceof Map) {
       Map that = (Map) other;
 
-      if (this.size() != that.size())
+      if (this.size() != that.size()) {
         return false;
+      }
 
-      for (@SuppressWarnings("unchecked")
-      Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
+      for (
+          Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext(); ) {
         Map.Entry entry = it.next();
 
         try {
-          @SuppressWarnings("unchecked")
           final Object key = (Object) entry.getKey();
           final Optional<Object> result =
               rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
@@ -603,7 +625,6 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
           if (!result.isPresent()) {
             return false;
           } else {
-            @SuppressWarnings("unchecked")
             final Object val = (Object) entry.getValue();
 
             if (!result.get().equals(val)) {
@@ -741,6 +762,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
   }
 
   abstract static class Optional<T> {
+
     private static final Optional EMPTY = new Optional() {
       @Override
       boolean isPresent() {
@@ -753,7 +775,6 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       }
     };
 
-    @SuppressWarnings("unchecked")
     static <T> Optional<T> empty() {
       return EMPTY;
     }
@@ -767,6 +788,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     abstract T get();
 
     private static final class Value<T> extends Optional<T> {
+
       private final T value;
 
       private Value(T value) {
@@ -784,7 +806,9 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       }
     }
   }
+
   static final class MapResult {
+
     private EitherIntOrObject replacedValue;
     private boolean isModified;
     private boolean isReplaced;
@@ -805,7 +829,8 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       return new MapResult();
     }
 
-    private MapResult() {}
+    private MapResult() {
+    }
 
     public boolean isModified() {
       return isModified;
@@ -819,8 +844,11 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       return replacedValue;
     }
   }
+
   protected static interface INode<K, V> {
+
   }
+
   protected abstract static class AbstractMapNode {
 
     protected static final sun.misc.Unsafe initializeUnsafe() {
@@ -906,8 +934,9 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
 
         @Override
         public AbstractMapNode next() {
-          if (!hasNext())
+          if (!hasNext()) {
             throw new NoSuchElementException();
+          }
           return AbstractMapNode.this.getNode(nextIndex++);
         }
 
@@ -944,7 +973,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
 
     /**
      * The arity of this trie node (i.e. number of values and nodes stored on this level).
-     * 
+     *
      * @return sum of nodes and values stored within
      */
 
@@ -959,7 +988,8 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       while (it.hasNext()) {
         size += 1;
         it.next();
-      } ;
+      }
+      ;
       return size;
     }
 
@@ -1786,7 +1816,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
 
       if (shift >= hashCodeLength()) {
         return new HashCollisionMapNode_Heterogeneous_BleedingEdge(keyHash0,
-            (Object[]) new Object[] {key0, key1}, (Object[]) new Object[] {val0, val1});
+            (Object[]) new Object[]{key0, key1}, (Object[]) new Object[]{val0, val1});
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -1818,7 +1848,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
 
       if (shift >= hashCodeLength()) {
         return new HashCollisionMapNode_Heterogeneous_BleedingEdge(keyHash0,
-            (Object[]) new Object[] {key0, key1}, (Object[]) new Object[] {val0, val1});
+            (Object[]) new Object[]{key0, key1}, (Object[]) new Object[]{val0, val1});
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -1848,7 +1878,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
 
       if (shift >= hashCodeLength()) {
         return new HashCollisionMapNode_Heterogeneous_BleedingEdge(keyHash0,
-            (Object[]) new Object[] {key0, key1}, (Object[]) new Object[] {val0, val1});
+            (Object[]) new Object[]{key0, key1}, (Object[]) new Object[]{val0, val1});
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -1877,7 +1907,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
 
       if (shift >= hashCodeLength()) {
         return new HashCollisionMapNode_Heterogeneous_BleedingEdge(keyHash0,
-            (Object[]) new Object[] {key0, key1}, (Object[]) new Object[] {val0, val1});
+            (Object[]) new Object[]{key0, key1}, (Object[]) new Object[]{val0, val1});
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -1958,13 +1988,13 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       for (int i = 0; i < src.payloadArity(); i++) {
         if (!(unsafe.getInt(src,
             arrayOffsets[src.logicalToPhysicalIndex(ContentType.KEY, i)]) == unsafe.getInt(dst,
-                arrayOffsets[dst.logicalToPhysicalIndex(ContentType.KEY, i)]))) {
+            arrayOffsets[dst.logicalToPhysicalIndex(ContentType.KEY, i)]))) {
           return false;
         }
 
         if (!(unsafe.getInt(src,
             arrayOffsets[src.logicalToPhysicalIndex(ContentType.VAL, i)]) == unsafe.getInt(dst,
-                arrayOffsets[dst.logicalToPhysicalIndex(ContentType.VAL, i)]))) {
+            arrayOffsets[dst.logicalToPhysicalIndex(ContentType.VAL, i)]))) {
           return false;
         }
       }
@@ -2129,49 +2159,50 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
           return this;
         }
       } else
-      // check for inplace (rare) value
-      if (isBitInBitmap(rareMap, bitpos)) {
-        final int rareIndex = index(rareMap, mask, bitpos);
-        final Object currentKey = getRareKey(rareIndex);
+        // check for inplace (rare) value
+        if (isBitInBitmap(rareMap, bitpos)) {
+          final int rareIndex = index(rareMap, mask, bitpos);
+          final Object currentKey = getRareKey(rareIndex);
 
-        final Object currentVal = getRareVal(rareIndex);
+          final Object currentVal = getRareVal(rareIndex);
 
-        final AbstractMapNode subNodeNew =
-            mergeTwoKeyValPairs(currentKey, currentVal, transformHashCode(currentKey.hashCode()),
-                key, val, keyHash, shift + bitPartitionSize());
-
-        details.modified();
-        return copyAndMigrateFromRareInlineToNode(mutator, bitpos, rareIndex, nodeIndex,
-            subNodeNew);
-
-      } else
-      // check for inplace value
-      if (isBitInBitmap(dataMap, bitpos)) {
-        final int dataIndex = index(dataMap, mask, bitpos);
-        final int currentKey = getKey(dataIndex);
-
-        if (currentKey == key) {
-          final int currentVal = getVal(dataIndex);
-
-          // update mapping
-          details.updated(EitherIntOrObject.ofInt(currentVal));
-          return copyAndSetValue(mutator, bitpos, dataIndex, val);
-        } else {
-          final int currentVal = getVal(dataIndex);
-
-          final AbstractMapNode subNodeNew = mergeTwoKeyValPairs(currentKey, currentVal,
-              transformHashCode(currentKey), key, val, keyHash, shift + bitPartitionSize());
+          final AbstractMapNode subNodeNew =
+              mergeTwoKeyValPairs(currentKey, currentVal, transformHashCode(currentKey.hashCode()),
+                  key, val, keyHash, shift + bitPartitionSize());
 
           details.modified();
-          return copyAndMigrateFromInlineToNode(mutator, bitpos, dataIndex, nodeIndex, subNodeNew);
-        }
+          return copyAndMigrateFromRareInlineToNode(mutator, bitpos, rareIndex, nodeIndex,
+              subNodeNew);
 
-      } else {
-        // no value
-        details.modified();
-        int dataIndex = index(dataMap, mask, bitpos);
-        return copyAndInsertValue(mutator, bitpos, dataIndex, key, val);
-      }
+        } else
+          // check for inplace value
+          if (isBitInBitmap(dataMap, bitpos)) {
+            final int dataIndex = index(dataMap, mask, bitpos);
+            final int currentKey = getKey(dataIndex);
+
+            if (currentKey == key) {
+              final int currentVal = getVal(dataIndex);
+
+              // update mapping
+              details.updated(EitherIntOrObject.ofInt(currentVal));
+              return copyAndSetValue(mutator, bitpos, dataIndex, val);
+            } else {
+              final int currentVal = getVal(dataIndex);
+
+              final AbstractMapNode subNodeNew = mergeTwoKeyValPairs(currentKey, currentVal,
+                  transformHashCode(currentKey), key, val, keyHash, shift + bitPartitionSize());
+
+              details.modified();
+              return copyAndMigrateFromInlineToNode(mutator, bitpos, dataIndex, nodeIndex,
+                  subNodeNew);
+            }
+
+          } else {
+            // no value
+            details.modified();
+            int dataIndex = index(dataMap, mask, bitpos);
+            return copyAndInsertValue(mutator, bitpos, dataIndex, key, val);
+          }
     }
 
     @Override
@@ -2201,49 +2232,50 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
           return this;
         }
       } else
-      // check for inplace (rare) value
-      if (isBitInBitmap(rareMap, bitpos)) {
-        final int rareIndex = index(rareMap, mask, bitpos);
-        final Object currentKey = getRareKey(rareIndex);
+        // check for inplace (rare) value
+        if (isBitInBitmap(rareMap, bitpos)) {
+          final int rareIndex = index(rareMap, mask, bitpos);
+          final Object currentKey = getRareKey(rareIndex);
 
-        final Object currentVal = getRareVal(rareIndex);
+          final Object currentVal = getRareVal(rareIndex);
 
-        final AbstractMapNode subNodeNew =
-            mergeTwoKeyValPairs(currentKey, currentVal, transformHashCode(currentKey.hashCode()),
-                key, val, keyHash, shift + bitPartitionSize());
-
-        details.modified();
-        return copyAndMigrateFromRareInlineToNode(mutator, bitpos, rareIndex, nodeIndex,
-            subNodeNew);
-
-      } else
-      // check for inplace value
-      if (isBitInBitmap(dataMap, bitpos)) {
-        final int dataIndex = index(dataMap, mask, bitpos);
-        final int currentKey = getKey(dataIndex);
-
-        if (currentKey == key) {
-          final int currentVal = getVal(dataIndex);
-
-          // update mapping
-          details.updated(EitherIntOrObject.ofInt(currentVal));
-          return copyAndSetValue(mutator, bitpos, dataIndex, val);
-        } else {
-          final int currentVal = getVal(dataIndex);
-
-          final AbstractMapNode subNodeNew = mergeTwoKeyValPairs(currentKey, currentVal,
-              transformHashCode(currentKey), key, val, keyHash, shift + bitPartitionSize());
+          final AbstractMapNode subNodeNew =
+              mergeTwoKeyValPairs(currentKey, currentVal, transformHashCode(currentKey.hashCode()),
+                  key, val, keyHash, shift + bitPartitionSize());
 
           details.modified();
-          return copyAndMigrateFromInlineToNode(mutator, bitpos, dataIndex, nodeIndex, subNodeNew);
-        }
+          return copyAndMigrateFromRareInlineToNode(mutator, bitpos, rareIndex, nodeIndex,
+              subNodeNew);
 
-      } else {
-        // no value
-        details.modified();
-        int dataIndex = index(dataMap, mask, bitpos);
-        return copyAndInsertValue(mutator, bitpos, dataIndex, key, val);
-      }
+        } else
+          // check for inplace value
+          if (isBitInBitmap(dataMap, bitpos)) {
+            final int dataIndex = index(dataMap, mask, bitpos);
+            final int currentKey = getKey(dataIndex);
+
+            if (currentKey == key) {
+              final int currentVal = getVal(dataIndex);
+
+              // update mapping
+              details.updated(EitherIntOrObject.ofInt(currentVal));
+              return copyAndSetValue(mutator, bitpos, dataIndex, val);
+            } else {
+              final int currentVal = getVal(dataIndex);
+
+              final AbstractMapNode subNodeNew = mergeTwoKeyValPairs(currentKey, currentVal,
+                  transformHashCode(currentKey), key, val, keyHash, shift + bitPartitionSize());
+
+              details.modified();
+              return copyAndMigrateFromInlineToNode(mutator, bitpos, dataIndex, nodeIndex,
+                  subNodeNew);
+            }
+
+          } else {
+            // no value
+            details.modified();
+            int dataIndex = index(dataMap, mask, bitpos);
+            return copyAndInsertValue(mutator, bitpos, dataIndex, key, val);
+          }
     }
 
     @Override
@@ -2279,49 +2311,51 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
           return this;
         }
       } else
-      // check for inplace (rare) value
-      if (isBitInBitmap(rareMap, bitpos)) {
-        final int rareIndex = index(rareMap, mask, bitpos);
-        final Object currentKey = getRareKey(rareIndex);
+        // check for inplace (rare) value
+        if (isBitInBitmap(rareMap, bitpos)) {
+          final int rareIndex = index(rareMap, mask, bitpos);
+          final Object currentKey = getRareKey(rareIndex);
 
-        if (cmp.compare(currentKey, key) == 0) {
-          final Object currentVal = getRareVal(rareIndex);
+          if (cmp.compare(currentKey, key) == 0) {
+            final Object currentVal = getRareVal(rareIndex);
 
-          // update mapping
-          details.updated(EitherIntOrObject.ofObject(currentVal));
-          return copyAndSetRareValue(mutator, bitpos, rareIndex, val);
-        } else {
-          final Object currentVal = getRareVal(rareIndex);
+            // update mapping
+            details.updated(EitherIntOrObject.ofObject(currentVal));
+            return copyAndSetRareValue(mutator, bitpos, rareIndex, val);
+          } else {
+            final Object currentVal = getRareVal(rareIndex);
 
-          final AbstractMapNode subNodeNew =
-              mergeTwoKeyValPairs(currentKey, currentVal, transformHashCode(currentKey.hashCode()),
-                  key, val, keyHash, shift + bitPartitionSize());
+            final AbstractMapNode subNodeNew =
+                mergeTwoKeyValPairs(currentKey, currentVal,
+                    transformHashCode(currentKey.hashCode()),
+                    key, val, keyHash, shift + bitPartitionSize());
 
-          details.modified();
-          return copyAndMigrateFromRareInlineToNode(mutator, bitpos, rareIndex, nodeIndex,
-              subNodeNew);
-        }
+            details.modified();
+            return copyAndMigrateFromRareInlineToNode(mutator, bitpos, rareIndex, nodeIndex,
+                subNodeNew);
+          }
 
-      } else
-      // check for inplace value
-      if (isBitInBitmap(dataMap, bitpos)) {
-        final int dataIndex = index(dataMap, mask, bitpos);
-        final int currentKey = getKey(dataIndex);
+        } else
+          // check for inplace value
+          if (isBitInBitmap(dataMap, bitpos)) {
+            final int dataIndex = index(dataMap, mask, bitpos);
+            final int currentKey = getKey(dataIndex);
 
-        final int currentVal = getVal(dataIndex);
+            final int currentVal = getVal(dataIndex);
 
-        final AbstractMapNode subNodeNew = mergeTwoKeyValPairs(currentKey, currentVal,
-            transformHashCode(currentKey), key, val, keyHash, shift + bitPartitionSize());
+            final AbstractMapNode subNodeNew = mergeTwoKeyValPairs(currentKey, currentVal,
+                transformHashCode(currentKey), key, val, keyHash, shift + bitPartitionSize());
 
-        details.modified();
-        return copyAndMigrateFromInlineToNode(mutator, bitpos, dataIndex, nodeIndex, subNodeNew);
+            details.modified();
+            return copyAndMigrateFromInlineToNode(mutator, bitpos, dataIndex, nodeIndex,
+                subNodeNew);
 
-      } else {
-        // no value
-        details.modified();
-        int rareIndex = index(rareMap, mask, bitpos);
-        return copyAndInsertRareValue(mutator, bitpos, rareIndex, key, val);
-      }
+          } else {
+            // no value
+            details.modified();
+            int rareIndex = index(rareMap, mask, bitpos);
+            return copyAndInsertRareValue(mutator, bitpos, rareIndex, key, val);
+          }
     }
 
     @Override
@@ -2351,49 +2385,51 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
           return this;
         }
       } else
-      // check for inplace (rare) value
-      if (isBitInBitmap(rareMap, bitpos)) {
-        final int rareIndex = index(rareMap, mask, bitpos);
-        final Object currentKey = getRareKey(rareIndex);
+        // check for inplace (rare) value
+        if (isBitInBitmap(rareMap, bitpos)) {
+          final int rareIndex = index(rareMap, mask, bitpos);
+          final Object currentKey = getRareKey(rareIndex);
 
-        if (currentKey.equals(key)) {
-          final Object currentVal = getRareVal(rareIndex);
+          if (currentKey.equals(key)) {
+            final Object currentVal = getRareVal(rareIndex);
 
-          // update mapping
-          details.updated(EitherIntOrObject.ofObject(currentVal));
-          return copyAndSetRareValue(mutator, bitpos, rareIndex, val);
-        } else {
-          final Object currentVal = getRareVal(rareIndex);
+            // update mapping
+            details.updated(EitherIntOrObject.ofObject(currentVal));
+            return copyAndSetRareValue(mutator, bitpos, rareIndex, val);
+          } else {
+            final Object currentVal = getRareVal(rareIndex);
 
-          final AbstractMapNode subNodeNew =
-              mergeTwoKeyValPairs(currentKey, currentVal, transformHashCode(currentKey.hashCode()),
-                  key, val, keyHash, shift + bitPartitionSize());
+            final AbstractMapNode subNodeNew =
+                mergeTwoKeyValPairs(currentKey, currentVal,
+                    transformHashCode(currentKey.hashCode()),
+                    key, val, keyHash, shift + bitPartitionSize());
 
-          details.modified();
-          return copyAndMigrateFromRareInlineToNode(mutator, bitpos, rareIndex, nodeIndex,
-              subNodeNew);
-        }
+            details.modified();
+            return copyAndMigrateFromRareInlineToNode(mutator, bitpos, rareIndex, nodeIndex,
+                subNodeNew);
+          }
 
-      } else
-      // check for inplace value
-      if (isBitInBitmap(dataMap, bitpos)) {
-        final int dataIndex = index(dataMap, mask, bitpos);
-        final int currentKey = getKey(dataIndex);
+        } else
+          // check for inplace value
+          if (isBitInBitmap(dataMap, bitpos)) {
+            final int dataIndex = index(dataMap, mask, bitpos);
+            final int currentKey = getKey(dataIndex);
 
-        final int currentVal = getVal(dataIndex);
+            final int currentVal = getVal(dataIndex);
 
-        final AbstractMapNode subNodeNew = mergeTwoKeyValPairs(currentKey, currentVal,
-            transformHashCode(currentKey), key, val, keyHash, shift + bitPartitionSize());
+            final AbstractMapNode subNodeNew = mergeTwoKeyValPairs(currentKey, currentVal,
+                transformHashCode(currentKey), key, val, keyHash, shift + bitPartitionSize());
 
-        details.modified();
-        return copyAndMigrateFromInlineToNode(mutator, bitpos, dataIndex, nodeIndex, subNodeNew);
+            details.modified();
+            return copyAndMigrateFromInlineToNode(mutator, bitpos, dataIndex, nodeIndex,
+                subNodeNew);
 
-      } else {
-        // no value
-        details.modified();
-        int rareIndex = index(rareMap, mask, bitpos);
-        return copyAndInsertRareValue(mutator, bitpos, rareIndex, key, val);
-      }
+          } else {
+            // no value
+            details.modified();
+            int rareIndex = index(rareMap, mask, bitpos);
+            return copyAndInsertRareValue(mutator, bitpos, rareIndex, key, val);
+          }
     }
 
     @Override
@@ -3521,7 +3557,8 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       /*
        * Linear scan for each key, because of arbitrary element order.
        */
-      outerLoop: for (int i = 0; i < that.payloadArity(); i++) {
+      outerLoop:
+      for (int i = 0; i < that.payloadArity(); i++) {
         final Object otherKey = that.getKey(i);
         final Object otherVal = that.getVal(i);
 
@@ -3594,6 +3631,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       throw new IllegalStateException("Converted to `rarePayload`.");
     }
   }
+
   /**
    * Iterator skeleton that uses a fixed stack in depth.
    */
@@ -3608,7 +3646,6 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     private int currentStackLevel = -1;
     private final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
 
-    @SuppressWarnings("unchecked")
     AbstractMapNode[] nodes = new AbstractMapNode[MAX_DEPTH];
 
     AbstractMapIterator(AbstractMapNode rootNode) {
@@ -3786,8 +3823,10 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       throw new UnsupportedOperationException();
     }
   }
+
   static final class TransientTrieMap_Heterogeneous_BleedingEdge
       implements io.usethesource.capsule.api.Map.Transient<Object, Object> {
+
     final private AtomicReference<Thread> mutator;
     private AbstractMapNode rootNode;
     private int hashCode;
@@ -3808,7 +3847,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       int hash = 0;
       int size = 0;
 
-      for (Iterator<Map.Entry<Object, Object>> it = entryIterator(); it.hasNext();) {
+      for (Iterator<Map.Entry<Object, Object>> it = entryIterator(); it.hasNext(); ) {
         final Map.Entry<Object, Object> entry = it.next();
         final Object key = entry.getKey();
         final Object val = entry.getValue();
@@ -3820,18 +3859,22 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       return hash == targetHash && size == targetSize;
     }
 
+    @Override
     public Object put(final Object key, final Object val) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public void putAll(final Map<? extends Object, ? extends Object> m) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public void clear() {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public Object remove(final Object key) {
       throw new UnsupportedOperationException();
     }
@@ -3844,9 +3887,9 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       return rootNode.containsKeyEquivalent(key, transformHashCode(key), 0, cmp);
     }
 
+    @Override
     public boolean containsKey(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final Object key = (Object) o;
         return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0);
       } catch (ClassCastException unused) {
@@ -3854,9 +3897,9 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       }
     }
 
+    @Override
     public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
       try {
-        @SuppressWarnings("unchecked")
         final Object key = (Object) o;
         return rootNode.containsKeyEquivalent(key, transformHashCode(key.hashCode()), 0, cmp);
       } catch (ClassCastException unused) {
@@ -3864,8 +3907,9 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       }
     }
 
+    @Override
     public boolean containsValue(final Object o) {
-      for (Iterator<Object> iterator = valueIterator(); iterator.hasNext();) {
+      for (Iterator<Object> iterator = valueIterator(); iterator.hasNext(); ) {
         if (iterator.next().equals(o)) {
           return true;
         }
@@ -3873,8 +3917,9 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       return false;
     }
 
+    @Override
     public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
-      for (Iterator<Object> iterator = valueIterator(); iterator.hasNext();) {
+      for (Iterator<Object> iterator = valueIterator(); iterator.hasNext(); ) {
         if (cmp.compare(iterator.next(), o) == 0) {
           return true;
         }
@@ -3882,9 +3927,9 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       return false;
     }
 
+    @Override
     public Object get(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final int key = (int) o;
         final Optional<Object> result = rootNode.findByKey(key, transformHashCode(key), 0);
 
@@ -3898,9 +3943,9 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       }
     }
 
+    @Override
     public Object getEquivalent(final Object o, final Comparator<Object> cmp) {
       try {
-        @SuppressWarnings("unchecked")
         final int key = (int) o;
         final Optional<Object> result = rootNode.findByKey(key, transformHashCode(key), 0, cmp);
 
@@ -4002,6 +4047,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       return null;
     }
 
+    @Override
     public Object __put(final Object key, final Object val) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -4046,6 +4092,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       return null;
     }
 
+    @Override
     public Object __putEquivalent(final Object key, final Object val,
         final Comparator<Object> cmp) {
       if (mutator.get() == null) {
@@ -4091,6 +4138,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       return null;
     }
 
+    @Override
     public boolean __putAll(final Map<? extends Object, ? extends Object> map) {
       boolean modified = false;
 
@@ -4106,6 +4154,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       return modified;
     }
 
+    @Override
     public boolean __putAllEquivalent(final Map<? extends Object, ? extends Object> map,
         final Comparator<Object> cmp) {
       boolean modified = false;
@@ -4186,6 +4235,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       return null;
     }
 
+    @Override
     public Object __remove(final Object key) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -4218,6 +4268,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       return null;
     }
 
+    @Override
     public Object __removeEquivalent(final Object key, final Comparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -4250,27 +4301,33 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       return null;
     }
 
+    @Override
     public int size() {
       return cachedSize;
     }
 
+    @Override
     public boolean isEmpty() {
       return cachedSize == 0;
     }
 
+    @Override
     public Iterator<Object> keyIterator() {
       return new TransientMapKeyIterator(this);
     }
 
+    @Override
     public Iterator<Object> valueIterator() {
       return new TransientMapValueIterator(this);
     }
 
+    @Override
     public Iterator<Map.Entry<Object, Object>> entryIterator() {
       return new TransientMapEntryIterator(this);
     }
 
     public static class TransientMapKeyIterator extends MapKeyIterator {
+
       final TransientTrieMap_Heterogeneous_BleedingEdge collection;
       Object lastKey;
 
@@ -4279,10 +4336,12 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
         this.collection = collection;
       }
 
+      @Override
       public Object next() {
         return lastKey = super.next();
       }
 
+      @Override
       public void remove() {
         // TODO: test removal at iteration rigorously
         collection.__remove(lastKey);
@@ -4290,6 +4349,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
     }
 
     public static class TransientMapValueIterator extends MapValueIterator {
+
       final TransientTrieMap_Heterogeneous_BleedingEdge collection;
 
       public TransientMapValueIterator(
@@ -4298,16 +4358,19 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
         this.collection = collection;
       }
 
+      @Override
       public Object next() {
         return super.next();
       }
 
+      @Override
       public void remove() {
         throw new UnsupportedOperationException();
       }
     }
 
     public static class TransientMapEntryIterator extends MapEntryIterator {
+
       final TransientTrieMap_Heterogeneous_BleedingEdge collection;
 
       public TransientMapEntryIterator(
@@ -4316,10 +4379,12 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
         this.collection = collection;
       }
 
+      @Override
       public Map.Entry<Object, Object> next() {
         return super.next();
       }
 
+      @Override
       public void remove() {
         throw new UnsupportedOperationException();
       }
@@ -4475,15 +4540,15 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
       } else if (other instanceof Map) {
         Map that = (Map) other;
 
-        if (this.size() != that.size())
+        if (this.size() != that.size()) {
           return false;
+        }
 
-        for (@SuppressWarnings("unchecked")
-        Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
+        for (
+            Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext(); ) {
           Map.Entry entry = it.next();
 
           try {
-            @SuppressWarnings("unchecked")
             final Object key = (Object) entry.getKey();
             final Optional<Object> result =
                 rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
@@ -4491,7 +4556,6 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
             if (!result.isPresent()) {
               return false;
             } else {
-              @SuppressWarnings("unchecked")
               final Object val = (Object) entry.getValue();
 
               if (!result.get().equals(val)) {
@@ -4528,7 +4592,7 @@ public class TrieMap_Heterogeneous_BleedingEdge implements io.usethesource.capsu
   private abstract static class DataLayoutHelper extends CompactMapNode {
 
     private static final long[] arrayOffsets =
-        arrayOffsets(DataLayoutHelper.class, new String[] {"slot0", "slot1"});
+        arrayOffsets(DataLayoutHelper.class, new String[]{"slot0", "slot1"});
 
     public final Object slot0 = null;
 

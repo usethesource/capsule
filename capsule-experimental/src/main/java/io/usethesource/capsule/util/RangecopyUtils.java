@@ -7,12 +7,12 @@
  */
 package io.usethesource.capsule.util;
 
-import static io.usethesource.capsule.util.DataLayoutHelper.*;
+import static io.usethesource.capsule.util.DataLayoutHelper.addressSize;
+import static io.usethesource.capsule.util.DataLayoutHelper.isCopyMemorySupported;
+import static io.usethesource.capsule.util.DataLayoutHelper.unsafe;
 
-@SuppressWarnings({"restriction"})
 public final class RangecopyUtils {
 
-  @SuppressWarnings("unchecked")
   public static final <T> T allocateHeapRegion(final Class<? extends T> clazz) {
     try {
       final Object newInstance = unsafe.allocateInstance(clazz);
@@ -130,7 +130,6 @@ public final class RangecopyUtils {
     return unsafe.getObject(dst, dstOffset);
   }
 
-  @SuppressWarnings("unchecked")
   public final static <T> T getFromObjectRegionAndCast(Object dst, long dstOffset) {
     return (T) unsafe.getObject(dst, dstOffset);
   }
@@ -139,13 +138,11 @@ public final class RangecopyUtils {
     return unsafe.getObject(dst, dstRegionOffset + dstPos * addressSize);
   }
 
-  @SuppressWarnings("unchecked")
   public final static <T> T getFromObjectRegionAndCast(Object dst, long dstRegionOffset,
       int dstPos) {
     return (T) unsafe.getObject(dst, dstRegionOffset + dstPos * addressSize);
   }
 
-  @SuppressWarnings("unchecked")
   public final static <T> T uncheckedCast(Object o) {
     return (T) o;
   }
@@ -458,6 +455,7 @@ public final class RangecopyUtils {
   // }
 
   public static abstract class EitherIntOrObject {
+
     public enum Type {
       INT, OBJECT
     }
@@ -478,6 +476,7 @@ public final class RangecopyUtils {
   }
 
   public static final class EitherAsInt extends EitherIntOrObject {
+
     private final int value;
 
     private EitherAsInt(int value) {
@@ -502,6 +501,7 @@ public final class RangecopyUtils {
   }
 
   public static final class EitherAsObject extends EitherIntOrObject {
+
     private final Object value;
 
     private EitherAsObject(Object value) {
@@ -549,14 +549,9 @@ public final class RangecopyUtils {
     return (byte) (Byte.toUnsignedInt(rawMap1) & Byte.toUnsignedInt(rawMap2));
   }
 
-  public static boolean isBitInBitmap(byte bitmap, byte bitpos) {
-    return (bitmap != 0 && (bitmap == -1 || (bitmap & bitpos) != 0));
-    // return (bitmap & bitpos) != 0;
-  }
-
   public static int toState(byte rawMap1, byte rawMap2, byte bitpos) {
-    int bit1 = isBitInBitmap(rawMap1, bitpos) ? 1 : 0;
-    int bit2 = isBitInBitmap(rawMap2, bitpos) ? 2 : 0;
+    int bit1 = BitmapUtils.isBitInBitmap(rawMap1, bitpos) ? 1 : 0;
+    int bit2 = BitmapUtils.isBitInBitmap(rawMap2, bitpos) ? 2 : 0;
     int bit = bit1 | bit2;
     return bit;
   }
@@ -577,14 +572,9 @@ public final class RangecopyUtils {
     return rawMap1 & rawMap2;
   }
 
-  public static boolean isBitInBitmap(int bitmap, int bitpos) {
-    return (bitmap != 0 && (bitmap == -1 || (bitmap & bitpos) != 0));
-    // return (bitmap & bitpos) != 0;
-  }
-
   public static int toState(int rawMap1, int rawMap2, int bitpos) {
-    int bit1 = isBitInBitmap(rawMap1, bitpos) ? 1 : 0;
-    int bit2 = isBitInBitmap(rawMap2, bitpos) ? 2 : 0;
+    int bit1 = BitmapUtils.isBitInBitmap(rawMap1, bitpos) ? 1 : 0;
+    int bit2 = BitmapUtils.isBitInBitmap(rawMap2, bitpos) ? 2 : 0;
     int bit = bit1 | bit2;
     return bit;
   }
@@ -824,41 +814,50 @@ public final class RangecopyUtils {
       dstOffset += bytes;
     }
 
+    @Override
     public final void copy(int count) {
       advance(rangecopyObjectRegion(src.base, srcOffset, dst.base, dstOffset, count));
     }
 
+    @Override
     public final void copyWithSrcForward(int count, int srcForward) {
       advance(rangecopyObjectRegion(src.base, srcOffset + srcForward * addressSize, dst.base,
           dstOffset, count));
     }
 
+    @Override
     public final void copyWithDstForward(int count, int dstForward) {
       advance(rangecopyObjectRegion(src.base, srcOffset, dst.base,
           dstOffset + dstForward * addressSize, count));
     }
 
+    @Override
     public final void copyWithSrcDstForward(int count, int srcForward, int dstForward) {
       advance(rangecopyObjectRegion(src.base, srcOffset + srcForward * addressSize, dst.base,
           dstOffset + dstForward * addressSize, count));
     }
 
+    @Override
     public final void skipAtSrc(int count) {
       srcOffset += count * addressSize;
     }
 
+    @Override
     public final void skipAtDst(int count) {
       dstOffset += count * addressSize;
     }
 
+    @Override
     public final void insert(Object value) {
       dstOffset += setInObjectRegionVarArgs(dst.base, dstOffset, value);
     }
 
+    @Override
     public final void insertWithDstForward(Object value, int dstForward) {
       dstOffset += setInObjectRegionVarArgs(dst.base, dstOffset + dstForward * addressSize, value);
     }
 
+    @Override
     public final void put(Object value) {
       setInObjectRegionVarArgs(dst.base, dstOffset, value);
     }
@@ -886,41 +885,50 @@ public final class RangecopyUtils {
       offset += bytes;
     }
 
+    @Override
     public final void copy(int count) {
       advance(rangecopyObjectRegion(src.base, offset, dst.base, offset, count));
     }
 
+    @Override
     public final void copyWithSrcForward(int count, int srcForward) {
       advance(rangecopyObjectRegion(src.base, offset + srcForward * addressSize, dst.base, offset,
           count));
     }
 
+    @Override
     public final void copyWithDstForward(int count, int dstForward) {
       advance(rangecopyObjectRegion(src.base, offset, dst.base, offset + dstForward * addressSize,
           count));
     }
 
+    @Override
     public final void copyWithSrcDstForward(int count, int srcForward, int dstForward) {
       advance(rangecopyObjectRegion(src.base, offset + srcForward * addressSize, dst.base,
           offset + dstForward * addressSize, count));
     }
 
+    @Override
     public final void skipAtSrc(int count) {
       // throw ...
     }
 
+    @Override
     public final void skipAtDst(int count) {
       // throw ...
     }
 
+    @Override
     public final void insert(Object value) {
       // throw ...
     }
 
+    @Override
     public final void insertWithDstForward(Object value, int dstForward) {
       offset += setInObjectRegionVarArgs(dst.base, offset + dstForward * addressSize, value);
     }
 
+    @Override
     public final void put(Object value) {
       setInObjectRegionVarArgs(dst.base, offset, value);
     }

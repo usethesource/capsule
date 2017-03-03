@@ -40,7 +40,7 @@ import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
 
 import static io.usethesource.capsule.core.PersistentTrieSetMultimap.EitherSingletonOrCollection.Type.COLLECTION;
 import static io.usethesource.capsule.core.PersistentTrieSetMultimap.EitherSingletonOrCollection.Type.SINGLETON;
-import static io.usethesource.capsule.util.RangecopyUtils.isBitInBitmap;
+import static io.usethesource.capsule.util.BitmapUtils.isBitInBitmap;
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 /**
