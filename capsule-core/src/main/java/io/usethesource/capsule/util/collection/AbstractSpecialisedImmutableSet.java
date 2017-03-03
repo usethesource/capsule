@@ -50,8 +50,8 @@ public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutab
 
   public static <K> io.usethesource.capsule.Set.Immutable<K> setOf(K key1, K key2, K key3,
       K key4, K key5, K key6) {
-    final io.usethesource.capsule.Set.Transient<K> tmp = io.usethesource.capsule.Set
-        .transientOf(key1, key2, key3, key4, key5, key6);
+    final io.usethesource.capsule.Set.Transient<K> tmp = io.usethesource.capsule.Set.Transient
+        .of(key1, key2, key3, key4, key5, key6);
     return tmp.freeze();
   }
 
@@ -59,8 +59,8 @@ public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutab
     if (set instanceof AbstractSpecialisedImmutableSet) {
       return (io.usethesource.capsule.Set.Immutable<K>) set;
     } else {
-      final io.usethesource.capsule.Set.Transient<K> tmp = io.usethesource.capsule.Set
-          .transientOf();
+      final io.usethesource.capsule.Set.Transient<K> tmp = io.usethesource.capsule.Set.Transient
+          .of();
       // TODO check interface definition of Immutable.union()
       for (K item : set) {
         tmp.__insert(item);
@@ -274,7 +274,7 @@ class Set0<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.Set.Transient<K> asTransient() {
-    return io.usethesource.capsule.Set.transientOf();
+    return io.usethesource.capsule.Set.Transient.of();
   }
 
   @Override
@@ -424,7 +424,7 @@ class Set1<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.Set.Transient<K> asTransient() {
-    return io.usethesource.capsule.Set.transientOf(key1);
+    return io.usethesource.capsule.Set.Transient.of(key1);
   }
 
   @Override
@@ -601,7 +601,7 @@ class Set2<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.Set.Transient<K> asTransient() {
-    return io.usethesource.capsule.Set.transientOf(key1, key2);
+    return io.usethesource.capsule.Set.Transient.of(key1, key2);
   }
 
   @Override
@@ -801,7 +801,7 @@ class Set3<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.Set.Transient<K> asTransient() {
-    return io.usethesource.capsule.Set.transientOf(key1, key2, key3);
+    return io.usethesource.capsule.Set.Transient.of(key1, key2, key3);
   }
 
   @Override
@@ -1025,7 +1025,7 @@ class Set4<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.Set.Transient<K> asTransient() {
-    return io.usethesource.capsule.Set.transientOf(key1, key2, key3, key4);
+    return io.usethesource.capsule.Set.Transient.of(key1, key2, key3, key4);
   }
 
   @Override
@@ -1274,7 +1274,7 @@ class Set5<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.Set.Transient<K> asTransient() {
-    return io.usethesource.capsule.Set.transientOf(key1, key2, key3, key4, key5);
+    return io.usethesource.capsule.Set.Transient.of(key1, key2, key3, key4, key5);
   }
 
   @Override

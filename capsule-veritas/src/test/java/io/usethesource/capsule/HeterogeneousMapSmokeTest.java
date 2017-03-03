@@ -7,15 +7,14 @@
  */
 package io.usethesource.capsule;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.math.BigInteger;
 import java.util.Random;
 
+import io.usethesource.capsule.experimental.heterogeneous.TrieMap_Heterogeneous_BleedingEdge;
 import org.junit.Test;
 
-import io.usethesource.capsule.experimental.heterogeneous.TrieMap_Heterogeneous_BleedingEdge;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class HeterogeneousMapSmokeTest {
 

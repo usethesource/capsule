@@ -7,31 +7,6 @@
  */
 package io.usethesource.capsule.experimental.multimap;
 
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_COLLECTION;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_SINGLETON;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_EMPTY;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_NODE;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setBitPattern;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setFromNode;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setNodeOf;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setOf;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setToNode;
-import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Interlinked.EitherSingletonOrCollection.Type.COLLECTION;
-import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Interlinked.EitherSingletonOrCollection.Type.SINGLETON;
-import static io.usethesource.capsule.util.BitmapUtils.filter;
-import static io.usethesource.capsule.util.BitmapUtils.index;
-import static io.usethesource.capsule.util.DataLayoutHelper.addressSize;
-import static io.usethesource.capsule.util.DataLayoutHelper.arrayOffsets;
-import static io.usethesource.capsule.util.DataLayoutHelper.fieldOffset;
-import static io.usethesource.capsule.util.DataLayoutHelper.unsafe;
-import static io.usethesource.capsule.util.RangecopyUtils._do_rangecompareObjectRegion;
-import static io.usethesource.capsule.util.RangecopyUtils.getFromObjectRegion;
-import static io.usethesource.capsule.util.RangecopyUtils.getFromObjectRegionAndCast;
-import static io.usethesource.capsule.util.RangecopyUtils.rangecopyObjectRegion;
-import static io.usethesource.capsule.util.RangecopyUtils.setInObjectRegion;
-import static io.usethesource.capsule.util.RangecopyUtils.setInObjectRegionVarArgs;
-import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
-
 import java.util.AbstractCollection;
 import java.util.AbstractSet;
 import java.util.ArrayDeque;
@@ -60,11 +35,42 @@ import java.util.stream.StreamSupport;
 import io.usethesource.capsule.SetMultimap;
 import io.usethesource.capsule.core.PersistentTrieSet.AbstractSetNode;
 import io.usethesource.capsule.core.PersistentTrieSet.SetResult;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Interlinked.*;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Interlinked.SetMultimap0To0Node;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Interlinked.SetMultimap0To1Node;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Interlinked.SetMultimap0To2Node;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Interlinked.SetMultimap0To4Node;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Interlinked.SetMultimap1To0Node;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Interlinked.SetMultimap1To2Node;
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Interlinked.SetMultimap2To0Node;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Interlinked.EitherSingletonOrCollection.Type;
 import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.RangecopyUtils;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
+
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_COLLECTION;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_SINGLETON;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_EMPTY;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_NODE;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setBitPattern;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setFromNode;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setNodeOf;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setOf;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setToNode;
+import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Interlinked.EitherSingletonOrCollection.Type.COLLECTION;
+import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Interlinked.EitherSingletonOrCollection.Type.SINGLETON;
+import static io.usethesource.capsule.util.BitmapUtils.filter;
+import static io.usethesource.capsule.util.BitmapUtils.index;
+import static io.usethesource.capsule.util.DataLayoutHelper.addressSize;
+import static io.usethesource.capsule.util.DataLayoutHelper.arrayOffsets;
+import static io.usethesource.capsule.util.DataLayoutHelper.fieldOffset;
+import static io.usethesource.capsule.util.DataLayoutHelper.unsafe;
+import static io.usethesource.capsule.util.RangecopyUtils._do_rangecompareObjectRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.getFromObjectRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.getFromObjectRegionAndCast;
+import static io.usethesource.capsule.util.RangecopyUtils.rangecopyObjectRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.setInObjectRegion;
+import static io.usethesource.capsule.util.RangecopyUtils.setInObjectRegionVarArgs;
+import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 public class TrieSetMultimap_HHAMT_Specialized_Interlinked<K, V>
     implements SetMultimap.Immutable<K, V> {

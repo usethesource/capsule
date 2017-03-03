@@ -40,8 +40,8 @@ public class MapSmokeTest {
       persistentMapOfEmpty = targetMapClass.getMethod("of");
       persistentMapOfKeyValuePairs = targetMapClass.getMethod("of", Object[].class);
 
-      transientMapOfEmpty = targetMapClass.getMethod("transientOf");
-      transientMapOfKeyValuePairs = targetMapClass.getMethod("transientOf", Object[].class);
+      transientMapOfEmpty = targetMapClass.getMethod("of");
+      transientMapOfKeyValuePairs = targetMapClass.getMethod("of", Object[].class);
     } catch (NoSuchMethodException | SecurityException e) {
       e.printStackTrace();
       throw new RuntimeException(e);

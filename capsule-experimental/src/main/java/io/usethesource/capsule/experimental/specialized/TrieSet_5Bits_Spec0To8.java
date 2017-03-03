@@ -26,10 +26,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-@SuppressWarnings("rawtypes")
 public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Immutable<K> {
 
-  @SuppressWarnings("unchecked")
   private static final TrieSet_5Bits_Spec0To8 EMPTY_SET =
       new TrieSet_5Bits_Spec0To8(CompactSetNode.EMPTY_NODE, 0, 0);
 
@@ -61,12 +59,10 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K> io.usethesource.capsule.Set.Immutable<K> of() {
     return TrieSet_5Bits_Spec0To8.EMPTY_SET;
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K> io.usethesource.capsule.Set.Immutable<K> of(K... keys) {
     io.usethesource.capsule.Set.Immutable<K> result = TrieSet_5Bits_Spec0To8.EMPTY_SET;
 
@@ -77,14 +73,13 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
     return result;
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K> io.usethesource.capsule.Set.Transient<K> transientOf() {
     return TrieSet_5Bits_Spec0To8.EMPTY_SET.asTransient();
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K> io.usethesource.capsule.Set.Transient<K> transientOf(K... keys) {
-    final io.usethesource.capsule.Set.Transient<K> result = TrieSet_5Bits_Spec0To8.EMPTY_SET.asTransient();
+    final io.usethesource.capsule.Set.Transient<K> result = TrieSet_5Bits_Spec0To8.EMPTY_SET
+        .asTransient();
 
     for (final K key : keys) {
       result.__insert(key);
@@ -97,7 +92,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
     int hash = 0;
     int size = 0;
 
-    for (Iterator<K> it = keyIterator(); it.hasNext();) {
+    for (Iterator<K> it = keyIterator(); it.hasNext(); ) {
       final K key = it.next();
 
       hash += key.hashCode();
@@ -110,7 +105,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
   private static <K> int hashCode(AbstractSetNode<K> rootNode) {
     int hash = 0;
 
-    for (Iterator<K> it = new SetKeyIterator<>(rootNode); it.hasNext();) {
+    for (Iterator<K> it = new SetKeyIterator<>(rootNode); it.hasNext(); ) {
       hash += it.next().hashCode();
     }
 
@@ -131,9 +126,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
     return hash;
   }
 
+  @Override
   public boolean contains(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       return rootNode.contains(key, transformHashCode(key.hashCode()), 0);
     } catch (ClassCastException unused) {
@@ -141,9 +136,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
     }
   }
 
+  @Override
   public boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       return rootNode.contains(key, transformHashCode(key.hashCode()), 0, cmp);
     } catch (ClassCastException unused) {
@@ -151,9 +146,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
     }
   }
 
+  @Override
   public K get(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
@@ -167,9 +162,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
     }
   }
 
+  @Override
   public K getEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
@@ -183,6 +178,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
     }
   }
 
+  @Override
   public io.usethesource.capsule.Set.Immutable<K> __insert(final K key) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
@@ -197,7 +193,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
     return this;
   }
 
-  public io.usethesource.capsule.Set.Immutable<K> __insertEquivalent(final K key, final Comparator<Object> cmp) {
+  @Override
+  public io.usethesource.capsule.Set.Immutable<K> __insertEquivalent(final K key,
+      final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -211,19 +209,22 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
     return this;
   }
 
+  @Override
   public io.usethesource.capsule.Set.Immutable<K> __insertAll(final Set<? extends K> set) {
     final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__insertAll(set);
     return tmpTransient.freeze();
   }
 
+  @Override
   public io.usethesource.capsule.Set.Immutable<K> __insertAllEquivalent(final Set<? extends K> set,
-                                                                            final Comparator<Object> cmp) {
+      final Comparator<Object> cmp) {
     final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__insertAllEquivalent(set, cmp);
     return tmpTransient.freeze();
   }
 
+  @Override
   public io.usethesource.capsule.Set.Immutable<K> __remove(final K key) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
@@ -238,7 +239,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
     return this;
   }
 
-  public io.usethesource.capsule.Set.Immutable<K> __removeEquivalent(final K key, final Comparator<Object> cmp) {
+  @Override
+  public io.usethesource.capsule.Set.Immutable<K> __removeEquivalent(final K key,
+      final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -252,52 +255,63 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
     return this;
   }
 
+  @Override
   public io.usethesource.capsule.Set.Immutable<K> __removeAll(final Set<? extends K> set) {
     final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__removeAll(set);
     return tmpTransient.freeze();
   }
 
+  @Override
   public io.usethesource.capsule.Set.Immutable<K> __removeAllEquivalent(final Set<? extends K> set,
-                                                                            final Comparator<Object> cmp) {
+      final Comparator<Object> cmp) {
     final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__removeAllEquivalent(set, cmp);
     return tmpTransient.freeze();
   }
 
+  @Override
   public io.usethesource.capsule.Set.Immutable<K> __retainAll(final Set<? extends K> set) {
     final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__retainAll(set);
     return tmpTransient.freeze();
   }
 
-  public io.usethesource.capsule.Set.Immutable<K> __retainAllEquivalent(final io.usethesource.capsule.Set.Transient<? extends K> transientSet,
-                                                                            final Comparator<Object> cmp) {
+  @Override
+  public io.usethesource.capsule.Set.Immutable<K> __retainAllEquivalent(
+      final io.usethesource.capsule.Set.Transient<? extends K> transientSet,
+      final Comparator<Object> cmp) {
     final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__retainAllEquivalent(transientSet, cmp);
     return tmpTransient.freeze();
   }
 
+  @Override
   public boolean add(final K key) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public boolean addAll(final Collection<? extends K> c) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void clear() {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public boolean remove(final Object key) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public boolean removeAll(final Collection<?> c) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public boolean retainAll(final Collection<?> c) {
     throw new UnsupportedOperationException();
   }
@@ -322,18 +336,22 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
     return true;
   }
 
+  @Override
   public int size() {
     return cachedSize;
   }
 
+  @Override
   public boolean isEmpty() {
     return cachedSize == 0;
   }
 
+  @Override
   public Iterator<K> iterator() {
     return keyIterator();
   }
 
+  @Override
   public Iterator<K> keyIterator() {
     return new SetKeyIterator<>(rootNode);
   }
@@ -385,8 +403,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
     } else if (other instanceof Set) {
       Set that = (Set) other;
 
-      if (this.size() != that.size())
+      if (this.size() != that.size()) {
         return false;
+      }
 
       return containsAll(that);
     }
@@ -401,7 +420,8 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
 
   @Override
   public String toString() {
-    String body = stream().map(k -> k.toString()).reduce((o1, o2) -> String.join(", ", o1, o2)).orElse("");
+    String body = stream().map(k -> k.toString()).reduce((o1, o2) -> String.join(", ", o1, o2))
+        .orElse("");
     return String.format("{%s}", body);
   }
 
@@ -523,6 +543,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
   }
 
   abstract static class Optional<T> {
+
     private static final Optional EMPTY = new Optional() {
       @Override
       boolean isPresent() {
@@ -535,7 +556,6 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       }
     };
 
-    @SuppressWarnings("unchecked")
     static <T> Optional<T> empty() {
       return EMPTY;
     }
@@ -549,6 +569,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
     abstract T get();
 
     private static final class Value<T> extends Optional<T> {
+
       private final T value;
 
       private Value(T value) {
@@ -572,6 +593,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
    * `protected` when experiments are finished.
    */
   public /* protected */ static final class SetResult<K> {
+
     private K replacedValue;
     private boolean isModified;
     private boolean isReplaced;
@@ -592,7 +614,8 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return new SetResult<>();
     }
 
-    private SetResult() {}
+    private SetResult() {
+    }
 
     public boolean isModified() {
       return isModified;
@@ -608,6 +631,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
   }
 
   protected static interface INode<K, V> {
+
   }
 
   /*
@@ -680,8 +704,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
 
         @Override
         public AbstractSetNode<K> next() {
-          if (!hasNext())
+          if (!hasNext()) {
             throw new NoSuchElementException();
+          }
           return AbstractSetNode.this.getNode(nextIndex++);
         }
 
@@ -707,7 +732,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
 
     /**
      * The arity of this trie node (i.e. number of values and nodes stored on this level).
-     * 
+     *
      * @return sum of nodes and values stored within
      */
 
@@ -772,7 +797,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
     /**
      * Abstract predicate over a node's size. Value can be either {@value #SIZE_EMPTY},
      * {@value #SIZE_ONE}, or {@value #SIZE_MORE_THAN_ONE}.
-     * 
+     *
      * @return size predicate
      */
     abstract byte sizePredicate();
@@ -820,7 +845,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       if (shift >= HASH_CODE_LENGTH) {
         // throw new
         // IllegalStateException("Hash collision not yet fixed.");
-        return new HashCollisionSetNode_5Bits_Spec0To8<>(keyHash0, (K[]) new Object[] {key0, key1});
+        return new HashCollisionSetNode_5Bits_Spec0To8<>(keyHash0, (K[]) new Object[]{key0, key1});
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -851,14 +876,15 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
 
       EMPTY_NODE = new Set0To0Node_5Bits_Spec0To8<>(null, (int) 0, (int) 0);
 
-    };
+    }
+
+    ;
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
         final int nodeMap, final int dataMap, final Object[] nodes) {
       return new BitmapIndexedSetNode<>(mutator, nodeMap, dataMap, nodes);
     }
 
-    @SuppressWarnings("unchecked")
     static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator) {
       return EMPTY_NODE;
     }
@@ -934,7 +960,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
         final CompactSetNode<K> node8, final CompactSetNode<K> node9) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {node9, node8, node7, node6, node5, node4, node3, node2, node1});
+          new Object[]{node9, node8, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
@@ -999,7 +1025,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
         final CompactSetNode<K> node8) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, node8, node7, node6, node5, node4, node3, node2, node1});
+          new Object[]{key1, node8, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
@@ -1059,7 +1085,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
         final CompactSetNode<K> node7) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, node7, node6, node5, node4, node3, node2, node1});
+          new Object[]{key1, key2, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
@@ -1111,7 +1137,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
         final CompactSetNode<K> node6) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, key3, node6, node5, node4, node3, node2, node1});
+          new Object[]{key1, key2, key3, node6, node5, node4, node3, node2, node1});
     }
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
@@ -1157,7 +1183,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
         final CompactSetNode<K> node5) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, key3, key4, node5, node4, node3, node2, node1});
+          new Object[]{key1, key2, key3, key4, node5, node4, node3, node2, node1});
     }
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
@@ -1195,7 +1221,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
         final CompactSetNode<K> node3, final CompactSetNode<K> node4) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, key3, key4, key5, node4, node3, node2, node1});
+          new Object[]{key1, key2, key3, key4, key5, node4, node3, node2, node1});
     }
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
@@ -1226,7 +1252,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
         final CompactSetNode<K> node2, final CompactSetNode<K> node3) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, key3, key4, key5, key6, node3, node2, node1});
+          new Object[]{key1, key2, key3, key4, key5, key6, node3, node2, node1});
     }
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
@@ -1249,7 +1275,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
         final CompactSetNode<K> node2) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, key3, key4, key5, key6, key7, node2, node1});
+          new Object[]{key1, key2, key3, key4, key5, key6, key7, node2, node1});
     }
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
@@ -1265,14 +1291,14 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
         final CompactSetNode<K> node1) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, key3, key4, key5, key6, key7, key8, node1});
+          new Object[]{key1, key2, key3, key4, key5, key6, key7, key8, node1});
     }
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
         final int nodeMap, final int dataMap, final K key1, final K key2, final K key3,
         final K key4, final K key5, final K key6, final K key7, final K key8, final K key9) {
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, key3, key4, key5, key6, key7, key8, key9});
+          new Object[]{key1, key2, key3, key4, key5, key6, key7, key8, key9});
     }
 
     static final int index(final int bitmap, final int bitpos) {
@@ -1299,6 +1325,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
      * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
      * `protected` when experiments are finished.
      */
+    @Override
     public /* protected */ boolean contains(final K key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -1318,6 +1345,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return false;
     }
 
+    @Override
     boolean contains(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -1338,6 +1366,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return false;
     }
 
+    @Override
     Optional<K> findByKey(final K key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -1360,6 +1389,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return Optional.empty();
     }
 
+    @Override
     Optional<K> findByKey(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -1387,6 +1417,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
      * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
      * `protected` when experiments are finished.
      */
+    @Override
     public /* protected */ CompactSetNode<K> updated(final AtomicReference<Thread> mutator,
         final K key, final int keyHash, final int shift, final SetResult<K> details) {
       final int mask = mask(keyHash, shift);
@@ -1422,6 +1453,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       }
     }
 
+    @Override
     CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key, final int keyHash,
         final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -1461,6 +1493,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
      * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
      * `protected` when experiments are finished.
      */
+    @Override
     public /* protected */ CompactSetNode<K> removed(final AtomicReference<Thread> mutator,
         final K key, final int keyHash, final int shift, final SetResult<K> details) {
       final int mask = mask(keyHash, shift);
@@ -1521,6 +1554,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return this;
     }
 
+    @Override
     CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key, final int keyHash,
         final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -1708,7 +1742,8 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
   protected static abstract class CompactEmptySetNode<K> extends CompactSetNode<K> {
 
     CompactEmptySetNode(final AtomicReference<Thread> mutator, final int nodeMap,
-        final int dataMap) {}
+        final int dataMap) {
+    }
 
     @Override
     public int nodeMap() {
@@ -1751,13 +1786,11 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       assert nodeInvariant();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     K getKey(final int index) {
       return (K) nodes[TUPLE_LENGTH * index];
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     CompactSetNode<K> getNode(final int index) {
       return (CompactSetNode<K>) nodes[nodes.length - 1 - index];
@@ -2784,6 +2817,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
   }
 
   private static final class HashCollisionSetNode_5Bits_Spec0To8<K> extends CompactSetNode<K> {
+
     private final K[] keys;
 
     private final int hash;
@@ -2800,6 +2834,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
      * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
      * `protected` when experiments are finished.
      */
+    @Override
     public /* protected */ boolean contains(final K key, final int keyHash, final int shift) {
       if (this.hash == keyHash) {
         for (K k : keys) {
@@ -2811,6 +2846,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return false;
     }
 
+    @Override
     boolean contains(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       if (this.hash == keyHash) {
@@ -2823,6 +2859,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return false;
     }
 
+    @Override
     Optional<K> findByKey(final K key, final int keyHash, final int shift) {
       for (int i = 0; i < keys.length; i++) {
         final K _key = keys[i];
@@ -2833,6 +2870,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return Optional.empty();
     }
 
+    @Override
     Optional<K> findByKey(final K key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       for (int i = 0; i < keys.length; i++) {
@@ -2848,6 +2886,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
      * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
      * `protected` when experiments are finished.
      */
+    @Override
     public /* protected */ CompactSetNode<K> updated(final AtomicReference<Thread> mutator,
         final K key, final int keyHash, final int shift, final SetResult<K> details) {
       assert this.hash == keyHash;
@@ -2858,7 +2897,6 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
         }
       }
 
-      @SuppressWarnings("unchecked")
       final K[] keysNew = (K[]) new Object[this.keys.length + 1];
 
       // copy 'this.keys' and insert 1 element(s) at position
@@ -2872,6 +2910,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return new HashCollisionSetNode_5Bits_Spec0To8<>(keyHash, keysNew);
     }
 
+    @Override
     CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key, final int keyHash,
         final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
       assert this.hash == keyHash;
@@ -2882,7 +2921,6 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
         }
       }
 
-      @SuppressWarnings("unchecked")
       final K[] keysNew = (K[]) new Object[this.keys.length + 1];
 
       // copy 'this.keys' and insert 1 element(s) at position
@@ -2900,6 +2938,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
      * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
      * `protected` when experiments are finished.
      */
+    @Override
     public /* protected */ CompactSetNode<K> removed(final AtomicReference<Thread> mutator,
         final K key, final int keyHash, final int shift, final SetResult<K> details) {
       for (int idx = 0; idx < keys.length; idx++) {
@@ -2918,7 +2957,6 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
             return CompactSetNode.<K>nodeOf(mutator).updated(mutator, theOtherKey, keyHash, 0,
                 details);
           } else {
-            @SuppressWarnings("unchecked")
             final K[] keysNew = (K[]) new Object[this.keys.length - 1];
 
             // copy 'this.keys' and remove 1 element(s) at position
@@ -2933,6 +2971,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return this;
     }
 
+    @Override
     CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key, final int keyHash,
         final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
       for (int idx = 0; idx < keys.length; idx++) {
@@ -2951,7 +2990,6 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
             return CompactSetNode.<K>nodeOf(mutator).updated(mutator, theOtherKey, keyHash, 0,
                 details, cmp);
           } else {
-            @SuppressWarnings("unchecked")
             final K[] keysNew = (K[]) new Object[this.keys.length - 1];
 
             // copy 'this.keys' and remove 1 element(s) at position
@@ -3055,7 +3093,8 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       /*
        * Linear scan for each key, because of arbitrary element order.
        */
-      outerLoop: for (int i = 0; i < that.payloadArity(); i++) {
+      outerLoop:
+      for (int i = 0; i < that.payloadArity(); i++) {
         final Object otherKey = that.getKey(i);
 
         for (int j = 0; j < keys.length; j++) {
@@ -3133,7 +3172,6 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
     private int currentStackLevel = -1;
     private final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
 
-    @SuppressWarnings("unchecked")
     AbstractSetNode<K>[] nodes = new AbstractSetNode[MAX_DEPTH];
 
     AbstractSetIterator(AbstractSetNode<K> rootNode) {
@@ -3277,7 +3315,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
     }
   }
 
-  static final class TransientTrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Transient<K> {
+  static final class TransientTrieSet_5Bits_Spec0To8<K> implements
+      io.usethesource.capsule.Set.Transient<K> {
+
     final private AtomicReference<Thread> mutator;
     private AbstractSetNode<K> rootNode;
     private int hashCode;
@@ -3297,7 +3337,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       int hash = 0;
       int size = 0;
 
-      for (Iterator<K> it = keyIterator(); it.hasNext();) {
+      for (Iterator<K> it = keyIterator(); it.hasNext(); ) {
         final K key = it.next();
 
         hash += key.hashCode();
@@ -3307,33 +3347,39 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return hash == targetHash && size == targetSize;
     }
 
+    @Override
     public boolean add(final K key) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean addAll(final Collection<? extends K> c) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public void clear() {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean remove(final Object key) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean removeAll(final Collection<?> c) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean retainAll(final Collection<?> c) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean contains(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         return rootNode.contains(key, transformHashCode(key.hashCode()), 0);
       } catch (ClassCastException unused) {
@@ -3341,9 +3387,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       }
     }
 
+    @Override
     public boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         return rootNode.contains(key, transformHashCode(key.hashCode()), 0, cmp);
       } catch (ClassCastException unused) {
@@ -3351,9 +3397,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       }
     }
 
+    @Override
     public K get(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
@@ -3367,9 +3413,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       }
     }
 
+    @Override
     public K getEquivalent(final Object o, final Comparator<Object> cmp) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         final Optional<K> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
@@ -3384,6 +3430,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       }
     }
 
+    @Override
     public boolean __insert(final K key) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -3414,6 +3461,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return false;
     }
 
+    @Override
     public boolean __insertEquivalent(final K key, final Comparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -3444,6 +3492,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return false;
     }
 
+    @Override
     public boolean __insertAll(final Set<? extends K> set) {
       boolean modified = false;
 
@@ -3454,6 +3503,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return modified;
     }
 
+    @Override
     public boolean __insertAllEquivalent(final Set<? extends K> set, final Comparator<Object> cmp) {
       boolean modified = false;
 
@@ -3464,6 +3514,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return modified;
     }
 
+    @Override
     public boolean __remove(final K key) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -3493,6 +3544,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return false;
     }
 
+    @Override
     public boolean __removeEquivalent(final K key, final Comparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -3522,6 +3574,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return false;
     }
 
+    @Override
     public boolean __removeAll(final Set<? extends K> set) {
       boolean modified = false;
 
@@ -3532,6 +3585,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return modified;
     }
 
+    @Override
     public boolean __removeAllEquivalent(final Set<? extends K> set, final Comparator<Object> cmp) {
       boolean modified = false;
 
@@ -3542,6 +3596,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return modified;
     }
 
+    @Override
     public boolean __retainAll(final Set<? extends K> set) {
       boolean modified = false;
 
@@ -3556,7 +3611,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return modified;
     }
 
-    public boolean __retainAllEquivalent(final io.usethesource.capsule.Set.Transient<? extends K> transientSet,
+    @Override
+    public boolean __retainAllEquivalent(
+        final io.usethesource.capsule.Set.Transient<? extends K> transientSet,
         final Comparator<Object> cmp) {
       boolean modified = false;
 
@@ -3591,23 +3648,28 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       return true;
     }
 
+    @Override
     public int size() {
       return cachedSize;
     }
 
+    @Override
     public boolean isEmpty() {
       return cachedSize == 0;
     }
 
+    @Override
     public Iterator<K> iterator() {
       return keyIterator();
     }
 
+    @Override
     public Iterator<K> keyIterator() {
       return new TransientSetKeyIterator<>(this);
     }
 
     public static class TransientSetKeyIterator<K> extends SetKeyIterator<K> {
+
       final TransientTrieSet_5Bits_Spec0To8<K> collection;
       K lastKey;
 
@@ -3616,10 +3678,12 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
         this.collection = collection;
       }
 
+      @Override
       public K next() {
         return lastKey = super.next();
       }
 
+      @Override
       public void remove() {
         // TODO: test removal at iteration rigorously
         collection.__remove(lastKey);
@@ -3673,8 +3737,9 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       } else if (other instanceof Set) {
         Set that = (Set) other;
 
-        if (this.size() != that.size())
+        if (this.size() != that.size()) {
           return false;
+        }
 
         return containsAll(that);
       }

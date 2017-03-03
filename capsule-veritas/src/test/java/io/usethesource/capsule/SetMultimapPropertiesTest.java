@@ -7,9 +7,8 @@
  */
 package io.usethesource.capsule;
 
-import org.junit.runner.RunWith;
-
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
+import org.junit.runner.RunWith;
 
 @RunWith(JUnitQuickcheck.class)
 public class SetMultimapPropertiesTest extends

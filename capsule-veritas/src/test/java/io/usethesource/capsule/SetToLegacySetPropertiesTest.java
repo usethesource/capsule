@@ -7,13 +7,11 @@
  */
 package io.usethesource.capsule;
 
+import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
+import io.usethesource.capsule.core.converter.SetToLegacySetConverter;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-
-import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-
-import io.usethesource.capsule.core.converter.SetToLegacySetConverter;
 
 @Ignore("Semantic difference in equality is not yet resolved.")
 @RunWith(Suite.class)

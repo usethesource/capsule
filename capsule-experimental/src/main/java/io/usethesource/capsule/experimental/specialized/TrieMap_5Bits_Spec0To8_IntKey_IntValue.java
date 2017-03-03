@@ -7,8 +7,6 @@
  */
 package io.usethesource.capsule.experimental.specialized;
 
-import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
-
 import java.text.DecimalFormat;
 import java.util.AbstractCollection;
 import java.util.AbstractSet;
@@ -24,6 +22,8 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 @SuppressWarnings("rawtypes")
 public class TrieMap_5Bits_Spec0To8_IntKey_IntValue

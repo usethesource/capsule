@@ -1045,8 +1045,8 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
 
       if (shift >= HASH_CODE_LENGTH) {
         return AbstractHashCollisionNode
-            .of(keyHash0, key0, io.usethesource.capsule.Set.of(val0), key1,
-                io.usethesource.capsule.Set.of(val1));
+            .of(keyHash0, key0, io.usethesource.capsule.Set.Immutable.of(val0), key1,
+                io.usethesource.capsule.Set.Immutable.of(val1));
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -1081,7 +1081,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
 
       if (shift >= HASH_CODE_LENGTH) {
         return AbstractHashCollisionNode
-            .of(keyHash0, key1, io.usethesource.capsule.Set.of(val1), key0, valColl0);
+            .of(keyHash0, key1, io.usethesource.capsule.Set.Immutable.of(val1), key0, valColl0);
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -1235,7 +1235,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
         if (cmp.equals(currentKey, key)) {
 
           final V currentVal = getSingletonValue(index);
-          return Optional.of(io.usethesource.capsule.Set.of(currentVal));
+          return Optional.of(io.usethesource.capsule.Set.Immutable.of(currentVal));
         }
 
         return Optional.empty();
@@ -1292,7 +1292,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
           } else {
             // migrate from singleton to collection
             final io.usethesource.capsule.Set.Immutable<V> valColl =
-                io.usethesource.capsule.Set.of(currentVal, val);
+                io.usethesource.capsule.Set.Immutable.of(currentVal, val);
 
             details.modified();
             return copyAndMigrateFromSingletonToCollection(mutator, bitpos, currentKey, valColl);
@@ -2809,7 +2809,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
 
         Stream.Builder<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> builder =
             Stream.<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>>builder()
-                .add(entryOf(key, io.usethesource.capsule.Set.of(val)));
+                .add(entryOf(key, io.usethesource.capsule.Set.Immutable.of(val)));
 
         collisionContent.forEach(builder::accept);
 
@@ -2821,7 +2821,8 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
         assert updatedCollisionContent.containsAll(collisionContent);
         // assert updatedCollisionContent.contains(entryOf(key, setOf(val)));
         assert updatedCollisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())
-            && Objects.equals(io.usethesource.capsule.Set.of(val), entry.getValue())).findAny()
+            && Objects.equals(io.usethesource.capsule.Set.Immutable.of(val), entry.getValue()))
+            .findAny()
             .isPresent();
 
         details.modified();
@@ -2867,7 +2868,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
 
         Stream.Builder<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> builder =
             Stream.<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>>builder()
-                .add(entryOf(key, io.usethesource.capsule.Set.of(val)));
+                .add(entryOf(key, io.usethesource.capsule.Set.Immutable.of(val)));
 
         collisionContent.forEach(builder::accept);
 
@@ -3092,7 +3093,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
       } else {
         // TODO: check case distinction
         if (currentValueSingletonCursor < currentValueSingletonLength) {
-          return io.usethesource.capsule.Set
+          return io.usethesource.capsule.Set.Immutable
               .of(currentValueNode.getSingletonValue(currentValueSingletonCursor++));
         } else {
           return currentValueNode.getCollectionValue(currentValueCollectionCursor++);

@@ -46,6 +46,18 @@ public interface Set<K> extends java.util.Set<K>, SetEq<K> {
 
     Set.Transient<K> asTransient();
 
+    static <K> Set.Immutable<K> of() {
+      return PersistentTrieSet.of();
+    }
+
+    static <K> Set.Immutable<K> of(K item) {
+      return PersistentTrieSet.of(item);
+    }
+
+    static <K> Set.Immutable<K> of(K item0, K item1) {
+      return PersistentTrieSet.of(item0, item1);
+    }
+
   }
 
   interface Transient<K> extends Set<K>, SetEq.Transient<K> {
@@ -62,85 +74,73 @@ public interface Set<K> extends java.util.Set<K>, SetEq<K> {
 
     Set.Immutable<K> freeze();
 
-  }
+    static <K> Set.Transient<K> of() {
+      return PersistentTrieSet.transientOf();
+    }
 
-  static <K> Set.Immutable<K> of() {
-    return PersistentTrieSet.of();
-  }
+    static <K> Set.Transient<K> of(K key0) {
+      final Set.Transient<K> tmp = Set.Transient.of();
 
-  static <K> Set.Immutable<K> of(K item) {
-    return PersistentTrieSet.of(item);
-  }
+      tmp.__insert(key0);
 
-  static <K> Set.Immutable<K> of(K item0, K item1) {
-    return PersistentTrieSet.of(item0, item1);
-  }
+      return tmp;
+    }
 
-  static <K> Set.Transient<K> transientOf() {
-    return PersistentTrieSet.transientOf();
-  }
+    static <K> Set.Transient<K> of(K key0, K key1) {
+      final Set.Transient<K> tmp = Set.Transient.of();
 
-  static <K> Set.Transient<K> transientOf(K key0) {
-    final Set.Transient<K> tmp = Set.transientOf();
+      tmp.__insert(key0);
+      tmp.__insert(key1);
 
-    tmp.__insert(key0);
+      return tmp;
+    }
 
-    return tmp;
-  }
+    static <K> Set.Transient<K> of(K key0, K key1, K key2) {
+      final Set.Transient<K> tmp = Set.Transient.of();
 
-  static <K> Set.Transient<K> transientOf(K key0, K key1) {
-    final Set.Transient<K> tmp = Set.transientOf();
+      tmp.__insert(key0);
+      tmp.__insert(key1);
+      tmp.__insert(key2);
 
-    tmp.__insert(key0);
-    tmp.__insert(key1);
+      return tmp;
+    }
 
-    return tmp;
-  }
+    static <K> Set.Transient<K> of(K key0, K key1, K key2, K key3) {
+      final Set.Transient<K> tmp = Set.Transient.of();
 
-  static <K> Set.Transient<K> transientOf(K key0, K key1, K key2) {
-    final Set.Transient<K> tmp = Set.transientOf();
+      tmp.__insert(key0);
+      tmp.__insert(key1);
+      tmp.__insert(key2);
+      tmp.__insert(key3);
 
-    tmp.__insert(key0);
-    tmp.__insert(key1);
-    tmp.__insert(key2);
+      return tmp;
+    }
 
-    return tmp;
-  }
+    static <K> Set.Transient<K> of(K key0, K key1, K key2, K key3, K key4) {
+      final Set.Transient<K> tmp = Set.Transient.of();
 
-  static <K> Set.Transient<K> transientOf(K key0, K key1, K key2, K key3) {
-    final Set.Transient<K> tmp = Set.transientOf();
+      tmp.__insert(key0);
+      tmp.__insert(key1);
+      tmp.__insert(key2);
+      tmp.__insert(key3);
+      tmp.__insert(key4);
 
-    tmp.__insert(key0);
-    tmp.__insert(key1);
-    tmp.__insert(key2);
-    tmp.__insert(key3);
+      return tmp;
+    }
 
-    return tmp;
-  }
+    static <K> Set.Transient<K> of(K key0, K key1, K key2, K key3, K key4, K key5) {
+      final Set.Transient<K> tmp = Set.Transient.of();
 
-  static <K> Set.Transient<K> transientOf(K key0, K key1, K key2, K key3, K key4) {
-    final Set.Transient<K> tmp = Set.transientOf();
+      tmp.__insert(key0);
+      tmp.__insert(key1);
+      tmp.__insert(key2);
+      tmp.__insert(key3);
+      tmp.__insert(key4);
+      tmp.__insert(key5);
 
-    tmp.__insert(key0);
-    tmp.__insert(key1);
-    tmp.__insert(key2);
-    tmp.__insert(key3);
-    tmp.__insert(key4);
+      return tmp;
+    }
 
-    return tmp;
-  }
-
-  static <K> Set.Transient<K> transientOf(K key0, K key1, K key2, K key3, K key4, K key5) {
-    final Set.Transient<K> tmp = Set.transientOf();
-
-    tmp.__insert(key0);
-    tmp.__insert(key1);
-    tmp.__insert(key2);
-    tmp.__insert(key3);
-    tmp.__insert(key4);
-    tmp.__insert(key5);
-
-    return tmp;
   }
 
 }

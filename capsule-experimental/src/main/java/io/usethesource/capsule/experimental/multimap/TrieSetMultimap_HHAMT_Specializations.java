@@ -7,11 +7,11 @@
  */
 package io.usethesource.capsule.experimental.multimap;
 
-import static io.usethesource.capsule.util.DataLayoutHelper.addressSize;
-
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized.CompactSetMultimapNode;
+
+import static io.usethesource.capsule.util.DataLayoutHelper.addressSize;
 
 @SuppressWarnings({"unused", "rawtypes", "restriction"})
 public class TrieSetMultimap_HHAMT_Specializations {

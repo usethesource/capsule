@@ -7,11 +7,11 @@
  */
 package io.usethesource.capsule.experimental.multimap;
 
-import static io.usethesource.capsule.util.DataLayoutHelper.addressSize;
-
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.CompactSetMultimapNode;
+
+import static io.usethesource.capsule.util.DataLayoutHelper.addressSize;
 
 @SuppressWarnings({"rawtypes", "restriction"})
 public class TrieSetMultimap_HHAMT_Specializations_Path_Interlinked {

@@ -7,18 +7,30 @@
  */
 package io.usethesource.capsule.experimental.multimap;
 
-import io.usethesource.capsule.SetMultimap;
-import io.usethesource.capsule.util.EqualityComparator;
-import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
-import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableSet;
-
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.AbstractCollection;
+import java.util.AbstractSet;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import io.usethesource.capsule.SetMultimap;
+import io.usethesource.capsule.util.EqualityComparator;
+import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
+import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableSet;
 
 @SuppressWarnings("rawtypes")
 public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Immutable<K, V> {

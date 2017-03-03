@@ -7,14 +7,14 @@
  */
 package io.usethesource.capsule.core.converter;
 
-import io.usethesource.capsule.api.experimental.Set;
-import io.usethesource.capsule.util.collection.AbstractImmutableSet;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+
+import io.usethesource.capsule.api.experimental.Set;
+import io.usethesource.capsule.util.collection.AbstractImmutableSet;
 
 public class SetToLegacySetConverter<K> extends AbstractImmutableSet<K> implements io.usethesource.capsule.Set.Immutable<K> {
 

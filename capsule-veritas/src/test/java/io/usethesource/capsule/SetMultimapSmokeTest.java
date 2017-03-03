@@ -7,13 +7,14 @@
  */
 package io.usethesource.capsule;
 
-import static org.junit.Assert.*;
-
 import java.util.Collection;
 
+import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked;
 import org.junit.Test;
 
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class SetMultimapSmokeTest {
 
@@ -22,7 +23,8 @@ public class SetMultimapSmokeTest {
   @Test
   public void testInsertTwoTuplesThatShareSameKey() {
     SetMultimap.Immutable<Integer, String> map =
-        TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.<Integer, String>of().__insert(1, "x").__insert(1, "y");
+        TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.<Integer, String>of().__insert(1, "x")
+            .__insert(1, "y");
 
     assertEquals(2, map.size());
     assertTrue(map.containsKey(1));
@@ -49,7 +51,8 @@ public class SetMultimapSmokeTest {
   @Test
   public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyXY() {
     SetMultimap.Immutable<Integer, String> map =
-        TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.<Integer, String>of().__insert(1, "x").__insert(1, "y")
+        TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.<Integer, String>of().__insert(1, "x")
+            .__insert(1, "y")
             .__remove(1, "x").__remove(1, "y");
 
     assertEquals(0, map.size());
@@ -59,7 +62,8 @@ public class SetMultimapSmokeTest {
   @Test
   public void testInsertTwoTuplesThatShareSameKey_Iterate() {
     SetMultimap.Immutable<Integer, String> map =
-        TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.<Integer, String>of().__insert(1, "x").__insert(1, "y");
+        TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.<Integer, String>of().__insert(1, "x")
+            .__insert(1, "y");
 
     Collection<String> values = map.values();
 

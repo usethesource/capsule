@@ -24,7 +24,7 @@ public class CapsuleCollectors {
 
   public static <T> Collector<T, ?, io.usethesource.capsule.Set.Immutable<T>> toSet() {
     return new DefaultCollector<>(
-        (Supplier<io.usethesource.capsule.Set.Transient<T>>) io.usethesource.capsule.Set::transientOf,
+        (Supplier<io.usethesource.capsule.Set.Transient<T>>) io.usethesource.capsule.Set.Transient::of,
         io.usethesource.capsule.Set.Transient::__insert, (left, right) -> {
       left.__insertAll(right);
       return left;
@@ -39,7 +39,7 @@ public class CapsuleCollectors {
 //        (map, element) -> map.__put(keyMapper.apply(element), valueMapper.apply(element));
 //
 //    return new DefaultCollector<>(
-//        io.usethesource.capsule.Map::transientOf,
+//        io.usethesource.capsule.Map::of,
 //        accumulator,
 //        (left, right) -> {
 //          left.union(right);
@@ -55,7 +55,7 @@ public class CapsuleCollectors {
         (map, element) -> map.__insert(keyMapper.apply(element), valueMapper.apply(element));
 
     return new DefaultCollector<>(
-        SetMultimap::transientOf,
+        SetMultimap.Transient::of,
         accumulator,
         (left, right) -> {
           left.union(right);

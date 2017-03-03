@@ -36,20 +36,20 @@ public class TernaryTrieSetMultimap<T, U, V, R extends Triple<T, U, V>>
      *
      * TODO: make classes of nested multi-maps configurable.
      */
-    return new TernaryTrieSetMultimap<>(SetMultimap.of(), SetMultimap.of(),
-        SetMultimap.of());
+    return new TernaryTrieSetMultimap<>(SetMultimap.Immutable.of(), SetMultimap.Immutable.of(),
+        SetMultimap.Immutable.of());
   }
 
   // @SuppressWarnings("unchecked")
   // public static final <T, U, V, R extends Triple<T, U, V>> TernaryRelation.Transient<T, U, V, R>
-  // transientOf() {
+  // of() {
   // /*
   // * NOTE: uses default multi-map to create nested forward and backward maps.
   // *
   // * TODO: make classes of nested multi-maps configurable.
   // */
-  // return new TransientTernaryTrieSetMultimap<>(SetMultimap.transientOf(),
-  // SetMultimap.transientOf(), SetMultimap.transientOf());
+  // return new TransientTernaryTrieSetMultimap<>(SetMultimap.of(),
+  // SetMultimap.of(), SetMultimap.of());
   // }
 
   private static <T, U, V, R extends Triple<T, U, V>> TernaryTrieSetMultimap<T, U, V, R> wireTuple(

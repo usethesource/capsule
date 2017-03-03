@@ -46,6 +46,18 @@ public interface Map<K, V> extends java.util.Map<K, V>, MapEq<K, V> {
 
     Map.Transient<K, V> asTransient();
 
+    static <K, V> Map.Immutable<K, V> of() {
+      return PersistentTrieMap.of();
+    }
+
+    static <K, V> Map.Immutable<K, V> of(K key, V value) {
+      return PersistentTrieMap.of(key, value);
+    }
+
+    static <K, V> Map.Immutable<K, V> of(K key0, V value0, K key1, V value1) {
+      return PersistentTrieMap.of(key0, value0, key1, value1);
+    }
+
   }
 
   interface Transient<K, V> extends Map<K, V>, MapEq.Transient<K, V> {
@@ -79,89 +91,77 @@ public interface Map<K, V> extends java.util.Map<K, V>, MapEq<K, V> {
 
     Map.Immutable<K, V> freeze();
 
-  }
+    static <K, V> Map.Transient<K, V> of() {
+      return PersistentTrieMap.transientOf();
+    }
 
-  static <K, V> Map.Immutable<K, V> of() {
-    return PersistentTrieMap.of();
-  }
+    static <K, V> Map.Transient<K, V> of(K key0, V value0) {
+      final Map.Transient<K, V> tmp = Map.Transient.of();
 
-  static <K, V> Map.Immutable<K, V> of(K key, V value) {
-    return PersistentTrieMap.of(key, value);
-  }
+      tmp.__put(key0, value0);
 
-  static <K, V> Map.Immutable<K, V> of(K key0, V value0, K key1, V value1) {
-    return PersistentTrieMap.of(key0, value0, key1, value1);
-  }
+      return tmp;
+    }
 
-  static <K, V> Map.Transient<K, V> transientOf() {
-    return PersistentTrieMap.transientOf();
-  }
+    static <K, V> Map.Transient<K, V> of(K key0, V value0, K key1, V value1) {
+      final Map.Transient<K, V> tmp = Map.Transient.of();
 
-  static <K, V> Map.Transient<K, V> transientOf(K key0, V value0) {
-    final Map.Transient<K, V> tmp = Map.transientOf();
+      tmp.__put(key0, value0);
+      tmp.__put(key1, value1);
 
-    tmp.__put(key0, value0);
+      return tmp;
+    }
 
-    return tmp;
-  }
+    static <K, V> Map.Transient<K, V> of(K key0, V value0, K key1, V value1, K key2,
+        V value2) {
+      final Map.Transient<K, V> tmp = Map.Transient.of();
 
-  static <K, V> Map.Transient<K, V> transientOf(K key0, V value0, K key1, V value1) {
-    final Map.Transient<K, V> tmp = Map.transientOf();
+      tmp.__put(key0, value0);
+      tmp.__put(key1, value1);
+      tmp.__put(key2, value2);
 
-    tmp.__put(key0, value0);
-    tmp.__put(key1, value1);
+      return tmp;
+    }
 
-    return tmp;
-  }
+    static <K, V> Map.Transient<K, V> of(K key0, V value0, K key1, V value1, K key2,
+        V value2, K key3, V value3) {
+      final Map.Transient<K, V> tmp = Map.Transient.of();
 
-  static <K, V> Map.Transient<K, V> transientOf(K key0, V value0, K key1, V value1, K key2,
-      V value2) {
-    final Map.Transient<K, V> tmp = Map.transientOf();
+      tmp.__put(key0, value0);
+      tmp.__put(key1, value1);
+      tmp.__put(key2, value2);
+      tmp.__put(key3, value3);
 
-    tmp.__put(key0, value0);
-    tmp.__put(key1, value1);
-    tmp.__put(key2, value2);
+      return tmp;
+    }
 
-    return tmp;
-  }
+    static <K, V> Map.Transient<K, V> of(K key0, V value0, K key1, V value1, K key2,
+        V value2, K key3, V value3, K key4, V value4) {
+      final Map.Transient<K, V> tmp = Map.Transient.of();
 
-  static <K, V> Map.Transient<K, V> transientOf(K key0, V value0, K key1, V value1, K key2,
-      V value2, K key3, V value3) {
-    final Map.Transient<K, V> tmp = Map.transientOf();
+      tmp.__put(key0, value0);
+      tmp.__put(key1, value1);
+      tmp.__put(key2, value2);
+      tmp.__put(key3, value3);
+      tmp.__put(key4, value4);
 
-    tmp.__put(key0, value0);
-    tmp.__put(key1, value1);
-    tmp.__put(key2, value2);
-    tmp.__put(key3, value3);
+      return tmp;
+    }
 
-    return tmp;
-  }
+    static <K, V> Map.Transient<K, V> of(K key0, V value0, K key1, V value1, K key2,
+        V value2, K key3, V value3, K key4, V value4, K key5, V value5) {
+      final Map.Transient<K, V> tmp = Map.Transient.of();
 
-  static <K, V> Map.Transient<K, V> transientOf(K key0, V value0, K key1, V value1, K key2,
-      V value2, K key3, V value3, K key4, V value4) {
-    final Map.Transient<K, V> tmp = Map.transientOf();
+      tmp.__put(key0, value0);
+      tmp.__put(key1, value1);
+      tmp.__put(key2, value2);
+      tmp.__put(key3, value3);
+      tmp.__put(key4, value4);
+      tmp.__put(key5, value5);
 
-    tmp.__put(key0, value0);
-    tmp.__put(key1, value1);
-    tmp.__put(key2, value2);
-    tmp.__put(key3, value3);
-    tmp.__put(key4, value4);
+      return tmp;
+    }
 
-    return tmp;
-  }
-
-  static <K, V> Map.Transient<K, V> transientOf(K key0, V value0, K key1, V value1, K key2,
-      V value2, K key3, V value3, K key4, V value4, K key5, V value5) {
-    final Map.Transient<K, V> tmp = Map.transientOf();
-
-    tmp.__put(key0, value0);
-    tmp.__put(key1, value1);
-    tmp.__put(key2, value2);
-    tmp.__put(key3, value3);
-    tmp.__put(key4, value4);
-    tmp.__put(key5, value5);
-
-    return tmp;
   }
 
 }

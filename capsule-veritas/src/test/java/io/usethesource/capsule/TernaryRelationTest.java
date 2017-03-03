@@ -7,12 +7,10 @@
  */
 package io.usethesource.capsule;
 
-import org.junit.runner.RunWith;
-
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-
 import io.usethesource.capsule.api.Triple;
 import io.usethesource.capsule.experimental.relation.TernaryTrieSetMultimap;
+import org.junit.runner.RunWith;
 
 @RunWith(JUnitQuickcheck.class)
 public class TernaryRelationTest extends AbstractSetProperties<Triple<Integer, Integer, Integer>, TernaryTrieSetMultimap<Integer, Integer, Integer, Triple<Integer, Integer, Integer>>> {

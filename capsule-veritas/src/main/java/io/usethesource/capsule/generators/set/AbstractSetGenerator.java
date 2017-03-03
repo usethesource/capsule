@@ -7,13 +7,6 @@
  */
 package io.usethesource.capsule.generators.set;
 
-import static com.pholser.junit.quickcheck.internal.Lists.removeFrom;
-import static com.pholser.junit.quickcheck.internal.Lists.shrinksOfOneItem;
-import static com.pholser.junit.quickcheck.internal.Ranges.checkRange;
-import static com.pholser.junit.quickcheck.internal.Ranges.Type.INTEGRAL;
-import static com.pholser.junit.quickcheck.internal.Sequences.halving;
-import static java.util.stream.StreamSupport.stream;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -26,10 +19,15 @@ import com.pholser.junit.quickcheck.generator.GenerationStatus;
 import com.pholser.junit.quickcheck.generator.Shrink;
 import com.pholser.junit.quickcheck.generator.Size;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
-
 import io.usethesource.capsule.Set;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
+import static com.pholser.junit.quickcheck.internal.Lists.removeFrom;
+import static com.pholser.junit.quickcheck.internal.Lists.shrinksOfOneItem;
+import static com.pholser.junit.quickcheck.internal.Ranges.Type.INTEGRAL;
+import static com.pholser.junit.quickcheck.internal.Ranges.checkRange;
+import static com.pholser.junit.quickcheck.internal.Sequences.halving;
+import static java.util.stream.StreamSupport.stream;
+
 public abstract class AbstractSetGenerator<T extends Set.Immutable>
     extends ComponentizedGenerator<T> {
 
@@ -78,14 +76,13 @@ public abstract class AbstractSetGenerator<T extends Set.Immutable>
     return items;
   }
 
-  @Override public List<T> doShrink(SourceOfRandomness random, T larger) {
-    @SuppressWarnings("unchecked")
+  @Override
+  public List<T> doShrink(SourceOfRandomness random, T larger) {
     List<Object> asList = new ArrayList<>(larger);
 
     List<T> shrinks = new ArrayList<>();
     shrinks.addAll(removals(asList));
 
-    @SuppressWarnings("unchecked")
     Shrink<Object> generator = (Shrink<Object>) componentGenerators().get(0);
 
     List<List<Object>> oneItemShrinks = shrinksOfOneItem(random, asList, generator);
@@ -111,7 +108,6 @@ public abstract class AbstractSetGenerator<T extends Set.Immutable>
         .collect(Collectors.toList());
   }
 
-  @SuppressWarnings("unchecked")
   private T convert(List<?> items) {
     T converted = empty();
     for (Object item : items) {

@@ -22,10 +22,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-@SuppressWarnings("rawtypes")
-public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Set.Immutable<Integer> {
+public class TrieSet_5Bits_Spec0To8_IntKey implements
+    io.usethesource.capsule.Set.Immutable<Integer> {
 
-  @SuppressWarnings("unchecked")
   private static final TrieSet_5Bits_Spec0To8_IntKey EMPTY_SET =
       new TrieSet_5Bits_Spec0To8_IntKey(CompactSetNode.EMPTY_NODE, 0, 0);
 
@@ -44,12 +43,10 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final io.usethesource.capsule.Set.Immutable<Integer> of() {
     return TrieSet_5Bits_Spec0To8_IntKey.EMPTY_SET;
   }
 
-  @SuppressWarnings("unchecked")
   public static final io.usethesource.capsule.Set.Immutable<Integer> of(int... keys) {
     io.usethesource.capsule.Set.Immutable<Integer> result = TrieSet_5Bits_Spec0To8_IntKey.EMPTY_SET;
 
@@ -60,12 +57,10 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
     return result;
   }
 
-  @SuppressWarnings("unchecked")
   public static final io.usethesource.capsule.Set.Transient<Integer> transientOf() {
     return TrieSet_5Bits_Spec0To8_IntKey.EMPTY_SET.asTransient();
   }
 
-  @SuppressWarnings("unchecked")
   public static final io.usethesource.capsule.Set.Transient<Integer> transientOf(int... keys) {
     final io.usethesource.capsule.Set.Transient<Integer> result =
         TrieSet_5Bits_Spec0To8_IntKey.EMPTY_SET.asTransient();
@@ -81,7 +76,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
     int hash = 0;
     int size = 0;
 
-    for (Iterator<java.lang.Integer> it = keyIterator(); it.hasNext();) {
+    for (Iterator<java.lang.Integer> it = keyIterator(); it.hasNext(); ) {
       final int key = it.next();
 
       hash += (int) key;
@@ -95,9 +90,9 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
     return hash;
   }
 
+  @Override
   public boolean contains(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final int key = (int) o;
       return rootNode.contains(key, transformHashCode(key), 0);
     } catch (ClassCastException unused) {
@@ -105,9 +100,9 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
     }
   }
 
+  @Override
   public boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
-      @SuppressWarnings("unchecked")
       final int key = (int) o;
       return rootNode.contains(key, transformHashCode(key), 0, cmp);
     } catch (ClassCastException unused) {
@@ -115,9 +110,9 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
     }
   }
 
+  @Override
   public java.lang.Integer get(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final int key = (int) o;
       final Optional<java.lang.Integer> result = rootNode.findByKey(key, transformHashCode(key), 0);
 
@@ -131,9 +126,9 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
     }
   }
 
+  @Override
   public java.lang.Integer getEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
-      @SuppressWarnings("unchecked")
       final int key = (int) o;
       final Optional<java.lang.Integer> result =
           rootNode.findByKey(key, transformHashCode(key), 0, cmp);
@@ -148,6 +143,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
     }
   }
 
+  @Override
   public io.usethesource.capsule.Set.Immutable<Integer> __insert(final java.lang.Integer key) {
     final int keyHash = key.hashCode();
     final SetResult details = SetResult.unchanged();
@@ -162,8 +158,10 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
     return this;
   }
 
-  public io.usethesource.capsule.Set.Immutable<Integer> __insertEquivalent(final java.lang.Integer key,
-                                                                               final Comparator<Object> cmp) {
+  @Override
+  public io.usethesource.capsule.Set.Immutable<Integer> __insertEquivalent(
+      final java.lang.Integer key,
+      final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult details = SetResult.unchanged();
 
@@ -177,12 +175,15 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
     return this;
   }
 
-  public io.usethesource.capsule.Set.Immutable<Integer> __insertAll(final Set<? extends java.lang.Integer> set) {
+  @Override
+  public io.usethesource.capsule.Set.Immutable<Integer> __insertAll(
+      final Set<? extends java.lang.Integer> set) {
     final io.usethesource.capsule.Set.Transient<Integer> tmpTransient = this.asTransient();
     tmpTransient.__insertAll(set);
     return tmpTransient.freeze();
   }
 
+  @Override
   public io.usethesource.capsule.Set.Immutable<Integer> __insertAllEquivalent(
       final Set<? extends java.lang.Integer> set, final Comparator<Object> cmp) {
     final io.usethesource.capsule.Set.Transient<Integer> tmpTransient = this.asTransient();
@@ -190,6 +191,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
     return tmpTransient.freeze();
   }
 
+  @Override
   public io.usethesource.capsule.Set.Immutable<Integer> __remove(final java.lang.Integer key) {
     final int keyHash = key.hashCode();
     final SetResult details = SetResult.unchanged();
@@ -204,8 +206,10 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
     return this;
   }
 
-  public io.usethesource.capsule.Set.Immutable<Integer> __removeEquivalent(final java.lang.Integer key,
-                                                                               final Comparator<Object> cmp) {
+  @Override
+  public io.usethesource.capsule.Set.Immutable<Integer> __removeEquivalent(
+      final java.lang.Integer key,
+      final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult details = SetResult.unchanged();
 
@@ -219,12 +223,15 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
     return this;
   }
 
-  public io.usethesource.capsule.Set.Immutable<Integer> __removeAll(final Set<? extends java.lang.Integer> set) {
+  @Override
+  public io.usethesource.capsule.Set.Immutable<Integer> __removeAll(
+      final Set<? extends java.lang.Integer> set) {
     final io.usethesource.capsule.Set.Transient<Integer> tmpTransient = this.asTransient();
     tmpTransient.__removeAll(set);
     return tmpTransient.freeze();
   }
 
+  @Override
   public io.usethesource.capsule.Set.Immutable<Integer> __removeAllEquivalent(
       final Set<? extends java.lang.Integer> set, final Comparator<Object> cmp) {
     final io.usethesource.capsule.Set.Transient<Integer> tmpTransient = this.asTransient();
@@ -232,39 +239,49 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
     return tmpTransient.freeze();
   }
 
-  public io.usethesource.capsule.Set.Immutable<Integer> __retainAll(final Set<? extends java.lang.Integer> set) {
+  @Override
+  public io.usethesource.capsule.Set.Immutable<Integer> __retainAll(
+      final Set<? extends java.lang.Integer> set) {
     final io.usethesource.capsule.Set.Transient<Integer> tmpTransient = this.asTransient();
     tmpTransient.__retainAll(set);
     return tmpTransient.freeze();
   }
 
+  @Override
   public io.usethesource.capsule.Set.Immutable<Integer> __retainAllEquivalent(
-      final io.usethesource.capsule.Set.Transient<? extends Integer> transientSet, final Comparator<Object> cmp) {
+      final io.usethesource.capsule.Set.Transient<? extends Integer> transientSet,
+      final Comparator<Object> cmp) {
     final io.usethesource.capsule.Set.Transient<Integer> tmpTransient = this.asTransient();
     tmpTransient.__retainAllEquivalent(transientSet, cmp);
     return tmpTransient.freeze();
   }
 
+  @Override
   public boolean add(final java.lang.Integer key) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public boolean addAll(final Collection<? extends java.lang.Integer> c) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void clear() {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public boolean remove(final Object key) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public boolean removeAll(final Collection<?> c) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public boolean retainAll(final Collection<?> c) {
     throw new UnsupportedOperationException();
   }
@@ -289,18 +306,22 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
     return true;
   }
 
+  @Override
   public int size() {
     return cachedSize;
   }
 
+  @Override
   public boolean isEmpty() {
     return cachedSize == 0;
   }
 
+  @Override
   public Iterator<java.lang.Integer> iterator() {
     return keyIterator();
   }
 
+  @Override
   public Iterator<java.lang.Integer> keyIterator() {
     return new SetKeyIterator(rootNode);
   }
@@ -352,8 +373,9 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
     } else if (other instanceof Set) {
       Set that = (Set) other;
 
-      if (this.size() != that.size())
+      if (this.size() != that.size()) {
         return false;
+      }
 
       return containsAll(that);
     }
@@ -481,6 +503,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
   }
 
   abstract static class Optional<T> {
+
     private static final Optional EMPTY = new Optional() {
       @Override
       boolean isPresent() {
@@ -493,7 +516,6 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       }
     };
 
-    @SuppressWarnings("unchecked")
     static <T> Optional<T> empty() {
       return EMPTY;
     }
@@ -507,6 +529,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
     abstract T get();
 
     private static final class Value<T> extends Optional<T> {
+
       private final T value;
 
       private Value(T value) {
@@ -526,6 +549,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
   }
 
   static final class SetResult {
+
     private int replacedValue;
     private boolean isModified;
     private boolean isReplaced;
@@ -546,7 +570,8 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return new SetResult();
     }
 
-    private SetResult() {}
+    private SetResult() {
+    }
 
     public boolean isModified() {
       return isModified;
@@ -562,6 +587,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
   }
 
   protected static interface INode<K, V> {
+
   }
 
   protected static abstract class AbstractSetNode
@@ -616,8 +642,9 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
 
         @Override
         public AbstractSetNode next() {
-          if (!hasNext())
+          if (!hasNext()) {
             throw new NoSuchElementException();
+          }
           return AbstractSetNode.this.getNode(nextIndex++);
         }
 
@@ -643,7 +670,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
 
     /**
      * The arity of this trie node (i.e. number of values and nodes stored on this level).
-     * 
+     *
      * @return sum of nodes and values stored within
      */
 
@@ -690,7 +717,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
     /**
      * Abstract predicate over a node's size. Value can be either {@value #SIZE_EMPTY},
      * {@value #SIZE_ONE}, or {@value #SIZE_MORE_THAN_ONE}.
-     * 
+     *
      * @return size predicate
      */
     abstract byte sizePredicate();
@@ -739,7 +766,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
         // throw new
         // IllegalStateException("Hash collision not yet fixed.");
         return new HashCollisionSetNode_5Bits_Spec0To8_IntKey(keyHash0,
-            (int[]) new int[] {key0, key1});
+            (int[]) new int[]{key0, key1});
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -770,14 +797,15 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
 
       EMPTY_NODE = new Set0To0Node_5Bits_Spec0To8_IntKey(null, (int) 0, (int) 0);
 
-    };
+    }
+
+    ;
 
     static final CompactSetNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
         final int dataMap, final Object[] nodes) {
       return new BitmapIndexedSetNode(mutator, nodeMap, dataMap, nodes);
     }
 
-    @SuppressWarnings("unchecked")
     static final CompactSetNode nodeOf(AtomicReference<Thread> mutator) {
       return EMPTY_NODE;
     }
@@ -848,7 +876,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
         final CompactSetNode node9) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {node9, node8, node7, node6, node5, node4, node3, node2, node1});
+          new Object[]{node9, node8, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final CompactSetNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
@@ -909,7 +937,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
         final CompactSetNode node6, final CompactSetNode node7, final CompactSetNode node8) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, node8, node7, node6, node5, node4, node3, node2, node1});
+          new Object[]{key1, node8, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final CompactSetNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
@@ -965,7 +993,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
         final CompactSetNode node5, final CompactSetNode node6, final CompactSetNode node7) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, node7, node6, node5, node4, node3, node2, node1});
+          new Object[]{key1, key2, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final CompactSetNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
@@ -1016,7 +1044,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
         final CompactSetNode node4, final CompactSetNode node5, final CompactSetNode node6) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, key3, node6, node5, node4, node3, node2, node1});
+          new Object[]{key1, key2, key3, node6, node5, node4, node3, node2, node1});
     }
 
     static final CompactSetNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
@@ -1060,7 +1088,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
         final CompactSetNode node4, final CompactSetNode node5) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, key3, key4, node5, node4, node3, node2, node1});
+          new Object[]{key1, key2, key3, key4, node5, node4, node3, node2, node1});
     }
 
     static final CompactSetNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
@@ -1098,7 +1126,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
         final CompactSetNode node3, final CompactSetNode node4) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, key3, key4, key5, node4, node3, node2, node1});
+          new Object[]{key1, key2, key3, key4, key5, node4, node3, node2, node1});
     }
 
     static final CompactSetNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
@@ -1128,7 +1156,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
         final CompactSetNode node3) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, key3, key4, key5, key6, node3, node2, node1});
+          new Object[]{key1, key2, key3, key4, key5, key6, node3, node2, node1});
     }
 
     static final CompactSetNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
@@ -1151,7 +1179,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
         final CompactSetNode node2) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, key3, key4, key5, key6, key7, node2, node1});
+          new Object[]{key1, key2, key3, key4, key5, key6, key7, node2, node1});
     }
 
     static final CompactSetNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
@@ -1167,14 +1195,14 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
         final CompactSetNode node1) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, key3, key4, key5, key6, key7, key8, node1});
+          new Object[]{key1, key2, key3, key4, key5, key6, key7, key8, node1});
     }
 
     static final CompactSetNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
         final int dataMap, final int key1, final int key2, final int key3, final int key4,
         final int key5, final int key6, final int key7, final int key8, final int key9) {
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, key2, key3, key4, key5, key6, key7, key8, key9});
+          new Object[]{key1, key2, key3, key4, key5, key6, key7, key8, key9});
     }
 
     static final int index(final int bitmap, final int bitpos) {
@@ -1197,6 +1225,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return getNode(nodeIndex(bitpos));
     }
 
+    @Override
     boolean contains(final int key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -1216,6 +1245,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return false;
     }
 
+    @Override
     boolean contains(final int key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -1236,6 +1266,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return false;
     }
 
+    @Override
     Optional<java.lang.Integer> findByKey(final int key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -1258,6 +1289,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return Optional.empty();
     }
 
+    @Override
     Optional<java.lang.Integer> findByKey(final int key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -1281,6 +1313,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return Optional.empty();
     }
 
+    @Override
     CompactSetNode updated(final AtomicReference<Thread> mutator, final int key, final int keyHash,
         final int shift, final SetResult details) {
       final int mask = mask(keyHash, shift);
@@ -1316,6 +1349,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       }
     }
 
+    @Override
     CompactSetNode updated(final AtomicReference<Thread> mutator, final int key, final int keyHash,
         final int shift, final SetResult details, final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -1351,6 +1385,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       }
     }
 
+    @Override
     CompactSetNode removed(final AtomicReference<Thread> mutator, final int key, final int keyHash,
         final int shift, final SetResult details) {
       final int mask = mask(keyHash, shift);
@@ -1411,6 +1446,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return this;
     }
 
+    @Override
     CompactSetNode removed(final AtomicReference<Thread> mutator, final int key, final int keyHash,
         final int shift, final SetResult details, final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -1598,7 +1634,8 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
   protected static abstract class CompactEmptySetNode extends CompactSetNode {
 
     CompactEmptySetNode(final AtomicReference<Thread> mutator, final int nodeMap,
-        final int dataMap) {}
+        final int dataMap) {
+    }
 
     @Override
     public int nodeMap() {
@@ -1646,7 +1683,6 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return (int) nodes[TUPLE_LENGTH * index];
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     CompactSetNode getNode(final int index) {
       return (CompactSetNode) nodes[nodes.length - 1 - index];
@@ -2673,6 +2709,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
   }
 
   private static final class HashCollisionSetNode_5Bits_Spec0To8_IntKey extends CompactSetNode {
+
     private final int[] keys;
 
     private final int hash;
@@ -2685,6 +2722,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       assert payloadArity() >= 2;
     }
 
+    @Override
     boolean contains(final int key, final int keyHash, final int shift) {
       if (this.hash == keyHash) {
         for (int k : keys) {
@@ -2696,6 +2734,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return false;
     }
 
+    @Override
     boolean contains(final int key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       if (this.hash == keyHash) {
@@ -2708,6 +2747,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return false;
     }
 
+    @Override
     Optional<java.lang.Integer> findByKey(final int key, final int keyHash, final int shift) {
       for (int i = 0; i < keys.length; i++) {
         final int _key = keys[i];
@@ -2718,6 +2758,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return Optional.empty();
     }
 
+    @Override
     Optional<java.lang.Integer> findByKey(final int key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       for (int i = 0; i < keys.length; i++) {
@@ -2729,6 +2770,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return Optional.empty();
     }
 
+    @Override
     CompactSetNode updated(final AtomicReference<Thread> mutator, final int key, final int keyHash,
         final int shift, final SetResult details) {
       assert this.hash == keyHash;
@@ -2752,6 +2794,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return new HashCollisionSetNode_5Bits_Spec0To8_IntKey(keyHash, keysNew);
     }
 
+    @Override
     CompactSetNode updated(final AtomicReference<Thread> mutator, final int key, final int keyHash,
         final int shift, final SetResult details, final Comparator<Object> cmp) {
       assert this.hash == keyHash;
@@ -2775,6 +2818,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return new HashCollisionSetNode_5Bits_Spec0To8_IntKey(keyHash, keysNew);
     }
 
+    @Override
     CompactSetNode removed(final AtomicReference<Thread> mutator, final int key, final int keyHash,
         final int shift, final SetResult details) {
       for (int idx = 0; idx < keys.length; idx++) {
@@ -2807,6 +2851,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return this;
     }
 
+    @Override
     CompactSetNode removed(final AtomicReference<Thread> mutator, final int key, final int keyHash,
         final int shift, final SetResult details, final Comparator<Object> cmp) {
       for (int idx = 0; idx < keys.length; idx++) {
@@ -2929,7 +2974,8 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       /*
        * Linear scan for each key, because of arbitrary element order.
        */
-      outerLoop: for (int i = 0; i < that.payloadArity(); i++) {
+      outerLoop:
+      for (int i = 0; i < that.payloadArity(); i++) {
         final int otherKey = that.getKey(i);
 
         for (int j = 0; j < keys.length; j++) {
@@ -3007,7 +3053,6 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
     private int currentStackLevel = -1;
     private final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
 
-    @SuppressWarnings("unchecked")
     AbstractSetNode[] nodes = new AbstractSetNode[MAX_DEPTH];
 
     AbstractSetIterator(AbstractSetNode rootNode) {
@@ -3154,6 +3199,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
 
   static final class TransientTrieSet_5Bits_Spec0To8_IntKey
       implements io.usethesource.capsule.Set.Transient<Integer> {
+
     final private AtomicReference<Thread> mutator;
     private AbstractSetNode rootNode;
     private int hashCode;
@@ -3174,7 +3220,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       int hash = 0;
       int size = 0;
 
-      for (Iterator<java.lang.Integer> it = keyIterator(); it.hasNext();) {
+      for (Iterator<java.lang.Integer> it = keyIterator(); it.hasNext(); ) {
         final int key = it.next();
 
         hash += (int) key;
@@ -3184,33 +3230,39 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return hash == targetHash && size == targetSize;
     }
 
+    @Override
     public boolean add(final java.lang.Integer key) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean addAll(final Collection<? extends java.lang.Integer> c) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public void clear() {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean remove(final Object key) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean removeAll(final Collection<?> c) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean retainAll(final Collection<?> c) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean contains(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final int key = (int) o;
         return rootNode.contains(key, transformHashCode(key), 0);
       } catch (ClassCastException unused) {
@@ -3218,9 +3270,9 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       }
     }
 
+    @Override
     public boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
       try {
-        @SuppressWarnings("unchecked")
         final int key = (int) o;
         return rootNode.contains(key, transformHashCode(key), 0, cmp);
       } catch (ClassCastException unused) {
@@ -3228,9 +3280,9 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       }
     }
 
+    @Override
     public java.lang.Integer get(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final int key = (int) o;
         final Optional<java.lang.Integer> result =
             rootNode.findByKey(key, transformHashCode(key), 0);
@@ -3245,9 +3297,9 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       }
     }
 
+    @Override
     public java.lang.Integer getEquivalent(final Object o, final Comparator<Object> cmp) {
       try {
-        @SuppressWarnings("unchecked")
         final int key = (int) o;
         final Optional<java.lang.Integer> result =
             rootNode.findByKey(key, transformHashCode(key), 0, cmp);
@@ -3262,6 +3314,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       }
     }
 
+    @Override
     public boolean __insert(final java.lang.Integer key) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -3292,6 +3345,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return false;
     }
 
+    @Override
     public boolean __insertEquivalent(final java.lang.Integer key, final Comparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -3322,6 +3376,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return false;
     }
 
+    @Override
     public boolean __insertAll(final Set<? extends java.lang.Integer> set) {
       boolean modified = false;
 
@@ -3332,6 +3387,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return modified;
     }
 
+    @Override
     public boolean __insertAllEquivalent(final Set<? extends java.lang.Integer> set,
         final Comparator<Object> cmp) {
       boolean modified = false;
@@ -3343,6 +3399,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return modified;
     }
 
+    @Override
     public boolean __remove(final java.lang.Integer key) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -3372,6 +3429,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return false;
     }
 
+    @Override
     public boolean __removeEquivalent(final java.lang.Integer key, final Comparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -3401,6 +3459,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return false;
     }
 
+    @Override
     public boolean __removeAll(final Set<? extends java.lang.Integer> set) {
       boolean modified = false;
 
@@ -3411,6 +3470,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return modified;
     }
 
+    @Override
     public boolean __removeAllEquivalent(final Set<? extends java.lang.Integer> set,
         final Comparator<Object> cmp) {
       boolean modified = false;
@@ -3422,6 +3482,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return modified;
     }
 
+    @Override
     public boolean __retainAll(final Set<? extends java.lang.Integer> set) {
       boolean modified = false;
 
@@ -3436,6 +3497,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return modified;
     }
 
+    @Override
     public boolean __retainAllEquivalent(
         final io.usethesource.capsule.Set.Transient<? extends Integer> transientSet,
         final Comparator<Object> cmp) {
@@ -3472,23 +3534,28 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       return true;
     }
 
+    @Override
     public int size() {
       return cachedSize;
     }
 
+    @Override
     public boolean isEmpty() {
       return cachedSize == 0;
     }
 
+    @Override
     public Iterator<java.lang.Integer> iterator() {
       return keyIterator();
     }
 
+    @Override
     public Iterator<java.lang.Integer> keyIterator() {
       return new TransientSetKeyIterator(this);
     }
 
     public static class TransientSetKeyIterator extends SetKeyIterator {
+
       final TransientTrieSet_5Bits_Spec0To8_IntKey collection;
       int lastKey;
 
@@ -3497,10 +3564,12 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
         this.collection = collection;
       }
 
+      @Override
       public java.lang.Integer next() {
         return lastKey = super.next();
       }
 
+      @Override
       public void remove() {
         // TODO: test removal at iteration rigorously
         collection.__remove(lastKey);
@@ -3555,8 +3624,9 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements io.usethesource.capsule.Se
       } else if (other instanceof Set) {
         Set that = (Set) other;
 
-        if (this.size() != that.size())
+        if (this.size() != that.size()) {
           return false;
+        }
 
         return containsAll(that);
       }

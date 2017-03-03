@@ -7,8 +7,6 @@
  */
 package io.usethesource.capsule.experimental.lazy;
 
-import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
-
 import java.text.DecimalFormat;
 import java.util.AbstractCollection;
 import java.util.AbstractSet;
@@ -25,6 +23,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.usethesource.capsule.util.ArrayUtils;
+
+import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 @SuppressWarnings("rawtypes")
 public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule.Map.Immutable<K, V> {

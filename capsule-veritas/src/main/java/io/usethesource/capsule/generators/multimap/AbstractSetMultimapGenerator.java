@@ -19,7 +19,6 @@ import io.usethesource.capsule.SetMultimap;
 import static com.pholser.junit.quickcheck.internal.Ranges.Type.INTEGRAL;
 import static com.pholser.junit.quickcheck.internal.Ranges.checkRange;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class AbstractSetMultimapGenerator<T extends SetMultimap.Immutable>
     extends ComponentizedGenerator<T> {
 

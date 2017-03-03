@@ -62,9 +62,9 @@ public abstract class AbstractSpecialisedImmutableMap<K, V>
   public static <K, V> io.usethesource.capsule.Map.Immutable<K, V> mapOf(K key1, V val1, K key2,
       V val2, K key3, V val3,
       K key4, V val4, K key5, V val5, K key6, V val6) {
-    final io.usethesource.capsule.Map.Transient<K, V> tmp = io.usethesource.capsule.Map
-        .transientOf(key1, val1, key2, val2, key3, val3,
-            key4, val4, key5, val5, key6, val6);
+    final io.usethesource.capsule.Map.Transient<K, V> tmp = io.usethesource.capsule.Map.
+        Transient.of(key1, val1, key2, val2, key3, val3,
+        key4, val4, key5, val5, key6, val6);
     return tmp.freeze();
   }
 
@@ -72,8 +72,8 @@ public abstract class AbstractSpecialisedImmutableMap<K, V>
     if (map instanceof io.usethesource.capsule.Map.Immutable) {
       return (io.usethesource.capsule.Map.Immutable<K, V>) map;
     } else {
-      final io.usethesource.capsule.Map.Transient<K, V> tmp = io.usethesource.capsule.Map
-          .transientOf();
+      final io.usethesource.capsule.Map.Transient<K, V> tmp = io.usethesource.capsule.Map.
+          Transient.of();
       tmp.__putAll(map);
       return tmp.freeze();
     }
@@ -316,7 +316,7 @@ class Map0<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
 
   @Override
   public io.usethesource.capsule.Map.Transient<K, V> asTransient() {
-    return io.usethesource.capsule.Map.transientOf();
+    return io.usethesource.capsule.Map.Transient.of();
   }
 
   @Override
@@ -501,7 +501,7 @@ class Map1<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
 
   @Override
   public io.usethesource.capsule.Map.Transient<K, V> asTransient() {
-    return io.usethesource.capsule.Map.transientOf(key1, val1);
+    return io.usethesource.capsule.Map.Transient.of(key1, val1);
   }
 
   @Override
@@ -722,7 +722,7 @@ class Map2<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
 
   @Override
   public io.usethesource.capsule.Map.Transient<K, V> asTransient() {
-    return io.usethesource.capsule.Map.transientOf(key1, val1, key2, val2);
+    return io.usethesource.capsule.Map.Transient.of(key1, val1, key2, val2);
   }
 
   @Override
@@ -974,7 +974,7 @@ class Map3<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
 
   @Override
   public io.usethesource.capsule.Map.Transient<K, V> asTransient() {
-    return io.usethesource.capsule.Map.transientOf(key1, val1, key2, val2, key3, val3);
+    return io.usethesource.capsule.Map.Transient.of(key1, val1, key2, val2, key3, val3);
   }
 
   @Override
@@ -1259,8 +1259,8 @@ class Map4<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
 
   @Override
   public io.usethesource.capsule.Map.Transient<K, V> asTransient() {
-    return io.usethesource.capsule.Map
-        .transientOf(key1, val1, key2, val2, key3, val3, key4, val4);
+    return io.usethesource.capsule.Map.
+        Transient.of(key1, val1, key2, val2, key3, val3, key4, val4);
   }
 
   @Override
@@ -1578,8 +1578,8 @@ class Map5<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
 
   @Override
   public io.usethesource.capsule.Map.Transient<K, V> asTransient() {
-    return io.usethesource.capsule.Map
-        .transientOf(key1, val1, key2, val2, key3, val3, key4, val4, key5, val5);
+    return io.usethesource.capsule.Map.
+        Transient.of(key1, val1, key2, val2, key3, val3, key4, val4, key5, val5);
   }
 
   @Override

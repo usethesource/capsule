@@ -35,8 +35,8 @@ public class PersistentBidirectionalTrieSetMultimap<K, V> implements
      *
      * TODO: make classes of nested multi-maps configurable.
      */
-    return new PersistentBidirectionalTrieSetMultimap<K, V>(SetMultimap.of(),
-        SetMultimap.of());
+    return new PersistentBidirectionalTrieSetMultimap<K, V>(SetMultimap.Immutable.of(),
+        SetMultimap.Immutable.of());
   }
 
   public static final <K, V> BinaryRelation.Transient<K, V> transientOf() {
@@ -45,8 +45,8 @@ public class PersistentBidirectionalTrieSetMultimap<K, V> implements
      *
      * TODO: make classes of nested multi-maps configurable.
      */
-    return new TransientBidirectionalTrieSetMultimap<K, V>(SetMultimap.transientOf(),
-        SetMultimap.transientOf());
+    return new TransientBidirectionalTrieSetMultimap<K, V>(SetMultimap.Transient.of(),
+        SetMultimap.Transient.of());
   }
 
   private static <K, V> BinaryRelation.Immutable<K, V> wireTuple(K key, V value,

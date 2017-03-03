@@ -9,9 +9,8 @@ package io.usethesource.capsule.generators.set;
 
 import com.pholser.junit.quickcheck.generator.GenerationStatus;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
-
-import io.usethesource.capsule.core.experimental.TrieSet;
 import io.usethesource.capsule.core.converter.SetToLegacySetConverter;
+import io.usethesource.capsule.core.experimental.TrieSet;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class SetToLegacySetGenerator<K> extends AbstractSetGenerator<SetToLegacySetConverter<K>> {

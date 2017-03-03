@@ -11,18 +11,26 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 import io.usethesource.capsule.core.PersistentTrieSet;
-import javax.tools.*;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.model.InitializationError;
-
 import io.usethesource.capsule.experimental.lazy.TrieSet_5Bits_LazyHashCode;
 import io.usethesource.capsule.experimental.memoized.TrieSet_5Bits_Memoized_LazyHashCode;
 import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8;
+import javax.tools.FileObject;
+import javax.tools.ForwardingJavaFileManager;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileManager;
+import javax.tools.JavaFileObject;
+import javax.tools.SimpleJavaFileObject;
+import javax.tools.ToolProvider;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.model.InitializationError;
 
 @RunWith(Suite.class)
 public class RuntimeCodeGenerationTestSuite extends Suite {
@@ -32,7 +40,7 @@ public class RuntimeCodeGenerationTestSuite extends Suite {
   }
 
   private static Class<?>[] getClasses(Class<?> setupClass) {
-     final List<Class<?>> suiteClasses = new ArrayList<Class<?>>();
+    final List<Class<?>> suiteClasses = new ArrayList<Class<?>>();
 
     // @formatter:off
     final List<Class> componentTypes = Arrays.asList(Integer.class);
@@ -46,15 +54,16 @@ public class RuntimeCodeGenerationTestSuite extends Suite {
     final String javaClassNameTemplate = "io.usethesource.capsule.$CLASS_NAME$$COMPONENT_TYPE$SetPropertiesTest";
     final String javaSourceCodeTemplate =
         "package io.usethesource.capsule;\n" +
-        "import $QUALIFIED_CLASS_NAME$;\n" +
-        "@org.junit.runner.RunWith(com.pholser.junit.quickcheck.runner.JUnitQuickcheck.class)\n" +
-        "public class $CLASS_NAME$$COMPONENT_TYPE$SetPropertiesTest extends AbstractSetProperties<$COMPONENT_TYPE$, $CLASS_NAME$<$COMPONENT_TYPE$>> {\n" +
-        "  public $CLASS_NAME$$COMPONENT_TYPE$SetPropertiesTest() {\n" +
-        "    super($CLASS_NAME$.class);\n" +
-        "  }\n" +
-        "}\n";
+            "import $QUALIFIED_CLASS_NAME$;\n" +
+            "@org.junit.runner.RunWith(com.pholser.junit.quickcheck.runner.JUnitQuickcheck.class)\n"
+            +
+            "public class $CLASS_NAME$$COMPONENT_TYPE$SetPropertiesTest extends AbstractSetProperties<$COMPONENT_TYPE$, $CLASS_NAME$<$COMPONENT_TYPE$>> {\n"
+            +
+            "  public $CLASS_NAME$$COMPONENT_TYPE$SetPropertiesTest() {\n" +
+            "    super($CLASS_NAME$.class);\n" +
+            "  }\n" +
+            "}\n";
     // @formatter:on
-
 
     setTypes.stream().flatMap(setKlass -> componentTypes.stream().map(componentKlass -> {
       try {
@@ -93,6 +102,7 @@ public class RuntimeCodeGenerationTestSuite extends Suite {
   }
 
   private static class RuntimeJavaCompiler {
+
     static final JavaCompiler JAVA_COMPILER = ToolProvider.getSystemJavaCompiler();
 
     public static Class<?> compile(String className, String sourceCode) throws Exception {
@@ -114,7 +124,8 @@ public class RuntimeCodeGenerationTestSuite extends Suite {
     }
   }
 
-  private  static class JavaSourceFromString extends SimpleJavaFileObject {
+  private static class JavaSourceFromString extends SimpleJavaFileObject {
+
     private final String sourceCode;
 
     private static final URI toURI(String className) {
@@ -132,12 +143,13 @@ public class RuntimeCodeGenerationTestSuite extends Suite {
     }
   }
 
-  private  static class ByteCodeFromString extends SimpleJavaFileObject {
+  private static class ByteCodeFromString extends SimpleJavaFileObject {
+
     private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-     private static final URI toURI(String className) throws Exception {
-       return new URI(className);
-     }
+    private static final URI toURI(String className) throws Exception {
+      return new URI(className);
+    }
 
     public ByteCodeFromString(String className) throws Exception {
       super(toURI(className), Kind.CLASS);
@@ -153,8 +165,9 @@ public class RuntimeCodeGenerationTestSuite extends Suite {
     }
   }
 
-  private  static class CustomClassLoader extends ClassLoader {
-    private final Map<String, ByteCodeFromString> classes = new HashMap<>();
+  private static class CustomClassLoader extends ClassLoader {
+
+    private final java.util.Map<String, ByteCodeFromString> classes = new HashMap<>();
 
     public CustomClassLoader(ClassLoader parentClassLoader) {
       super(parentClassLoader);
@@ -176,6 +189,7 @@ public class RuntimeCodeGenerationTestSuite extends Suite {
   }
 
   private static class CustomJavaFileManager extends ForwardingJavaFileManager<JavaFileManager> {
+
     private final CustomClassLoader classLoader;
 
     protected CustomJavaFileManager(JavaFileManager fileManager, CustomClassLoader classLoader) {

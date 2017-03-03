@@ -7,14 +7,17 @@
  */
 package io.usethesource.capsule.experimental.multimap;
 
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.*;
-import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap.EitherSingletonOrCollection.Type.COLLECTION;
-import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap.EitherSingletonOrCollection.Type.SINGLETON;
-import static io.usethesource.capsule.util.BitmapUtils.filter;
-import static io.usethesource.capsule.util.BitmapUtils.index;
-import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
-
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -27,6 +30,19 @@ import io.usethesource.capsule.api.experimental.SetMultimap;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap.EitherSingletonOrCollection.Type;
 import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
+
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_COLLECTION;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_SINGLETON;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_EMPTY;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_NODE;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setBitPattern;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setOf;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setOfNew;
+import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap.EitherSingletonOrCollection.Type.COLLECTION;
+import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap.EitherSingletonOrCollection.Type.SINGLETON;
+import static io.usethesource.capsule.util.BitmapUtils.filter;
+import static io.usethesource.capsule.util.BitmapUtils.index;
+import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 @SuppressWarnings("rawtypes")
 public class TrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {

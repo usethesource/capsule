@@ -7,12 +7,14 @@
  */
 package io.usethesource.capsule;
 
-import static org.junit.Assert.*;
-
 import java.util.HashSet;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.generator.Size;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 
@@ -56,9 +58,6 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
    * Inserted element by element, starting from an empty set. Keeps track of all so far inserted
    * values and checks after each insertion if all inserted elements are contained (quadratic
    * operation).
-   *
-   * @param emptySet
-   * @param inputValues
    */
   @Property(trials = DEFAULT_TRIALS)
   public void stepwiseContainsAfterInsert(@Size(min = 0, max = 0) final CT emptySet,
