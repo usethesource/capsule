@@ -34,6 +34,9 @@ import java.util.stream.StreamSupport;
 import io.usethesource.capsule.SetMultimap;
 import io.usethesource.capsule.core.PersistentTrieSet.AbstractSetNode;
 import io.usethesource.capsule.core.PersistentTrieSet.SetResult;
+import io.usethesource.capsule.core.trie.ArrayView;
+import io.usethesource.capsule.core.trie.MultimapNode;
+import io.usethesource.capsule.core.trie.MultimapNode.MultimapResult;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Interlinked.EitherSingletonOrCollection.Type;
 import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
@@ -185,8 +188,8 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
-    final CompactSetMultimapNode<K, V> newRootNode =
-        rootNode.updated(null, key, val, transformHashCode(keyHash), 0, details, cmp);
+    final AbstractSetMultimapNode<K, V> newRootNode =
+        rootNode.updatedSingle(null, key, val, transformHashCode(keyHash), 0, details, cmp);
 
     if (details.isModified()) {
       if (details.hasReplacedValue()) {
@@ -224,7 +227,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
-    final CompactSetMultimapNode<K, V> newRootNode =
+    final AbstractSetMultimapNode<K, V> newRootNode =
         rootNode.inserted(null, key, val, transformHashCode(keyHash), 0, details, cmp);
 
     if (details.isModified()) {
@@ -249,7 +252,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
-    final CompactSetMultimapNode<K, V> newRootNode =
+    final AbstractSetMultimapNode<K, V> newRootNode =
         rootNode.removed(null, key, val, transformHashCode(keyHash), 0, details, cmp);
 
     if (details.isModified()) {
@@ -267,8 +270,8 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     final int keyHash = key.hashCode();
     final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
-    final CompactSetMultimapNode<K, V> newRootNode =
-        rootNode.removedAll(null, key, transformHashCode(keyHash), 0, details, cmp);
+    final AbstractSetMultimapNode<K, V> newRootNode =
+        rootNode.removed(null, key, transformHashCode(keyHash), 0, details, cmp);
 
     if (details.isModified()) {
       assert details.hasReplacedValue();
@@ -718,7 +721,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     }
   }
 
-  static final class SetMultimapResult<K, V> {
+  static final class SetMultimapResult<K, V> implements MultimapResult<K, V, AbstractSetNode<V>> {
 
     private V replacedValue;
     private AbstractSetNode<V> replacedValueCollection;
@@ -728,18 +731,21 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     private boolean isReplaced;
 
     // update: inserted/removed single element, element count changed
+    @Override
     public void modified() {
       this.isModified = true;
     }
 
-    public void updated(V replacedValue) {
+    @Override
+    public void updatedSingle(V replacedValue) {
       this.replacedValue = replacedValue;
       this.isModified = true;
       this.isReplaced = true;
       this.replacedType = SINGLETON;
     }
 
-    public void updated(AbstractSetNode<V> replacedValueCollection) {
+    @Override
+    public void updatedMultiple(AbstractSetNode<V> replacedValueCollection) {
       this.replacedValueCollection = replacedValueCollection;
       this.isModified = true;
       this.isReplaced = true;
@@ -754,6 +760,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     private SetMultimapResult() {
     }
 
+    @Override
     public boolean isModified() {
       return isModified;
     }
@@ -762,15 +769,18 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
       return replacedType;
     }
 
+    @Override
     public boolean hasReplacedValue() {
       return isReplaced;
     }
 
+    @Override
     public V getReplacedValue() {
       assert getType() == SINGLETON;
       return replacedValue;
     }
 
+    @Override
     public AbstractSetNode<V> getReplacedCollection() {
       assert getType() == COLLECTION;
       return replacedValueCollection;
@@ -781,40 +791,40 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
 
   }
 
-  protected static abstract class AbstractSetMultimapNode<K, V> implements INode<K, V> {
+  protected static abstract class AbstractSetMultimapNode<K, V> implements
+      MultimapNode<K, V, AbstractSetNode<V>, AbstractSetMultimapNode<K, V>> {
 
     static final int TUPLE_LENGTH = 2;
 
-    abstract boolean containsKey(final K key, final int keyHash, final int shift,
-        EqualityComparator<Object> cmp);
-
-    abstract boolean containsTuple(final K key, final V val, final int keyHash, final int shift,
-        EqualityComparator<Object> cmp);
-
-    abstract Optional<AbstractSetNode<V>> findByKey(final K key, final int keyHash, final int shift,
-        EqualityComparator<Object> cmp);
-
-    abstract CompactSetMultimapNode<K, V> inserted(final AtomicReference<Thread> mutator,
+    @Override
+    public abstract AbstractSetMultimapNode<K, V> inserted(final AtomicReference<Thread> mutator,
         final K key, final V val, final int keyHash, final int shift,
-        final SetMultimapResult<K, V> details, EqualityComparator<Object> cmp);
+        final MultimapResult<K, V, AbstractSetNode<V>> details, EqualityComparator<Object> cmp);
 
-    abstract CompactSetMultimapNode<K, V> updated(final AtomicReference<Thread> mutator,
+    @Override
+    public abstract AbstractSetMultimapNode<K, V> updatedSingle(
+        final AtomicReference<Thread> mutator,
         final K key, final V val, final int keyHash, final int shift,
-        final SetMultimapResult<K, V> details, EqualityComparator<Object> cmp);
+        final MultimapResult<K, V, AbstractSetNode<V>> details, EqualityComparator<Object> cmp);
 
-    abstract CompactSetMultimapNode<K, V> updated(final AtomicReference<Thread> mutator,
+    @Override
+    public abstract AbstractSetMultimapNode<K, V> updatedMultiple(
+        final AtomicReference<Thread> mutator,
         final K key, final AbstractSetNode<V> val, final int keyHash, final int shift,
-        final SetMultimapResult<K, V> details, EqualityComparator<Object> cmp);
+        final MultimapResult<K, V, AbstractSetNode<V>> details, EqualityComparator<Object> cmp);
 
-    abstract CompactSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator,
+    @Override
+    public abstract AbstractSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator,
         final K key, final V val, final int keyHash, final int shift,
-        final SetMultimapResult<K, V> details, EqualityComparator<Object> cmp);
+        final MultimapResult<K, V, AbstractSetNode<V>> details, EqualityComparator<Object> cmp);
 
-    abstract CompactSetMultimapNode<K, V> removedAll(final AtomicReference<Thread> mutator,
-        final K key, final int keyHash, final int shift, final SetMultimapResult<K, V> details,
+    @Override
+    public abstract AbstractSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator,
+        final K key, final int keyHash, final int shift,
+        final MultimapResult<K, V, AbstractSetNode<V>> details,
         EqualityComparator<Object> cmp);
 
-    static final boolean isAllowedToEdit(AtomicReference<Thread> x, AtomicReference<Thread> y) {
+    static final boolean isAllowedToEdit(AtomicReference<?> x, AtomicReference<?> y) {
       return x != null && y != null && (x == y || x.get() == y.get());
     }
 
@@ -985,7 +995,8 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
      *
      * @return size predicate
      */
-    abstract byte sizePredicate();
+    @Override
+    public abstract byte sizePredicate();
 
     @Override
     abstract CompactSetMultimapNode<K, V> getNode(final int index);
@@ -1004,8 +1015,8 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
       // return inv1 && inv2 && inv3 && inv4 && inv5;
     }
 
-    abstract CompactSetMultimapNode<K, V> copyAndUpdateBitmaps(AtomicReference<Thread> mutator,
-        final long bitmap);
+//    abstract CompactSetMultimapNode<K, V> copyAndUpdateBitmaps(AtomicReference<Thread> mutator,
+//        final long bitmap);
 
     abstract CompactSetMultimapNode<K, V> copyAndSetSingletonValue(
         final AtomicReference<Thread> mutator, final long doubledBitpos, final V val);
@@ -1015,7 +1026,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
         final AbstractSetNode<V> valColl);
 
     abstract CompactSetMultimapNode<K, V> copyAndSetNode(final AtomicReference<Thread> mutator,
-        final long doubledBitpos, final CompactSetMultimapNode<K, V> node);
+        final long doubledBitpos, final AbstractSetMultimapNode<K, V> node);
 
     abstract CompactSetMultimapNode<K, V> copyAndInsertSingleton(
         final AtomicReference<Thread> mutator, final long doubledBitpos, final K key, final V val);
@@ -1046,7 +1057,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
 
     abstract CompactSetMultimapNode<K, V> copyAndMigrateFromNodeToSingleton(
         final AtomicReference<Thread> mutator, final long doubledBitpos,
-        final CompactSetMultimapNode<K, V> node); // node get's unwrapped inside method
+        final AbstractSetMultimapNode<K, V> node); // node get's unwrapped inside method
 
     abstract CompactSetMultimapNode<K, V> copyAndMigrateFromCollectionToNode(
         final AtomicReference<Thread> mutator, final long doubledBitpos,
@@ -1054,7 +1065,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
 
     abstract CompactSetMultimapNode<K, V> copyAndMigrateFromNodeToCollection(
         final AtomicReference<Thread> mutator, final long doubledBitpos,
-        final CompactSetMultimapNode<K, V> node); // node get's unwrapped inside method
+        final AbstractSetMultimapNode<K, V> node); // node get's unwrapped inside method
 
     abstract CompactSetMultimapNode<K, V> copyAndMigrateFromCollectionToSingleton(
         final AtomicReference<Thread> mutator, final long doubledBitpos, final K key, final V val);
@@ -1207,7 +1218,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     }
 
     @Override
-    boolean containsKey(final K key, final int keyHash, final int shift,
+    public boolean containsKey(final K key, final int keyHash, final int shift,
         EqualityComparator<Object> cmp) {
       long bitmap = this.bitmap();
 
@@ -1235,7 +1246,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     }
 
     @Override
-    boolean containsTuple(final K key, final V val, final int keyHash, final int shift,
+    public boolean containsTuple(final K key, final V val, final int keyHash, final int shift,
         EqualityComparator<Object> cmp) {
       long bitmap = this.bitmap();
 
@@ -1281,7 +1292,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     }
 
     @Override
-    Optional<AbstractSetNode<V>> findByKey(final K key, final int keyHash, final int shift,
+    public Optional<AbstractSetNode<V>> findByKey(final K key, final int keyHash, final int shift,
         EqualityComparator<Object> cmp) {
       long bitmap = this.bitmap();
 
@@ -1327,9 +1338,9 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     }
 
     @Override
-    CompactSetMultimapNode<K, V> inserted(final AtomicReference<Thread> mutator, final K key,
-        final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details,
-        EqualityComparator<Object> cmp) {
+    public AbstractSetMultimapNode<K, V> inserted(final AtomicReference<Thread> mutator,
+        final K key, final V val, final int keyHash, final int shift,
+        final MultimapResult<K, V, AbstractSetNode<V>> details, EqualityComparator<Object> cmp) {
       long bitmap = this.bitmap();
 
       final int doubledMask = doubledMask(keyHash, shift);
@@ -1340,8 +1351,8 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
       switch (pattern) {
         case PATTERN_NODE: {
           int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
-          final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
-          final CompactSetMultimapNode<K, V> subNodeNew = subNode.inserted(mutator, key, val,
+          final AbstractSetMultimapNode<K, V> subNode = getNode(nodeIndex);
+          final AbstractSetMultimapNode<K, V> subNodeNew = subNode.inserted(mutator, key, val,
               keyHash, shift + BIT_PARTITION_SIZE, details, cmp);
 
           if (details.isModified()) {
@@ -1415,8 +1426,10 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     }
 
     @Override
-    CompactSetMultimapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key,
-        final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details,
+    public AbstractSetMultimapNode<K, V> updatedSingle(final AtomicReference<Thread> mutator,
+        final K key,
+        final V val, final int keyHash, final int shift,
+        final MultimapResult<K, V, AbstractSetNode<V>> details,
         EqualityComparator<Object> cmp) {
       long bitmap = this.bitmap();
 
@@ -1428,9 +1441,10 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
       switch (pattern) {
         case PATTERN_NODE: {
           int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
-          final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
-          final CompactSetMultimapNode<K, V> subNodeNew =
-              subNode.updated(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details, cmp);
+          final AbstractSetMultimapNode<K, V> subNode = getNode(nodeIndex);
+          final AbstractSetMultimapNode<K, V> subNodeNew =
+              subNode.updatedSingle(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details,
+                  cmp);
 
           if (details.isModified()) {
             return copyAndSetNode(mutator, doubledBitpos, subNodeNew);
@@ -1446,7 +1460,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
             final V currentVal = getSingletonValue(dataIndex);
 
             // update singleton value
-            details.updated(currentVal);
+            details.updatedSingle(currentVal);
             return copyAndSetSingletonValue(mutator, doubledBitpos, val);
           } else {
             // prefix-collision (case: singleton x singleton)
@@ -1468,7 +1482,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
             final AbstractSetNode<V> currentCollVal = getCollectionValue(collIndex);
 
             // migrate from collection to singleton
-            details.updated(currentCollVal);
+            details.updatedMultiple(currentCollVal);
             return copyAndMigrateFromCollectionToSingleton(mutator, doubledBitpos, currentCollKey,
                 val);
           } else {
@@ -1490,9 +1504,10 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     }
 
     @Override
-    CompactSetMultimapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key,
+    public AbstractSetMultimapNode<K, V> updatedMultiple(final AtomicReference<Thread> mutator,
+        final K key,
         final AbstractSetNode<V> valColl, final int keyHash, final int shift,
-        final SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
+        final MultimapResult<K, V, AbstractSetNode<V>> details, EqualityComparator<Object> cmp) {
       long bitmap = this.bitmap();
 
       final int doubledMask = doubledMask(keyHash, shift);
@@ -1503,9 +1518,10 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
       switch (pattern) {
         case PATTERN_NODE: {
           int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
-          final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
-          final CompactSetMultimapNode<K, V> subNodeNew = subNode.updated(mutator, key, valColl,
-              keyHash, shift + BIT_PARTITION_SIZE, details, cmp);
+          final AbstractSetMultimapNode<K, V> subNode = getNode(nodeIndex);
+          final AbstractSetMultimapNode<K, V> subNodeNew = subNode
+              .updatedMultiple(mutator, key, valColl,
+                  keyHash, shift + BIT_PARTITION_SIZE, details, cmp);
 
           if (details.isModified()) {
             return copyAndSetNode(mutator, doubledBitpos, subNodeNew);
@@ -1521,7 +1537,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
             final V currentVal = getSingletonValue(dataIndex);
 
             // migrate from singleton to collection
-            details.updated(currentVal);
+            details.updatedSingle(currentVal);
             return copyAndMigrateFromSingletonToCollection(mutator, doubledBitpos, currentKey,
                 valColl);
             //
@@ -1559,7 +1575,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
             final AbstractSetNode<V> currentCollVal = getCollectionValue(collIndex);
 
             // update collection value
-            details.updated(currentCollVal);
+            details.updatedMultiple(currentCollVal);
             return copyAndSetCollectionValue(mutator, doubledBitpos, valColl);
 
             // // migrate from collection to singleton
@@ -1595,8 +1611,9 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     }
 
     @Override
-    CompactSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
-        final V val, final int keyHash, final int shift, final SetMultimapResult<K, V> details,
+    public AbstractSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
+        final V val, final int keyHash, final int shift,
+        final MultimapResult<K, V, AbstractSetNode<V>> details,
         EqualityComparator<Object> cmp) {
       long bitmap = this.bitmap();
 
@@ -1609,8 +1626,8 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
         case PATTERN_NODE: {
           int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
 
-          final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
-          final CompactSetMultimapNode<K, V> subNodeNew =
+          final AbstractSetMultimapNode<K, V> subNode = getNode(nodeIndex);
+          final AbstractSetMultimapNode<K, V> subNodeNew =
               subNode.removed(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details, cmp);
 
           if (!details.isModified()) {
@@ -1637,14 +1654,13 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
                 }
               } else {
                 // inline value (move to front)
-                EitherSingletonOrCollection.Type type = subNodeNew.typeOfSingleton();
+                final int patternOfSingleton = subNodeNew.patternOfSingleton();
 
-                if (type == EitherSingletonOrCollection.Type.SINGLETON) {
+                if (patternOfSingleton == PATTERN_DATA_SINGLETON) {
                   return copyAndMigrateFromNodeToSingleton(mutator, doubledBitpos, subNodeNew);
                 } else {
                   return copyAndMigrateFromNodeToCollection(mutator, doubledBitpos, subNodeNew);
                 }
-
               }
             }
             default: {
@@ -1663,7 +1679,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
             if (cmp.equals(currentVal, val)) {
 
               // remove mapping
-              details.updated(val);
+              details.updatedSingle(val);
               return copyAndRemoveSingleton(mutator, doubledBitpos);
             } else {
               return this;
@@ -1682,7 +1698,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
             if (currentValColl.contains(val, val.hashCode(), 0)) {
 
               // remove mapping
-              details.updated(val);
+              details.updatedSingle(val);
 
               final AbstractSetNode<V> newValColl =
                   currentValColl.removed(mutator, val, val.hashCode(), 0, SetResult.unchanged());
@@ -1715,29 +1731,9 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
       return arities[PATTERN_EMPTY] == 30 && arities[PATTERN_NODE] == 0;
     }
 
-    enum State {
-      EMPTY, NODE, PAYLOAD, PAYLOAD_RARE
-    }
-
-    static final State toState(final int pattern) {
-      // final State[] states = {State.EMPTY, State.NODE, State.PAYLOAD, State.PAYLOAD_RARE};
-      // return states[pattern];
-
-      switch (pattern) {
-        case PATTERN_EMPTY:
-          return State.EMPTY;
-        case PATTERN_NODE:
-          return State.NODE;
-        case PATTERN_DATA_SINGLETON:
-          return State.PAYLOAD;
-        default:
-          return State.PAYLOAD_RARE;
-      }
-    }
-
     @Override
-    CompactSetMultimapNode<K, V> removedAll(final AtomicReference<Thread> mutator, final K key,
-        final int keyHash, final int shift, final SetMultimapResult<K, V> details,
+    public AbstractSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
+        final int keyHash, final int shift, final MultimapResult<K, V, AbstractSetNode<V>> details,
         EqualityComparator<Object> cmp) {
       long bitmap = this.bitmap();
 
@@ -1750,9 +1746,9 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
         case PATTERN_NODE: {
           int nodeIndex = index(bitmap, PATTERN_NODE, doubledBitpos);
 
-          final CompactSetMultimapNode<K, V> subNode = getNode(nodeIndex);
-          final CompactSetMultimapNode<K, V> subNodeNew =
-              subNode.removedAll(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, details, cmp);
+          final AbstractSetMultimapNode<K, V> subNode = getNode(nodeIndex);
+          final AbstractSetMultimapNode<K, V> subNodeNew =
+              subNode.removed(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, details, cmp);
 
           if (!details.isModified()) {
             return this;
@@ -1796,9 +1792,9 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
                 // }
 
                 // inline value (move to front)
-                EitherSingletonOrCollection.Type type = subNodeNew.typeOfSingleton();
+                final int patternOfSingleton = subNodeNew.patternOfSingleton();
 
-                if (type == EitherSingletonOrCollection.Type.SINGLETON) {
+                if (patternOfSingleton == PATTERN_DATA_SINGLETON) {
                   return copyAndMigrateFromNodeToSingleton(mutator, doubledBitpos, subNodeNew);
                 } else {
                   return copyAndMigrateFromNodeToCollection(mutator, doubledBitpos, subNodeNew);
@@ -1837,7 +1833,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
 
             final V currentVal = getSingletonValue(dataIndex);
 
-            details.updated(currentVal);
+            details.updatedSingle(currentVal);
             return copyAndRemoveSingleton(mutator, doubledBitpos);
           } else {
             return this;
@@ -1851,7 +1847,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
 
             final AbstractSetNode<V> currentValColl = getCollectionValue(collIndex);
 
-            details.updated(currentValColl);
+            details.updatedMultiple(currentValColl);
             return copyAndRemoveCollection(mutator, doubledBitpos);
           } else {
             return this;
@@ -1862,13 +1858,14 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
       }
     }
 
-    abstract int patternOfSingleton();
+    @Override
+    public abstract int patternOfSingleton();
 
-    @Deprecated
-    abstract EitherSingletonOrCollection.Type typeOfSingleton();
+//    @Deprecated
+//    public abstract EitherSingletonOrCollection.Type typeOfSingleton();
 
-    @Deprecated
-    abstract State stateOfSingleton();
+//    @Deprecated
+//    public abstract State stateOfSingleton();
 
     /**
      * @return 0 <= mask <= 2^BIT_PARTITION_SIZE - 1
@@ -2033,6 +2030,31 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     }
 
     @Override
+    public ArrayView<AbstractSetMultimapNode<K, V>> nodeArray() {
+      return new ArrayView<AbstractSetMultimapNode<K, V>>() {
+        @Override
+        public int size() {
+          return BitmapIndexedSetMultimapNode.this.nodeArity();
+        }
+
+        @Override
+        public AbstractSetMultimapNode<K, V> get(int index) {
+          return (AbstractSetMultimapNode<K, V>) BitmapIndexedSetMultimapNode.this.getNode(index);
+        }
+
+        @Override
+        public void set(int index, AbstractSetMultimapNode<K, V> item,
+            AtomicReference<?> writeCapabilityToken) {
+          if (!isAllowedToEdit(BitmapIndexedSetMultimapNode.this.mutator, writeCapabilityToken)) {
+            throw new IllegalStateException();
+          }
+
+          nodes[nodes.length - 1 - index] = item;
+        }
+      };
+    }
+
+    @Override
     K getSingletonKey(final int index) {
       return (K) nodes[TUPLE_LENGTH * index];
     }
@@ -2153,7 +2175,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     }
 
     @Override
-    byte sizePredicate() {
+    public byte sizePredicate() {
 
       // switch (slotArity()) {
       // case 0:
@@ -2262,8 +2284,8 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     }
 
     @Override
-    CompactSetMultimapNode<K, V> copyAndSetNode(final AtomicReference<Thread> mutator,
-        final long doubledBitpos, final CompactSetMultimapNode<K, V> node) {
+    public CompactSetMultimapNode<K, V> copyAndSetNode(final AtomicReference<Thread> mutator,
+        final long doubledBitpos, final AbstractSetMultimapNode<K, V> node) {
 
       final int idx = this.nodes.length - 1 - nodeIndex(doubledBitpos);
 
@@ -2467,7 +2489,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromNodeToSingleton(
         final AtomicReference<Thread> mutator, final long doubledBitpos,
-        final CompactSetMultimapNode<K, V> node) {
+        final AbstractSetMultimapNode<K, V> node) {
 
       final int idxOld = this.nodes.length - 1 - nodeIndex(doubledBitpos);
       final int idxNew = TUPLE_LENGTH * dataIndex(doubledBitpos);
@@ -2483,7 +2505,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
 
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromNodeToCollection(AtomicReference<Thread> mutator,
-        long doubledBitpos, CompactSetMultimapNode<K, V> node) {
+        long doubledBitpos, AbstractSetMultimapNode<K, V> node) {
 
       final int idxOld = this.nodes.length - 1 - nodeIndex(doubledBitpos);
       final int idxNew =
@@ -2517,13 +2539,13 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     }
 
     @Override
-    CompactSetMultimapNode<K, V> copyAndUpdateBitmaps(AtomicReference<Thread> mutator,
+    public AbstractSetMultimapNode<K, V> copyAndUpdateBitmaps(AtomicReference<Thread> mutator,
         final long bitmap) {
       return nodeOf(mutator, bitmap, nodes);
     }
 
     @Override
-    int patternOfSingleton() {
+    public int patternOfSingleton() {
       assert this.sizePredicate() == SIZE_ONE;
 
       long bitmap = this.bitmap();
@@ -2532,30 +2554,6 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
       final int pattern = pattern(bitmap, doubledMask);
 
       return pattern;
-    }
-
-    @Override
-    State stateOfSingleton() {
-      assert this.sizePredicate() == SIZE_ONE;
-
-      long bitmap = this.bitmap();
-
-      final int doubledMask = Long.numberOfTrailingZeros(bitmap) / 2 * 2;
-      final int pattern = pattern(bitmap, doubledMask);
-
-      return toState(pattern);
-    }
-
-    @Deprecated
-    @Override
-    EitherSingletonOrCollection.Type typeOfSingleton() {
-      final int pattern = patternOfSingleton();
-
-      if (pattern == PATTERN_DATA_SINGLETON) {
-        return EitherSingletonOrCollection.Type.SINGLETON;
-      } else {
-        return EitherSingletonOrCollection.Type.COLLECTION;
-      }
     }
 
   }
@@ -2594,7 +2592,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
 
     @Override
     CompactSetMultimapNode<K, V> copyAndSetNode(AtomicReference<Thread> mutator, long doubledBitpos,
-        CompactSetMultimapNode<K, V> node) {
+        AbstractSetMultimapNode<K, V> node) {
       throw UOE_FACTORY.get();
     }
 
@@ -2630,7 +2628,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
 
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromNodeToSingleton(AtomicReference<Thread> mutator,
-        long doubledBitpos, CompactSetMultimapNode<K, V> node) {
+        long doubledBitpos, AbstractSetMultimapNode<K, V> node) {
       throw UOE_FACTORY.get();
     }
 
@@ -2642,12 +2640,12 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
 
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromNodeToCollection(AtomicReference<Thread> mutator,
-        long doubledBitpos, CompactSetMultimapNode<K, V> node) {
+        long doubledBitpos, AbstractSetMultimapNode<K, V> node) {
       throw UOE_FACTORY.get();
     }
 
     @Override
-    CompactSetMultimapNode<K, V> copyAndUpdateBitmaps(AtomicReference<Thread> mutator,
+    public AbstractSetMultimapNode<K, V> copyAndUpdateBitmaps(AtomicReference<Thread> mutator,
         long bitmap) {
       throw UOE_FACTORY.get();
     }
@@ -2681,12 +2679,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     }
 
     @Override
-    Type typeOfSingleton() {
-      throw UOE_FACTORY.get();
-    }
-
-    @Override
-    int patternOfSingleton() {
+    public int patternOfSingleton() {
       throw UOE_FACTORY.get();
     }
   }
@@ -2708,13 +2701,18 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
       this.collisionContent = collisionContent;
     }
 
+    @Override
+    public ArrayView<AbstractSetMultimapNode<K, V>> nodeArray() {
+      return ArrayView.empty();
+    }
+
     private static final RuntimeException UOE = new UnsupportedOperationException();
 
     private static final Supplier<RuntimeException> UOE_NOT_YET_IMPLEMENTED_FACTORY =
         () -> new UnsupportedOperationException("Not yet implemented @ HashCollisionNode.");
 
     @Override
-    byte sizePredicate() {
+    public byte sizePredicate() {
       return SIZE_MORE_THAN_ONE;
     }
 
@@ -2811,13 +2809,14 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     }
 
     @Override
-    boolean containsKey(K key, int keyHash, int shift, EqualityComparator<Object> cmp) {
+    public boolean containsKey(K key, int keyHash, int shift, EqualityComparator<Object> cmp) {
       return collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny()
           .isPresent();
     }
 
     @Override
-    boolean containsTuple(K key, V val, int keyHash, int shift, EqualityComparator<Object> cmp) {
+    public boolean containsTuple(K key, V val, int keyHash, int shift,
+        EqualityComparator<Object> cmp) {
       return collisionContent.stream()
           .filter(entry -> cmp.equals(key, entry.getKey())
               && entry.getValue().containsEquivalent(val, cmp.toComparator()))
@@ -2825,14 +2824,15 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     }
 
     @Override
-    Optional<AbstractSetNode<V>> findByKey(K key, int keyHash, int shift,
+    public Optional<AbstractSetNode<V>> findByKey(K key, int keyHash, int shift,
         EqualityComparator<Object> cmp) {
       throw UOE_NOT_YET_IMPLEMENTED_FACTORY.get();
     }
 
     @Override
-    CompactSetMultimapNode<K, V> inserted(AtomicReference<Thread> mutator, K key, V val,
-        int keyHash, int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
+    public AbstractSetMultimapNode<K, V> inserted(AtomicReference<Thread> mutator, K key, V val,
+        int keyHash, int shift, MultimapResult<K, V, AbstractSetNode<V>> details,
+        EqualityComparator<Object> cmp) {
       Optional<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> optionalTuple =
           collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
 
@@ -2843,7 +2843,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
 
         if (values.containsEquivalent(val, cmp.toComparator())) {
           // contains key and value
-          details.unchanged();
+          SetMultimapResult.unchanged();
           return this;
 
         } else {
@@ -2902,8 +2902,11 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     }
 
     @Override
-    CompactSetMultimapNode<K, V> updated(AtomicReference<Thread> mutator, K key, V val, int keyHash,
-        int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
+    public AbstractSetMultimapNode<K, V> updatedSingle(AtomicReference<Thread> mutator, K key,
+        V val,
+        int keyHash,
+        int shift, MultimapResult<K, V, AbstractSetNode<V>> details,
+        EqualityComparator<Object> cmp) {
       Optional<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> optionalTuple =
           collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
 
@@ -2927,9 +2930,9 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
             collisionContent.stream().map(substitutionMapper).collect(Collectors.toList());
 
         if (values.size() == 1) {
-          details.updated(values.stream().findAny().get()); // unbox singleton
+          details.updatedSingle(values.stream().findAny().get()); // unbox singleton
         } else {
-          details.updated(setToNode(values));
+          details.updatedMultiple(setToNode(values));
         }
 
         return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
@@ -2951,8 +2954,11 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     }
 
     @Override
-    CompactSetMultimapNode<K, V> removed(AtomicReference<Thread> mutator, K key, V val, int keyHash,
-        int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
+    public AbstractSetMultimapNode<K, V> removed(AtomicReference<Thread> mutator, K key, V val,
+        int keyHash,
+        int shift, MultimapResult<K, V, AbstractSetNode<V>> details,
+        EqualityComparator<Object> cmp) {
+
       Optional<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> optionalTuple =
           collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
 
@@ -2986,19 +2992,15 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
                 collisionContent.stream().map(substitutionMapper).collect(Collectors.toList());
           }
 
-          details.updated(val);
+          details.updatedSingle(val);
           return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
         }
       }
 
-      details.unchanged();
+      SetMultimapResult.unchanged();
       return this;
     }
 
-    @Override
-    State stateOfSingleton() {
-      return null;
-    }
   }
 
   /**
@@ -3394,7 +3396,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
       final int keyHash = key.hashCode();
       final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
-      final CompactSetMultimapNode<K, V> newRootNode = rootNode.updated(null, key,
+      final AbstractSetMultimapNode<K, V> newRootNode = rootNode.updatedMultiple(null, key,
           setToNode(valColl), transformHashCode(keyHash), 0, details, cmp);
 
       if (details.isModified()) {
@@ -3466,7 +3468,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
       final int keyHash = key.hashCode();
       final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
-      final CompactSetMultimapNode<K, V> newRootNode =
+      final AbstractSetMultimapNode<K, V> newRootNode =
           rootNode.inserted(mutator, key, val, transformHashCode(keyHash), 0, details, cmp);
 
       if (details.isModified()) {
@@ -3512,7 +3514,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
       final int keyHash = key.hashCode();
       final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
 
-      final CompactSetMultimapNode<K, V> newRootNode =
+      final AbstractSetMultimapNode<K, V> newRootNode =
           rootNode.removed(mutator, key, val, transformHashCode(keyHash), 0, details, cmp);
 
       if (details.isModified()) {
