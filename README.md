@@ -2,7 +2,7 @@
 
 Capsule aims to become a full-fledged (immutable) collections library for Java 8+ (with backport to Java 7) that is solely built around persistent tries.
 
-Capsule was recently extracted from the [usethesource/rascal-value](https://github.com/usethesource/rascal-value) project and still has to undergo some incubation before it can ship as a well-rounded collection library. Nevertheless, the code is stable and performance is already solid. Feel free to use it and let us about your experiences!
+Capsule was recently extracted from the [usethesource/vallang](https://github.com/usethesource/vallang) project and still has to undergo some incubation before it can ship as a well-rounded collection library. Nevertheless, the code is stable and performance is already solid. Feel free to use it and let us about your experiences!
 
 More extensive tests and performance benchmarks will be added soon. The preliminary API for the immutable interfaces will be reworked as soon as possible as well.
 
@@ -25,7 +25,7 @@ Furthermore, you have to declare capsule as a dependency. To obtain the latest s
 <dependency>
 	<groupId>io.usethesource</groupId>
 	<artifactId>capsule</artifactId>
-	<version>0.2.2</version>
+	<version>0.3.0</version>
 </dependency>
 ```
 
@@ -52,8 +52,9 @@ We introduce CHAMP (Compressed Hash-Array Mapped Prefix-tree), an evolutionary i
 * [JVM Language Summit 2016 - Efficient and Expressive Immutable Collections (Speaker: Michael Steindorfer)](https://www.youtube.com/watch?v=pUXeNAeyY34)
 * [Clojure/west 2016 - Hash Maps: More Room on the Bottom (Speaker: Peter Schuck)](https://www.youtube.com/watch?v=GibNOQVelFY)
 
-## Papers
-* [Paper: Optimizing Hash-Array Mapped Tries for Fast and Lean Immutable JVM Collections (OOPSLA 2015)](http://michael.steindorfer.name/publications/oopsla15.pdf)
+## Publications
+* [PhD Thesis: Efficient Immutable Collections (2017)](https://michael.steindorfer.name/publications/phd-thesis-efficient-immutable-collections)
+* [Paper: Optimizing Hash-Array Mapped Tries for Fast and Lean Immutable JVM Collections (OOPSLA 2015)](https://michael.steindorfer.name/publications/oopsla15.pdf)
 * [Paper: Fast and Lean Immutable Multi-Maps on the JVM based on Heterogeneous Hash-Array Mapped Tries (Draft, 2016)](https://arxiv.org/abs/1608.01036)
-* [Paper: Towards a Software Product Line of Trie-Based Collections (Short Paper, GPCE 2016)](http://michael.steindorfer.name/publications/gpce16.pdf)
-* [Paper: Code Specialization for Memory Efficient Hash Tries (Short Paper, GPCE 2014)](http://michael.steindorfer.name/publications/gpce14.pdf)
+* [Paper: Towards a Software Product Line of Trie-Based Collections (Short Paper, GPCE 2016)](https://michael.steindorfer.name/publications/gpce16.pdf)
+* [Paper: Code Specialization for Memory Efficient Hash Tries (Short Paper, GPCE 2014)](https://michael.steindorfer.name/publications/gpce14.pdf)
