@@ -2826,7 +2826,8 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     @Override
     public Optional<AbstractSetNode<V>> findByKey(K key, int keyHash, int shift,
         EqualityComparator<Object> cmp) {
-      throw UOE_NOT_YET_IMPLEMENTED_FACTORY.get();
+      return collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny()
+          .map(Map.Entry::getValue).map(SetMultimapUtils::setToNode);
     }
 
     @Override

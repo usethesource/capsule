@@ -52,17 +52,7 @@ public interface MultimapNode<K, V, C, R extends MultimapNode<K, V, C, R>> exten
 
   R copyAndUpdateBitmaps(AtomicReference<Thread> mutator, final long bitmap);
 
-//  @Deprecated
-//  EitherSingletonOrCollection.Type typeOfSingleton();
-//
-//  @Deprecated
-//  State stateOfSingleton();
-
-  interface Result {
-
-  }
-
-  interface MultimapResult<K, V, C> extends Result {
+  interface MultimapResult<K, V, C> {
 
     // update: inserted/removed single element, element count changed
     void modified();
@@ -70,7 +60,6 @@ public interface MultimapNode<K, V, C, R extends MultimapNode<K, V, C, R>> exten
     void updatedSingle(V replacedValue);
 
     void updatedMultiple(C replacedValueCollection);
-
 
     boolean isModified();
 
