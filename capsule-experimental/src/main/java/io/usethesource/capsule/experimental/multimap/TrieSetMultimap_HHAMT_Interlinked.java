@@ -1397,12 +1397,13 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
           if (cmp.equals(currentCollKey, key)) {
             final AbstractSetNode<V> currentCollVal = getCollectionValue(collIndex);
 
-            if (currentCollVal.contains(val, val.hashCode(), 0)) {
+            int valHash = val.hashCode();
+            if (currentCollVal.contains(val, valHash, 0)) {
               return this;
             } else {
               // add new mapping
               final AbstractSetNode<V> newCollVal =
-                  currentCollVal.updated(mutator, val, val.hashCode(), 0, SetResult.unchanged());
+                  currentCollVal.updated(mutator, val, valHash, 0, SetResult.unchanged());
 
               details.modified();
               return copyAndSetCollectionValue(mutator, doubledBitpos, newCollVal);
