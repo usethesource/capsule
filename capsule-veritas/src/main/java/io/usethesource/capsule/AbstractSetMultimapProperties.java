@@ -183,4 +183,9 @@ public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap
     assertNotNull("Must always return a set and not null.", input.get(key));
   }
 
+  @Property(trials = DEFAULT_TRIALS)
+  public void transientGetReturnsNonNull(CT input, K key) {
+    assertNotNull("Must always return a set and not null.", input.asTransient().get(key));
+  }
+
 }
