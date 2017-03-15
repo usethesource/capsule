@@ -179,10 +179,10 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
       if (result.isPresent()) {
         return setFromNode(result.get());
       } else {
-        return null;
+        return io.usethesource.capsule.Set.Immutable.of();
       }
     } catch (ClassCastException unused) {
-      return null;
+      return io.usethesource.capsule.Set.Immutable.of();
     }
   }
 
@@ -3392,10 +3392,10 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
         if (result.isPresent()) {
           return setFromNode(result.get());
         } else {
-          return null;
+          return io.usethesource.capsule.Set.Immutable.of();
         }
       } catch (ClassCastException unused) {
-        return null;
+        return io.usethesource.capsule.Set.Immutable.of();
       }
     }
 

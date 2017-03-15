@@ -204,10 +204,10 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
       if (result.isPresent()) {
         return setFromNode(result.get());
       } else {
-        return null;
+        return io.usethesource.capsule.Set.Immutable.of();
       }
     } catch (ClassCastException unused) {
-      return null;
+      return io.usethesource.capsule.Set.Immutable.of();
     }
   }
 
@@ -3847,10 +3847,10 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
         if (result.isPresent()) {
           return setFromNode(result.get());
         } else {
-          return null;
+          return io.usethesource.capsule.Set.Immutable.of();
         }
       } catch (ClassCastException unused) {
-        return null;
+        return io.usethesource.capsule.Set.Immutable.of();
       }
     }
 

@@ -19,6 +19,7 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -191,13 +192,9 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
       final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
           rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
-      if (result.isPresent()) {
-        return result.get();
-      } else {
-        return null;
-      }
+      return result.orElse(io.usethesource.capsule.Set.Immutable.of());
     } catch (ClassCastException unused) {
-      return null;
+      return io.usethesource.capsule.Set.Immutable.of();
     }
   }
 
@@ -209,13 +206,9 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
       final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
           rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
-      if (result.isPresent()) {
-        return result.get();
-      } else {
-        return null;
-      }
+      return result.orElse(io.usethesource.capsule.Set.Immutable.of());
     } catch (ClassCastException unused) {
-      return null;
+      return io.usethesource.capsule.Set.Immutable.of();
     }
   }
 
@@ -652,52 +645,6 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         System.out.println(String.format("%2d: %s\t[cumsum = %s]\t%s", i,
             new DecimalFormat("0.00%").format(arityPercentage),
             new DecimalFormat("0.00%").format(cumsumArityPercentage), detailPercentages));
-      }
-    }
-  }
-
-  abstract static class Optional<T> {
-
-    private static final Optional EMPTY = new Optional() {
-      @Override
-      boolean isPresent() {
-        return false;
-      }
-
-      @Override
-      Object get() {
-        return null;
-      }
-    };
-
-    static <T> Optional<T> empty() {
-      return EMPTY;
-    }
-
-    static <T> Optional<T> of(T value) {
-      return new Value<T>(value);
-    }
-
-    abstract boolean isPresent();
-
-    abstract T get();
-
-    private static final class Value<T> extends Optional<T> {
-
-      private final T value;
-
-      private Value(T value) {
-        this.value = value;
-      }
-
-      @Override
-      boolean isPresent() {
-        return true;
-      }
-
-      @Override
-      T get() {
-        return value;
       }
     }
   }
@@ -2568,13 +2515,9 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
-        if (result.isPresent()) {
-          return result.get();
-        } else {
-          return null;
-        }
+        return result.orElse(io.usethesource.capsule.Set.Immutable.of());
       } catch (ClassCastException unused) {
-        return null;
+        return io.usethesource.capsule.Set.Immutable.of();
       }
     }
 
@@ -2586,13 +2529,9 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
-        if (result.isPresent()) {
-          return result.get();
-        } else {
-          return null;
-        }
+        return result.orElse(io.usethesource.capsule.Set.Immutable.of());
       } catch (ClassCastException unused) {
-        return null;
+        return io.usethesource.capsule.Set.Immutable.of();
       }
     }
 

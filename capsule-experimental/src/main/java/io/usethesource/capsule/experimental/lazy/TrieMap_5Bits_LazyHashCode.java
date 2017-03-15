@@ -19,6 +19,7 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -26,10 +27,9 @@ import io.usethesource.capsule.util.ArrayUtils;
 
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
-@SuppressWarnings("rawtypes")
-public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule.Map.Immutable<K, V> {
+public class TrieMap_5Bits_LazyHashCode<K, V> implements
+    io.usethesource.capsule.Map.Immutable<K, V> {
 
-  @SuppressWarnings("unchecked")
   private static final TrieMap_5Bits_LazyHashCode EMPTY_MAP =
       new TrieMap_5Bits_LazyHashCode(CompactMapNode.EMPTY_NODE, 0);
 
@@ -47,13 +47,12 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> io.usethesource.capsule.Map.Immutable<K, V> of() {
     return TrieMap_5Bits_LazyHashCode.EMPTY_MAP;
   }
 
-  @SuppressWarnings("unchecked")
-  public static final <K, V> io.usethesource.capsule.Map.Immutable<K, V> of(Object... keyValuePairs) {
+  public static final <K, V> io.usethesource.capsule.Map.Immutable<K, V> of(
+      Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
       throw new IllegalArgumentException("Length of argument list is uneven: no key/value pairs.");
     }
@@ -70,18 +69,18 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
     return result;
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K, V> io.usethesource.capsule.Map.Transient<K, V> transientOf() {
     return TrieMap_5Bits_LazyHashCode.EMPTY_MAP.asTransient();
   }
 
-  @SuppressWarnings("unchecked")
-  public static final <K, V> io.usethesource.capsule.Map.Transient<K, V> transientOf(Object... keyValuePairs) {
+  public static final <K, V> io.usethesource.capsule.Map.Transient<K, V> transientOf(
+      Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
       throw new IllegalArgumentException("Length of argument list is uneven: no key/value pairs.");
     }
 
-    final io.usethesource.capsule.Map.Transient<K, V> result = TrieMap_5Bits_LazyHashCode.EMPTY_MAP.asTransient();
+    final io.usethesource.capsule.Map.Transient<K, V> result = TrieMap_5Bits_LazyHashCode.EMPTY_MAP
+        .asTransient();
 
     for (int i = 0; i < keyValuePairs.length; i += 2) {
       final K key = (K) keyValuePairs[i];
@@ -97,7 +96,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
     int hash = 0;
     int size = 0;
 
-    for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
+    for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext(); ) {
       final Map.Entry<K, V> entry = it.next();
       final K key = entry.getKey();
       final V val = entry.getValue();
@@ -112,7 +111,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
   @Override
   public boolean containsKey(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       return rootNode.containsKey(key, key.hashCode(), 0);
     } catch (ClassCastException unused) {
@@ -123,7 +121,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
   @Override
   public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       return rootNode.containsKey(key, key.hashCode(), 0, cmp);
     } catch (ClassCastException unused) {
@@ -133,7 +130,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
 
   @Override
   public boolean containsValue(final Object o) {
-    for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
+    for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
       if (iterator.next().equals(o)) {
         return true;
       }
@@ -143,7 +140,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
 
   @Override
   public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
-    for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
+    for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
       if (cmp.compare(iterator.next(), o) == 0) {
         return true;
       }
@@ -154,7 +151,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
   @Override
   public V get(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       final Optional<V> result = rootNode.findByKey(key, key.hashCode(), 0);
 
@@ -171,7 +167,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
   @Override
   public V getEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       final Optional<V> result = rootNode.findByKey(key, key.hashCode(), 0, cmp);
 
@@ -205,7 +200,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
 
   @Override
   public io.usethesource.capsule.Map.Immutable<K, V> __putEquivalent(final K key, final V val,
-                                                                         final Comparator<Object> cmp) {
+      final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -224,15 +219,17 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
   }
 
   @Override
-  public io.usethesource.capsule.Map.Immutable<K, V> __putAll(final Map<? extends K, ? extends V> map) {
+  public io.usethesource.capsule.Map.Immutable<K, V> __putAll(
+      final Map<? extends K, ? extends V> map) {
     final io.usethesource.capsule.Map.Transient<K, V> tmpTransient = this.asTransient();
     tmpTransient.__putAll(map);
     return tmpTransient.freeze();
   }
 
   @Override
-  public io.usethesource.capsule.Map.Immutable<K, V> __putAllEquivalent(final Map<? extends K, ? extends V> map,
-                                                                            final Comparator<Object> cmp) {
+  public io.usethesource.capsule.Map.Immutable<K, V> __putAllEquivalent(
+      final Map<? extends K, ? extends V> map,
+      final Comparator<Object> cmp) {
     final io.usethesource.capsule.Map.Transient<K, V> tmpTransient = this.asTransient();
     tmpTransient.__putAllEquivalent(map, cmp);
     return tmpTransient.freeze();
@@ -254,7 +251,8 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
   }
 
   @Override
-  public io.usethesource.capsule.Map.Immutable<K, V> __removeEquivalent(final K key, final Comparator<Object> cmp) {
+  public io.usethesource.capsule.Map.Immutable<K, V> __removeEquivalent(final K key,
+      final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -466,19 +464,17 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
         return false;
       }
 
-      for (@SuppressWarnings("unchecked")
-      Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
+      for (
+          Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext(); ) {
         Map.Entry entry = it.next();
 
         try {
-          @SuppressWarnings("unchecked")
           final K key = (K) entry.getKey();
           final Optional<V> result = rootNode.findByKey(key, key.hashCode(), 0);
 
           if (!result.isPresent()) {
             return false;
           } else {
-            @SuppressWarnings("unchecked")
             final V val = (V) entry.getValue();
 
             if (!result.get().equals(val)) {
@@ -500,7 +496,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
   public int hashCode() {
     if (hashCode == -1) {
       int hash = 0;
-      for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
+      for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext(); ) {
         final Map.Entry<K, V> entry = it.next();
         final K key = entry.getKey();
         final V val = entry.getValue();
@@ -627,52 +623,8 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
     }
   }
 
-  abstract static class Optional<T> {
-    private static final Optional EMPTY = new Optional() {
-      @Override
-      boolean isPresent() {
-        return false;
-      }
-
-      @Override
-      Object get() {
-        return null;
-      }
-    };
-
-    @SuppressWarnings("unchecked")
-    static <T> Optional<T> empty() {
-      return EMPTY;
-    }
-
-    static <T> Optional<T> of(T value) {
-      return new Value<T>(value);
-    }
-
-    abstract boolean isPresent();
-
-    abstract T get();
-
-    private static final class Value<T> extends Optional<T> {
-      private final T value;
-
-      private Value(T value) {
-        this.value = value;
-      }
-
-      @Override
-      boolean isPresent() {
-        return true;
-      }
-
-      @Override
-      T get() {
-        return value;
-      }
-    }
-  }
-
   static final class MapResult<K, V> {
+
     private V replacedValue;
     private boolean isModified;
     private boolean isReplaced;
@@ -693,7 +645,8 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
       return new MapResult<>();
     }
 
-    private MapResult() {}
+    private MapResult() {
+    }
 
     public boolean isModified() {
       return isModified;
@@ -709,6 +662,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
   }
 
   protected static interface INode<K, V> {
+
   }
 
   protected static abstract class AbstractMapNode<K, V> implements INode<K, V> {
@@ -881,7 +835,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
     abstract CompactMapNode<K, V> copyAndMigrateFromNodeToInline(
         final AtomicReference<Thread> mutator, final int bitpos, final CompactMapNode<K, V> node);
 
-    @SuppressWarnings("unchecked")
     static final <K, V> CompactMapNode<K, V> mergeTwoKeyValPairs(final K key0, final V val0,
         final int keyHash0, final K key1, final V val1, final int keyHash1, final int shift) {
       assert !(key0.equals(key1));
@@ -889,8 +842,8 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
       if (shift >= HASH_CODE_LENGTH) {
         // throw new
         // IllegalStateException("Hash collision not yet fixed.");
-        return new HashCollisionMapNode_5Bits<>(keyHash0, (K[]) new Object[] {key0, key1},
-            (V[]) new Object[] {val0, val1});
+        return new HashCollisionMapNode_5Bits<>(keyHash0, (K[]) new Object[]{key0, key1},
+            (V[]) new Object[]{val0, val1});
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -901,9 +854,9 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
         final int dataMap = bitpos(mask0) | bitpos(mask1);
 
         if (mask0 < mask1) {
-          return nodeOf(null, (0), dataMap, new Object[] {key0, val0, key1, val1});
+          return nodeOf(null, (0), dataMap, new Object[]{key0, val0, key1, val1});
         } else {
-          return nodeOf(null, (0), dataMap, new Object[] {key1, val1, key0, val0});
+          return nodeOf(null, (0), dataMap, new Object[]{key1, val1, key0, val0});
         }
       } else {
         final CompactMapNode<K, V> node = mergeTwoKeyValPairs(key0, val0, keyHash0, key1, val1,
@@ -911,7 +864,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
         // values fit on next level
 
         final int nodeMap = bitpos(mask0);
-        return nodeOf(null, nodeMap, (0), new Object[] {node});
+        return nodeOf(null, nodeMap, (0), new Object[]{node});
       }
     }
 
@@ -919,16 +872,17 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
 
     static {
 
-      EMPTY_NODE = new BitmapIndexedMapNode<>(null, (0), (0), new Object[] {});
+      EMPTY_NODE = new BitmapIndexedMapNode<>(null, (0), (0), new Object[]{});
 
-    };
+    }
+
+    ;
 
     static final <K, V> CompactMapNode<K, V> nodeOf(final AtomicReference<Thread> mutator,
         final int nodeMap, final int dataMap, final Object[] nodes) {
       return new BitmapIndexedMapNode<>(mutator, nodeMap, dataMap, nodes);
     }
 
-    @SuppressWarnings("unchecked")
     static final <K, V> CompactMapNode<K, V> nodeOf(AtomicReference<Thread> mutator) {
       return EMPTY_NODE;
     }
@@ -936,7 +890,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
     static final <K, V> CompactMapNode<K, V> nodeOf(AtomicReference<Thread> mutator,
         final int nodeMap, final int dataMap, final K key, final V val) {
       assert nodeMap == 0;
-      return nodeOf(mutator, (0), dataMap, new Object[] {key, val});
+      return nodeOf(mutator, (0), dataMap, new Object[]{key, val});
     }
 
     static final int index(final int bitmap, final int bitpos) {
@@ -1373,25 +1327,21 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
       assert nodeInvariant();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     K getKey(final int index) {
       return (K) nodes[TUPLE_LENGTH * index];
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     V getValue(final int index) {
       return (V) nodes[TUPLE_LENGTH * index + 1];
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     Map.Entry<K, V> getKeyValueEntry(final int index) {
       return entryOf((K) nodes[TUPLE_LENGTH * index], (V) nodes[TUPLE_LENGTH * index + 1]);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     CompactMapNode<K, V> getNode(final int index) {
       return (CompactMapNode<K, V>) nodes[nodes.length - 1 - index];
@@ -1603,6 +1553,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
   }
 
   private static final class HashCollisionMapNode_5Bits<K, V> extends CompactMapNode<K, V> {
+
     private final K[] keys;
     private final V[] vals;
     private final int hash;
@@ -1679,7 +1630,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
           } else {
             // add new mapping
             final V[] src = this.vals;
-            @SuppressWarnings("unchecked")
             final V[] dst = (V[]) new Object[src.length];
 
             // copy 'src' and set 1 element(s) at position 'idx'
@@ -1695,7 +1645,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
         }
       }
 
-      @SuppressWarnings("unchecked")
       final K[] keysNew = (K[]) new Object[this.keys.length + 1];
 
       // copy 'this.keys' and insert 1 element(s) at position
@@ -1705,7 +1654,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
       System.arraycopy(this.keys, keys.length, keysNew, keys.length + 1,
           this.keys.length - keys.length);
 
-      @SuppressWarnings("unchecked")
       final V[] valsNew = (V[]) new Object[this.vals.length + 1];
 
       // copy 'this.vals' and insert 1 element(s) at position
@@ -1734,7 +1682,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
           } else {
             // add new mapping
             final V[] src = this.vals;
-            @SuppressWarnings("unchecked")
             final V[] dst = (V[]) new Object[src.length];
 
             // copy 'src' and set 1 element(s) at position 'idx'
@@ -1750,7 +1697,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
         }
       }
 
-      @SuppressWarnings("unchecked")
       final K[] keysNew = (K[]) new Object[this.keys.length + 1];
 
       // copy 'this.keys' and insert 1 element(s) at position
@@ -1760,7 +1706,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
       System.arraycopy(this.keys, keys.length, keysNew, keys.length + 1,
           this.keys.length - keys.length);
 
-      @SuppressWarnings("unchecked")
       final V[] valsNew = (V[]) new Object[this.vals.length + 1];
 
       // copy 'this.vals' and insert 1 element(s) at position
@@ -1794,7 +1739,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
             return CompactMapNode.<K, V>nodeOf(mutator).updated(mutator, theOtherKey, theOtherVal,
                 keyHash, 0, details);
           } else {
-            @SuppressWarnings("unchecked")
             final K[] keysNew = (K[]) new Object[this.keys.length - 1];
 
             // copy 'this.keys' and remove 1 element(s) at position
@@ -1802,7 +1746,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
             System.arraycopy(this.keys, 0, keysNew, 0, idx);
             System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
 
-            @SuppressWarnings("unchecked")
             final V[] valsNew = (V[]) new Object[this.vals.length - 1];
 
             // copy 'this.vals' and remove 1 element(s) at position
@@ -1838,7 +1781,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
             return CompactMapNode.<K, V>nodeOf(mutator).updated(mutator, theOtherKey, theOtherVal,
                 keyHash, 0, details, cmp);
           } else {
-            @SuppressWarnings("unchecked")
             final K[] keysNew = (K[]) new Object[this.keys.length - 1];
 
             // copy 'this.keys' and remove 1 element(s) at position
@@ -1846,7 +1788,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
             System.arraycopy(this.keys, 0, keysNew, 0, idx);
             System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
 
-            @SuppressWarnings("unchecked")
             final V[] valsNew = (V[]) new Object[this.vals.length - 1];
 
             // copy 'this.vals' and remove 1 element(s) at position
@@ -1961,7 +1902,8 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
       /*
        * Linear scan for each key, because of arbitrary element order.
        */
-      outerLoop: for (int i = 0; i < that.payloadArity(); i++) {
+      outerLoop:
+      for (int i = 0; i < that.payloadArity(); i++) {
         final Object otherKey = that.getKey(i);
         final Object otherVal = that.getValue(i);
 
@@ -2041,7 +1983,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
     private int currentStackLevel = -1;
     private final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
 
-    @SuppressWarnings("unchecked")
     AbstractMapNode<K, V>[] nodes = new AbstractMapNode[MAX_DEPTH];
 
     AbstractMapIterator(AbstractMapNode<K, V> rootNode) {
@@ -2221,7 +2162,9 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
     }
   }
 
-  static final class TransientTrieMap_5Bits<K, V> implements io.usethesource.capsule.Map.Transient<K, V> {
+  static final class TransientTrieMap_5Bits<K, V> implements
+      io.usethesource.capsule.Map.Transient<K, V> {
+
     final private AtomicReference<Thread> mutator;
     private AbstractMapNode<K, V> rootNode;
     private int cachedSize;
@@ -2255,7 +2198,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
     @Override
     public boolean containsKey(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         return rootNode.containsKey(key, key.hashCode(), 0);
       } catch (ClassCastException unused) {
@@ -2266,7 +2208,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
     @Override
     public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         return rootNode.containsKey(key, key.hashCode(), 0, cmp);
       } catch (ClassCastException unused) {
@@ -2276,7 +2217,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
 
     @Override
     public boolean containsValue(final Object o) {
-      for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
+      for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
         if (iterator.next().equals(o)) {
           return true;
         }
@@ -2286,7 +2227,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
 
     @Override
     public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
-      for (Iterator<V> iterator = valueIterator(); iterator.hasNext();) {
+      for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
         if (cmp.compare(iterator.next(), o) == 0) {
           return true;
         }
@@ -2297,7 +2238,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
     @Override
     public V get(Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         final Optional<V> result = rootNode.findByKey(key, key.hashCode(), 0);
 
@@ -2314,7 +2254,6 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
     @Override
     public V getEquivalent(Object o, Comparator<Object> cmp) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         final Optional<V> result = rootNode.findByKey(key, key.hashCode(), 0, cmp);
 
@@ -2490,6 +2429,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
     }
 
     public static class TransientMapKeyIterator<K, V> extends MapKeyIterator<K, V> {
+
       final TransientTrieMap_5Bits<K, V> collection;
       K lastKey;
 
@@ -2511,6 +2451,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
     }
 
     public static class TransientMapValueIterator<K, V> extends MapValueIterator<K, V> {
+
       final TransientTrieMap_5Bits<K, V> collection;
 
       public TransientMapValueIterator(final TransientTrieMap_5Bits<K, V> collection) {
@@ -2530,6 +2471,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
     }
 
     public static class TransientMapEntryIterator<K, V> extends MapEntryIterator<K, V> {
+
       final TransientTrieMap_5Bits<K, V> collection;
 
       public TransientMapEntryIterator(final TransientTrieMap_5Bits<K, V> collection) {
@@ -2697,19 +2639,17 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
           return false;
         }
 
-        for (@SuppressWarnings("unchecked")
-        Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
+        for (
+            Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext(); ) {
           Map.Entry entry = it.next();
 
           try {
-            @SuppressWarnings("unchecked")
             final K key = (K) entry.getKey();
             final Optional<V> result = rootNode.findByKey(key, key.hashCode(), 0);
 
             if (!result.isPresent()) {
               return false;
             } else {
-              @SuppressWarnings("unchecked")
               final V val = (V) entry.getValue();
 
               if (!result.get().equals(val)) {
@@ -2730,7 +2670,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements io.usethesource.capsule
     @Override
     public int hashCode() {
       int hash = 0;
-      for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext();) {
+      for (Iterator<Map.Entry<K, V>> it = entryIterator(); it.hasNext(); ) {
         final Map.Entry<K, V> entry = it.next();
         final K key = entry.getKey();
         final V val = entry.getValue();

@@ -199,13 +199,9 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements SetMultimap.Immu
       final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
           rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
-      if (result.isPresent()) {
-        return result.get();
-      } else {
-        return null;
-      }
+      return result.orElse(io.usethesource.capsule.Set.Immutable.of());
     } catch (ClassCastException unused) {
-      return null;
+      return io.usethesource.capsule.Set.Immutable.of();
     }
   }
 
@@ -4031,13 +4027,9 @@ public class TrieSetMultimap_HHAMT_Specialized<K, V> implements SetMultimap.Immu
         final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
-        if (result.isPresent()) {
-          return result.get();
-        } else {
-          return null;
-        }
+        return result.orElse(io.usethesource.capsule.Set.Immutable.of());
       } catch (ClassCastException unused) {
-        return null;
+        return io.usethesource.capsule.Set.Immutable.of();
       }
     }
 

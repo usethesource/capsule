@@ -165,13 +165,9 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
       final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
           rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
-      if (result.isPresent()) {
-        return result.get();
-      } else {
-        return null;
-      }
+      return result.orElse(io.usethesource.capsule.Set.Immutable.of());
     } catch (ClassCastException unused) {
-      return null;
+      return io.usethesource.capsule.Set.Immutable.of();
     }
   }
 
@@ -3502,13 +3498,9 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
         final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
-        if (result.isPresent()) {
-          return result.get();
-        } else {
-          return null;
-        }
+        return result.orElse(io.usethesource.capsule.Set.Immutable.of());
       } catch (ClassCastException unused) {
-        return null;
+        return io.usethesource.capsule.Set.Immutable.of();
       }
     }
 
@@ -3712,7 +3704,8 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
       return StreamSupport.stream(valueCollectionsSpliterator(), isParallel);
     }
 
-    public static class TransientSetMultimapKeyIterator<K, V> extends SetMultimapKeyIterator<K, V> {
+    public static class TransientSetMultimapKeyIterator<K, V> extends
+        SetMultimapKeyIterator<K, V> {
 
       final TransientTrieSetMultimap_BleedingEdge<K, V> collection;
       K lastKey;
