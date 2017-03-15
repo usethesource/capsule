@@ -9,6 +9,18 @@ package io.usethesource.capsule.core.trie;
 
 public interface Node {
 
+  byte SIZE_EMPTY = 0b00;
+  byte SIZE_ONE = 0b01;
+  byte SIZE_MORE_THAN_ONE = 0b10;
+
+  /**
+   * Abstract predicate over a node's size. Value can be either {@value #SIZE_EMPTY},
+   * {@value #SIZE_ONE}, or {@value #SIZE_MORE_THAN_ONE}.
+   *
+   * @return size predicate
+   */
+  byte sizePredicate();
+
   // <T> ArrayView<T> dataArray(int category);
 
   /**

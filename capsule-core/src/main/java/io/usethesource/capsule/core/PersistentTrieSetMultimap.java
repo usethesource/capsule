@@ -908,42 +908,16 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
 
     static final int TUPLE_LENGTH = 2;
 
-//    abstract CompactSetMultimapNode<K, V> inserted(final AtomicReference<Thread> mutator,
-//        final K key, final V val, final int keyHash, final int shift,
-//        final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details, EqualityComparator<Object> cmp);
-//
-//    abstract CompactSetMultimapNode<K, V> updated(final AtomicReference<Thread> mutator,
-//        final K key, final V val, final int keyHash, final int shift,
-//        final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details, EqualityComparator<Object> cmp);
-//
-//    abstract CompactSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator,
-//        final K key, final V val, final int keyHash, final int shift,
-//        final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details, EqualityComparator<Object> cmp);
-//
-//    abstract CompactSetMultimapNode<K, V> removedAll(final AtomicReference<Thread> mutator,
-//        final K key, final int keyHash, final int shift, final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details,
-//        EqualityComparator<Object> cmp);
+    @Override
+    public final boolean mustUnbox(io.usethesource.capsule.Set.Immutable<V> values) {
+      return values.size() == 1;
+    }
 
-    // TODO: move to interface
-    abstract AbstractSetMultimapNode<K, V> inserted(final AtomicReference<Thread> mutator,
-        final K key, final io.usethesource.capsule.Set.Immutable<V> values, final int keyHash,
-        final int shift,
-        final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details,
-        EqualityComparator<Object> cmp);
-
-    // TODO: move to interface
-    abstract AbstractSetMultimapNode<K, V> insertedMultiple(final AtomicReference<Thread> mutator,
-        final K key, final io.usethesource.capsule.Set.Immutable<V> values, final int keyHash,
-        final int shift,
-        final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details,
-        EqualityComparator<Object> cmp);
-
-    // TODO: move to interface
-    abstract AbstractSetMultimapNode<K, V> updated(AtomicReference<Thread> mutator,
-        K key,
-        io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift,
-        MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details,
-        EqualityComparator<Object> cmp);
+    @Override
+    public final V unbox(io.usethesource.capsule.Set.Immutable<V> values) {
+      assert mustUnbox(values);
+      return values.findFirst().get();
+    }
 
     static final boolean isAllowedToEdit(AtomicReference<?> x, AtomicReference<?> y) {
       return x != null && y != null && (x == y || x.get() == y.get());
@@ -1172,10 +1146,6 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
         return Integer.bitCount(bitmap);
       }
     }
-
-    static final byte SIZE_EMPTY = 0b00;
-    static final byte SIZE_ONE = 0b01;
-    static final byte SIZE_MORE_THAN_ONE = 0b10;
 
     @Override
     abstract CompactSetMultimapNode<K, V> getNode(final int index);

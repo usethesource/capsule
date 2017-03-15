@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.concurrent.atomic.AtomicReference;
@@ -567,52 +568,6 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     }
   }
 
-  abstract static class Optional<T> {
-
-    private static final Optional EMPTY = new Optional() {
-      @Override
-      boolean isPresent() {
-        return false;
-      }
-
-      @Override
-      Object get() {
-        return null;
-      }
-    };
-
-    static <T> Optional<T> empty() {
-      return EMPTY;
-    }
-
-    static <T> Optional<T> of(T value) {
-      return new Value<T>(value);
-    }
-
-    abstract boolean isPresent();
-
-    abstract T get();
-
-    private static final class Value<T> extends Optional<T> {
-
-      private final T value;
-
-      private Value(T value) {
-        this.value = value;
-      }
-
-      @Override
-      boolean isPresent() {
-        return true;
-      }
-
-      @Override
-      T get() {
-        return value;
-      }
-    }
-  }
-
   /*
    * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
    * `protected` when experiments are finished.
@@ -719,6 +674,19 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
     static final <T> boolean isAllowedToEdit(AtomicReference<?> x, AtomicReference<?> y) {
       return x != null && y != null && (x == y || x.get() == y.get());
+    }
+
+    /*
+     * TODO: in future move to SetNode interface
+     */
+    public Optional<K> findFirst() {
+      final ArrayView<K> elementArray = dataArray(0, 0);
+
+      if (elementArray.isEmpty()) {
+        return Optional.empty();
+      } else {
+        return Optional.of(elementArray.get(0));
+      }
     }
 
     @Override
@@ -860,18 +828,6 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     abstract int nodeMap();
 
     abstract int dataMap();
-
-    static final byte SIZE_EMPTY = 0b00;
-    static final byte SIZE_ONE = 0b01;
-    static final byte SIZE_MORE_THAN_ONE = 0b10;
-
-    /**
-     * Abstract predicate over a node's size. Value can be either {@value #SIZE_EMPTY},
-     * {@value #SIZE_ONE}, or {@value #SIZE_MORE_THAN_ONE}.
-     *
-     * @return size predicate
-     */
-    abstract byte sizePredicate();
 
     @Override
     abstract CompactSetNode<K> getNode(final int index);
@@ -1515,7 +1471,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     }
 
     @Override
-    byte sizePredicate() {
+    public byte sizePredicate() {
       if (this.nodeArity() == 0) {
         switch (this.payloadArity()) {
           case 0:
@@ -1845,7 +1801,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     }
 
     @Override
-    byte sizePredicate() {
+    public byte sizePredicate() {
       return SIZE_MORE_THAN_ONE;
     }
 

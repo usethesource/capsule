@@ -750,6 +750,17 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
     static final int TUPLE_LENGTH = 2;
 
     @Override
+    public final boolean mustUnbox(AbstractSetNode<V> valuesNode) {
+      return valuesNode.sizePredicate() == SIZE_ONE;
+    }
+
+    @Override
+    public final V unbox(AbstractSetNode<V> valuesNode) {
+      assert mustUnbox(valuesNode);
+      return valuesNode.findFirst().get();
+    }
+
+    @Override
     public abstract AbstractSetMultimapNode<K, V> insertedSingle(
         final AtomicReference<Thread> mutator,
         final K key, final V value, final int keyHash, final int shift,
@@ -993,19 +1004,6 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
 
       return arities;
     }
-
-    static final byte SIZE_EMPTY = 0b00;
-    static final byte SIZE_ONE = 0b01;
-    static final byte SIZE_MORE_THAN_ONE = 0b10;
-
-    /**
-     * Abstract predicate over a node's size. Value can be either {@value #SIZE_EMPTY},
-     * {@value #SIZE_ONE}, or {@value #SIZE_MORE_THAN_ONE}.
-     *
-     * @return size predicate
-     */
-    @Override
-    public abstract byte sizePredicate();
 
     @Override
     abstract CompactSetMultimapNode<K, V> getNode(final int index);
@@ -1434,6 +1432,13 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
           return copyAndInsertSingleton(mutator, doubledBitpos, key, value);
         }
       }
+    }
+
+    @Override
+    public AbstractSetMultimapNode<K, V> insertedMultiple(AtomicReference<Thread> mutator, K key,
+        AbstractSetNode<V> values, int keyHash, int shift,
+        MultimapResult<K, V, AbstractSetNode<V>> details, EqualityComparator<Object> cmp) {
+      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
     @Override

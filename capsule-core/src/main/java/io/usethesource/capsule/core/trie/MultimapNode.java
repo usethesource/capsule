@@ -23,8 +23,33 @@ public interface MultimapNode<K, V, C, R extends MultimapNode<K, V, C, R>> exten
 
   Optional<C> findByKey(K key, int keyHash, int shift, EqualityComparator<Object> cmp);
 
+  boolean mustUnbox(C values);
+  
+  V unbox(C values);
+
+  default R inserted(AtomicReference<Thread> mutator, K key, C values, int keyHash, int shift,
+      MultimapResult<K, V, C> details, EqualityComparator<Object> cmp) {
+    if (mustUnbox(values)) {
+      return insertedSingle(mutator, key, unbox(values), keyHash, shift, details, cmp);
+    } else {
+      return insertedMultiple(mutator, key, values, keyHash, shift, details, cmp);
+    }
+  }
+
   R insertedSingle(AtomicReference<Thread> mutator, K key, V value, int keyHash, int shift,
       MultimapResult<K, V, C> details, EqualityComparator<Object> cmp);
+
+  R insertedMultiple(AtomicReference<Thread> mutator, K key, C values, int keyHash, int shift,
+      MultimapResult<K, V, C> details, EqualityComparator<Object> cmp);
+
+  default R updated(AtomicReference<Thread> mutator, K key, C values, int keyHash, int shift,
+      MultimapResult<K, V, C> details, EqualityComparator<Object> cmp) {
+    if (mustUnbox(values)) {
+      return updatedSingle(mutator, key, unbox(values), keyHash, shift, details, cmp);
+    } else {
+      return updatedMultiple(mutator, key, values, keyHash, shift, details, cmp);
+    }
+  }
 
   R updatedSingle(AtomicReference<Thread> mutator, K key, V value, int keyHash, int shift,
       MultimapResult<K, V, C> details, EqualityComparator<Object> cmp);
@@ -43,14 +68,6 @@ public interface MultimapNode<K, V, C, R extends MultimapNode<K, V, C, R>> exten
    */
   R removed(AtomicReference<Thread> mutator, K key, int keyHash, int shift,
       MultimapResult<K, V, C> details, EqualityComparator<Object> cmp);
-
-  /**
-   * Abstract predicate over a node's size. Value can be either {@value #SIZE_EMPTY},
-   * {@value #SIZE_ONE}, or {@value #SIZE_MORE_THAN_ONE}.
-   *
-   * @return size predicate
-   */
-  byte sizePredicate();
 
   // TODO: remove from interface
   @Deprecated

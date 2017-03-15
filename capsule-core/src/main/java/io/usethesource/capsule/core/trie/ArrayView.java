@@ -19,6 +19,10 @@ public interface ArrayView<T> extends Iterable<T> {
 
   int size();
 
+  default boolean isEmpty() {
+    return size() != 0;
+  }
+
   T get(int index);
 
   default void set(int index, T item) {
@@ -67,8 +71,9 @@ public interface ArrayView<T> extends Iterable<T> {
 
       @Override
       public void set(T t) {
-        if (previous == -1)
+        if (previous == -1) {
           throw new IllegalStateException();
+        }
 
         ArrayView.this.set(previous, t);
       }

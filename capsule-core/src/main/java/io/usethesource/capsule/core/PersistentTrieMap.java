@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
@@ -639,52 +640,6 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
         System.out.println(String.format("%2d: %s\t[cumsum = %s]\t%s", i,
             new DecimalFormat("0.00%").format(arityPercentage),
             new DecimalFormat("0.00%").format(cumsumArityPercentage), detailPercentages));
-      }
-    }
-  }
-
-  abstract static class Optional<T> {
-
-    private static final Optional EMPTY = new Optional() {
-      @Override
-      boolean isPresent() {
-        return false;
-      }
-
-      @Override
-      Object get() {
-        return null;
-      }
-    };
-
-    static <T> Optional<T> empty() {
-      return EMPTY;
-    }
-
-    static <T> Optional<T> of(T value) {
-      return new Value<T>(value);
-    }
-
-    abstract boolean isPresent();
-
-    abstract T get();
-
-    private static final class Value<T> extends Optional<T> {
-
-      private final T value;
-
-      private Value(T value) {
-        this.value = value;
-      }
-
-      @Override
-      boolean isPresent() {
-        return true;
-      }
-
-      @Override
-      T get() {
-        return value;
       }
     }
   }

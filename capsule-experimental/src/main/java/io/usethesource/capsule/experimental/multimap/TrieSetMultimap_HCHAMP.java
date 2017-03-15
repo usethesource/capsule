@@ -941,18 +941,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
       }
     }
 
-    static final byte SIZE_EMPTY = 0b00;
-    static final byte SIZE_ONE = 0b01;
-    static final byte SIZE_MORE_THAN_ONE = 0b10;
-
-    /**
-     * Abstract predicate over a node's size. Value can be either {@value #SIZE_EMPTY},
-     * {@value #SIZE_ONE}, or {@value #SIZE_MORE_THAN_ONE}.
-     *
-     * @return size predicate
-     */
-    abstract byte sizePredicate();
-
     @Override
     abstract CompactSetMultimapNode<K, V> getNode(final int index);
 
@@ -2081,7 +2069,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
     }
 
     @Override
-    byte sizePredicate() {
+    public byte sizePredicate() {
       if (this.nodeArity() == 0) {
         switch (arity(dataMap()) + arity(collMap())) {
           case 0:
@@ -2571,7 +2559,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
     // }
 
     @Override
-    byte sizePredicate() {
+    public byte sizePredicate() {
       return SIZE_MORE_THAN_ONE;
     }
 
