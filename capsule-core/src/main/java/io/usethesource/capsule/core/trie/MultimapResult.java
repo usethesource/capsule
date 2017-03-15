@@ -8,8 +8,13 @@
 package io.usethesource.capsule.core.trie;
 
 import java.util.EnumSet;
+import java.util.Optional;
 
 public interface MultimapResult<K, V, C> {
+
+  static <K, V, C> MultimapResultImpl<K, V, C> unchanged() {
+    return new MultimapResultImpl<>();
+  }
 
   Modification getModificationEffect();
 
@@ -22,6 +27,10 @@ public interface MultimapResult<K, V, C> {
 
   void modified(Modification modificationEffect, EnumSet<Modification> modificationDetails,
       C evictedPayload);
+
+  Optional<C> getEvictedPayload();
+
+  Optional<Integer> sizeDelta();
 
   @Deprecated
   default boolean isModified() {

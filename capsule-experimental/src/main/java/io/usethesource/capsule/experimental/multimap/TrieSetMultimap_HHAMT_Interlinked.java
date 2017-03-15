@@ -742,6 +742,16 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> implements SetMultimap.Immu
         AbstractSetNode<V> evictedPayload) {
       throw new IllegalStateException();
     }
+
+    @Override
+    public Optional<AbstractSetNode<V>> getEvictedPayload() {
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public Optional<Integer> sizeDelta() {
+      throw new IllegalStateException();
+    }
   }
 
   protected static abstract class AbstractSetMultimapNode<K, V> implements

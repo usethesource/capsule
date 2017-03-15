@@ -335,7 +335,8 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     }
 
     final int keyHash = key.hashCode();
-    final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
+    final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details = MultimapResult
+        .unchanged();
 
 //    final AbstractSetMultimapNode<K, V> newRootNode;
 //
@@ -357,7 +358,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
         // int hashCodeDeltaNew = tupleHash(keyHash, values);
 
         // int propertyHashCode = cachedHashCode + hashCodeDeltaNew - hashCodeDeltaOld;
-        int propertySize = cachedSize - details.getEvictedPayload().size() + values.size();
+        int propertySize = cachedSize - details.getEvictedPayload().get().size() + values.size();
         int propertyKeySetHashCode = cachedKeySetHashCode;
         int propertyKeySetSize = cachedKeySetSize;
 
@@ -404,7 +405,8 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     }
 
     final int keyHash = key.hashCode();
-    final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
+    final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details = MultimapResult
+        .unchanged();
 
 //    final AbstractSetMultimapNode<K, V> newRootNode;
 //
@@ -455,7 +457,8 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
   @Override
   public final SetMultimap.Immutable<K, V> __remove(final K key, final V value) {
     final int keyHash = key.hashCode();
-    final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
+    final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details = MultimapResult
+        .unchanged();
 
     final AbstractSetMultimapNode<K, V> newRootNode =
         rootNode.removed(null, key, value, transformHashCode(keyHash), 0, details, cmp);
@@ -487,7 +490,8 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
   @Override
   public final SetMultimap.Immutable<K, V> __remove(K key) {
     final int keyHash = key.hashCode();
-    final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
+    final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details = MultimapResult
+        .unchanged();
 
     final AbstractSetMultimapNode<K, V> newRootNode =
         rootNode.removed(null, key, transformHashCode(keyHash), 0, details, cmp);
@@ -499,7 +503,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
         // int hashCodeDeltaOld = tupleHash(keyHash, details.getEvictedPayload());
 
         // int propertyHashCode = cachedHashCode - hashCodeDeltaOld;
-        int propertySize = cachedSize - details.getEvictedPayload().size();
+        int propertySize = cachedSize - details.getEvictedPayload().get().size();
         int propertyKeySetHashCode = cachedKeySetHashCode - keyHash;
         int propertyKeySetSize = cachedKeySetSize - 1;
 
@@ -842,65 +846,6 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     }
 
     return sumNodes;
-  }
-
-  static final class SetMultimapResult<K, V> implements
-      MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> {
-
-    private Modification modificationEffect = NOTHING;
-    private EnumSet<Modification> modificationDetails = EnumSet.noneOf(Modification.class);
-    private Optional<Integer> sizeDelta = Optional.empty();
-
-    private io.usethesource.capsule.Set.Immutable<V> evictedPayload =
-        io.usethesource.capsule.Set.Immutable.of();
-
-    @Override
-    public Modification getModificationEffect() {
-      return modificationEffect;
-    }
-
-    @Override
-    public EnumSet<Modification> getModificationDetails() {
-      return modificationDetails;
-    }
-
-    public Optional<Integer> sizeDelta() {
-      return sizeDelta;
-    }
-
-    @Override
-    public void modified(Modification modificationEffect,
-        EnumSet<Modification> modificationDetails) {
-      this.modificationEffect = modificationEffect;
-      this.modificationDetails = modificationDetails;
-    }
-
-    @Override
-    public void modified(Modification modificationEffect,
-        EnumSet<Modification> modificationDetails, int sizeDelta) {
-      this.modificationEffect = modificationEffect;
-      this.modificationDetails = modificationDetails;
-      this.sizeDelta = Optional.of(sizeDelta);
-    }
-
-    @Override
-    public void modified(Modification modificationEffect, EnumSet<Modification> modificationDetails,
-        io.usethesource.capsule.Set.Immutable<V> evictedPayload) {
-      this.modificationEffect = modificationEffect;
-      this.modificationDetails = modificationDetails;
-      this.evictedPayload = evictedPayload;
-    }
-
-    public io.usethesource.capsule.Set.Immutable<V> getEvictedPayload() {
-      return evictedPayload;
-    }
-
-    public static <K, V> SetMultimapResult<K, V> unchanged() {
-      return new SetMultimapResult<>();
-    }
-
-    private SetMultimapResult() {
-    }
   }
 
   protected static abstract class AbstractSetMultimapNode<K, V> implements
@@ -3308,9 +3253,11 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
       return this;
     }
 
+    @Override
     public AbstractSetMultimapNode<K, V> removed(AtomicReference<Thread> mutator, K key,
         int keyHash,
-        int shift, SetMultimapResult<K, V> details, EqualityComparator<Object> cmp) {
+        int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details,
+        EqualityComparator<Object> cmp) {
       final Optional<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> optionalTuple =
           collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
 
@@ -3719,7 +3666,8 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
       }
 
       final int keyHash = key.hashCode();
-      final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
+      final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details = MultimapResult
+          .unchanged();
 
 //      final AbstractSetMultimapNode<K, V> newRootNode;
 //
@@ -3741,7 +3689,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
           // int hashCodeDeltaNew = tupleHash(keyHash, values);
 
           // this.cachedHashCode = cachedHashCode + hashCodeDeltaNew - hashCodeDeltaOld;
-          this.cachedSize = cachedSize - details.getEvictedPayload().size() + values.size();
+          this.cachedSize = cachedSize - details.getEvictedPayload().get().size() + values.size();
           this.cachedKeySetHashCode = cachedKeySetHashCode;
           this.cachedKeySetSize = cachedKeySetSize;
 
@@ -3788,7 +3736,8 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
       }
 
       final int keyHash = key.hashCode();
-      final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
+      final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details = MultimapResult
+          .unchanged();
 
 //      final AbstractSetMultimapNode<K, V> newRootNode;
 //
@@ -3846,7 +3795,8 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
       }
 
       final int keyHash = key.hashCode();
-      final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
+      final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details = MultimapResult
+          .unchanged();
 
       final AbstractSetMultimapNode<K, V> newRootNode =
           rootNode.removed(mutator, key, value, transformHashCode(keyHash), 0, details, cmp);
@@ -3882,7 +3832,8 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
       }
 
       final int keyHash = key.hashCode();
-      final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
+      final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details = MultimapResult
+          .unchanged();
 
       final AbstractSetMultimapNode<K, V> newRootNode =
           rootNode.removed(mutator, key, transformHashCode(keyHash), 0, details, cmp);
@@ -3894,7 +3845,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
           // int hashCodeDeltaOld = tupleHash(keyHash, details.getEvictedPayload());
 
           // this.cachedHashCode = cachedHashCode - hashCodeDeltaOld;
-          this.cachedSize = cachedSize - details.getEvictedPayload().size();
+          this.cachedSize = cachedSize - details.getEvictedPayload().get().size();
           this.cachedKeySetHashCode = cachedKeySetHashCode - keyHash;
           this.cachedKeySetSize = cachedKeySetSize - 1;
 
