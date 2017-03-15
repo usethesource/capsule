@@ -22,6 +22,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.usethesource.capsule.util.ArrayUtils;
+
 public class TrieSet_5Bits_Spec0To8_IntKey implements
     io.usethesource.capsule.Set.Immutable<Integer> {
 
@@ -1751,7 +1753,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
       if (dataMap() != that.dataMap()) {
         return false;
       }
-      if (!Arrays.equals(nodes, that.nodes)) {
+      if (!ArrayUtils.equals(nodes, that.nodes)) {
         return false;
       }
       return true;

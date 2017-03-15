@@ -19,6 +19,7 @@ import com.pholser.junit.quickcheck.generator.Size;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap.Immutable<K, V>> {
@@ -156,6 +157,30 @@ public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap
     boolean containsInsertedValues = entryStream.allMatch(inputValues::contains);
 
     assertTrue("Must contain all inserted values.", containsInsertedValues);
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void sizeAfterInsertKeyValue(CT input, K key, V value) {
+    int sizeDelta =
+        Set.Immutable.of(value).__insertAll(input.get(key)).__removeAll(input.get(key)).size();
+
+    assertEquals(sizeDelta, input.__insert(key, value).size() - input.size());
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void sizeAfterInsertKeyValues(CT input, K key, Set.Immutable<V> values) {
+    int sizeDelta = values.__insertAll(input.get(key)).__removeAll(input.get(key)).size();
+
+    CT updatedInput = (CT) input.__insert(key, values);
+    assertEquals(sizeDelta, updatedInput.size() - input.size());
+
+    // invoke other properties
+    convertToJavaSetAndCheckSize(updatedInput);
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void getReturnsNonNull(CT input, K key) {
+    assertNotNull("Must always return a set and not null.", input.get(key));
   }
 
 }

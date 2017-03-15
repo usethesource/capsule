@@ -26,6 +26,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import io.usethesource.capsule.util.ArrayUtils;
+
 public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Immutable<K> {
 
   private static final TrieSet_5Bits_Spec0To8 EMPTY_SET =
@@ -1859,7 +1861,7 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       if (dataMap() != that.dataMap()) {
         return false;
       }
-      if (!Arrays.equals(nodes, that.nodes)) {
+      if (!ArrayUtils.equals(nodes, that.nodes)) {
         return false;
       }
       return true;

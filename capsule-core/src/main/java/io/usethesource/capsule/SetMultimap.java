@@ -143,6 +143,14 @@ public interface SetMultimap<K, V> {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
+    /*
+     * TODO: also include a transient variant?
+     * TODO: resolve name clash with BinaryRelation
+     */
+    default SetMultimap.Immutable<V, K> inverseMap() {
+      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
+    }
+
     boolean isTransientSupported();
 
     SetMultimap.Transient<K, V> asTransient();

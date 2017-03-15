@@ -9,26 +9,17 @@ package io.usethesource.capsule.core.trie;
 
 public interface Node {
 
-  // boolean hasNodes();
-  //
-  // int nodeArity();
-  //
-  // INode getNode(final int index);
-  //
-  // default void setNode(final AtomicReference<Thread> mutator, final int index, final INode node)
-  // {
-  // throw new UnsupportedOperationException("Immutable.");
-  // }
+  // <T> ArrayView<T> dataArray(int category);
 
-  default <T> ArrayView<T> dataArray(int category, int component) {
-    throw new UnsupportedOperationException("Experimental and only partially supported.");
-  }
+  /**
+   * Creates an array abstraction for a subset of data stored in a node.
+   *
+   * @param category the bit pattern of the (heterogeneous) data category
+   * @param component the index to address into tuple
+   * @param <T> dynamic cast type of projected on view
+   */
+  <T> ArrayView<T> dataArray(int category, int component);
 
   ArrayView<? extends Node> nodeArray();
-
-  // /** TODO: create local stream transformer */
-  // default <T> Stream<T> localStream() {
-  // return new Spliterators.spliterator(dataArray());
-  // }
 
 }

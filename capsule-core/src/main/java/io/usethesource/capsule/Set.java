@@ -9,6 +9,7 @@ package io.usethesource.capsule;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Optional;
 
 import io.usethesource.capsule.core.PersistentTrieSet;
 
@@ -27,6 +28,14 @@ public interface Set<K> extends java.util.Set<K>, SetEq<K> {
   boolean containsAll(Collection<?> c);
 
   K get(Object o);
+
+  default Optional<K> findFirst() {
+    if (isEmpty()) {
+      return Optional.empty();
+    } else {
+      return Optional.of(iterator().next());
+    }
+  }
 
   Iterator<K> keyIterator();
 

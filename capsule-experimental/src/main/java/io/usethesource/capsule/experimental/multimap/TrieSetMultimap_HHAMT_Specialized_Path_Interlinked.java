@@ -33,6 +33,8 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import io.usethesource.capsule.SetMultimap;
+import io.usethesource.capsule.core.trie.EitherSingletonOrCollection;
+import io.usethesource.capsule.core.trie.EitherSingletonOrCollection.Type;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.SetMultimap0To0Node;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.SetMultimap0To1Node;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.SetMultimap0To2Node;
@@ -40,7 +42,6 @@ import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Speci
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.SetMultimap1To0Node;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.SetMultimap1To2Node;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specializations_Path_Interlinked.SetMultimap2To0Node;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EitherSingletonOrCollection.Type;
 import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8;
 import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8.AbstractSetNode;
 import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8.SetResult;
@@ -48,6 +49,8 @@ import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.RangecopyUtils;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
 
+import static io.usethesource.capsule.core.trie.EitherSingletonOrCollection.Type.COLLECTION;
+import static io.usethesource.capsule.core.trie.EitherSingletonOrCollection.Type.SINGLETON;
 import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_COLLECTION;
 import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_SINGLETON;
 import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_EMPTY;
@@ -57,8 +60,6 @@ import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.set
 import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.specSetNodeOf;
 import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.specSetOf;
 import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.specSetToNode;
-import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EitherSingletonOrCollection.Type.COLLECTION;
-import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.EitherSingletonOrCollection.Type.SINGLETON;
 import static io.usethesource.capsule.util.BitmapUtils.filter;
 import static io.usethesource.capsule.util.BitmapUtils.index;
 import static io.usethesource.capsule.util.DataLayoutHelper.addressSize;
@@ -220,7 +221,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
 
     if (details.isModified()) {
       if (details.hasReplacedValue()) {
-        if (details.getType() == EitherSingletonOrCollection.Type.SINGLETON) {
+        if (details.getType() == SINGLETON) {
           final int valHashOld = details.getReplacedValue().hashCode();
           final int valHashNew = val.hashCode();
 
@@ -303,7 +304,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
     if (details.isModified()) {
       assert details.hasReplacedValue();
 
-      if (details.getType() == EitherSingletonOrCollection.Type.SINGLETON) {
+      if (details.getType() == SINGLETON) {
         final int valHash = details.getReplacedValue().hashCode();
         return new TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>(cmp, newRootNode,
             hashCode - ((keyHash ^ valHash)), cachedSize - 1);
@@ -676,77 +677,6 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
   // }
   // }
   // }
-
-  static abstract class EitherSingletonOrCollection<T> {
-
-    public enum Type {
-      SINGLETON, COLLECTION
-    }
-
-    public static final <T> EitherSingletonOrCollection<T> of(T value) {
-      return new SomeSingleton<>(value);
-    }
-
-    public static final <T> EitherSingletonOrCollection of(AbstractSetNode<T> value) {
-      return new SomeCollection<>(value);
-    }
-
-    abstract boolean isType(Type type);
-
-    abstract T getSingleton();
-
-    abstract AbstractSetNode<T> getCollection();
-  }
-
-  static final class SomeSingleton<T> extends EitherSingletonOrCollection<T> {
-
-    private final T value;
-
-    private SomeSingleton(T value) {
-      this.value = value;
-    }
-
-    @Override
-    boolean isType(Type type) {
-      return type == Type.SINGLETON;
-    }
-
-    @Override
-    T getSingleton() {
-      return value;
-    }
-
-    @Override
-    AbstractSetNode<T> getCollection() {
-      throw new UnsupportedOperationException(String
-          .format("Requested type %s but actually found %s.", Type.COLLECTION, Type.SINGLETON));
-    }
-  }
-
-  static final class SomeCollection<T> extends EitherSingletonOrCollection<T> {
-
-    private final AbstractSetNode<T> value;
-
-    private SomeCollection(AbstractSetNode<T> value) {
-      this.value = value;
-    }
-
-    @Override
-    boolean isType(Type type) {
-      return type == Type.COLLECTION;
-    }
-
-    @Override
-    T getSingleton() {
-      throw new UnsupportedOperationException(String
-          .format("Requested type %s but actually found %s.", Type.SINGLETON, Type.COLLECTION));
-    }
-
-    @Override
-    AbstractSetNode<T> getCollection() {
-      return value;
-    }
-  }
 
   static final class SetMultimapResult<K, V> {
 
@@ -1167,7 +1097,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
     // TODO: use final modifer when decoupling collision node from compact node
     @Override
     int payloadArity(EitherSingletonOrCollection.Type type) {
-      if (type == Type.SINGLETON) {
+      if (type == SINGLETON) {
         return arity(bitmap(), PATTERN_DATA_SINGLETON);
       } else {
         return arity(bitmap(), PATTERN_DATA_COLLECTION);
@@ -2279,7 +2209,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
                 // inline value (move to front)
                 EitherSingletonOrCollection.Type type = subNodeNew.typeOfSingleton();
 
-                if (type == EitherSingletonOrCollection.Type.SINGLETON) {
+                if (type == SINGLETON) {
                   return copyAndMigrateFromNodeToSingleton(mutator, doubledBitpos, subNodeNew);
                 } else {
                   return copyAndMigrateFromNodeToCollection(mutator, doubledBitpos, subNodeNew);
@@ -2438,7 +2368,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
                 // inline value (move to front)
                 EitherSingletonOrCollection.Type type = subNodeNew.typeOfSingleton();
 
-                if (type == EitherSingletonOrCollection.Type.SINGLETON) {
+                if (type == SINGLETON) {
                   return copyAndMigrateFromNodeToSingleton(mutator, doubledBitpos, subNodeNew);
                 } else {
                   return copyAndMigrateFromNodeToCollection(mutator, doubledBitpos, subNodeNew);
@@ -2530,9 +2460,9 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
       final int pattern = patternOfSingleton();
 
       if (pattern == PATTERN_DATA_SINGLETON) {
-        return EitherSingletonOrCollection.Type.SINGLETON;
+        return SINGLETON;
       } else {
-        return EitherSingletonOrCollection.Type.COLLECTION;
+        return COLLECTION;
       }
     }
 
@@ -3219,7 +3149,7 @@ public class TrieSetMultimap_HHAMT_Specialized_Path_Interlinked<K, V>
             currentValueSingletonCursor = 0;
             currentValueSingletonLength = nextNode.payloadArity(SINGLETON);
             currentValueCollectionCursor = 0;
-            currentValueCollectionLength = nextNode.payloadArity(Type.COLLECTION);
+            currentValueCollectionLength = nextNode.payloadArity(COLLECTION);
             return true;
           }
         } else {

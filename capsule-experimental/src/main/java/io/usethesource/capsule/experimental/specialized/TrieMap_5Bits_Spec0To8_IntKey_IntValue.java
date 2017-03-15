@@ -23,13 +23,13 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.usethesource.capsule.util.ArrayUtils;
+
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
-@SuppressWarnings("rawtypes")
 public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     implements io.usethesource.capsule.Map.Immutable<Integer, Integer> {
 
-  @SuppressWarnings("unchecked")
   private static final TrieMap_5Bits_Spec0To8_IntKey_IntValue EMPTY_MAP =
       new TrieMap_5Bits_Spec0To8_IntKey_IntValue(CompactMapNode.EMPTY_NODE, 0, 0);
 
@@ -48,12 +48,10 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final io.usethesource.capsule.Map.Immutable<Integer, Integer> of() {
     return TrieMap_5Bits_Spec0To8_IntKey_IntValue.EMPTY_MAP;
   }
 
-  @SuppressWarnings("unchecked")
   public static final io.usethesource.capsule.Map.Immutable<Integer, Integer> of(
       Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
@@ -73,12 +71,10 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     return result;
   }
 
-  @SuppressWarnings("unchecked")
   public static final io.usethesource.capsule.Map.Transient<Integer, Integer> transientOf() {
     return TrieMap_5Bits_Spec0To8_IntKey_IntValue.EMPTY_MAP.asTransient();
   }
 
-  @SuppressWarnings("unchecked")
   public static final io.usethesource.capsule.Map.Transient<Integer, Integer> transientOf(
       Object... keyValuePairs) {
     if (keyValuePairs.length % 2 != 0) {
@@ -103,7 +99,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     int size = 0;
 
     for (Iterator<Map.Entry<java.lang.Integer, java.lang.Integer>> it = entryIterator(); it
-        .hasNext();) {
+        .hasNext(); ) {
       final Map.Entry<java.lang.Integer, java.lang.Integer> entry = it.next();
       final int key = entry.getKey();
       final int val = entry.getValue();
@@ -119,9 +115,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     return hash;
   }
 
+  @Override
   public boolean containsKey(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final int key = (int) o;
       return rootNode.containsKey(key, transformHashCode(key), 0);
     } catch (ClassCastException unused) {
@@ -129,9 +125,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     }
   }
 
+  @Override
   public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
-      @SuppressWarnings("unchecked")
       final int key = (int) o;
       return rootNode.containsKey(key, transformHashCode(key), 0, cmp);
     } catch (ClassCastException unused) {
@@ -139,8 +135,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     }
   }
 
+  @Override
   public boolean containsValue(final Object o) {
-    for (Iterator<java.lang.Integer> iterator = valueIterator(); iterator.hasNext();) {
+    for (Iterator<java.lang.Integer> iterator = valueIterator(); iterator.hasNext(); ) {
       if (iterator.next().equals(o)) {
         return true;
       }
@@ -148,8 +145,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     return false;
   }
 
+  @Override
   public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
-    for (Iterator<java.lang.Integer> iterator = valueIterator(); iterator.hasNext();) {
+    for (Iterator<java.lang.Integer> iterator = valueIterator(); iterator.hasNext(); ) {
       if (cmp.compare(iterator.next(), o) == 0) {
         return true;
       }
@@ -157,9 +155,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     return false;
   }
 
+  @Override
   public java.lang.Integer get(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final int key = (int) o;
       final Optional<java.lang.Integer> result = rootNode.findByKey(key, transformHashCode(key), 0);
 
@@ -173,9 +171,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     }
   }
 
+  @Override
   public java.lang.Integer getEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
-      @SuppressWarnings("unchecked")
       final int key = (int) o;
       final Optional<java.lang.Integer> result =
           rootNode.findByKey(key, transformHashCode(key), 0, cmp);
@@ -190,8 +188,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     }
   }
 
+  @Override
   public io.usethesource.capsule.Map.Immutable<Integer, Integer> __put(final java.lang.Integer key,
-                                                                           final java.lang.Integer val) {
+      final java.lang.Integer val) {
     final int keyHash = key.hashCode();
     final MapResult details = MapResult.unchanged();
 
@@ -215,6 +214,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     return this;
   }
 
+  @Override
   public io.usethesource.capsule.Map.Immutable<Integer, Integer> __putEquivalent(
       final java.lang.Integer key, final java.lang.Integer val, final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
@@ -240,6 +240,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     return this;
   }
 
+  @Override
   public io.usethesource.capsule.Map.Immutable<Integer, Integer> __putAll(
       final Map<? extends java.lang.Integer, ? extends java.lang.Integer> map) {
     final io.usethesource.capsule.Map.Transient<Integer, Integer> tmpTransient = this.asTransient();
@@ -247,6 +248,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     return tmpTransient.freeze();
   }
 
+  @Override
   public io.usethesource.capsule.Map.Immutable<Integer, Integer> __putAllEquivalent(
       final Map<? extends java.lang.Integer, ? extends java.lang.Integer> map,
       final Comparator<Object> cmp) {
@@ -255,7 +257,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     return tmpTransient.freeze();
   }
 
-  public io.usethesource.capsule.Map.Immutable<Integer, Integer> __remove(final java.lang.Integer key) {
+  @Override
+  public io.usethesource.capsule.Map.Immutable<Integer, Integer> __remove(
+      final java.lang.Integer key) {
     final int keyHash = key.hashCode();
     final MapResult details = MapResult.unchanged();
 
@@ -272,6 +276,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     return this;
   }
 
+  @Override
   public io.usethesource.capsule.Map.Immutable<Integer, Integer> __removeEquivalent(
       final java.lang.Integer key, final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
@@ -290,38 +295,47 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     return this;
   }
 
+  @Override
   public java.lang.Integer put(final java.lang.Integer key, final java.lang.Integer val) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void putAll(final Map<? extends java.lang.Integer, ? extends java.lang.Integer> m) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void clear() {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public java.lang.Integer remove(final Object key) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public int size() {
     return cachedSize;
   }
 
+  @Override
   public boolean isEmpty() {
     return cachedSize == 0;
   }
 
+  @Override
   public Iterator<java.lang.Integer> keyIterator() {
     return new MapKeyIterator(rootNode);
   }
 
+  @Override
   public Iterator<java.lang.Integer> valueIterator() {
     return new MapValueIterator(rootNode);
   }
 
+  @Override
   public Iterator<Map.Entry<java.lang.Integer, java.lang.Integer>> entryIterator() {
     return new MapEntryIterator(rootNode);
   }
@@ -476,15 +490,15 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     } else if (other instanceof Map) {
       Map that = (Map) other;
 
-      if (this.size() != that.size())
+      if (this.size() != that.size()) {
         return false;
+      }
 
-      for (@SuppressWarnings("unchecked")
-      Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
+      for (
+          Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext(); ) {
         Map.Entry entry = it.next();
 
         try {
-          @SuppressWarnings("unchecked")
           final int key = (java.lang.Integer) entry.getKey();
           final Optional<java.lang.Integer> result =
               rootNode.findByKey(key, transformHashCode(key), 0);
@@ -492,7 +506,6 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
           if (!result.isPresent()) {
             return false;
           } else {
-            @SuppressWarnings("unchecked")
             final int val = (java.lang.Integer) entry.getValue();
 
             if (!result.get().equals(val)) {
@@ -630,6 +643,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
   }
 
   abstract static class Optional<T> {
+
     private static final Optional EMPTY = new Optional() {
       @Override
       boolean isPresent() {
@@ -642,7 +656,6 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       }
     };
 
-    @SuppressWarnings("unchecked")
     static <T> Optional<T> empty() {
       return EMPTY;
     }
@@ -656,6 +669,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     abstract T get();
 
     private static final class Value<T> extends Optional<T> {
+
       private final T value;
 
       private Value(T value) {
@@ -675,6 +689,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
   }
 
   static final class MapResult {
+
     private int replacedValue;
     private boolean isModified;
     private boolean isReplaced;
@@ -695,7 +710,8 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return new MapResult();
     }
 
-    private MapResult() {}
+    private MapResult() {
+    }
 
     public boolean isModified() {
       return isModified;
@@ -711,6 +727,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
   }
 
   protected static interface INode<K, V> {
+
   }
 
   protected static abstract class AbstractMapNode
@@ -766,8 +783,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
 
         @Override
         public AbstractMapNode next() {
-          if (!hasNext())
+          if (!hasNext()) {
             throw new NoSuchElementException();
+          }
           return AbstractMapNode.this.getNode(nextIndex++);
         }
 
@@ -797,7 +815,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
 
     /**
      * The arity of this trie node (i.e. number of values and nodes stored on this level).
-     * 
+     *
      * @return sum of nodes and values stored within
      */
 
@@ -844,7 +862,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     /**
      * Abstract predicate over a node's size. Value can be either {@value #SIZE_EMPTY},
      * {@value #SIZE_ONE}, or {@value #SIZE_MORE_THAN_ONE}.
-     * 
+     *
      * @return size predicate
      */
     abstract byte sizePredicate();
@@ -896,7 +914,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         // throw new
         // IllegalStateException("Hash collision not yet fixed.");
         return new HashCollisionMapNode_5Bits_Spec0To8_IntKey_IntValue(keyHash0,
-            (int[]) new int[] {key0, key1}, (int[]) new int[] {val0, val1});
+            (int[]) new int[]{key0, key1}, (int[]) new int[]{val0, val1});
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -927,14 +945,15 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
 
       EMPTY_NODE = new Map0To0Node_5Bits_Spec0To8_IntKey_IntValue(null, (int) 0, (int) 0);
 
-    };
+    }
+
+    ;
 
     static final CompactMapNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
         final int dataMap, final Object[] nodes) {
       return new BitmapIndexedMapNode(mutator, nodeMap, dataMap, nodes);
     }
 
-    @SuppressWarnings("unchecked")
     static final CompactMapNode nodeOf(AtomicReference<Thread> mutator) {
       return EMPTY_NODE;
     }
@@ -1007,7 +1026,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         final CompactMapNode node9) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {node9, node8, node7, node6, node5, node4, node3, node2, node1});
+          new Object[]{node9, node8, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final CompactMapNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
@@ -1073,7 +1092,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         final CompactMapNode node8) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, val1, node8, node7, node6, node5, node4, node3, node2, node1});
+          new Object[]{key1, val1, node8, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final CompactMapNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
@@ -1134,7 +1153,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         final CompactMapNode node7) {
       // NOTE: reversed node argument list due to CHAMP encoding
       return nodeOf(mutator, nodeMap, dataMap,
-          new Object[] {key1, val1, key2, val2, node7, node6, node5, node4, node3, node2, node1});
+          new Object[]{key1, val1, key2, val2, node7, node6, node5, node4, node3, node2, node1});
     }
 
     static final CompactMapNode nodeOf(final AtomicReference<Thread> mutator, final int nodeMap,
@@ -1188,7 +1207,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         final CompactMapNode node3, final CompactMapNode node4, final CompactMapNode node5,
         final CompactMapNode node6) {
       // NOTE: reversed node argument list due to CHAMP encoding
-      return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
+      return nodeOf(mutator, nodeMap, dataMap, new Object[]{key1, val1, key2, val2, key3, val3,
           node6, node5, node4, node3, node2, node1});
     }
 
@@ -1237,7 +1256,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         final CompactMapNode node2, final CompactMapNode node3, final CompactMapNode node4,
         final CompactMapNode node5) {
       // NOTE: reversed node argument list due to CHAMP encoding
-      return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
+      return nodeOf(mutator, nodeMap, dataMap, new Object[]{key1, val1, key2, val2, key3, val3,
           key4, val4, node5, node4, node3, node2, node1});
     }
 
@@ -1280,7 +1299,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         final int val5, final CompactMapNode node1, final CompactMapNode node2,
         final CompactMapNode node3, final CompactMapNode node4) {
       // NOTE: reversed node argument list due to CHAMP encoding
-      return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
+      return nodeOf(mutator, nodeMap, dataMap, new Object[]{key1, val1, key2, val2, key3, val3,
           key4, val4, key5, val5, node4, node3, node2, node1});
     }
 
@@ -1315,7 +1334,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         final int val5, final int key6, final int val6, final CompactMapNode node1,
         final CompactMapNode node2, final CompactMapNode node3) {
       // NOTE: reversed node argument list due to CHAMP encoding
-      return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
+      return nodeOf(mutator, nodeMap, dataMap, new Object[]{key1, val1, key2, val2, key3, val3,
           key4, val4, key5, val5, key6, val6, node3, node2, node1});
     }
 
@@ -1342,7 +1361,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         final int val5, final int key6, final int val6, final int key7, final int val7,
         final CompactMapNode node1, final CompactMapNode node2) {
       // NOTE: reversed node argument list due to CHAMP encoding
-      return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
+      return nodeOf(mutator, nodeMap, dataMap, new Object[]{key1, val1, key2, val2, key3, val3,
           key4, val4, key5, val5, key6, val6, key7, val7, node2, node1});
     }
 
@@ -1361,7 +1380,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         final int val5, final int key6, final int val6, final int key7, final int val7,
         final int key8, final int val8, final CompactMapNode node1) {
       // NOTE: reversed node argument list due to CHAMP encoding
-      return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
+      return nodeOf(mutator, nodeMap, dataMap, new Object[]{key1, val1, key2, val2, key3, val3,
           key4, val4, key5, val5, key6, val6, key7, val7, key8, val8, node1});
     }
 
@@ -1370,7 +1389,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         final int key3, final int val3, final int key4, final int val4, final int key5,
         final int val5, final int key6, final int val6, final int key7, final int val7,
         final int key8, final int val8, final int key9, final int val9) {
-      return nodeOf(mutator, nodeMap, dataMap, new Object[] {key1, val1, key2, val2, key3, val3,
+      return nodeOf(mutator, nodeMap, dataMap, new Object[]{key1, val1, key2, val2, key3, val3,
           key4, val4, key5, val5, key6, val6, key7, val7, key8, val8, key9, val9});
     }
 
@@ -1394,6 +1413,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return getNode(nodeIndex(bitpos));
     }
 
+    @Override
     boolean containsKey(final int key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -1413,6 +1433,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return false;
     }
 
+    @Override
     boolean containsKey(final int key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -1433,6 +1454,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return false;
     }
 
+    @Override
     Optional<java.lang.Integer> findByKey(final int key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -1457,6 +1479,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return Optional.empty();
     }
 
+    @Override
     Optional<java.lang.Integer> findByKey(final int key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -1482,6 +1505,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return Optional.empty();
     }
 
+    @Override
     CompactMapNode updated(final AtomicReference<Thread> mutator, final int key, final int val,
         final int keyHash, final int shift, final MapResult details) {
       final int mask = mask(keyHash, shift);
@@ -1526,6 +1550,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       }
     }
 
+    @Override
     CompactMapNode updated(final AtomicReference<Thread> mutator, final int key, final int val,
         final int keyHash, final int shift, final MapResult details, final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -1570,6 +1595,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       }
     }
 
+    @Override
     CompactMapNode removed(final AtomicReference<Thread> mutator, final int key, final int keyHash,
         final int shift, final MapResult details) {
       final int mask = mask(keyHash, shift);
@@ -1631,6 +1657,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return this;
     }
 
+    @Override
     CompactMapNode removed(final AtomicReference<Thread> mutator, final int key, final int keyHash,
         final int shift, final MapResult details, final Comparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -1820,7 +1847,8 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
   protected static abstract class CompactEmptyMapNode extends CompactMapNode {
 
     CompactEmptyMapNode(final AtomicReference<Thread> mutator, final int nodeMap,
-        final int dataMap) {}
+        final int dataMap) {
+    }
 
     @Override
     public int nodeMap() {
@@ -1873,11 +1901,11 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return (int) nodes[TUPLE_LENGTH * index + 1];
     }
 
+    @Override
     Map.Entry<java.lang.Integer, java.lang.Integer> getKeyValueEntry(final int index) {
       return entryOf((int) nodes[TUPLE_LENGTH * index], (int) nodes[TUPLE_LENGTH * index + 1]);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     CompactMapNode getNode(final int index) {
       return (CompactMapNode) nodes[nodes.length - 1 - index];
@@ -1946,7 +1974,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       if (dataMap() != that.dataMap()) {
         return false;
       }
-      if (!Arrays.equals(nodes, that.nodes)) {
+      if (!ArrayUtils.equals(nodes, that.nodes)) {
         return false;
       }
       return true;
@@ -2966,6 +2994,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
 
   private static final class HashCollisionMapNode_5Bits_Spec0To8_IntKey_IntValue
       extends CompactMapNode {
+
     private final int[] keys;
     private final int[] vals;
     private final int hash;
@@ -2979,6 +3008,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       assert payloadArity() >= 2;
     }
 
+    @Override
     boolean containsKey(final int key, final int keyHash, final int shift) {
       if (this.hash == keyHash) {
         for (int k : keys) {
@@ -2990,6 +3020,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return false;
     }
 
+    @Override
     boolean containsKey(final int key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       if (this.hash == keyHash) {
@@ -3002,6 +3033,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return false;
     }
 
+    @Override
     Optional<java.lang.Integer> findByKey(final int key, final int keyHash, final int shift) {
       for (int i = 0; i < keys.length; i++) {
         final int _key = keys[i];
@@ -3013,6 +3045,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return Optional.empty();
     }
 
+    @Override
     Optional<java.lang.Integer> findByKey(final int key, final int keyHash, final int shift,
         final Comparator<Object> cmp) {
       for (int i = 0; i < keys.length; i++) {
@@ -3025,6 +3058,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return Optional.empty();
     }
 
+    @Override
     CompactMapNode updated(final AtomicReference<Thread> mutator, final int key, final int val,
         final int keyHash, final int shift, final MapResult details) {
       assert this.hash == keyHash;
@@ -3075,6 +3109,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return new HashCollisionMapNode_5Bits_Spec0To8_IntKey_IntValue(keyHash, keysNew, valsNew);
     }
 
+    @Override
     CompactMapNode updated(final AtomicReference<Thread> mutator, final int key, final int val,
         final int keyHash, final int shift, final MapResult details, final Comparator<Object> cmp) {
       assert this.hash == keyHash;
@@ -3125,6 +3160,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return new HashCollisionMapNode_5Bits_Spec0To8_IntKey_IntValue(keyHash, keysNew, valsNew);
     }
 
+    @Override
     CompactMapNode removed(final AtomicReference<Thread> mutator, final int key, final int keyHash,
         final int shift, final MapResult details) {
       for (int idx = 0; idx < keys.length; idx++) {
@@ -3166,6 +3202,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return this;
     }
 
+    @Override
     CompactMapNode removed(final AtomicReference<Thread> mutator, final int key, final int keyHash,
         final int shift, final MapResult details, final Comparator<Object> cmp) {
       for (int idx = 0; idx < keys.length; idx++) {
@@ -3247,6 +3284,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return vals[index];
     }
 
+    @Override
     Map.Entry<java.lang.Integer, java.lang.Integer> getKeyValueEntry(final int index) {
       return entryOf(keys[index], vals[index]);
     }
@@ -3307,7 +3345,8 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       /*
        * Linear scan for each key, because of arbitrary element order.
        */
-      outerLoop: for (int i = 0; i < that.payloadArity(); i++) {
+      outerLoop:
+      for (int i = 0; i < that.payloadArity(); i++) {
         final int otherKey = that.getKey(i);
         final int otherVal = that.getValue(i);
 
@@ -3392,7 +3431,6 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     private int currentStackLevel = -1;
     private final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
 
-    @SuppressWarnings("unchecked")
     AbstractMapNode[] nodes = new AbstractMapNode[MAX_DEPTH];
 
     AbstractMapIterator(AbstractMapNode rootNode) {
@@ -3575,6 +3613,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
 
   static final class TransientTrieMap_5Bits_Spec0To8_IntKey_IntValue
       implements io.usethesource.capsule.Map.Transient<Integer, Integer> {
+
     final private AtomicReference<Thread> mutator;
     private AbstractMapNode rootNode;
     private int hashCode;
@@ -3596,7 +3635,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       int size = 0;
 
       for (Iterator<Map.Entry<java.lang.Integer, java.lang.Integer>> it = entryIterator(); it
-          .hasNext();) {
+          .hasNext(); ) {
         final Map.Entry<java.lang.Integer, java.lang.Integer> entry = it.next();
         final int key = entry.getKey();
         final int val = entry.getValue();
@@ -3608,25 +3647,29 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return hash == targetHash && size == targetSize;
     }
 
+    @Override
     public java.lang.Integer put(final java.lang.Integer key, final java.lang.Integer val) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public void putAll(final Map<? extends java.lang.Integer, ? extends java.lang.Integer> m) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public void clear() {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public java.lang.Integer remove(final Object key) {
       throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean containsKey(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final int key = (int) o;
         return rootNode.containsKey(key, transformHashCode(key), 0);
       } catch (ClassCastException unused) {
@@ -3634,9 +3677,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       }
     }
 
+    @Override
     public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
       try {
-        @SuppressWarnings("unchecked")
         final int key = (int) o;
         return rootNode.containsKey(key, transformHashCode(key), 0, cmp);
       } catch (ClassCastException unused) {
@@ -3644,8 +3687,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       }
     }
 
+    @Override
     public boolean containsValue(final Object o) {
-      for (Iterator<java.lang.Integer> iterator = valueIterator(); iterator.hasNext();) {
+      for (Iterator<java.lang.Integer> iterator = valueIterator(); iterator.hasNext(); ) {
         if (iterator.next().equals(o)) {
           return true;
         }
@@ -3653,8 +3697,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return false;
     }
 
+    @Override
     public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
-      for (Iterator<java.lang.Integer> iterator = valueIterator(); iterator.hasNext();) {
+      for (Iterator<java.lang.Integer> iterator = valueIterator(); iterator.hasNext(); ) {
         if (cmp.compare(iterator.next(), o) == 0) {
           return true;
         }
@@ -3662,9 +3707,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return false;
     }
 
+    @Override
     public java.lang.Integer get(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final int key = (int) o;
         final Optional<java.lang.Integer> result =
             rootNode.findByKey(key, transformHashCode(key), 0);
@@ -3679,9 +3724,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       }
     }
 
+    @Override
     public java.lang.Integer getEquivalent(final Object o, final Comparator<Object> cmp) {
       try {
-        @SuppressWarnings("unchecked")
         final int key = (int) o;
         final Optional<java.lang.Integer> result =
             rootNode.findByKey(key, transformHashCode(key), 0, cmp);
@@ -3696,6 +3741,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       }
     }
 
+    @Override
     public java.lang.Integer __put(final java.lang.Integer key, final java.lang.Integer val) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -3740,6 +3786,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return null;
     }
 
+    @Override
     public java.lang.Integer __putEquivalent(final java.lang.Integer key,
         final java.lang.Integer val, final Comparator<Object> cmp) {
       if (mutator.get() == null) {
@@ -3785,6 +3832,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return null;
     }
 
+    @Override
     public boolean __putAll(
         final Map<? extends java.lang.Integer, ? extends java.lang.Integer> map) {
       boolean modified = false;
@@ -3802,6 +3850,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return modified;
     }
 
+    @Override
     public boolean __putAllEquivalent(
         final Map<? extends java.lang.Integer, ? extends java.lang.Integer> map,
         final Comparator<Object> cmp) {
@@ -3821,6 +3870,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return modified;
     }
 
+    @Override
     public java.lang.Integer __remove(final java.lang.Integer key) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -3853,6 +3903,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return null;
     }
 
+    @Override
     public java.lang.Integer __removeEquivalent(final java.lang.Integer key,
         final Comparator<Object> cmp) {
       if (mutator.get() == null) {
@@ -3886,27 +3937,33 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       return null;
     }
 
+    @Override
     public int size() {
       return cachedSize;
     }
 
+    @Override
     public boolean isEmpty() {
       return cachedSize == 0;
     }
 
+    @Override
     public Iterator<java.lang.Integer> keyIterator() {
       return new TransientMapKeyIterator(this);
     }
 
+    @Override
     public Iterator<java.lang.Integer> valueIterator() {
       return new TransientMapValueIterator(this);
     }
 
+    @Override
     public Iterator<Map.Entry<java.lang.Integer, java.lang.Integer>> entryIterator() {
       return new TransientMapEntryIterator(this);
     }
 
     public static class TransientMapKeyIterator extends MapKeyIterator {
+
       final TransientTrieMap_5Bits_Spec0To8_IntKey_IntValue collection;
       int lastKey;
 
@@ -3916,10 +3973,12 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         this.collection = collection;
       }
 
+      @Override
       public java.lang.Integer next() {
         return lastKey = super.next();
       }
 
+      @Override
       public void remove() {
         // TODO: test removal at iteration rigorously
         collection.__remove(lastKey);
@@ -3927,6 +3986,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     }
 
     public static class TransientMapValueIterator extends MapValueIterator {
+
       final TransientTrieMap_5Bits_Spec0To8_IntKey_IntValue collection;
 
       public TransientMapValueIterator(
@@ -3935,16 +3995,19 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         this.collection = collection;
       }
 
+      @Override
       public java.lang.Integer next() {
         return super.next();
       }
 
+      @Override
       public void remove() {
         throw new UnsupportedOperationException();
       }
     }
 
     public static class TransientMapEntryIterator extends MapEntryIterator {
+
       final TransientTrieMap_5Bits_Spec0To8_IntKey_IntValue collection;
 
       public TransientMapEntryIterator(
@@ -3953,10 +4016,12 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
         this.collection = collection;
       }
 
+      @Override
       public Map.Entry<java.lang.Integer, java.lang.Integer> next() {
         return super.next();
       }
 
+      @Override
       public void remove() {
         throw new UnsupportedOperationException();
       }
@@ -4113,15 +4178,15 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
       } else if (other instanceof Map) {
         Map that = (Map) other;
 
-        if (this.size() != that.size())
+        if (this.size() != that.size()) {
           return false;
+        }
 
-        for (@SuppressWarnings("unchecked")
-        Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext();) {
+        for (
+            Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext(); ) {
           Map.Entry entry = it.next();
 
           try {
-            @SuppressWarnings("unchecked")
             final int key = (java.lang.Integer) entry.getKey();
             final Optional<java.lang.Integer> result =
                 rootNode.findByKey(key, transformHashCode(key), 0);
@@ -4129,7 +4194,6 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
             if (!result.isPresent()) {
               return false;
             } else {
-              @SuppressWarnings("unchecked")
               final int val = (java.lang.Integer) entry.getValue();
 
               if (!result.get().equals(val)) {

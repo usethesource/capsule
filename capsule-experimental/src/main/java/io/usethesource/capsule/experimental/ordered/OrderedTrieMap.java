@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import io.usethesource.capsule.api.experimental.Map;
+import io.usethesource.capsule.util.ArrayUtils;
 import io.usethesource.capsule.util.iterator.SupplierIterator;
 
 import static java.lang.System.arraycopy;
@@ -642,7 +643,7 @@ public final class OrderedTrieMap<K, V> implements Map.Immutable<K, V> {
       if (dataMap != that.dataMap) {
         return false;
       }
-      if (!Arrays.equals(nodes, that.nodes)) {
+      if (!ArrayUtils.equals(nodes, that.nodes)) {
         return false;
       }
       return true;

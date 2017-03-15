@@ -25,10 +25,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import io.usethesource.capsule.util.ArrayUtils;
 import io.usethesource.capsule.util.ArrayUtilsInt;
 
-@SuppressWarnings("rawtypes")
-public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.capsule.Set.Immutable<K> {
+public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements
+    io.usethesource.capsule.Set.Immutable<K> {
 
-  @SuppressWarnings("unchecked")
   private static final TrieSet_5Bits_Memoized_LazyHashCode EMPTY_SET =
       new TrieSet_5Bits_Memoized_LazyHashCode(CompactSetNode.EMPTY_NODE, 0);
 
@@ -46,12 +45,10 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K> io.usethesource.capsule.Set.Immutable<K> of() {
     return TrieSet_5Bits_Memoized_LazyHashCode.EMPTY_SET;
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K> io.usethesource.capsule.Set.Immutable<K> of(K... keys) {
     io.usethesource.capsule.Set.Immutable<K> result = TrieSet_5Bits_Memoized_LazyHashCode.EMPTY_SET;
 
@@ -62,14 +59,13 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
     return result;
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K> io.usethesource.capsule.Set.Transient<K> transientOf() {
     return TrieSet_5Bits_Memoized_LazyHashCode.EMPTY_SET.asTransient();
   }
 
-  @SuppressWarnings("unchecked")
   public static final <K> io.usethesource.capsule.Set.Transient<K> transientOf(K... keys) {
-    final io.usethesource.capsule.Set.Transient<K> result = TrieSet_5Bits_Memoized_LazyHashCode.EMPTY_SET.asTransient();
+    final io.usethesource.capsule.Set.Transient<K> result = TrieSet_5Bits_Memoized_LazyHashCode.EMPTY_SET
+        .asTransient();
 
     for (final K key : keys) {
       result.__insert(key);
@@ -82,7 +78,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
     int hash = 0;
     int size = 0;
 
-    for (Iterator<K> it = keyIterator(); it.hasNext();) {
+    for (Iterator<K> it = keyIterator(); it.hasNext(); ) {
       final K key = it.next();
 
       hash += key.hashCode();
@@ -99,7 +95,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
   @Override
   public boolean contains(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       return rootNode.contains(key, transformHashCode(key.hashCode()), 0);
     } catch (ClassCastException unused) {
@@ -110,7 +105,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
   @Override
   public boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       return rootNode.contains(key, transformHashCode(key.hashCode()), 0, cmp);
     } catch (ClassCastException unused) {
@@ -121,7 +115,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
   @Override
   public K get(final Object o) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
@@ -138,7 +131,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
   @Override
   public K getEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
-      @SuppressWarnings("unchecked")
       final K key = (K) o;
       final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
@@ -168,7 +160,8 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
   }
 
   @Override
-  public io.usethesource.capsule.Set.Immutable<K> __insertEquivalent(final K key, final Comparator<Object> cmp) {
+  public io.usethesource.capsule.Set.Immutable<K> __insertEquivalent(final K key,
+      final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -191,7 +184,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
 
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __insertAllEquivalent(final Set<? extends K> set,
-                                                                            final Comparator<Object> cmp) {
+      final Comparator<Object> cmp) {
     final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__insertAllEquivalent(set, cmp);
     return tmpTransient.freeze();
@@ -213,7 +206,8 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
   }
 
   @Override
-  public io.usethesource.capsule.Set.Immutable<K> __removeEquivalent(final K key, final Comparator<Object> cmp) {
+  public io.usethesource.capsule.Set.Immutable<K> __removeEquivalent(final K key,
+      final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -236,7 +230,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
 
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __removeAllEquivalent(final Set<? extends K> set,
-                                                                            final Comparator<Object> cmp) {
+      final Comparator<Object> cmp) {
     final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__removeAllEquivalent(set, cmp);
     return tmpTransient.freeze();
@@ -250,8 +244,9 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
   }
 
   @Override
-  public io.usethesource.capsule.Set.Immutable<K> __retainAllEquivalent(final io.usethesource.capsule.Set.Transient<? extends K> transientSet,
-                                                                            final Comparator<Object> cmp) {
+  public io.usethesource.capsule.Set.Immutable<K> __retainAllEquivalent(
+      final io.usethesource.capsule.Set.Transient<? extends K> transientSet,
+      final Comparator<Object> cmp) {
     final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__retainAllEquivalent(transientSet, cmp);
     return tmpTransient.freeze();
@@ -384,7 +379,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
   public int hashCode() {
     if (hashCode == -1) {
       int hash = 0;
-      for (Iterator<K> it = keyIterator(); it.hasNext();) {
+      for (Iterator<K> it = keyIterator(); it.hasNext(); ) {
         final K key = it.next();
         hash += key.hashCode();
       }
@@ -509,6 +504,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
   }
 
   abstract static class Optional<T> {
+
     private static final Optional EMPTY = new Optional() {
       @Override
       boolean isPresent() {
@@ -521,7 +517,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
       }
     };
 
-    @SuppressWarnings("unchecked")
     static <T> Optional<T> empty() {
       return EMPTY;
     }
@@ -535,6 +530,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
     abstract T get();
 
     private static final class Value<T> extends Optional<T> {
+
       private final T value;
 
       private Value(T value) {
@@ -554,6 +550,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
   }
 
   static final class SetResult<K> {
+
     private K replacedValue;
     private boolean isModified;
     private boolean isReplaced;
@@ -574,7 +571,8 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
       return new SetResult<>();
     }
 
-    private SetResult() {}
+    private SetResult() {
+    }
 
     public boolean isModified() {
       return isModified;
@@ -590,6 +588,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
   }
 
   protected static interface INode<K, V> {
+
   }
 
   protected static abstract class AbstractSetNode<K> implements INode<K, java.lang.Void> {
@@ -757,7 +756,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
     abstract CompactSetNode<K> copyAndMigrateFromNodeToInline(final AtomicReference<Thread> mutator,
         final int bitpos, final CompactSetNode<K> node);
 
-    @SuppressWarnings("unchecked")
     static final <K> CompactSetNode<K> mergeTwoKeyValPairs(final K key0, final int keyHash0,
         final K key1, final int keyHash1, final int shift) {
       // assert !(key0.equals(key1));
@@ -765,7 +763,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
       if (shift >= HASH_CODE_LENGTH) {
         // throw new
         // IllegalStateException("Hash collision not yet fixed.");
-        return new HashCollisionSetNode_5Bits<>(keyHash0, (K[]) new Object[] {key0, key1});
+        return new HashCollisionSetNode_5Bits<>(keyHash0, (K[]) new Object[]{key0, key1});
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -776,11 +774,11 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
         final int dataMap = bitpos(mask0) | bitpos(mask1);
 
         if (mask0 < mask1) {
-          return nodeOf(null, (0), dataMap, new Object[] {key0, key1},
-              new int[] {keyHash0, keyHash1});
+          return nodeOf(null, (0), dataMap, new Object[]{key0, key1},
+              new int[]{keyHash0, keyHash1});
         } else {
-          return nodeOf(null, (0), dataMap, new Object[] {key1, key0},
-              new int[] {keyHash1, keyHash0});
+          return nodeOf(null, (0), dataMap, new Object[]{key1, key0},
+              new int[]{keyHash1, keyHash0});
         }
       } else {
         final CompactSetNode<K> node =
@@ -788,22 +786,23 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
         // values fit on next level
 
         final int nodeMap = bitpos(mask0);
-        return nodeOf(null, nodeMap, (0), new Object[] {node}, new int[] {});
+        return nodeOf(null, nodeMap, (0), new Object[]{node}, new int[]{});
       }
     }
 
     static final CompactSetNode EMPTY_NODE;
 
     static {
-      EMPTY_NODE = new BitmapIndexedSetNode<>(null, (0), (0), new Object[] {}, new int[] {});
-    };
+      EMPTY_NODE = new BitmapIndexedSetNode<>(null, (0), (0), new Object[]{}, new int[]{});
+    }
+
+    ;
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
         final int nodeMap, final int dataMap, final Object[] nodes, final int[] keyHashes) {
       return new BitmapIndexedSetNode<>(mutator, nodeMap, dataMap, nodes, keyHashes);
     }
 
-    @SuppressWarnings("unchecked")
     static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator) {
       return EMPTY_NODE;
     }
@@ -1023,11 +1022,11 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
                 (shift == 0) ? (int) (dataMap() ^ bitpos) : bitpos(mask(keyHash, 0));
 
             if (dataIndex == 0) {
-              return CompactSetNode.nodeOf(mutator, (0), newDataMap, new Object[] {getKey(1)},
-                  new int[] {getKeyHash(1)});
+              return CompactSetNode.nodeOf(mutator, (0), newDataMap, new Object[]{getKey(1)},
+                  new int[]{getKeyHash(1)});
             } else {
-              return CompactSetNode.nodeOf(mutator, (0), newDataMap, new Object[] {getKey(0)},
-                  new int[] {getKeyHash(0)});
+              return CompactSetNode.nodeOf(mutator, (0), newDataMap, new Object[]{getKey(0)},
+                  new int[]{getKeyHash(0)});
             }
           } else {
             return copyAndRemoveValue(mutator, bitpos);
@@ -1090,11 +1089,11 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
                 (shift == 0) ? (int) (dataMap() ^ bitpos) : bitpos(mask(keyHash, 0));
 
             if (dataIndex == 0) {
-              return CompactSetNode.nodeOf(mutator, (0), newDataMap, new Object[] {getKey(1)},
-                  new int[] {getKeyHash(1)});
+              return CompactSetNode.nodeOf(mutator, (0), newDataMap, new Object[]{getKey(1)},
+                  new int[]{getKeyHash(1)});
             } else {
-              return CompactSetNode.nodeOf(mutator, (0), newDataMap, new Object[] {getKey(0)},
-                  new int[] {getKeyHash(0)});
+              return CompactSetNode.nodeOf(mutator, (0), newDataMap, new Object[]{getKey(0)},
+                  new int[]{getKeyHash(0)});
             }
           } else {
             return copyAndRemoveValue(mutator, bitpos);
@@ -1246,7 +1245,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
       assert nodeInvariant();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     K getKey(final int index) {
       return (K) nodes[TUPLE_LENGTH * index];
@@ -1257,7 +1255,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
       return keyHashes[index];
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     CompactSetNode<K> getNode(final int index) {
       return (CompactSetNode<K>) nodes[nodes.length - 1 - index];
@@ -1490,6 +1487,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
   }
 
   private static final class HashCollisionSetNode_5Bits<K> extends CompactSetNode<K> {
+
     private final K[] keys;
 
     private final int hash;
@@ -1561,7 +1559,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
         }
       }
 
-      @SuppressWarnings("unchecked")
       final K[] keysNew = (K[]) new Object[this.keys.length + 1];
 
       // copy 'this.keys' and insert 1 element(s) at position
@@ -1586,7 +1583,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
         }
       }
 
-      @SuppressWarnings("unchecked")
       final K[] keysNew = (K[]) new Object[this.keys.length + 1];
 
       // copy 'this.keys' and insert 1 element(s) at position
@@ -1619,7 +1615,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
             return CompactSetNode.<K>nodeOf(mutator).updated(mutator, theOtherKey, keyHash, 0,
                 details);
           } else {
-            @SuppressWarnings("unchecked")
             final K[] keysNew = (K[]) new Object[this.keys.length - 1];
 
             // copy 'this.keys' and remove 1 element(s) at position
@@ -1653,7 +1648,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
             return CompactSetNode.<K>nodeOf(mutator).updated(mutator, theOtherKey, keyHash, 0,
                 details, cmp);
           } else {
-            @SuppressWarnings("unchecked")
             final K[] keysNew = (K[]) new Object[this.keys.length - 1];
 
             // copy 'this.keys' and remove 1 element(s) at position
@@ -1762,7 +1756,8 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
       /*
        * Linear scan for each key, because of arbitrary element order.
        */
-      outerLoop: for (int i = 0; i < that.payloadArity(); i++) {
+      outerLoop:
+      for (int i = 0; i < that.payloadArity(); i++) {
         final Object otherKey = that.getKey(i);
 
         for (int j = 0; j < keys.length; j++) {
@@ -1834,7 +1829,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
     private int currentStackLevel = -1;
     private final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
 
-    @SuppressWarnings("unchecked")
     AbstractSetNode<K>[] nodes = new AbstractSetNode[MAX_DEPTH];
 
     AbstractSetIterator(AbstractSetNode<K> rootNode) {
@@ -1978,6 +1972,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
   }
 
   static final class TransientTrieSet_5Bits<K> implements io.usethesource.capsule.Set.Transient<K> {
+
     final private AtomicReference<Thread> mutator;
     private AbstractSetNode<K> rootNode;
     private int cachedSize;
@@ -1988,12 +1983,11 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
       this.cachedSize = trieSet_5Bits.cachedSize;
     }
 
-    @SuppressWarnings("unused")
     private boolean checkHashCodeAndSize(final int targetHash, final int targetSize) {
       int hash = 0;
       int size = 0;
 
-      for (Iterator<K> it = keyIterator(); it.hasNext();) {
+      for (Iterator<K> it = keyIterator(); it.hasNext(); ) {
         final K key = it.next();
 
         hash += key.hashCode();
@@ -2036,7 +2030,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
     @Override
     public boolean contains(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         return rootNode.contains(key, transformHashCode(key.hashCode()), 0);
       } catch (ClassCastException unused) {
@@ -2047,7 +2040,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
     @Override
     public boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         return rootNode.contains(key, transformHashCode(key.hashCode()), 0, cmp);
       } catch (ClassCastException unused) {
@@ -2058,7 +2050,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
     @Override
     public K get(final Object o) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
@@ -2075,7 +2066,6 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
     @Override
     public K getEquivalent(final Object o, final Comparator<Object> cmp) {
       try {
-        @SuppressWarnings("unchecked")
         final K key = (K) o;
         final Optional<K> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
@@ -2242,7 +2232,8 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
     }
 
     @Override
-    public boolean __retainAllEquivalent(final io.usethesource.capsule.Set.Transient<? extends K> transientSet,
+    public boolean __retainAllEquivalent(
+        final io.usethesource.capsule.Set.Transient<? extends K> transientSet,
         final Comparator<Object> cmp) {
       boolean modified = false;
 
@@ -2298,6 +2289,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
     }
 
     public static class TransientSetKeyIterator<K> extends SetKeyIterator<K> {
+
       final TransientTrieSet_5Bits<K> collection;
       K lastKey;
 
@@ -2374,7 +2366,7 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements io.usethesource.c
     @Override
     public int hashCode() {
       int hash = 0;
-      for (Iterator<K> it = keyIterator(); it.hasNext();) {
+      for (Iterator<K> it = keyIterator(); it.hasNext(); ) {
         final K key = it.next();
         hash += key.hashCode();
       }

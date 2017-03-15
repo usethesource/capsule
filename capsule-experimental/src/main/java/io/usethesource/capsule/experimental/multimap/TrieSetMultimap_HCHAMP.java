@@ -34,19 +34,22 @@ import java.util.stream.StreamSupport;
 import io.usethesource.capsule.SetMultimap;
 import io.usethesource.capsule.core.PersistentTrieSet;
 import io.usethesource.capsule.core.trie.ArrayView;
+import io.usethesource.capsule.core.trie.EitherSingletonOrCollection;
+import io.usethesource.capsule.core.trie.EitherSingletonOrCollection.Type;
 import io.usethesource.capsule.core.trie.Node;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type;
+import io.usethesource.capsule.util.ArrayUtils;
 import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
 
-import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type.COLLECTION;
-import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP.EitherSingletonOrCollection.Type.SINGLETON;
+import static io.usethesource.capsule.core.trie.EitherSingletonOrCollection.Type.COLLECTION;
+import static io.usethesource.capsule.core.trie.EitherSingletonOrCollection.Type.SINGLETON;
 import static io.usethesource.capsule.util.BitmapUtils.isBitInBitmap;
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 /**
  * Persistent trie-based set multi-map implementing the HCHAMP encoding.
  */
+@Deprecated
 public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V> {
 
   private final EqualityComparator<Object> cmp;
@@ -221,7 +224,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
 
     if (details.isModified()) {
       if (details.hasReplacedValue()) {
-        if (details.getType() == EitherSingletonOrCollection.Type.SINGLETON) {
+        if (details.getType() == SINGLETON) {
           final int valHashOld = details.getReplacedValue().hashCode();
           final int valHashNew = val.hashCode();
 
@@ -340,7 +343,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
     if (details.isModified()) {
       assert details.hasReplacedValue();
 
-      if (details.getType() == EitherSingletonOrCollection.Type.SINGLETON) {
+      if (details.getType() == SINGLETON) {
         final int valHash = details.getReplacedValue().hashCode();
         return new TrieSetMultimap_HCHAMP<K, V>(cmp, newRootNode,
             hashCode - ((keyHash ^ valHash)),
@@ -665,78 +668,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
     return sumNodes;
   }
 
-  static abstract class EitherSingletonOrCollection<T> {
-
-    public enum Type {
-      SINGLETON, COLLECTION
-    }
-
-    public static final <T> EitherSingletonOrCollection<T> of(T value) {
-      return new SomeSingleton<>(value);
-    }
-
-    public static final <T> EitherSingletonOrCollection of(
-        io.usethesource.capsule.Set.Immutable<T> value) {
-      return new SomeCollection<>(value);
-    }
-
-    abstract boolean isType(Type type);
-
-    abstract T getSingleton();
-
-    abstract io.usethesource.capsule.Set.Immutable<T> getCollection();
-  }
-
-  static final class SomeSingleton<T> extends EitherSingletonOrCollection<T> {
-
-    private final T value;
-
-    private SomeSingleton(T value) {
-      this.value = value;
-    }
-
-    @Override
-    boolean isType(Type type) {
-      return type == Type.SINGLETON;
-    }
-
-    @Override
-    T getSingleton() {
-      return value;
-    }
-
-    @Override
-    io.usethesource.capsule.Set.Immutable<T> getCollection() {
-      throw new UnsupportedOperationException(String
-          .format("Requested type %s but actually found %s.", Type.COLLECTION, Type.SINGLETON));
-    }
-  }
-
-  static final class SomeCollection<T> extends EitherSingletonOrCollection<T> {
-
-    private final io.usethesource.capsule.Set.Immutable<T> value;
-
-    private SomeCollection(io.usethesource.capsule.Set.Immutable<T> value) {
-      this.value = value;
-    }
-
-    @Override
-    boolean isType(Type type) {
-      return type == Type.COLLECTION;
-    }
-
-    @Override
-    T getSingleton() {
-      throw new UnsupportedOperationException(String
-          .format("Requested type %s but actually found %s.", Type.SINGLETON, Type.COLLECTION));
-    }
-
-    @Override
-    io.usethesource.capsule.Set.Immutable<T> getCollection() {
-      return value;
-    }
-  }
-
   static final class SetMultimapResult<K, V> {
 
     private V replacedValue;
@@ -828,6 +759,58 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
 
     static final boolean isAllowedToEdit(AtomicReference<?> x, AtomicReference<?> y) {
       return x != null && y != null && (x == y || x.get() == y.get());
+    }
+
+    @Override
+    public <T> ArrayView<T> dataArray(final int category, final int component) {
+      switch (category) {
+        case 0:
+          return categoryArrayView0(component);
+        case 1:
+          return categoryArrayView1(component);
+        default:
+          throw new IllegalArgumentException("Category %i is not supported.");
+      }
+    }
+
+    private <T> ArrayView<T> categoryArrayView0(final int component) {
+      return new ArrayView<T>() {
+        @Override
+        public int size() {
+          return payloadArity(SINGLETON);
+        }
+
+        @Override
+        public T get(int index) {
+          switch (component) {
+            case 0:
+              return (T) getSingletonKey(index);
+            case 1:
+              return (T) getSingletonValue(index);
+          }
+          throw new IllegalStateException();
+        }
+      };
+    }
+
+    private <T> ArrayView<T> categoryArrayView1(final int component) {
+      return new ArrayView<T>() {
+        @Override
+        public int size() {
+          return payloadArity(COLLECTION);
+        }
+
+        @Override
+        public T get(int index) {
+          switch (component) {
+            case 0:
+              return (T) getCollectionKey(index);
+            case 1:
+              return (T) getCollectionValue(index);
+          }
+          throw new IllegalStateException();
+        }
+      };
     }
 
     @Override
@@ -1524,7 +1507,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
               // inline value (move to front)
               EitherSingletonOrCollection.Type type = subNodeNew.typeOfSingleton();
 
-              if (type == EitherSingletonOrCollection.Type.SINGLETON) {
+              if (type == SINGLETON) {
                 return copyAndMigrateFromNodeToSingleton(mutator, bitpos, subNodeNew);
               } else {
                 return copyAndMigrateFromNodeToCollection(mutator, bitpos, subNodeNew);
@@ -1633,7 +1616,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
               // inline value (move to front)
               EitherSingletonOrCollection.Type type = subNodeNew.typeOfSingleton();
 
-              if (type == EitherSingletonOrCollection.Type.SINGLETON) {
+              if (type == SINGLETON) {
                 return copyAndMigrateFromNodeToSingleton(mutator, bitpos, subNodeNew);
               } else {
                 return copyAndMigrateFromNodeToCollection(mutator, bitpos, subNodeNew);
@@ -1846,58 +1829,6 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
       }
 
       assert nodeInvariant();
-    }
-
-    @Override
-    public <T> ArrayView<T> dataArray(final int category, final int component) {
-      switch (category) {
-        case 0:
-          return categoryArrayView0(component);
-        case 1:
-          return categoryArrayView1(component);
-        default:
-          throw new IllegalArgumentException("Category %i is not supported.");
-      }
-    }
-
-    private <T> ArrayView<T> categoryArrayView0(final int component) {
-      return new ArrayView<T>() {
-        @Override
-        public int size() {
-          return arity(dataMap());
-        }
-
-        @Override
-        public T get(int index) {
-          switch (component) {
-            case 0:
-              return (T) getSingletonKey(index);
-            case 1:
-              return (T) getSingletonValue(index);
-          }
-          throw new IllegalStateException();
-        }
-      };
-    }
-
-    private <T> ArrayView<T> categoryArrayView1(final int component) {
-      return new ArrayView<T>() {
-        @Override
-        public int size() {
-          return arity(collMap());
-        }
-
-        @Override
-        public T get(int index) {
-          switch (component) {
-            case 0:
-              return (T) getCollectionKey(index);
-            case 1:
-              return (T) getCollectionValue(index);
-          }
-          throw new IllegalStateException();
-        }
-      };
     }
 
     @Override
@@ -2147,7 +2078,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
       if (rawMap2() != that.rawMap2()) {
         return false;
       }
-      if (!Arrays.equals(nodes, that.nodes)) {
+      if (!ArrayUtils.equals(nodes, that.nodes)) {
         return false;
       }
       return true;
@@ -2431,9 +2362,9 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
       int rawMap2 = rawMap2();
 
       if (rawMap1 != rawMap2) {
-        return EitherSingletonOrCollection.Type.SINGLETON;
+        return SINGLETON;
       } else {
-        return EitherSingletonOrCollection.Type.COLLECTION;
+        return COLLECTION;
       }
     }
 
@@ -3489,7 +3420,7 @@ public class TrieSetMultimap_HCHAMP<K, V> implements SetMultimap.Immutable<K, V>
       if (details.isModified()) {
         assert details.hasReplacedValue();
 
-        if (details.getType() == EitherSingletonOrCollection.Type.SINGLETON) {
+        if (details.getType() == SINGLETON) {
           final int valHash = details.getReplacedValue().hashCode();
 
           rootNode = newRootNode;

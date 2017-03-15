@@ -5,260 +5,146 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-// package io.usethesource.capsule.core.trie;
+package io.usethesource.capsule.core.trie;
+
+import java.util.ListIterator;
+import java.util.Stack;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
+
+import io.usethesource.capsule.core.PersistentTrieSet;
+
+/**
+ * Bottom Up Trie Transformer, e.g., for combined mapping plus canonicalization of the tree.
+ *
+ * TODO: finish implementation (WIP converting from transient to immutable transformer)
+ */
+public class BottomUpImmutableNodeTransformer<SN extends Node, DN extends Node> {
+
+  private static final int MAX_DEPTH = 7;
+
+  //  private final BiFunction<SN, AtomicReference<Thread>, DN> nodeMapper;
+  private final BiFunction<SN, DN[], DN> nodeMapper;
+  private final AtomicReference<Thread> mutator;
+  private final DN dstRootNode;
+
+  static final <SN extends Node, DN extends Node> DN applyNodeTransformation(
+      final SN rootNode, final BiFunction<SN, DN[], DN> nodeMapper) {
+
+    BottomUpImmutableNodeTransformer<SN, DN> transformer =
+        new BottomUpImmutableNodeTransformer<>(rootNode, nodeMapper);
+    transformer.processStack();
+    return transformer.mappedNodesStack.peek();
+  }
+
+  private int stackIndex = -1;
+  private final SN[] srcNodeStack = (SN[]) new Object[MAX_DEPTH];
+
+  private final int[] srcNodeCursorsAndLengths = new int[MAX_DEPTH * 2];
+  private final Stack<DN> mappedNodesStack = new Stack<DN>();
+
+  private final DN[] EMPTY_DN_ARRAY = (DN[]) new Object[]{};
+
+  public BottomUpImmutableNodeTransformer(final SN srcRootNode,
+      final BiFunction<SN, DN[], DN> nodeMapper) {
+    mappedNodesStack.ensureCapacity(128);
+    this.nodeMapper = nodeMapper;
+    this.mutator = new AtomicReference<>(Thread.currentThread());
+    this.dstRootNode = null; // nodeMapper.apply(srcRootNode, mutator);
+
+    final ListIterator<SN> srcIterator = (ListIterator<SN>) srcRootNode.nodeArray().iterator();
+
+    if (srcIterator.hasNext()) {
+//      final ListIterator<DN> dstIterator = (ListIterator<DN>) dstRootNode.nodeArray().iterator();
 //
-// import java.util.Iterator;
-// import java.util.NoSuchElementException;
-// import java.util.Stack;
-// import java.util.function.BiFunction;
+//      pushOnStack(srcIterator, dstIterator);
+
+      pushOnStack(srcRootNode);
+    } else {
+      // TODO: Transform Leaf Node
+      mappedNodesStack.push(nodeMapper.apply(srcRootNode, (DN[]) EMPTY_DN_ARRAY));
+    }
+  }
+
+  public final DN apply() {
+    if (!isStackEmpty()) {
+      processStack();
+    }
+
+    mutator.set(null);
+    return dstRootNode;
+  }
+
+  private final boolean isStackEmpty() {
+    return stackIndex == -1;
+  }
+
+  private final void pushOnStack(SN srcNode) {
+    // push on stack
+    final int nextIndex = ++stackIndex;
+
+    srcNodeStack[nextIndex] = srcNode;
+    srcNodeCursorsAndLengths[2 * nextIndex + 0] = 0;
+    srcNodeCursorsAndLengths[2 * nextIndex + 1] = srcNode.nodeArray().size();
+  }
+
+  private final void dropFromStack() {
+    // pop from stack
+    final int previousIndex = stackIndex--;
+    srcNodeStack[previousIndex] = null;
+    srcNodeCursorsAndLengths[2 * previousIndex + 0] = 0;
+    srcNodeCursorsAndLengths[2 * previousIndex + 1] = 0;
+  }
+
+  private final void processStack() {
+    while (!isStackEmpty()) {
+      final int currentCursorIndex = stackIndex * 2;
+      final int currentLengthIndex = currentCursorIndex + 1;
+
+      final int childNodeCursor = srcNodeCursorsAndLengths[currentCursorIndex];
+      final int childNodeLength = srcNodeCursorsAndLengths[currentLengthIndex];
+
+      boolean stackModified = false;
+      while (!stackModified) {
+        if (childNodeCursor < childNodeLength) {
+          final SN src = (SN) srcNodeStack[stackIndex].nodeArray().get(childNodeCursor);
+          srcNodeCursorsAndLengths[currentCursorIndex]++;
+
+//          final SN src = srcIterator.next();
+//          final DN dst = nodeMapper.apply(src, mutator);
 //
-// import io.usethesource.capsule.core.deprecated.PersistentTrieSet;
-// import io.usethesource.capsule.core.PersistentTrieSetMultimap;
-//
-/// **
-// * Basic support for both PUSH- and PULL-based data processing. Still needs tweaking of the
-// * interface and implementation, but the the functionality is there.
-// */
-// public class BottomUpImmutableNodeTransformer<K, V, MN extends
-/// PersistentTrieSetMultimap.AbstractSetMultimapNode<K, V>, SN extends
-/// PersistentTrieSet.AbstractSetNode<K>>
-// implements Iterator<SN> {
-//
-// static final <K, V, MN extends PersistentTrieSetMultimap.AbstractSetMultimapNode<K, V>, SN extends
-/// PersistentTrieSet.AbstractSetNode<K>> SN applyNodeTransformation(
-// final MN rootNode, final BiFunction<MN, SN[], SN> nodeMapper) {
-//
-// BottomUpImmutableNodeTransformer<K, V, MN, SN> transformer =
-// new BottomUpImmutableNodeTransformer<>(rootNode, nodeMapper);
-// transformer.applyNodeTranformation(PersistentTrieSetMultimap.StreamType.PUSH);
-// return transformer.mappedNodesStack.peek();
-// }
-//
-// private static final int MAX_DEPTH = 7;
-//
-// private final BiFunction<MN, SN[], SN> nodeMapper;
-//
-// boolean isNextAvailable;
-// private int currentStackLevel;
-// private final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
-//
-// final MN[] nodes = (MN[]) new PersistentTrieSetMultimap.AbstractSetMultimapNode[MAX_DEPTH];
-//
-// final Stack<SN> mappedNodesStack = new Stack<SN>();
-//
-// private final static PersistentTrieSet.AbstractSetNode[] EMPTY_SN_ARRAY =
-// new PersistentTrieSet.AbstractSetNode[] {};
-//
-// BottomUpImmutableNodeTransformer(final MN rootNode, final BiFunction<MN, SN[], SN> nodeMapper) {
-// mappedNodesStack.ensureCapacity(128);
-//
-// this.nodeMapper = nodeMapper;
-//
-// if (rootNode.hasNodes()) {
-// // rootNode == non-leaf node
-// currentStackLevel = 0;
-// isNextAvailable = false;
-//
-// nodes[0] = rootNode;
-// nodeCursorsAndLengths[0] = 0;
-// nodeCursorsAndLengths[1] = rootNode.nodeArity();
-// } else {
-// currentStackLevel = -1;
-// isNextAvailable = true;
-//
-// mappedNodesStack.push(nodeMapper.apply(rootNode, (SN[]) EMPTY_SN_ARRAY));
-// // mappedNodesStack.push((SN) rootNode.toSetNode(EMPTY_SN_ARRAY));
-// // System.err.println(String.format("mappedNodesStack.size == %d",
-// // mappedNodesStack.size()));
-// // MAX_STACK_SIZE = Math.max(MAX_STACK_SIZE, mappedNodesStack.size());
-// }
-// }
-//
-// /*
-// * search for next node that can be mapped
-// */
-// private boolean applyNodeTranformation(final PersistentTrieSetMultimap.StreamType streamType) {
-// while (currentStackLevel >= 0) {
-// final int currentCursorIndex = currentStackLevel * 2;
-// final int currentLengthIndex = currentCursorIndex + 1;
-//
-// final int childNodeCursor = nodeCursorsAndLengths[currentCursorIndex];
-// final int childNodeLength = nodeCursorsAndLengths[currentLengthIndex];
-//
-// if (childNodeCursor < childNodeLength) {
-// final MN nextNode = (MN) nodes[currentStackLevel].getNode(childNodeCursor);
-// nodeCursorsAndLengths[currentCursorIndex]++;
-//
-// if (nextNode.hasNodes()) {
-// // root node == non-leaf node
-// // put node on next stack level for depth-first traversal
-// final int nextStackLevel = ++currentStackLevel;
-// final int nextCursorIndex = nextStackLevel * 2;
-// final int nextLengthIndex = nextCursorIndex + 1;
-//
-// nodes[nextStackLevel] = nextNode;
-// nodeCursorsAndLengths[nextCursorIndex] = 0;
-// nodeCursorsAndLengths[nextLengthIndex] = nextNode.nodeArity();
-// } else {
-// // nextNode == leaf node
-// mappedNodesStack.push(nodeMapper.apply(nextNode, (SN[]) EMPTY_SN_ARRAY));
-// // mappedNodesStack.push((SN) nextNode.toSetNode(EMPTY_SN_ARRAY));
-// // System.err.println(String.format("mappedNodesStack.size == %d",
-// // mappedNodesStack.size()));
-// // MAX_STACK_SIZE = Math.max(MAX_STACK_SIZE, mappedNodesStack.size());
-//
-// if (streamType == PersistentTrieSetMultimap.StreamType.PULL) {
-// return true;
-// }
-// }
-// } else {
-// // pop all children
-// assert childNodeLength != 0;
-// SN[] newChildren = (SN[]) new PersistentTrieSet.AbstractSetNode[childNodeLength];
-// for (int i = childNodeLength - 1; i >= 0; i--) {
-// newChildren[i] = mappedNodesStack.pop();
-// }
-//
-// // apply mapper, push mapped node
-// mappedNodesStack.push(nodeMapper.apply(nodes[currentStackLevel], newChildren));
-// // mappedNodesStack.push((SN) nodes[currentStackLevel].toSetNode(newChildren));
-// // System.err.println(String.format("mappedNodesStack.size == %d",
-// // mappedNodesStack.size()));
-// // MAX_STACK_SIZE = Math.max(MAX_STACK_SIZE, mappedNodesStack.size());
-// currentStackLevel--;
-//
-// if (streamType == PersistentTrieSetMultimap.StreamType.PULL) {
-// return true;
-// }
-// }
-// }
-//
-// // TODO: this is mind tangling; rework
-// if (streamType == PersistentTrieSetMultimap.StreamType.PUSH) {
-// return true;
-// } else {
-// return false;
-// }
-// }
-//
-// @Override
-// public boolean hasNext() {
-// if (currentStackLevel >= -1 && isNextAvailable) {
-// return true;
-// } else {
-// return isNextAvailable = applyNodeTranformation(PersistentTrieSetMultimap.StreamType.PULL);
-// }
-// }
-//
-// /**
-// * Returns transformed --either internal or leaf-- node.
-// *
-// * @return mapped node
-// */
-// @Override
-// public SN next() {
-// if (!hasNext()) {
-// throw new NoSuchElementException();
-// } else {
-// isNextAvailable = false;
-// return mappedNodesStack.peek();
-// }
-// }
-//
-// @Override
-// public void remove() {
-// throw new UnsupportedOperationException();
-// }
-//
-// public SN result() {
-// assert !hasNext();
-// return mappedNodesStack.peek();
-// }
-//
-// }
-//
-//
-// enum StreamType {
-// PULL, PUSH
-// }
-//
-//// private static final int MAX_DEPTH = 7;
-//// private final static Class<?> MAP_CLASS = AbstractSetMultimapNode.class;
-//// private final static Class<?> SET_CLASS = PersistentTrieSet.AbstractSetNode.class;
-////
-//// public static final <K, V, MN extends AbstractSetMultimapNode<K, V>, SN extends
-//// PersistentTrieSet.AbstractSetNode<K>> Optional<SN> applyNodeTransformation(
-//// final MN mapRootNode, final BiFunction<MN, AtomicReference<Thread>, SN> nodeMapper) {
-////
-//// final AtomicReference<Thread> mutator = new AtomicReference<>(Thread.currentThread());
-////
-//// final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
-//// final MN[] mapNodes = (MN[]) Array.newInstance(MAP_CLASS, MAX_DEPTH);
-//// final SN[] setNodes = (SN[]) Array.newInstance(SET_CLASS, MAX_DEPTH);
-////
-//// int currentStackLevel;
-////
-//// /************/
-//// /*** INIT ***/
-//// /************/
-////
-//// final SN setRootNode = nodeMapper.apply(mapRootNode, mutator);
-////
-//// if (mapRootNode.hasNodes()) {
-//// // rootNode == non-leaf node
-//// currentStackLevel = 0;
-////
-//// mapNodes[0] = mapRootNode;
-//// setNodes[0] = setRootNode;
-////
-//// nodeCursorsAndLengths[0] = 0;
-//// nodeCursorsAndLengths[1] = mapRootNode.nodeArity();
-//// } else {
-//// // nextNode == leaf node
-//// currentStackLevel = -1;
-//// return Optional.of(setRootNode);
-//// }
-////
-//// /************/
-//// /*** BODY ***/
-//// /************/
-////
-//// while (currentStackLevel >= 0) {
-//// final int currentCursorIndex = currentStackLevel * 2;
-//// final int currentLengthIndex = currentCursorIndex + 1;
-////
-//// final int childNodeCursor = nodeCursorsAndLengths[currentCursorIndex];
-//// final int childNodeLength = nodeCursorsAndLengths[currentLengthIndex];
-////
-//// if (childNodeCursor < childNodeLength) {
-//// final MN nextMapNode = (MN) mapNodes[currentStackLevel].getNode(childNodeCursor);
-//// nodeCursorsAndLengths[currentCursorIndex]++;
-////
-//// final SN nextSetNode = nodeMapper.apply(nextMapNode, mutator);
-//// setNodes[currentStackLevel].setNode(mutator, childNodeCursor, nextSetNode);
-////
-//// if (nextMapNode.hasNodes()) {
-//// // root node == non-leaf node
-//// // put node on next stack level for depth-first traversal
-//// final int nextStackLevel = ++currentStackLevel;
-//// final int nextCursorIndex = nextStackLevel * 2;
-//// final int nextLengthIndex = nextCursorIndex + 1;
-////
-//// mapNodes[nextStackLevel] = nextMapNode;
-//// setNodes[nextStackLevel] = nextSetNode;
-//// nodeCursorsAndLengths[nextCursorIndex] = 0;
-//// nodeCursorsAndLengths[nextLengthIndex] = nextMapNode.nodeArity();
-//// } else {
-//// // nextNode == (finished) leaf node
-//// }
-//// } else {
-//// // nextNode == (finished) intermediate node
-////
-//// // pop from stack
-//// currentStackLevel--;
-//// }
-//// }
-////
-//// // yield set's rootNode
-//// return Optional.of(setNodes[0]);
-//// }
+//          dstIterator.next();
+//          dstIterator.set(dst);
+
+          final ListIterator<SN> nextSrcIterator = (ListIterator<SN>) src.nodeArray().iterator();
+
+          if (nextSrcIterator.hasNext()) {
+            // root node == non-leaf node
+            // put node on next stack level for depth-first traversal
+            pushOnStack(src);
+            stackModified = true;
+          } else {
+            // nextNode == leaf node
+            // TODO: Transform Leaf Node
+            mappedNodesStack.push(nodeMapper.apply(src, (DN[]) EMPTY_DN_ARRAY));
+          }
+        } else {
+          // pop all children
+          assert childNodeLength != 0;
+          DN[] newChildren = (DN[]) new PersistentTrieSet.AbstractSetNode[childNodeLength];
+          for (int i = childNodeLength - 1; i >= 0; i--) {
+            newChildren[i] = mappedNodesStack.pop();
+          }
+
+          // TODO: Transform Non-Leaf Node
+          // apply mapper, push mapped node
+          mappedNodesStack.push(nodeMapper.apply(srcNodeStack[stackIndex], newChildren));
+
+          dropFromStack();
+          stackModified = true;
+        }
+      }
+    }
+  }
+
+}

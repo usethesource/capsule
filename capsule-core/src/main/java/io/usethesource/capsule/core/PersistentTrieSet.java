@@ -457,7 +457,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
   @Override
   public Set.Transient<K> asTransient() {
-    return new TransientTrieSet_5Bits<K>(this);
+    return new TransientTrieSet<K>(this);
   }
 
   /*
@@ -474,7 +474,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
    * For analysis purposes only.
    */
   protected Iterator<AbstractSetNode<K>> nodeIterator() {
-    return new TrieSet_5BitsNodeIterator<>(rootNode);
+    return new TrieSetNodeIterator<>(rootNode);
   }
 
   /*
@@ -666,7 +666,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     // factory method to construct trie from outer classes
     // TODO: find alternative solution that does not violate information hiding
     public static <K> AbstractSetNode<K> newHashCollisonNode(final int hash, K... keys) {
-      return new HashCollisionSetNode_5Bits<>(hash, keys);
+      return new HashCollisionSetNode<>(hash, keys);
     }
 
     // factory method to construct trie from outer classes
@@ -719,6 +719,29 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
     static final <T> boolean isAllowedToEdit(AtomicReference<?> x, AtomicReference<?> y) {
       return x != null && y != null && (x == y || x.get() == y.get());
+    }
+
+    @Override
+    public <T> ArrayView<T> dataArray(final int category, final int component) {
+      if (category == 0 && component == 0) {
+        return categoryArrayView0();
+      } else {
+        throw new IllegalArgumentException("Category %i is not supported.");
+      }
+    }
+
+    private <T> ArrayView<T> categoryArrayView0() {
+      return new ArrayView<T>() {
+        @Override
+        public int size() {
+          return payloadArity();
+        }
+
+        @Override
+        public T get(int index) {
+          return (T) getKey(index);
+        }
+      };
     }
 
     @Override
@@ -888,7 +911,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       if (shift >= HASH_CODE_LENGTH) {
         // throw new
         // IllegalStateException("Hash collision not yet fixed.");
-        return new HashCollisionSetNode_5Bits<>(keyHash0, (K[]) new Object[]{key0, key1});
+        return new HashCollisionSetNode<>(keyHash0, (K[]) new Object[]{key0, key1});
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -1378,6 +1401,9 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
           return BitmapIndexedSetNode.this.getNode(index);
         }
 
+        /**
+         * TODO: replace with {{@link #set(int, AbstractSetNode, AtomicReference)}}
+         */
         @Override
         public void set(int index, AbstractSetNode<K> item) {
           // if (!isAllowedToEdit(BitmapIndexedSetNode.this.mutator, writeCapabilityToken)) {
@@ -1600,13 +1626,13 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
   }
 
-  private static final class HashCollisionSetNode_5Bits<K> extends CompactSetNode<K> {
+  private static final class HashCollisionSetNode<K> extends CompactSetNode<K> {
 
     private final K[] keys;
 
     private final int hash;
 
-    HashCollisionSetNode_5Bits(final int hash, final K[] keys) {
+    HashCollisionSetNode(final int hash, final K[] keys) {
       this.keys = keys;
 
       this.hash = hash;
@@ -1696,7 +1722,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
           this.keys.length - keys.length);
 
       details.modified();
-      return new HashCollisionSetNode_5Bits<>(keyHash, keysNew);
+      return new HashCollisionSetNode<>(keyHash, keysNew);
     }
 
     @Override
@@ -1720,7 +1746,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
           this.keys.length - keys.length);
 
       details.modified();
-      return new HashCollisionSetNode_5Bits<>(keyHash, keysNew);
+      return new HashCollisionSetNode<>(keyHash, keysNew);
     }
 
     /*
@@ -1753,7 +1779,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
             System.arraycopy(this.keys, 0, keysNew, 0, idx);
             System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
 
-            return new HashCollisionSetNode_5Bits<>(keyHash, keysNew);
+            return new HashCollisionSetNode<>(keyHash, keysNew);
           }
         }
       }
@@ -1786,7 +1812,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
             System.arraycopy(this.keys, 0, keysNew, 0, idx);
             System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
 
-            return new HashCollisionSetNode_5Bits<>(keyHash, keysNew);
+            return new HashCollisionSetNode<>(keyHash, keysNew);
           }
         }
       }
@@ -1874,7 +1900,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
         return false;
       }
 
-      HashCollisionSetNode_5Bits<?> that = (HashCollisionSetNode_5Bits<?>) other;
+      HashCollisionSetNode<?> that = (HashCollisionSetNode<?>) other;
 
       if (hash != that.hash) {
         return false;
@@ -2056,11 +2082,11 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
   /**
    * Iterator that first iterates over inlined-values and then continues depth first recursively.
    */
-  private static class TrieSet_5BitsNodeIterator<K> implements Iterator<AbstractSetNode<K>> {
+  private static class TrieSetNodeIterator<K> implements Iterator<AbstractSetNode<K>> {
 
     final Deque<Iterator<? extends AbstractSetNode<K>>> nodeIteratorStack;
 
-    TrieSet_5BitsNodeIterator(AbstractSetNode<K> rootNode) {
+    TrieSetNodeIterator(AbstractSetNode<K> rootNode) {
       nodeIteratorStack = new ArrayDeque<>();
       nodeIteratorStack.push(Collections.singleton(rootNode).iterator());
     }
@@ -2102,18 +2128,16 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     }
   }
 
-  static final class TransientTrieSet_5Bits<K> implements Set.Transient<K> {
+  static abstract class AbstractTransientTrieSet<K> implements Set.Transient<K> {
 
-    final private AtomicReference<Thread> mutator;
-    private AbstractSetNode<K> rootNode;
-    private int hashCode;
-    private int cachedSize;
+    protected AbstractSetNode<K> rootNode;
+    protected int hashCode;
+    protected int cachedSize;
 
-    TransientTrieSet_5Bits(PersistentTrieSet<K> trieSet_5Bits) {
-      this.mutator = new AtomicReference<Thread>(Thread.currentThread());
-      this.rootNode = trieSet_5Bits.rootNode;
-      this.hashCode = trieSet_5Bits.hashCode;
-      this.cachedSize = trieSet_5Bits.cachedSize;
+    AbstractTransientTrieSet(PersistentTrieSet<K> trieSet) {
+      this.rootNode = trieSet.rootNode;
+      this.hashCode = trieSet.hashCode;
+      this.cachedSize = trieSet.cachedSize;
       if (DEBUG) {
         assert checkHashCodeAndSize(hashCode, cachedSize);
       }
@@ -2216,8 +2240,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       }
     }
 
-    @Override
-    public boolean __insert(final K key) {
+    protected boolean __insertWithCapability(AtomicReference<Thread> mutator, K key) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -2247,8 +2270,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       return false;
     }
 
-    @Override
-    public boolean __insertEquivalent(final K key, final Comparator<Object> cmp) {
+    protected boolean __insertEquivalentWithCapability(AtomicReference<Thread> mutator, final K key,
+        final Comparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -2301,8 +2324,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       return modified;
     }
 
-    @Override
-    public boolean __remove(final K key) {
+    protected boolean __removeWithCapability(AtomicReference<Thread> mutator, final K key) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -2331,8 +2353,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       return false;
     }
 
-    @Override
-    public boolean __removeEquivalent(final K key, final Comparator<Object> cmp) {
+    protected boolean __removeEquivalentWithCapability(AtomicReference<Thread> mutator, final K key,
+        final Comparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -2457,10 +2479,10 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
     public static class TransientSetKeyIterator<K> extends SetKeyIterator<K> {
 
-      final TransientTrieSet_5Bits<K> collection;
+      final AbstractTransientTrieSet<K> collection;
       K lastKey;
 
-      public TransientSetKeyIterator(final TransientTrieSet_5Bits<K> collection) {
+      public TransientSetKeyIterator(final AbstractTransientTrieSet<K> collection) {
         super(collection.rootNode);
         this.collection = collection;
       }
@@ -2500,7 +2522,6 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       return list.toArray(a);
     }
 
-    @Override
     public boolean equals(final Object other) {
       if (other == this) {
         return true;
@@ -2509,8 +2530,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
         return false;
       }
 
-      if (other instanceof TransientTrieSet_5Bits) {
-        TransientTrieSet_5Bits<?> that = (TransientTrieSet_5Bits<?>) other;
+      if (other instanceof PersistentTrieSet.AbstractTransientTrieSet) {
+        AbstractTransientTrieSet<?> that = (AbstractTransientTrieSet<?>) other;
 
         if (this.cachedSize != that.cachedSize) {
           return false;
@@ -2539,6 +2560,37 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       return hashCode;
     }
 
+  }
+
+  static final class TransientTrieSet<K> extends AbstractTransientTrieSet<K> {
+
+    final private AtomicReference<Thread> mutator;
+
+    TransientTrieSet(PersistentTrieSet<K> trieSet) {
+      super(trieSet);
+      this.mutator = new AtomicReference<Thread>(Thread.currentThread());
+    }
+
+    @Override
+    public boolean __insert(final K key) {
+      return __insertWithCapability(this.mutator, key);
+    }
+
+    @Override
+    public boolean __insertEquivalent(final K key, final Comparator<Object> cmp) {
+      return __insertEquivalentWithCapability(this.mutator, key, cmp);
+    }
+
+    @Override
+    public boolean __remove(final K key) {
+      return __removeWithCapability(this.mutator, key);
+    }
+
+    @Override
+    public boolean __removeEquivalent(final K key, final Comparator<Object> cmp) {
+      return __removeEquivalentWithCapability(this.mutator, key, cmp);
+    }
+
     @Override
     public Set.Immutable<K> freeze() {
       if (mutator.get() == null) {
@@ -2548,6 +2600,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       mutator.set(null);
       return new PersistentTrieSet<K>(rootNode, hashCode, cachedSize);
     }
+
   }
 
 }

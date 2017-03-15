@@ -23,6 +23,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.usethesource.capsule.util.ArrayUtils;
+
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 public class TrieMap_5Bits_Spec0To8<K, V> implements
@@ -1995,7 +1997,7 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements
       if (dataMap() != that.dataMap()) {
         return false;
       }
-      if (!Arrays.equals(nodes, that.nodes)) {
+      if (!ArrayUtils.equals(nodes, that.nodes)) {
         return false;
       }
       return true;
