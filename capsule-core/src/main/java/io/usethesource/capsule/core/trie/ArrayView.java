@@ -20,7 +20,7 @@ public interface ArrayView<T> extends Iterable<T> {
   int size();
 
   default boolean isEmpty() {
-    return size() != 0;
+    return size() == 0;
   }
 
   T get(int index);
