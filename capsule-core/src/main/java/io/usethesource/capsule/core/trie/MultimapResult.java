@@ -31,27 +31,7 @@ public interface MultimapResult<K, V, C> {
   Optional<C> getEvictedPayload();
 
   Optional<Integer> sizeDelta();
-
-  @Deprecated
-  default boolean isModified() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Deprecated
-  default void modified() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Deprecated
-  default void updatedSingle(V currentVal) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Deprecated
-  default void updatedMultiple(C currentCollVal) {
-    throw new UnsupportedOperationException();
-  }
-
+  
   enum Modification {
     NOTHING,
 

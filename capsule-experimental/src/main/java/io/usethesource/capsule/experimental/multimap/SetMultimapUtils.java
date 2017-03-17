@@ -11,6 +11,7 @@ import io.usethesource.capsule.api.experimental.Set;
 import io.usethesource.capsule.core.PersistentTrieSet;
 import io.usethesource.capsule.core.experimental.TrieSet;
 import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8;
+import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableSet;
 
 public class SetMultimapUtils {
 
@@ -150,7 +151,12 @@ public class SetMultimapUtils {
   @Deprecated
   public static final <T> PersistentTrieSet.AbstractSetNode<T> setToNode(
       io.usethesource.capsule.Set.Immutable<T> set) {
-    return ((PersistentTrieSet) set).getRootNode();
+    if (set instanceof AbstractSpecialisedImmutableSet && set.size() == 1) {
+      return setNodeOf(set.findFirst().get());
+    } else {
+      return ((PersistentTrieSet) set).getRootNode();
+    }
+
   }
 
   @Deprecated

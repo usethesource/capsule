@@ -7,18 +7,11 @@
  */
 package io.usethesource.capsule.core;
 
-import java.util.AbstractCollection;
-import java.util.AbstractSet;
-import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Deque;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,7 +20,6 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -35,6 +27,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import io.usethesource.capsule.SetMultimap;
+import io.usethesource.capsule.core.PersistentTrieSetMultimap.AbstractSetMultimapNode;
 import io.usethesource.capsule.core.trie.ArrayView;
 import io.usethesource.capsule.core.trie.EitherSingletonOrCollection;
 import io.usethesource.capsule.core.trie.EitherSingletonOrCollection.Type;
@@ -65,54 +58,55 @@ import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutab
 /**
  * Persistent trie-based set multi-map implementing the HCHAMP encoding.
  */
-public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K, V> {
-
-  private final EqualityComparator<Object> cmp;
+public class PersistentTrieSetMultimap<K, V> extends
+    AbstractPersistentTrieSetMultimap<K, V, io.usethesource.capsule.Set.Immutable<V>, AbstractSetMultimapNode<K, V>> {
 
   private static final PersistentTrieSetMultimap EMPTY_SETMULTIMAP = new PersistentTrieSetMultimap(
       EqualityComparator.EQUALS, CompactSetMultimapNode.EMPTY_NODE, 0, 0, 0);
 
-  private static final boolean DEBUG = false;
-
-  private final AbstractSetMultimapNode<K, V> rootNode;
-  //  private final int cachedHashCode;
-  private final int cachedSize;
-
-  private final int cachedKeySetSize;
-  private final int cachedKeySetHashCode;
-
-  PersistentTrieSetMultimap(EqualityComparator<Object> cmp,
-      AbstractSetMultimapNode<K, V> rootNode) {
-    this.cmp = cmp;
-    this.rootNode = rootNode;
-
-    // // this.cachedHashCode = hashCode(rootNode);
-    this.cachedSize = size(rootNode);
-
-    this.cachedKeySetHashCode = keySetHashCode(rootNode);
-    this.cachedKeySetSize = keySetSize(rootNode);
-
-    if (DEBUG) {
-      // assert checkHashCodeAndSize(cachedHashCode, cachedSize, entryIterator());
-      assert checkKeySetHashCodeAndSize(cachedKeySetHashCode, cachedKeySetSize, keyIterator());
-    }
-  }
+//  PersistentTrieSetMultimap(EqualityComparator<Object> cmp,
+//      AbstractSetMultimapNode<K, V> rootNode) {
+//    this.cmp = cmp;
+//    this.rootNode = rootNode;
+//
+//    // // this.cachedHashCode = hashCode(rootNode);
+//    this.cachedSize = size(rootNode);
+//
+//    this.cachedKeySetHashCode = keySetHashCode(rootNode);
+//    this.cachedKeySetSize = keySetSize(rootNode);
+//
+//    if (DEBUG) {
+//      // assert checkHashCodeAndSize(cachedHashCode, cachedSize, entryIterator());
+//      assert checkKeySetHashCodeAndSize(cachedKeySetHashCode, cachedKeySetSize, keyIterator());
+//    }
+//  }
 
   PersistentTrieSetMultimap(EqualityComparator<Object> cmp, AbstractSetMultimapNode<K, V> rootNode,
       int cachedSize, int keySetHashCode, int keySetSize) {
-    this.cmp = cmp;
-    this.rootNode = rootNode;
+    super(cmp, rootNode, cachedSize, keySetHashCode, keySetSize);
+  }
 
-//    // this.cachedHashCode = cachedHashCode;
-    this.cachedSize = cachedSize;
+  @Override
+  protected io.usethesource.capsule.Set.Immutable<V> valueToTemporaryBox(V value) {
+    return AbstractSpecialisedImmutableSet.setOf(value);
+  }
 
-    this.cachedKeySetHashCode = keySetHashCode;
-    this.cachedKeySetSize = keySetSize;
+  @Override
+  protected final io.usethesource.capsule.Set.Immutable<V> collectionToInternalFormat(
+      io.usethesource.capsule.Set.Immutable<V> valueCollection) {
+    return valueCollection;
+  }
 
-    if (DEBUG) {
-//      assert checkHashCodeAndSize(cachedHashCode, cachedSize, entryIterator());
-      assert checkKeySetHashCodeAndSize(cachedKeySetHashCode, cachedKeySetSize, keyIterator());
-    }
+  @Override
+  protected final io.usethesource.capsule.Set.Immutable<V> internalFormatToCollection(
+      io.usethesource.capsule.Set.Immutable<V> values) {
+    return values;
+  }
+
+  @Override
+  protected final PersistentTrieSetMultimap<K, V> wrap(EqualityComparator<Object> cmp,
+      AbstractSetMultimapNode<K, V> rootNode, int cachedSize, int keySetHashCode, int keySetSize) {
+    return new PersistentTrieSetMultimap(cmp, rootNode, cachedSize, keySetHashCode, keySetSize);
   }
 
   public static final <K, V> SetMultimap.Immutable<K, V> of() {
@@ -162,359 +156,12 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     return result;
   }
 
-  private static <K, V> int hashCode(AbstractSetMultimapNode<K, V> rootNode) {
-    int hash = 0;
-
-    final Iterator<Entry<K, V>> it = new SetMultimapTupleIterator<>(rootNode,
-        AbstractSpecialisedImmutableMap::entryOf);
-
-    while (it.hasNext()) {
-      final Map.Entry<K, V> entry = it.next();
-      final K key = entry.getKey();
-      final V val = entry.getValue();
-
-      hash += key.hashCode() ^ val.hashCode();
-    }
-
-    return hash;
-  }
-
-  private static <K, V> int size(AbstractSetMultimapNode<K, V> rootNode) {
-    int size = 0;
-
-    final Iterator<Entry<K, V>> it = new SetMultimapTupleIterator<>(rootNode,
-        AbstractSpecialisedImmutableMap::entryOf);
-
-    while (it.hasNext()) {
-      it.next();
-      size += 1;
-    }
-
-    return size;
-  }
-
-  private static <K, V> int keySetHashCode(AbstractSetMultimapNode<K, V> rootNode) {
-    int hash = 0;
-
-    final Iterator<K> it = new SetMultimapKeyIterator<>(rootNode);
-
-    while (it.hasNext()) {
-      final K key = it.next();
-      hash += key.hashCode();
-    }
-
-    return hash;
-  }
-
-  private static <K, V> int keySetSize(AbstractSetMultimapNode<K, V> rootNode) {
-    int size = 0;
-
-    final Iterator<K> it = new SetMultimapKeyIterator<>(rootNode);
-
-    while (it.hasNext()) {
-      it.next();
-      size += 1;
-    }
-
-    return size;
-  }
-
-  static <K, V> boolean checkHashCodeAndSize(final int targetHash, final int targetSize,
-      final Iterator<Map.Entry<K, V>> iterator) {
-    int hash = 0;
-    int size = 0;
-
-    while (iterator.hasNext()) {
-      final Map.Entry<K, V> entry = iterator.next();
-      final K key = entry.getKey();
-      final V val = entry.getValue();
-
-      hash += key.hashCode() ^ val.hashCode();
-      size += 1;
-    }
-
-    return hash == targetHash && size == targetSize;
-  }
-
-  static <K> boolean checkKeySetHashCodeAndSize(final int targetHash, final int targetSize,
-      final Iterator<K> iterator) {
-    int hash = 0;
-    int size = 0;
-
-    while (iterator.hasNext()) {
-      final K key = iterator.next();
-
-      hash += key.hashCode();
-      size += 1;
-    }
-
-    return hash == targetHash && size == targetSize;
-  }
-
-  public static final int transformHashCode(final int hash) {
-    return hash;
-  }
-
-  @Override
-  public boolean containsKey(final Object o) {
-    try {
-      final K key = (K) o;
-      return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0, cmp);
-    } catch (ClassCastException unused) {
-      return false;
-    }
-  }
-
-  @Override
-  public boolean containsValue(final Object o) {
-    for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
-      if (cmp.equals(iterator.next(), o)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  @Override
-  public boolean containsEntry(final Object o0, final Object o1) {
-    try {
-      final K key = (K) o0;
-      final V val = (V) o1;
-      return rootNode.containsTuple(key, val, transformHashCode(key.hashCode()), 0, cmp);
-    } catch (ClassCastException unused) {
-      return false;
-    }
-  }
-
-  @Override
-  public io.usethesource.capsule.Set.Immutable<V> get(final Object o) {
-    try {
-      final K key = (K) o;
-      final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
-          rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
-
-      return result.orElse(io.usethesource.capsule.Set.Immutable.of());
-    } catch (ClassCastException unused) {
-      return io.usethesource.capsule.Set.Immutable.of();
-    }
-  }
-
-  private static final <K, V> int tupleHash(final int keyHash, final int valueHash) {
-    return keyHash ^ valueHash;
-  }
-
-  private static final <K, V> int tupleHash(final int keyHash, final V value) {
-    return tupleHash(keyHash, Objects.hashCode(value));
-  }
-
-  private static final <K, V> int tupleHash(final K key, final V value) {
-    return tupleHash(Objects.hashCode(key), Objects.hashCode(value));
-  }
-
-  private static final <K, V, C extends java.util.Collection<V>> int tupleHash(final int keyHash,
-      final C values) {
-    return values.stream().mapToInt(Objects::hashCode)
-        .map(valueHash -> tupleHash(keyHash, valueHash)).sum();
-  }
-
-  private static final <K, V, C extends java.util.Collection<V>> int tupleHash(final K key,
-      final C values) {
-    return tupleHash(Objects.hashCode(key), values);
-  }
-
-  @Override
-  public final SetMultimap.Immutable<K, V> __put(K key, V value) {
-    return __put(key, AbstractSpecialisedImmutableSet.setOf(value));
-  }
-
-  @Override
-  public final SetMultimap.Immutable<K, V> __put(K key,
-      io.usethesource.capsule.Set.Immutable<V> values) {
-    if (values.isEmpty()) {
-      return __remove(key);
-    }
-
-    final int keyHash = key.hashCode();
-    final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details = MultimapResult
-        .unchanged();
-
-//    final AbstractSetMultimapNode<K, V> newRootNode;
-//
-//    if (values.size() == 1) {
-//      final V value = values.findFirst().get();
-//      newRootNode = rootNode
-//          .updatedSingle(null, key, value, transformHashCode(keyHash), 0, details, cmp);
-//    } else {
-//      newRootNode = rootNode
-//          .updatedMultiple(null, key, values, transformHashCode(keyHash), 0, details, cmp);
-//    }
-
-    final AbstractSetMultimapNode<K, V> newRootNode =
-        rootNode.updated(null, key, values, transformHashCode(keyHash), 0, details, cmp);
-
-    switch (details.getModificationEffect()) {
-      case REPLACED_PAYLOAD: {
-        // int hashCodeDeltaOld = tupleHash(keyHash, details.getEvictedPayload());
-        // int hashCodeDeltaNew = tupleHash(keyHash, values);
-
-        // int propertyHashCode = cachedHashCode + hashCodeDeltaNew - hashCodeDeltaOld;
-        int propertySize = cachedSize - details.getEvictedPayload().get().size() + values.size();
-        int propertyKeySetHashCode = cachedKeySetHashCode;
-        int propertyKeySetSize = cachedKeySetSize;
-
-        return new PersistentTrieSetMultimap<K, V>(cmp, newRootNode,
-            propertySize, propertyKeySetHashCode, propertyKeySetSize);
-      }
-
-      case INSERTED_PAYLOAD: {
-        assert details.getModificationDetails().contains(INSERTED_KEY);
-
-        // int hashCodeDeltaNew = tupleHash(keyHash, values);
-
-        // int propertyHashCode = cachedHashCode + hashCodeDeltaNew;
-        int propertySize = cachedSize + values.size();
-        int propertyKeySetHashCode = cachedKeySetHashCode + keyHash;
-        int propertyKeySetSize = cachedKeySetSize + 1;
-
-        return new PersistentTrieSetMultimap<K, V>(cmp, newRootNode,
-            propertySize, propertyKeySetHashCode, propertyKeySetSize);
-      }
-
-      default: {
-        return this;
-      }
-    }
-  }
-
-  private static final BinaryOperator<Boolean> BOOLEAN_OR = (left, right) -> left | right;
-  private static final BinaryOperator<Boolean> BOOLEAN_XOR = (left, right) -> left ^ right;
-
-  @Override
-  public final SetMultimap.Immutable<K, V> __insert(final K key, final V value) {
-    return __insert(key, AbstractSpecialisedImmutableSet.setOf(value));
-  }
-
-  /*
-   * TODO: erroneous -> does not communicate back how many values were inserted (necessary for updating size count)
-   */
-  @Override
-  public final SetMultimap.Immutable<K, V> __insert(K key,
-      io.usethesource.capsule.Set.Immutable<V> values) {
-    if (values.isEmpty()) {
-      return this;
-    }
-
-    final int keyHash = key.hashCode();
-    final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details = MultimapResult
-        .unchanged();
-
-//    final AbstractSetMultimapNode<K, V> newRootNode;
-//
-//    if (values.size() == 1) {
-//      final V value = values.findFirst().get();
-//      newRootNode = rootNode
-//          .insertedSingle(null, key, value, transformHashCode(keyHash), 0, details, cmp);
-//    } else {
-//      newRootNode = rootNode
-//          .insertedMultiple(null, key, values, transformHashCode(keyHash), 0, details, cmp);
-//    }
-
-    final AbstractSetMultimapNode<K, V> newRootNode = rootNode
-        .inserted(null, key, values, transformHashCode(keyHash), 0, details, cmp);
-
-    switch (details.getModificationEffect()) {
-      case INSERTED_PAYLOAD: {
-        // int hashCodeDeltaNew = tupleHash(keyHash, values);
-
-        // int propertyHashCode = cachedHashCode + hashCodeDeltaNew;
-        int propertySize = cachedSize + details.sizeDelta().get();
-        int propertyKeySetHashCode = cachedKeySetHashCode;
-        int propertyKeySetSize = cachedKeySetSize;
-
-        if (details.getModificationDetails().contains(INSERTED_KEY)) {
-          propertyKeySetHashCode += keyHash;
-          propertyKeySetSize += 1;
-        }
-
-        return new PersistentTrieSetMultimap<K, V>(cmp, newRootNode,
-            propertySize, propertyKeySetHashCode, propertyKeySetSize);
-      }
-
-      default: {
-        return this;
-      }
-    }
-  }
-
   @Override
   public SetMultimap.Immutable<K, V> union(
       final SetMultimap<? extends K, ? extends V> setMultimap) {
     final SetMultimap.Transient<K, V> tmpTransient = this.asTransient();
     tmpTransient.union(setMultimap);
     return tmpTransient.freeze();
-  }
-
-  @Override
-  public final SetMultimap.Immutable<K, V> __remove(final K key, final V value) {
-    final int keyHash = key.hashCode();
-    final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details = MultimapResult
-        .unchanged();
-
-    final AbstractSetMultimapNode<K, V> newRootNode =
-        rootNode.removed(null, key, value, transformHashCode(keyHash), 0, details, cmp);
-
-    switch (details.getModificationEffect()) {
-      case REMOVED_PAYLOAD: {
-        // int hashCodeDeltaOld = tupleHash(keyHash, value); // TODO: support collection
-
-        // int propertyHashCode = cachedHashCode - hashCodeDeltaOld;
-        int propertySize = cachedSize - 1; // TODO: support collection
-        int propertyKeySetHashCode = cachedKeySetHashCode;
-        int propertyKeySetSize = cachedKeySetSize;
-
-        if (details.getModificationDetails().contains(REMOVED_KEY)) {
-          propertyKeySetHashCode -= keyHash;
-          propertyKeySetSize -= 1;
-        }
-
-        return new PersistentTrieSetMultimap<K, V>(cmp, newRootNode,
-            propertySize, propertyKeySetHashCode, propertyKeySetSize);
-      }
-
-      default: {
-        return this;
-      }
-    }
-  }
-
-  @Override
-  public final SetMultimap.Immutable<K, V> __remove(K key) {
-    final int keyHash = key.hashCode();
-    final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details = MultimapResult
-        .unchanged();
-
-    final AbstractSetMultimapNode<K, V> newRootNode =
-        rootNode.removed(null, key, transformHashCode(keyHash), 0, details, cmp);
-
-    switch (details.getModificationEffect()) {
-      case REMOVED_PAYLOAD: {
-        assert details.getModificationDetails().contains(REMOVED_KEY);
-
-        // int hashCodeDeltaOld = tupleHash(keyHash, details.getEvictedPayload());
-
-        // int propertyHashCode = cachedHashCode - hashCodeDeltaOld;
-        int propertySize = cachedSize - details.getEvictedPayload().get().size();
-        int propertyKeySetHashCode = cachedKeySetHashCode - keyHash;
-        int propertyKeySetSize = cachedKeySetSize - 1;
-
-        return new PersistentTrieSetMultimap<K, V>(cmp, newRootNode,
-            propertySize, propertyKeySetHashCode, propertyKeySetSize);
-      }
-
-      default: {
-        return this;
-      }
-    }
   }
 
   @Override
@@ -542,271 +189,8 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
   }
 
   @Override
-  public Iterator<K> keyIterator() {
-    return new SetMultimapKeyIterator<>(rootNode);
-  }
-
-  @Override
   public Iterator<V> valueIterator() {
-    return valueCollectionsStream().flatMap(Set::stream).iterator();
-  }
-
-  @Override
-  public Iterator<Map.Entry<K, V>> entryIterator() {
-    return new SetMultimapTupleIterator<>(rootNode, AbstractSpecialisedImmutableMap::entryOf);
-  }
-
-  @Override
-  public Iterator<Map.Entry<K, Object>> nativeEntryIterator() {
-    return new SetMultimapNativeTupleIterator<>(rootNode);
-  }
-
-  @Override
-  public <T> Iterator<T> tupleIterator(final BiFunction<K, V, T> tupleOf) {
-    return new SetMultimapTupleIterator<>(rootNode, tupleOf);
-  }
-
-  private Spliterator<io.usethesource.capsule.Set.Immutable<V>> valueCollectionsSpliterator() {
-    /*
-     * TODO: specialize between mutable / SetMultimap.Immutable<K, V> ({@see Spliterator.IMMUTABLE})
-     */
-    int characteristics = Spliterator.NONNULL | Spliterator.SIZED | Spliterator.SUBSIZED;
-    return Spliterators.spliterator(new SetMultimapValueIterator<>(rootNode), size(),
-        characteristics);
-  }
-
-  private Stream<io.usethesource.capsule.Set.Immutable<V>> valueCollectionsStream() {
-    boolean isParallel = false;
-    return StreamSupport.stream(valueCollectionsSpliterator(), isParallel);
-  }
-
-  @Override
-  public Set<K> keySet() {
-    Set<K> keySet = null;
-
-    if (keySet == null) {
-      keySet = new AbstractSet<K>() {
-        @Override
-        public Iterator<K> iterator() {
-          return PersistentTrieSetMultimap.this.keyIterator();
-        }
-
-        @Override
-        public int size() {
-          return PersistentTrieSetMultimap.this.sizeDistinct();
-        }
-
-        @Override
-        public boolean isEmpty() {
-          return PersistentTrieSetMultimap.this.isEmpty();
-        }
-
-        @Override
-        public void clear() {
-          throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public boolean contains(Object k) {
-          return PersistentTrieSetMultimap.this.containsKey(k);
-        }
-      };
-    }
-
-    return keySet;
-  }
-
-//  /**
-//   * Eagerly calcualated set of keys (instead of returning a set view on a map).
-//   *
-//   * @return canonical SetMultimap.Immutable<K, V> set of keys
-//   */
-//  @Override
-//  public Set<K> keySet() {
-//    final BottomUpTransientNodeTransformer<AbstractSetMultimapNode<K, V>, PersistentTrieSet.AbstractSetNode<K>> transformer =
-//        new BottomUpTransientNodeTransformer<>(rootNode,
-//            (node, mutator) -> node.toSetNode(mutator));
-//
-//    final PersistentTrieSet.AbstractSetNode<K> newRootNode = transformer.apply();
-//
-//    return new PersistentTrieSet<>(newRootNode, cachedKeySetHashCode, cachedKeySetSize);
-//  }
-
-  @Override
-  public Collection<V> values() {
-    Collection<V> values = null;
-
-    if (values == null) {
-      values = new AbstractCollection<V>() {
-        @Override
-        public Iterator<V> iterator() {
-          return PersistentTrieSetMultimap.this.valueIterator();
-        }
-
-        @Override
-        public int size() {
-          return PersistentTrieSetMultimap.this.size();
-        }
-
-        @Override
-        public boolean isEmpty() {
-          return PersistentTrieSetMultimap.this.isEmpty();
-        }
-
-        @Override
-        public void clear() {
-          throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public boolean contains(Object v) {
-          return PersistentTrieSetMultimap.this.containsValue(v);
-        }
-      };
-    }
-
-    return values;
-  }
-
-  @Override
-  public Set<java.util.Map.Entry<K, V>> entrySet() {
-    Set<java.util.Map.Entry<K, V>> entrySet = null;
-
-    if (entrySet == null) {
-      entrySet = new AbstractSet<java.util.Map.Entry<K, V>>() {
-        @Override
-        public Iterator<java.util.Map.Entry<K, V>> iterator() {
-          return new Iterator<Map.Entry<K, V>>() {
-            private final Iterator<Map.Entry<K, V>> i = entryIterator();
-
-            @Override
-            public boolean hasNext() {
-              return i.hasNext();
-            }
-
-            @Override
-            public Map.Entry<K, V> next() {
-              return i.next();
-            }
-
-            @Override
-            public void remove() {
-              i.remove();
-            }
-          };
-        }
-
-        @Override
-        public int size() {
-          return PersistentTrieSetMultimap.this.size();
-        }
-
-        @Override
-        public boolean isEmpty() {
-          return PersistentTrieSetMultimap.this.isEmpty();
-        }
-
-        @Override
-        public void clear() {
-          throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public boolean contains(Object k) {
-          return PersistentTrieSetMultimap.this.containsKey(k);
-        }
-      };
-    }
-
-    return entrySet;
-  }
-
-  @Override
-  public boolean equals(final Object other) {
-    if (other == this) {
-      return true;
-    }
-    if (other == null) {
-      return false;
-    }
-
-    if (other instanceof PersistentTrieSetMultimap) {
-      PersistentTrieSetMultimap<?, ?> that = (PersistentTrieSetMultimap<?, ?>) other;
-
-      if (this.cachedSize != that.cachedSize) {
-        return false;
-      }
-
-//      if (this.cachedHashCode != that.cachedHashCode) {
-//        return false;
-//      }
-
-      if (this.cachedKeySetSize != that.cachedKeySetSize) {
-        return false;
-      }
-
-      if (this.cachedKeySetHashCode != that.cachedKeySetHashCode) {
-        return false;
-      }
-
-      return rootNode.equals(that.rootNode);
-    } else if (other instanceof SetMultimap) {
-      SetMultimap that = (SetMultimap) other;
-
-      if (this.size() != that.size()) {
-        return false;
-      }
-
-      for (
-          Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext(); ) {
-        Map.Entry entry = it.next();
-
-        try {
-          final K key = (K) entry.getKey();
-          final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
-              rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
-
-          if (!result.isPresent()) {
-            return false;
-          } else {
-            final io.usethesource.capsule.Set.Immutable<V> valColl =
-                (io.usethesource.capsule.Set.Immutable<V>) entry.getValue();
-
-            if (!cmp.equals(result.get(), valColl)) {
-              return false;
-            }
-          }
-        } catch (ClassCastException unused) {
-          return false;
-        }
-      }
-
-      return true;
-    }
-
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-//    return cachedHashCode;
-    return hashCode(rootNode);
-  }
-
-  @Override
-  public String toString() {
-    final int TO_STRING_MAX_COUNT = 10;
-
-    String body =
-        entrySet().stream().limit(TO_STRING_MAX_COUNT)
-            .map(entry -> String.format("%s: %s", entry.getKey(), entry.getValue()))
-            .reduce((o1, o2) -> String.join(", ", o1, o2)).orElse("");
-
-    if (size() > TO_STRING_MAX_COUNT && !body.isEmpty()) {
-      return String.format("{%s, ...}", body);
-    } else {
-      return String.format("{%s}", body);
-    }
+    return super.valueIterator(io.usethesource.capsule.Set.Immutable::of);
   }
 
   @Override
@@ -817,35 +201,6 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
   @Override
   public SetMultimap.Transient<K, V> asTransient() {
     return new TransientTrieSetMultimap<K, V>(this);
-  }
-
-  /*
-   * For analysis purposes only.
-   */
-  protected AbstractSetMultimapNode<K, V> getRootNode() {
-    return rootNode;
-  }
-
-  /*
-   * For analysis purposes only.
-   */
-  protected Iterator<AbstractSetMultimapNode<K, V>> nodeIterator() {
-    return new TrieSetMultimap_BleedingEdgeNodeIterator<>(rootNode);
-  }
-
-  /*
-   * For analysis purposes only.
-   */
-
-  protected int getNodeCount() {
-    final Iterator<AbstractSetMultimapNode<K, V>> it = nodeIterator();
-    int sumNodes = 0;
-
-    for (; it.hasNext(); it.next()) {
-      sumNodes += 1;
-    }
-
-    return sumNodes;
   }
 
   protected static abstract class AbstractSetMultimapNode<K, V> implements
@@ -1750,7 +1105,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
         if (cmp.equals(currentKey, key)) {
           final V currentVal = getSingletonValue(dataIndex);
 
-          // update singleton value
+          // replace singleton value with collection
           details.modified(REPLACED_PAYLOAD, EnumSet.of(REPLACED_VALUE));
           return copyAndMigrateFromSingletonToCollection(mutator, bitpos, key, values);
         } else {
@@ -1774,7 +1129,7 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
           final io.usethesource.capsule.Set.Immutable<V> currentCollVal =
               getCollectionValue(collIndex);
 
-          // migrate from collection to singleton
+          // update collection
           details.modified(REPLACED_PAYLOAD, EnumSet.of(REPLACED_VALUE_COLLECTION));
           return copyAndSetCollectionValue(mutator, bitpos, values);
         } else {
@@ -3288,493 +2643,28 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
     }
   }
 
-  /**
-   * Iterator skeleton that uses a fixed stack in depth.
-   */
-  private static abstract class AbstractSetMultimapIterator<K, V> {
+  static final class TransientTrieSetMultimap<K, V> extends
+      AbstractTransientTrieSetMultimap<K, V, io.usethesource.capsule.Set.Immutable<V>, AbstractSetMultimapNode<K, V>> {
 
-    private static final int MAX_DEPTH = 7;
-
-    protected int currentValueSingletonCursor;
-    protected int currentValueSingletonLength;
-    protected int currentValueCollectionCursor;
-    protected int currentValueCollectionLength;
-    protected AbstractSetMultimapNode<K, V> currentValueNode;
-
-    private int currentStackLevel = -1;
-    private final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
-
-    AbstractSetMultimapNode<K, V>[] nodes = new AbstractSetMultimapNode[MAX_DEPTH];
-
-    AbstractSetMultimapIterator(AbstractSetMultimapNode<K, V> rootNode) {
-      if (rootNode.hasNodes()) {
-        currentStackLevel = 0;
-
-        nodes[0] = rootNode;
-        nodeCursorsAndLengths[0] = 0;
-        nodeCursorsAndLengths[1] = rootNode.nodeArity();
-      }
-
-      if (rootNode.hasPayload(SINGLETON) || rootNode.hasPayload(COLLECTION)) {
-        currentValueNode = rootNode;
-        currentValueSingletonCursor = 0;
-        currentValueSingletonLength = rootNode.payloadArity(SINGLETON);
-        currentValueCollectionCursor = 0;
-        currentValueCollectionLength = rootNode.payloadArity(COLLECTION);
-      }
-    }
-
-    /*
-     * search for next node that contains values
-     */
-    private boolean searchNextValueNode() {
-      while (currentStackLevel >= 0) {
-        final int currentCursorIndex = currentStackLevel * 2;
-        final int currentLengthIndex = currentCursorIndex + 1;
-
-        final int nodeCursor = nodeCursorsAndLengths[currentCursorIndex];
-        final int nodeLength = nodeCursorsAndLengths[currentLengthIndex];
-
-        if (nodeCursor < nodeLength) {
-          final AbstractSetMultimapNode<K, V> nextNode =
-              nodes[currentStackLevel].getNode(nodeCursor);
-          nodeCursorsAndLengths[currentCursorIndex]++;
-
-          if (nextNode.hasNodes()) {
-            /*
-             * put node on next stack level for depth-first traversal
-             */
-            final int nextStackLevel = ++currentStackLevel;
-            final int nextCursorIndex = nextStackLevel * 2;
-            final int nextLengthIndex = nextCursorIndex + 1;
-
-            nodes[nextStackLevel] = nextNode;
-            nodeCursorsAndLengths[nextCursorIndex] = 0;
-            nodeCursorsAndLengths[nextLengthIndex] = nextNode.nodeArity();
-          }
-
-          if (nextNode.hasPayload(SINGLETON) || nextNode.hasPayload(COLLECTION)) {
-            /*
-             * found next node that contains values
-             */
-            currentValueNode = nextNode;
-            currentValueSingletonCursor = 0;
-            currentValueSingletonLength = nextNode.payloadArity(SINGLETON);
-            currentValueCollectionCursor = 0;
-            currentValueCollectionLength = nextNode.payloadArity(COLLECTION);
-            return true;
-          }
-        } else {
-          currentStackLevel--;
-        }
-      }
-
-      return false;
-    }
-
-    public boolean hasNext() {
-      if (currentValueSingletonCursor < currentValueSingletonLength
-          || currentValueCollectionCursor < currentValueCollectionLength) {
-        return true;
-      } else {
-        return searchNextValueNode();
-      }
-    }
-
-    public void remove() {
-      throw new UnsupportedOperationException();
-    }
-  }
-
-  protected static class SetMultimapKeyIterator<K, V> extends AbstractSetMultimapIterator<K, V>
-      implements Iterator<K> {
-
-    SetMultimapKeyIterator(AbstractSetMultimapNode<K, V> rootNode) {
-      super(rootNode);
+    TransientTrieSetMultimap(PersistentTrieSetMultimap<K, V> trieSetMultimap) {
+      super(trieSetMultimap);
     }
 
     @Override
-    public K next() {
-      if (!hasNext()) {
-        throw new NoSuchElementException();
-      } else {
-        // TODO: check case distinction
-        if (currentValueSingletonCursor < currentValueSingletonLength) {
-          return currentValueNode.getSingletonKey(currentValueSingletonCursor++);
-        } else {
-          return currentValueNode.getCollectionKey(currentValueCollectionCursor++);
-        }
-      }
-    }
-
-  }
-
-  protected static class SetMultimapValueIterator<K, V> extends AbstractSetMultimapIterator<K, V>
-      implements Iterator<io.usethesource.capsule.Set.Immutable<V>> {
-
-    SetMultimapValueIterator(AbstractSetMultimapNode<K, V> rootNode) {
-      super(rootNode);
+    protected io.usethesource.capsule.Set.Immutable<V> valueToTemporaryBox(V value) {
+      return AbstractSpecialisedImmutableSet.setOf(value);
     }
 
     @Override
-    public io.usethesource.capsule.Set.Immutable<V> next() {
-      if (!hasNext()) {
-        throw new NoSuchElementException();
-      } else {
-        // TODO: check case distinction
-        if (currentValueSingletonCursor < currentValueSingletonLength) {
-          return io.usethesource.capsule.Set.Immutable
-              .of(currentValueNode.getSingletonValue(currentValueSingletonCursor++));
-        } else {
-          return currentValueNode.getCollectionValue(currentValueCollectionCursor++);
-        }
-      }
-    }
-
-  }
-
-  protected static class SetMultimapNativeTupleIterator<K, V>
-      extends AbstractSetMultimapIterator<K, V> implements Iterator<Map.Entry<K, Object>> {
-
-    SetMultimapNativeTupleIterator(AbstractSetMultimapNode<K, V> rootNode) {
-      super(rootNode);
+    protected final io.usethesource.capsule.Set.Immutable<V> collectionToInternalFormat(
+        io.usethesource.capsule.Set.Immutable<V> valueCollection) {
+      return valueCollection;
     }
 
     @Override
-    public Map.Entry<K, Object> next() {
-      if (!hasNext()) {
-        throw new NoSuchElementException();
-      } else {
-        // TODO: check case distinction
-        if (currentValueSingletonCursor < currentValueSingletonLength) {
-          final K currentKey = currentValueNode.getSingletonKey(currentValueSingletonCursor);
-          final Object currentValue =
-              currentValueNode.getSingletonValue(currentValueSingletonCursor);
-          currentValueSingletonCursor++;
-
-          return entryOf(currentKey, currentValue);
-        } else {
-          final K currentKey = currentValueNode.getCollectionKey(currentValueCollectionCursor);
-          final Object currentValue =
-              currentValueNode.getCollectionValue(currentValueCollectionCursor);
-          currentValueCollectionCursor++;
-
-          return entryOf(currentKey, currentValue);
-        }
-      }
-    }
-
-  }
-
-  protected static class SetMultimapTupleIterator<K, V, T> extends
-      AbstractSetMultimapIterator<K, V>
-      implements Iterator<T> {
-
-    final BiFunction<K, V, T> tupleOf;
-
-    K currentKey = null;
-    V currentValue = null;
-    Iterator<V> currentSetIterator = Collections.emptyIterator();
-
-    SetMultimapTupleIterator(AbstractSetMultimapNode<K, V> rootNode,
-        final BiFunction<K, V, T> tupleOf) {
-      super(rootNode);
-      this.tupleOf = tupleOf;
-    }
-
-    @Override
-    public boolean hasNext() {
-      if (currentSetIterator.hasNext()) {
-        return true;
-      } else {
-        if (super.hasNext()) {
-          // TODO: check case distinction
-          if (currentValueSingletonCursor < currentValueSingletonLength) {
-            currentKey = currentValueNode.getSingletonKey(currentValueSingletonCursor);
-            currentSetIterator = Collections
-                .singleton(currentValueNode.getSingletonValue(currentValueSingletonCursor))
-                .iterator();
-            currentValueSingletonCursor++;
-          } else {
-            currentKey = currentValueNode.getCollectionKey(currentValueCollectionCursor);
-            currentSetIterator =
-                currentValueNode.getCollectionValue(currentValueCollectionCursor).iterator();
-            currentValueCollectionCursor++;
-          }
-
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }
-
-    @Override
-    public T next() {
-      if (!hasNext()) {
-        throw new NoSuchElementException();
-      } else {
-        currentValue = currentSetIterator.next();
-        return tupleOf.apply(currentKey, currentValue);
-      }
-    }
-
-  }
-
-  /**
-   * Iterator that first iterates over inlined-values and then continues depth first recursively.
-   */
-  private static class TrieSetMultimap_BleedingEdgeNodeIterator<K, V>
-      implements Iterator<AbstractSetMultimapNode<K, V>> {
-
-    final Deque<Iterator<? extends AbstractSetMultimapNode<K, V>>> nodeIteratorStack;
-
-    TrieSetMultimap_BleedingEdgeNodeIterator(AbstractSetMultimapNode<K, V> rootNode) {
-      nodeIteratorStack = new ArrayDeque<>();
-      nodeIteratorStack.push(Collections.singleton(rootNode).iterator());
-    }
-
-    @Override
-    public boolean hasNext() {
-      while (true) {
-        if (nodeIteratorStack.isEmpty()) {
-          return false;
-        } else {
-          if (nodeIteratorStack.peek().hasNext()) {
-            return true;
-          } else {
-            nodeIteratorStack.pop();
-            continue;
-          }
-        }
-      }
-    }
-
-    @Override
-    public AbstractSetMultimapNode<K, V> next() {
-      if (!hasNext()) {
-        throw new NoSuchElementException();
-      }
-
-      AbstractSetMultimapNode<K, V> innerNode = nodeIteratorStack.peek().next();
-
-      if (innerNode.hasNodes()) {
-        nodeIteratorStack.push(innerNode.nodeIterator());
-      }
-
-      return innerNode;
-    }
-
-    @Override
-    public void remove() {
-      throw new UnsupportedOperationException();
-    }
-  }
-
-  static final class TransientTrieSetMultimap<K, V>
-      implements SetMultimap.Transient<K, V> {
-
-    private final EqualityComparator<Object> cmp;
-    private final AtomicReference<Thread> mutator;
-
-    private AbstractSetMultimapNode<K, V> rootNode;
-    // private int cachedHashCode;
-    private int cachedSize;
-
-    private int cachedKeySetHashCode;
-    private int cachedKeySetSize;
-
-    TransientTrieSetMultimap(
-        PersistentTrieSetMultimap<K, V> trieSetMultimap) {
-      this.cmp = trieSetMultimap.cmp;
-      this.mutator = new AtomicReference<Thread>(Thread.currentThread());
-      this.rootNode = trieSetMultimap.rootNode;
-      // // this.cachedHashCode = trieSetMultimap.cachedHashCode;
-      this.cachedSize = trieSetMultimap.cachedSize;
-      this.cachedKeySetHashCode = trieSetMultimap.cachedKeySetHashCode;
-      this.cachedKeySetSize = trieSetMultimap.cachedKeySetSize;
-      if (DEBUG) {
-        // assert checkHashCodeAndSize(cachedHashCode, cachedSize, entryIterator());
-        assert checkKeySetHashCodeAndSize(cachedKeySetHashCode, cachedKeySetSize, keyIterator());
-      }
-    }
-
-    @Override
-    public boolean containsKey(final Object o) {
-      try {
-        final K key = (K) o;
-        return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0, cmp);
-      } catch (ClassCastException unused) {
-        return false;
-      }
-    }
-
-    @Override
-    public boolean containsValue(final Object o) {
-      for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
-        if (cmp.equals(iterator.next(), o)) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    @Override
-    public boolean containsEntry(final Object o0, final Object o1) {
-      try {
-        final K key = (K) o0;
-        final V val = (V) o1;
-        final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
-            rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
-
-        if (result.isPresent()) {
-          return result.get().contains(val);
-        } else {
-          return false;
-        }
-      } catch (ClassCastException unused) {
-        return false;
-      }
-    }
-
-    @Override
-    public io.usethesource.capsule.Set.Immutable<V> get(final Object o) {
-      try {
-        final K key = (K) o;
-        final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
-            rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
-
-        return result.orElse(io.usethesource.capsule.Set.Immutable.of());
-      } catch (ClassCastException unused) {
-        return io.usethesource.capsule.Set.Immutable.of();
-      }
-    }
-
-    @Override
-    public final boolean __put(K key, V value) {
-      return __put(key, AbstractSpecialisedImmutableSet.setOf(value));
-    }
-
-    @Override
-    public final boolean __put(K key, io.usethesource.capsule.Set.Immutable<V> values) {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
-      if (values.isEmpty()) {
-        return __remove(key);
-      }
-
-      final int keyHash = key.hashCode();
-      final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details = MultimapResult
-          .unchanged();
-
-//      final AbstractSetMultimapNode<K, V> newRootNode;
-//
-//      if (values.size() == 1) {
-//        final V value = values.findFirst().get();
-//        newRootNode = rootNode
-//            .updatedSingle(mutator, key, value, transformHashCode(keyHash), 0, details, cmp);
-//      } else {
-//        newRootNode = rootNode
-//            .updatedMultiple(mutator, key, values, transformHashCode(keyHash), 0, details, cmp);
-//      }
-
-      final AbstractSetMultimapNode<K, V> newRootNode =
-          rootNode.updated(mutator, key, values, transformHashCode(keyHash), 0, details, cmp);
-
-      switch (details.getModificationEffect()) {
-        case REPLACED_PAYLOAD: {
-          // int hashCodeDeltaOld = tupleHash(keyHash, details.getEvictedPayload());
-          // int hashCodeDeltaNew = tupleHash(keyHash, values);
-
-          // this.cachedHashCode = cachedHashCode + hashCodeDeltaNew - hashCodeDeltaOld;
-          this.cachedSize = cachedSize - details.getEvictedPayload().get().size() + values.size();
-          this.cachedKeySetHashCode = cachedKeySetHashCode;
-          this.cachedKeySetSize = cachedKeySetSize;
-
-          this.rootNode = newRootNode;
-          return true;
-        }
-
-        case INSERTED_PAYLOAD: {
-          assert details.getModificationDetails().contains(INSERTED_KEY);
-
-          // int hashCodeDeltaNew = tupleHash(keyHash, values);
-
-          // this.cachedHashCode = cachedHashCode + hashCodeDeltaNew;
-          this.cachedSize = cachedSize + values.size();
-          this.cachedKeySetHashCode = cachedKeySetHashCode + keyHash;
-          this.cachedKeySetSize = cachedKeySetSize + 1;
-
-          this.rootNode = newRootNode;
-          return true;
-        }
-
-        default: {
-          return false;
-        }
-      }
-    }
-
-    @Override
-    public final boolean __insert(final K key, final V value) {
-      return __insert(key, AbstractSpecialisedImmutableSet.setOf(value));
-    }
-
-    /*
-     * TODO: erroneous -> does not communicate back how many values were inserted (necessary for updating size count)
-     */
-    @Override
-    public final boolean __insert(K key, io.usethesource.capsule.Set.Immutable<V> values) {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
-      if (values.isEmpty()) {
-        return false;
-      }
-
-      final int keyHash = key.hashCode();
-      final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details = MultimapResult
-          .unchanged();
-
-//      final AbstractSetMultimapNode<K, V> newRootNode;
-//
-//      if (values.size() == 1) {
-//        final V value = values.findFirst().get();
-//        newRootNode = rootNode
-//            .insertedSingle(mutator, key, value, transformHashCode(keyHash), 0, details, cmp);
-//      } else {
-//        newRootNode = rootNode
-//            .insertedMultiple(mutator, key, values, transformHashCode(keyHash), 0, details, cmp);
-//      }
-
-      final AbstractSetMultimapNode<K, V> newRootNode = rootNode
-          .inserted(mutator, key, values, transformHashCode(keyHash), 0, details, cmp);
-
-      switch (details.getModificationEffect()) {
-        case INSERTED_PAYLOAD: {
-          // int hashCodeDeltaNew = tupleHash(keyHash, values);
-
-          // this.cachedHashCode = cachedHashCode + hashCodeDeltaNew;
-          this.cachedSize = cachedSize + details.sizeDelta().get();
-          this.cachedKeySetHashCode = cachedKeySetHashCode;
-          this.cachedKeySetSize = cachedKeySetSize;
-
-          if (details.getModificationDetails().contains(INSERTED_KEY)) {
-            this.cachedKeySetHashCode += keyHash;
-            this.cachedKeySetSize += 1;
-          }
-
-          this.rootNode = newRootNode;
-          return true;
-        }
-
-        default: {
-          return false;
-        }
-      }
+    protected final io.usethesource.capsule.Set.Immutable<V> internalFormatToCollection(
+        io.usethesource.capsule.Set.Immutable<V> values) {
+      return values;
     }
 
     @Override
@@ -3786,77 +2676,6 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
       }
 
       return modified;
-    }
-
-    @Override
-    public final boolean __remove(final K key, final V value) {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
-      final int keyHash = key.hashCode();
-      final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details = MultimapResult
-          .unchanged();
-
-      final AbstractSetMultimapNode<K, V> newRootNode =
-          rootNode.removed(mutator, key, value, transformHashCode(keyHash), 0, details, cmp);
-
-      switch (details.getModificationEffect()) {
-        case REMOVED_PAYLOAD: {
-          // int hashCodeDeltaOld = tupleHash(keyHash, value); // TODO: support collection
-
-          // this.cachedHashCode = cachedHashCode - hashCodeDeltaOld;
-          this.cachedSize = cachedSize - 1; // TODO: support collection
-          this.cachedKeySetHashCode = cachedKeySetHashCode;
-          this.cachedKeySetSize = cachedKeySetSize;
-
-          if (details.getModificationDetails().contains(REMOVED_KEY)) {
-            this.cachedKeySetHashCode -= keyHash;
-            this.cachedKeySetSize -= 1;
-          }
-
-          this.rootNode = newRootNode;
-          return true;
-        }
-
-        default: {
-          return false;
-        }
-      }
-    }
-
-    @Override
-    public final boolean __remove(K key) {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
-      final int keyHash = key.hashCode();
-      final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details = MultimapResult
-          .unchanged();
-
-      final AbstractSetMultimapNode<K, V> newRootNode =
-          rootNode.removed(mutator, key, transformHashCode(keyHash), 0, details, cmp);
-
-      switch (details.getModificationEffect()) {
-        case REMOVED_PAYLOAD: {
-          assert details.getModificationDetails().contains(REMOVED_KEY);
-
-          // int hashCodeDeltaOld = tupleHash(keyHash, details.getEvictedPayload());
-
-          // this.cachedHashCode = cachedHashCode - hashCodeDeltaOld;
-          this.cachedSize = cachedSize - details.getEvictedPayload().get().size();
-          this.cachedKeySetHashCode = cachedKeySetHashCode - keyHash;
-          this.cachedKeySetSize = cachedKeySetSize - 1;
-
-          this.rootNode = newRootNode;
-          return true;
-        }
-
-        default: {
-          return false;
-        }
-      }
     }
 
     @Override
@@ -3896,280 +2715,14 @@ public class PersistentTrieSetMultimap<K, V> implements SetMultimap.Immutable<K,
        * Spliterator.IMMUTABLE})
        */
       int characteristics = Spliterator.NONNULL | Spliterator.SIZED | Spliterator.SUBSIZED;
-      return Spliterators.spliterator(new SetMultimapValueIterator<>(rootNode), size(),
-          characteristics);
+      return Spliterators.spliterator(
+          new SetMultimapValueIterator<>(rootNode, io.usethesource.capsule.Set.Immutable::of),
+          size(), characteristics);
     }
 
     private Stream<io.usethesource.capsule.Set.Immutable<V>> valueCollectionsStream() {
       boolean isParallel = false;
       return StreamSupport.stream(valueCollectionsSpliterator(), isParallel);
-    }
-
-    public static class TransientSetMultimapKeyIterator<K, V> extends
-        SetMultimapKeyIterator<K, V> {
-
-      final TransientTrieSetMultimap<K, V> collection;
-      K lastKey;
-
-      public TransientSetMultimapKeyIterator(
-          final TransientTrieSetMultimap<K, V> collection) {
-        super(collection.rootNode);
-        this.collection = collection;
-      }
-
-      @Override
-      public K next() {
-        return lastKey = super.next();
-      }
-
-      @Override
-      public void remove() {
-        throw new UnsupportedOperationException();
-      }
-    }
-
-    public static class TransientSetMultimapValueIterator<K, V>
-        extends SetMultimapValueIterator<K, V> {
-
-      final TransientTrieSetMultimap<K, V> collection;
-
-      public TransientSetMultimapValueIterator(
-          final TransientTrieSetMultimap<K, V> collection) {
-        super(collection.rootNode);
-        this.collection = collection;
-      }
-
-      @Override
-      public io.usethesource.capsule.Set.Immutable<V> next() {
-        return super.next();
-      }
-
-      @Override
-      public void remove() {
-        throw new UnsupportedOperationException();
-      }
-    }
-
-    public static class TransientSetMultimapTupleIterator<K, V, T>
-        extends SetMultimapTupleIterator<K, V, T> {
-
-      final TransientTrieSetMultimap<K, V> collection;
-
-      public TransientSetMultimapTupleIterator(
-          final TransientTrieSetMultimap<K, V> collection,
-          final BiFunction<K, V, T> tupleOf) {
-        super(collection.rootNode, tupleOf);
-        this.collection = collection;
-      }
-
-      @Override
-      public T next() {
-        return super.next();
-      }
-
-      @Override
-      public void remove() {
-        // TODO: test removal at iteration rigorously
-        collection.__remove(currentKey, currentValue);
-      }
-    }
-
-    @Override
-    public Set<K> keySet() {
-      Set<K> keySet = null;
-
-      if (keySet == null) {
-        keySet = new AbstractSet<K>() {
-          @Override
-          public Iterator<K> iterator() {
-            return TransientTrieSetMultimap.this.keyIterator();
-          }
-
-          @Override
-          public int size() {
-            return TransientTrieSetMultimap.this.sizeDistinct();
-          }
-
-          @Override
-          public boolean isEmpty() {
-            return TransientTrieSetMultimap.this.isEmpty();
-          }
-
-          @Override
-          public void clear() {
-            throw new UnsupportedOperationException();
-          }
-
-          @Override
-          public boolean contains(Object k) {
-            return TransientTrieSetMultimap.this.containsKey(k);
-          }
-        };
-      }
-
-      return keySet;
-    }
-
-    @Override
-    public Collection<V> values() {
-      Collection<V> values = null;
-
-      if (values == null) {
-        values = new AbstractCollection<V>() {
-          @Override
-          public Iterator<V> iterator() {
-            return TransientTrieSetMultimap.this.valueIterator();
-          }
-
-          @Override
-          public int size() {
-            return TransientTrieSetMultimap.this.size();
-          }
-
-          @Override
-          public boolean isEmpty() {
-            return TransientTrieSetMultimap.this.isEmpty();
-          }
-
-          @Override
-          public void clear() {
-            throw new UnsupportedOperationException();
-          }
-
-          @Override
-          public boolean contains(Object v) {
-            return TransientTrieSetMultimap.this.containsValue(v);
-          }
-        };
-      }
-
-      return values;
-    }
-
-    @Override
-    public Set<java.util.Map.Entry<K, V>> entrySet() {
-      Set<java.util.Map.Entry<K, V>> entrySet = null;
-
-      if (entrySet == null) {
-        entrySet = new AbstractSet<java.util.Map.Entry<K, V>>() {
-          @Override
-          public Iterator<java.util.Map.Entry<K, V>> iterator() {
-            return new Iterator<Map.Entry<K, V>>() {
-              private final Iterator<Map.Entry<K, V>> i = entryIterator();
-
-              @Override
-              public boolean hasNext() {
-                return i.hasNext();
-              }
-
-              @Override
-              public Map.Entry<K, V> next() {
-                return i.next();
-              }
-
-              @Override
-              public void remove() {
-                i.remove();
-              }
-            };
-          }
-
-          @Override
-          public int size() {
-            return TransientTrieSetMultimap.this.size();
-          }
-
-          @Override
-          public boolean isEmpty() {
-            return TransientTrieSetMultimap.this.isEmpty();
-          }
-
-          @Override
-          public void clear() {
-            throw new UnsupportedOperationException();
-          }
-
-          @Override
-          public boolean contains(Object k) {
-            return TransientTrieSetMultimap.this.containsKey(k);
-          }
-        };
-      }
-
-      return entrySet;
-    }
-
-    @Override
-    public boolean equals(final Object other) {
-      if (other == this) {
-        return true;
-      }
-      if (other == null) {
-        return false;
-      }
-
-      if (other instanceof PersistentTrieSetMultimap.TransientTrieSetMultimap) {
-        TransientTrieSetMultimap<?, ?> that =
-            (TransientTrieSetMultimap<?, ?>) other;
-
-        if (this.cachedSize != that.cachedSize) {
-          return false;
-        }
-
-//        if (this.cachedHashCode != that.cachedHashCode) {
-//          return false;
-//        }
-
-        if (this.cachedKeySetSize != that.cachedKeySetSize) {
-          return false;
-        }
-
-        if (this.cachedKeySetHashCode != that.cachedKeySetHashCode) {
-          return false;
-        }
-
-        return rootNode.equals(that.rootNode);
-      } else if (other instanceof SetMultimap) {
-        SetMultimap that = (SetMultimap) other;
-
-        if (this.size() != that.size()) {
-          return false;
-        }
-
-        for (
-            Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext(); ) {
-          Map.Entry entry = it.next();
-
-          try {
-            final K key = (K) entry.getKey();
-            final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
-                rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
-
-            if (!result.isPresent()) {
-              return false;
-            } else {
-              final io.usethesource.capsule.Set.Immutable<V> valColl =
-                  (io.usethesource.capsule.Set.Immutable<V>) entry.getValue();
-
-              if (!cmp.equals(result.get(), valColl)) {
-                return false;
-              }
-            }
-          } catch (ClassCastException unused) {
-            return false;
-          }
-        }
-
-        return true;
-      }
-
-      return false;
-    }
-
-    @Override
-    public int hashCode() {
-//    return cachedHashCode;
-      return PersistentTrieSetMultimap.hashCode(rootNode);
     }
 
     @Override

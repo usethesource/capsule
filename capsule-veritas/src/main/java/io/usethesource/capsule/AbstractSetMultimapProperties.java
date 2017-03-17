@@ -8,6 +8,7 @@
 package io.usethesource.capsule;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -16,7 +17,7 @@ import java.util.stream.StreamSupport;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.generator.Size;
-import org.junit.Ignore;
+import io.usethesource.capsule.core.PersistentTrieSet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -35,7 +36,33 @@ public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap
 
   @Property(trials = DEFAULT_TRIALS)
   public void convertToJavaSetAndCheckSize(CT input) {
-    assertEquals(new HashSet<>(input.entrySet()).size(), input.size());
+    final java.util.Set<java.util.Map.Entry<K, V>> javaSet = new HashSet<>(input.entrySet());
+    assertEquals(javaSet.size(), input.size());
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void checkSizeOfEntrySetIterator(CT input) {
+    final Iterator<?> iterator = input.entrySet().iterator();
+
+    int encounteredSize = 0;
+    while (iterator.hasNext()) {
+      iterator.next();
+      encounteredSize++;
+    }
+
+    assertEquals(input.size(), encounteredSize);
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void mapEqualsOtherMap(@Size(min = 0, max = 0) final CT emptyCollection,
+      final SetMultimap.Immutable<K, V> thatMap) {
+    final SetMultimap.Transient builder = emptyCollection.asTransient();
+    thatMap.entryIterator()
+        .forEachRemaining(tuple -> builder.__insert(tuple.getKey(), tuple.getValue()));
+    final CT thisMap = (CT) builder.freeze();
+
+    assertEquals(thisMap, thatMap);
+    assertEquals(thatMap, thisMap);
   }
 
   @Property(trials = DEFAULT_TRIALS)
@@ -168,9 +195,10 @@ public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap
     assertEquals(sizeDelta, input.__insert(key, value).size() - input.size());
   }
 
-  @Ignore(value = "Temporary ignoring until __insert(key, values) is mandatory to implement.")
+  //  @Ignore(value = "Temporary ignoring until __insert(key, values) is mandatory to implement.")
+  // TODO: interlinked does not work yet with Set.Immutable<V>
   @Property(trials = DEFAULT_TRIALS)
-  public void sizeAfterInsertKeyValues(CT input, K key, Set.Immutable<V> values) {
+  public void sizeAfterInsertKeyValues(CT input, K key, PersistentTrieSet<V> values) {
     int sizeDelta = values.__insertAll(input.get(key)).__removeAll(input.get(key)).size();
 
     CT updatedInput = (CT) input.__insert(key, values);
