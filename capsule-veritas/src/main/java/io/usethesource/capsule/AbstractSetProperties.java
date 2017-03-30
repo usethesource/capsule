@@ -101,4 +101,197 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     assertFalse(input.__insert(item).__remove(item).contains(item));
   }
 
+  @Property(trials = DEFAULT_TRIALS)
+  public void intersectIdentity(@Size(min = 0, max = 0) final CT emptySet, final CT inputShared) {
+    assertEquals("intersect reference equal", inputShared, inputShared.intersect(inputShared));
+
+    final Set.Transient<T> builder = emptySet.asTransient();
+    inputShared.forEach(builder::__insert);
+
+    assertEquals("intersect copy equal", inputShared, inputShared.intersect(builder.freeze()));
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void intersect(
+      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
+      @Size(min = 0, max = MAX_SIZE) final CT inputTwo,
+      @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
+
+    CT oneWithoutShared = (CT) inputOne.__removeAll(inputShared).__removeAll(inputTwo);
+    CT twoWithoutShared = (CT) inputTwo.__removeAll(inputShared).__removeAll(inputOne);
+
+    // CT intersectedWithoutShared = (CT) oneWithoutShared.intersect(twoWithoutShared);
+
+    CT oneWithShared = (CT) inputOne.__insertAll(inputShared);
+    CT twoWithShared = (CT) inputTwo.__insertAll(inputShared);
+
+    CT intersectedWithShared = (CT) oneWithShared.intersect(twoWithShared);
+
+    // CT intersectedMinusShared = (CT) intersectedWithShared.__removeAll(inputShared);
+    // CT sharedMinusIntersected = (CT) inputShared.__removeAll(intersectedWithShared);
+
+    assertTrue(inputShared.size() <= intersectedWithShared.size());
+    assertTrue(inputShared.stream().allMatch(intersectedWithShared::contains));
+    assertTrue(intersectedWithShared.stream().noneMatch(oneWithoutShared::contains));
+    assertTrue(intersectedWithShared.stream().noneMatch(twoWithoutShared::contains));
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void intersectMaintainsSizeAndHashCode(
+      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
+      @Size(min = 0, max = MAX_SIZE) final CT inputTwo,
+      @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
+
+    CT oneWithShared = (CT) inputOne.__insertAll(inputShared);
+    CT twoWithShared = (CT) inputTwo.__insertAll(inputShared);
+    CT intersectedWithShared = (CT) oneWithShared.intersect(twoWithShared);
+
+    convertToJavaSetAndCheckHashCode(intersectedWithShared);
+    convertToJavaSetAndCheckSize(intersectedWithShared);
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void intersectEqualToDefaultImplementation(
+      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
+      @Size(min = 0, max = MAX_SIZE) final CT inputTwo,
+      @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
+
+    CT oneWithShared = (CT) inputOne.__insertAll(inputShared);
+    CT twoWithShared = (CT) inputTwo.__insertAll(inputShared);
+
+    CT intersectNative = (CT) oneWithShared.intersect(twoWithShared);
+    CT intersectDefault = (CT) Set.Immutable.intersect(oneWithShared, twoWithShared);
+
+    assertEquals(intersectDefault, intersectNative);
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void unionIdentity(@Size(min = 0, max = 0) final CT emptySet, final CT inputShared) {
+    assertEquals("intersect reference equal", inputShared, inputShared.union(inputShared));
+
+    final Set.Transient<T> builder = emptySet.asTransient();
+    inputShared.forEach(builder::__insert);
+
+    assertEquals("intersect copy equal", inputShared, inputShared.union(builder.freeze()));
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void union(
+      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
+      @Size(min = 0, max = MAX_SIZE) final CT inputTwo) {
+
+    CT unioned = (CT) inputOne.intersect(inputTwo);
+
+    assertTrue(unioned.stream().allMatch(inputOne::contains));
+    assertTrue(unioned.stream().allMatch(inputTwo::contains));
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void unionMaintainsSizeAndHashCode(
+      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
+      @Size(min = 0, max = MAX_SIZE) final CT inputTwo) {
+
+    CT unioned = (CT) inputOne.union(inputTwo);
+
+    convertToJavaSetAndCheckHashCode(unioned);
+    convertToJavaSetAndCheckSize(unioned);
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void unionEqualToDefaultImplementation(
+      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
+      @Size(min = 0, max = MAX_SIZE) final CT inputTwo) {
+
+    CT intersectNative = (CT) inputOne.union(inputTwo);
+    CT intersectDefault = (CT) Set.Immutable.union(inputOne, inputTwo);
+
+    assertEquals(intersectDefault, intersectNative);
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void subtract(
+      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
+      @Size(min = 0, max = MAX_SIZE) final CT inputTwo) {
+
+    CT subtracted = (CT) inputOne.subtract(inputTwo);
+
+    assertTrue(subtracted.stream().allMatch(inputOne::contains));
+    assertTrue(subtracted.stream().noneMatch(inputTwo::contains));
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void subtractMaintainsSizeAndHashCode(
+      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
+      @Size(min = 0, max = MAX_SIZE) final CT inputTwo) {
+
+    CT subtracted = (CT) inputOne.subtract(inputTwo);
+
+    convertToJavaSetAndCheckHashCode(subtracted);
+    convertToJavaSetAndCheckSize(subtracted);
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void subtractIdentity(@Size(min = 0, max = 0) final CT emptySet, final CT inputShared) {
+    assertEquals("subtract reference equal", emptySet, inputShared.subtract(inputShared));
+
+    final Set.Transient<T> builder = emptySet.asTransient();
+    inputShared.forEach(builder::__insert);
+
+    assertEquals("subtract copy equal", emptySet, inputShared.subtract(builder.freeze()));
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void subtract(
+      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
+      @Size(min = 0, max = MAX_SIZE) final CT inputTwo,
+      @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
+
+    CT oneWithoutShared = (CT) inputOne.__removeAll(inputShared).__removeAll(inputTwo);
+    CT twoWithoutShared = (CT) inputTwo.__removeAll(inputShared).__removeAll(inputOne);
+
+    // CT subtractedWithoutShared = (CT) oneWithoutShared.subtracted(twoWithoutShared);
+
+    CT oneWithShared = (CT) inputOne.__insertAll(inputShared);
+    CT twoWithShared = (CT) inputTwo.__insertAll(inputShared);
+
+    CT subtractedWithShared = (CT) oneWithShared.subtract(twoWithShared);
+
+    // CT intersectedMinusShared = (CT) intersectedWithShared.__removeAll(inputShared);
+    // CT sharedMinusIntersected = (CT) inputShared.__removeAll(intersectedWithShared);
+
+    // assertTrue(inputShared.size() <= intersectedWithShared.size());
+    assertTrue(inputShared.stream().noneMatch(subtractedWithShared::contains));
+    assertTrue(subtractedWithShared.stream().allMatch(oneWithoutShared::contains));
+    assertTrue(subtractedWithShared.stream().noneMatch(twoWithoutShared::contains));
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void subtractMaintainsSizeAndHashCode(
+      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
+      @Size(min = 0, max = MAX_SIZE) final CT inputTwo,
+      @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
+
+    CT oneWithShared = (CT) inputOne.__insertAll(inputShared);
+    CT twoWithShared = (CT) inputTwo.__insertAll(inputShared);
+    CT subtractedWithShared = (CT) oneWithShared.subtract(twoWithShared);
+
+    convertToJavaSetAndCheckHashCode(subtractedWithShared);
+    convertToJavaSetAndCheckSize(subtractedWithShared);
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void subtractEqualToDefaultImplementation(
+      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
+      @Size(min = 0, max = MAX_SIZE) final CT inputTwo,
+      @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
+
+    CT oneWithShared = (CT) inputOne.__insertAll(inputShared);
+    CT twoWithShared = (CT) inputTwo.__insertAll(inputShared);
+
+    CT subtractNative = (CT) oneWithShared.subtract(twoWithShared);
+    CT subtractDefault = (CT) Set.Immutable.subtract(oneWithShared, twoWithShared);
+
+    assertEquals(subtractDefault, subtractNative);
+  }
+
 }

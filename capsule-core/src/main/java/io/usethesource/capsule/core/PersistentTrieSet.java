@@ -28,8 +28,14 @@ import java.util.stream.StreamSupport;
 
 import io.usethesource.capsule.Set;
 import io.usethesource.capsule.core.trie.ArrayView;
-import io.usethesource.capsule.core.trie.Node;
+import io.usethesource.capsule.core.trie.SetNode;
 import io.usethesource.capsule.util.ArrayUtils;
+import io.usethesource.capsule.util.EqualityComparator;
+
+import static io.usethesource.capsule.core.trie.SetNode.Preference.INDIFFERENT;
+import static io.usethesource.capsule.core.trie.SetNode.Preference.LEFT;
+import static io.usethesource.capsule.core.trie.SetNode.Preference.RIGHT;
+import static io.usethesource.capsule.util.BitmapUtils.isBitInBitmap;
 
 public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
@@ -39,7 +45,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
   private static final boolean DEBUG = false;
 
   private final AbstractSetNode<K> rootNode;
-  private final int hashCode;
+  private final int cachedHashCode;
   private final int cachedSize;
 
   /*
@@ -48,21 +54,34 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
    */
   public /* protected */ PersistentTrieSet(AbstractSetNode<K> rootNode) {
     this.rootNode = rootNode;
-    this.hashCode = hashCode(rootNode);
-    this.cachedSize = size(rootNode);
+//    this.cachedHashCode = rootNode.recursivePayloadHashCode();
+//    this.cachedSize = rootNode.size();
+
+    final Iterator<? extends AbstractSetNode<K>> it = nodeIterator();
+
+    int size = 0;
+    int hashCode = 0;
+    while (it.hasNext()) {
+      final AbstractSetNode<K> node = it.next();
+      size += node.payloadArity();
+      hashCode += node.recursivePayloadHashCode();
+    }
+
+    this.cachedHashCode = hashCode;
+    this.cachedSize = size;
   }
 
   /*
    * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
    * `protected` when experiments are finished.
    */
-  public /* protected */ PersistentTrieSet(AbstractSetNode<K> rootNode, int hashCode,
+  public /* protected */ PersistentTrieSet(AbstractSetNode<K> rootNode, int cachedHashCode,
       int cachedSize) {
     this.rootNode = rootNode;
-    this.hashCode = hashCode;
+    this.cachedHashCode = cachedHashCode;
     this.cachedSize = cachedSize;
     if (DEBUG) {
-      assert checkHashCodeAndSize(hashCode, cachedSize);
+      assert checkHashCodeAndSize(cachedHashCode, cachedSize);
     }
   }
 
@@ -76,7 +95,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     final int nodeMap = 0;
     final int dataMap = CompactSetNode.bitpos(CompactSetNode.mask(keyHash0, 0));
 
-    CompactSetNode<K> newRootNode = CompactSetNode.nodeOf(null, nodeMap, dataMap, key0);
+    final CompactSetNode<K> newRootNode = CompactSetNode.nodeOf(null, nodeMap, dataMap, key0);
 
     return new PersistentTrieSet<K>(newRootNode, keyHash0, 1);
   }
@@ -216,7 +235,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
         rootNode.updated(null, key, transformHashCode(keyHash), 0, details);
 
     if (details.isModified()) {
-      return new PersistentTrieSet<K>(newRootNode, hashCode + keyHash, cachedSize + 1);
+      return new PersistentTrieSet<K>(newRootNode, cachedHashCode + keyHash, cachedSize + 1);
     }
 
     return this;
@@ -231,7 +250,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
         rootNode.updated(null, key, transformHashCode(keyHash), 0, details, cmp);
 
     if (details.isModified()) {
-      return new PersistentTrieSet<K>(newRootNode, hashCode + keyHash, cachedSize + 1);
+      return new PersistentTrieSet<K>(newRootNode, cachedHashCode + keyHash, cachedSize + 1);
     }
 
     return this;
@@ -261,7 +280,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
         rootNode.removed(null, key, transformHashCode(keyHash), 0, details);
 
     if (details.isModified()) {
-      return new PersistentTrieSet<K>(newRootNode, hashCode - keyHash, cachedSize - 1);
+      return new PersistentTrieSet<K>(newRootNode, cachedHashCode - keyHash, cachedSize - 1);
     }
 
     return this;
@@ -276,7 +295,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
         rootNode.removed(null, key, transformHashCode(keyHash), 0, details, cmp);
 
     if (details.isModified()) {
-      return new PersistentTrieSet<K>(newRootNode, hashCode - keyHash, cachedSize - 1);
+      return new PersistentTrieSet<K>(newRootNode, cachedHashCode - keyHash, cachedSize - 1);
     }
 
     return this;
@@ -310,6 +329,172 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     final Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__retainAllEquivalent(transientSet, cmp);
     return tmpTransient.freeze();
+  }
+
+  @Override
+  public Set.Immutable<K> union(final Set.Immutable<K> other) {
+
+    if (!(other instanceof PersistentTrieSet)) {
+      return Set.Immutable.union(this, other);
+    }
+
+    if (this == other) {
+      return this;
+    }
+
+    if (other == null) {
+      return this;
+    }
+
+    if (this == EMPTY_SET || this.isEmpty()) {
+      return other;
+    }
+    if (other == EMPTY_SET || other.isEmpty()) {
+      return this;
+    }
+
+    final PersistentTrieSet<K> set1 = this;
+    final PersistentTrieSet<K> set2 = (PersistentTrieSet<K>) other;
+
+    final PersistentTrieSet<K> smaller;
+    final PersistentTrieSet<K> bigger;
+
+    final PersistentTrieSet<K> unmodified;
+
+    if (set2.size() >= set1.size()) {
+      unmodified = set2;
+      smaller = set1;
+      bigger = set2;
+    } else {
+      unmodified = set1;
+      smaller = set2;
+      bigger = set1;
+    }
+
+    final SetNode.IntersectionResult details = new SetNode.IntersectionResult();
+
+    final AbstractSetNode<K> newRootNode = bigger.rootNode.union(null, smaller.rootNode, 0,
+        details, EqualityComparator.EQUALS.toComparator(), INDIFFERENT);
+
+    assert unmodified.cachedHashCode != details.getAccumulatedHashCode()
+        || unmodified.rootNode == newRootNode || null == newRootNode;
+
+    if (newRootNode == unmodified.rootNode || newRootNode == null) {
+      return unmodified;
+//      } else if (details.getAccumulatedSize() == 0) {
+//        return Set.Immutable.of();
+    } else {
+      return new PersistentTrieSet(newRootNode,
+          details.getAccumulatedHashCode(),
+          details.getAccumulatedSize());
+    }
+  }
+
+  @Override
+  public Set.Immutable<K> subtract(final Set.Immutable<K> other) {
+
+    if (!(other instanceof PersistentTrieSet)) {
+      return Set.Immutable.subtract(this, other);
+    }
+
+    if (this == other) {
+      return Set.Immutable.of();
+    }
+
+    if (other == null) {
+      return this;
+    }
+
+    if (this == EMPTY_SET || this.isEmpty()) {
+      return this;
+    }
+
+    if (other == EMPTY_SET || other.isEmpty()) {
+      return this;
+    }
+
+    final PersistentTrieSet<K> set1 = this;
+    final PersistentTrieSet<K> set2 = (PersistentTrieSet<K>) other;
+
+    final PersistentTrieSet<K> unmodified = set1;
+
+    final SetNode.IntersectionResult details = new SetNode.IntersectionResult();
+
+    final AbstractSetNode<K> newRootNode = set1.rootNode.difference(null, set2.rootNode, 0,
+        details, EqualityComparator.EQUALS.toComparator(), INDIFFERENT);
+
+    assert unmodified.cachedHashCode != details.getAccumulatedHashCode()
+        || unmodified.rootNode == newRootNode || null == newRootNode;
+
+    if (newRootNode == unmodified.rootNode || newRootNode == null) {
+      return unmodified;
+    } else if (details.getAccumulatedSize() == 0) {
+      return Set.Immutable.of();
+    } else {
+      return new PersistentTrieSet(newRootNode,
+          details.getAccumulatedHashCode(),
+          details.getAccumulatedSize());
+    }
+  }
+
+  @Override
+  public Set.Immutable<K> intersect(final Set.Immutable<K> other) {
+
+    if (!(other instanceof PersistentTrieSet)) {
+      return Set.Immutable.intersect(this, other);
+    }
+
+    if (this == other) {
+      return this;
+    }
+
+    if (other == null) {
+      return Set.Immutable.of();
+    }
+
+    if (this == EMPTY_SET || this.isEmpty()) {
+      return this; // return Set.Immutable.of();
+    }
+
+    if (other == EMPTY_SET || other.isEmpty()) {
+      return other; // return Set.Immutable.of();
+    }
+
+    final PersistentTrieSet<K> set1 = this;
+    final PersistentTrieSet<K> set2 = (PersistentTrieSet<K>) other;
+
+    final PersistentTrieSet<K> smaller;
+    final PersistentTrieSet<K> bigger;
+
+    final PersistentTrieSet<K> unmodified;
+
+    if (set2.size() >= set1.size()) {
+      unmodified = set1;
+      smaller = set1;
+      bigger = set2;
+    } else {
+      unmodified = set2;
+      smaller = set2;
+      bigger = set1;
+    }
+
+    final SetNode.IntersectionResult details = new SetNode.IntersectionResult();
+
+    final AbstractSetNode<K> newRootNode = smaller.rootNode.intersect(null, bigger.rootNode, 0,
+        details, EqualityComparator.EQUALS.toComparator(), INDIFFERENT);
+
+    assert unmodified.cachedHashCode != details.getAccumulatedHashCode()
+        || unmodified.rootNode == newRootNode || null == newRootNode;
+
+    if (newRootNode == unmodified.rootNode || newRootNode == null) {
+      return unmodified;
+    } else if (details.getAccumulatedSize() == 0) {
+      return Set.Immutable.of();
+    } else {
+      return new PersistentTrieSet(newRootNode,
+          details.getAccumulatedHashCode(),
+          details.getAccumulatedSize());
+    }
   }
 
   @Override
@@ -421,7 +606,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
         return false;
       }
 
-      if (this.hashCode != that.hashCode) {
+      if (this.cachedHashCode != that.cachedHashCode) {
         return false;
       }
 
@@ -441,7 +626,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
   @Override
   public int hashCode() {
-    return hashCode;
+    return cachedHashCode;
   }
 
   @Override
@@ -481,6 +666,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
   /*
    * For analysis purposes only.
    */
+
   protected int getNodeCount() {
     final Iterator<AbstractSetNode<K>> it = nodeIterator();
     int sumNodes = 0;
@@ -614,7 +800,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
    * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
    * `protected` when experiments are finished.
    */
-  public /* protected */ static abstract class AbstractSetNode<K> implements Node, Iterable<K> {
+  public /* protected */ static abstract class AbstractSetNode<K> implements
+      SetNode<K, AbstractSetNode<K>>, Iterable<K> {
 
     static final int TUPLE_LENGTH = 1;
 
@@ -755,11 +942,11 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       };
     }
 
-    abstract boolean hasPayload();
-
-    abstract int payloadArity();
-
-    abstract K getKey(final int index);
+//    abstract boolean hasPayload();
+//
+//    abstract int payloadArity();
+//
+//    abstract K getKey(final int index);
 
     @Deprecated
     abstract boolean hasSlots();
@@ -782,16 +969,40 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
      * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
      * `protected` when experiments are finished.
      */
-    public /* protected */ int size() {
-      final Iterator<K> it = new SetKeyIterator<>(this);
+    public /* protected */ final int size() {
+//      final Iterator<K> it = new SetKeyIterator<>(this);
+//
+//      int size = 0;
+//      while (it.hasNext()) {
+//        size += 1;
+//        it.next();
+//      }
+//
+//      return size;
+
+      final Iterator<? extends AbstractSetNode<K>> it = new TrieSetNodeIterator(this);
 
       int size = 0;
       while (it.hasNext()) {
-        size += 1;
-        it.next();
+        final AbstractSetNode<K> node = it.next();
+        size += node.payloadArity();
       }
 
       return size;
+    }
+
+    abstract int localPayloadHashCode();
+
+    final int recursivePayloadHashCode() {
+      final Iterator<? extends AbstractSetNode<K>> it = new TrieSetNodeIterator(this);
+
+      int hashCode = 0;
+      while (it.hasNext()) {
+        final AbstractSetNode<K> node = it.next();
+        hashCode += node.localPayloadHashCode();
+      }
+
+      return hashCode;
     }
 
     @Override
@@ -1382,8 +1593,13 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     }
 
     @Override
-    K getKey(final int index) {
+    public K getKey(final int index) {
       return (K) nodes[TUPLE_LENGTH * index];
+    }
+
+    @Override
+    public int getKeyHash(int index) {
+      return getKey(index).hashCode();
     }
 
     @Override
@@ -1402,12 +1618,12 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 //    }
 
     @Override
-    boolean hasPayload() {
+    public boolean hasPayload() {
       return dataMap() != 0;
     }
 
     @Override
-    int payloadArity() {
+    public int payloadArity() {
       return java.lang.Integer.bitCount(dataMap());
     }
 
@@ -1434,6 +1650,13 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     @Override
     int slotArity() {
       return nodes.length;
+    }
+
+    @Override
+    int localPayloadHashCode() {
+      final Stream<K> keyStream =
+          StreamSupport.stream(this.<K>dataArray(0, 0).spliterator(), false);
+      return keyStream.mapToInt(Object::hashCode).sum();
     }
 
     @Override
@@ -1580,6 +1803,989 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       return nodeOf(mutator, nodeMap() ^ bitpos, dataMap() | bitpos, dst);
     }
 
+    private final int bitPattern(int dataMap, int nodeMap, int bitpos) {
+      boolean isInDataMap = isBitInBitmap(dataMap, bitpos);
+      boolean isInNodeMap = isBitInBitmap(nodeMap, bitpos);
+
+      int bitPattern = 0;
+
+      if (isInDataMap) {
+        bitPattern = bitPattern + 2;
+      }
+
+      if (isInNodeMap) {
+        bitPattern = bitPattern + 1;
+      }
+
+      return bitPattern;
+    }
+
+//    // @formatter:off
+//    public final static int PATTERN_EMPTY           = 0b00;
+//    public final static int PATTERN_NODE            = 0b01;
+//    public final static int PATTERN_DATA_SINGLETON  = 0b10;
+//    public final static int PATTERN_DATA_COLLECTION = 0b11;
+//    // @formatter:on
+//
+//    // @formatter:off
+//    public final static int PATTERN_EMPTY_AND_EMPTY = 0b0000;
+//
+//    public final static int PATTERN_EMPTY_AND_NODE  = 0b0001;
+//    public final static int PATTERN_EMPTY_AND_DATA_SINGLETON  = 0b0010;
+//    public final static int PATTERN_EMPTY_AND_DATA_COLLECTION = 0b0011;
+//
+//    public final static int PATTERN_NODE_AND_EMPTY  = 0b0100;
+//    public final static int PATTERN_DATA_SINGLETON_AND_EMPTY  = 0b1000;
+//    public final static int PATTERN_DATA_COLLECTION_AND_EMPTY = 0b1100;
+//
+//    public final static int PATTERN_DATA_SINGLETON_AND_DATA_SINGLETON  = 0b1010;
+//    public final static int PATTERN_DATA_SINGLETON_AND_NODE = 0b1001;
+//    public final static int PATTERN_NODE_AND_DATA_SINGLETON = 0b0110;
+//
+//    public final static int PATTERN_DATA_SINGLETON_AND_DATA_COLLECTION = 0b1011;
+//    public final static int PATTERN_DATA_COLLECTION_AND_DATA_SINGLETON = 0b1110;
+//
+//    public final static int PATTERN_DATA_COLLECTION_AND_DATA_COLLECTION  = 0b1111;
+//    public final static int PATTERN_DATA_COLLECTION_AND_NODE = 0b1101;
+//    public final static int PATTERN_NODE_AND_DATA_COLLECTION = 0b0111;
+//
+//    public final static int PATTERN_NODE_AND_NODE = 0b0101;
+//    // @formatter:on
+
+    // @formatter:off
+    public final static int PATTERN_EMPTY           = 0b00;
+    public final static int PATTERN_NODE            = 0b01;
+    public final static int PATTERN_DATA            = 0b10;
+    // @formatter:on
+
+    // @formatter:off
+
+    public final static int PATTERN_EMPTY_AND_NODE  = 0b0001;
+    public final static int PATTERN_NODE_AND_EMPTY  = 0b0100;
+
+    public final static int PATTERN_EMPTY_AND_DATA  = 0b0010;
+    public final static int PATTERN_DATA_AND_EMPTY  = 0b1000;
+
+    public final static int PATTERN_DATA_AND_NODE   = 0b1001;
+    public final static int PATTERN_NODE_AND_DATA   = 0b0110;
+
+    public final static int PATTERN_EMPTY_AND_EMPTY = 0b0000;
+    public final static int PATTERN_DATA_AND_DATA   = 0b1010;
+    public final static int PATTERN_NODE_AND_NODE   = 0b0101;
+    // @formatter:on
+
+    /*
+     * TODO: for incrementality: only consider duplicate elements
+     */
+    @Override
+    public final AbstractSetNode<K> union(AtomicReference<Thread> mutator,
+        AbstractSetNode<K> that, int shift, IntersectionResult details,
+        Comparator<Object> cmp, Preference directionPreference) {
+
+      final CompactSetNode<K> node0 = this;
+      final CompactSetNode<K> node1 = (CompactSetNode<K>) that;
+
+      if (node0 == node1) {
+        return node0;
+      }
+
+      final int dataMap0 = node0.dataMap();
+      final int nodeMap0 = node0.nodeMap();
+      final int dataMap1 = node1.dataMap();
+      final int nodeMap1 = node1.nodeMap();
+
+      final int bitmap0 = dataMap0 | nodeMap0;
+      final int bitmap1 = dataMap1 | nodeMap1;
+
+      int unionedBitmap = bitmap0 | bitmap1;
+
+//      if (unionedBitmap == 0) {
+//        return EMPTY_NODE;
+//      }
+
+      final Buffer<K, AbstractSetNode<K>> newBuffer = new Buffer<>();
+      int newDataMap = 0;
+      int newNodeMap = 0;
+
+      final boolean isDataMapIdentical0 = (dataMap0 | dataMap1) == dataMap0;
+      final boolean isDataMapIdentical1 = (dataMap0 | dataMap1) == dataMap1;
+
+      final boolean isNodeMapIdentical0 = (nodeMap0 | nodeMap1) == nodeMap0;
+      final boolean isNodeMapIdentical1 = (nodeMap0 | nodeMap1) == nodeMap1;
+
+      final boolean areBitmapsIdentical0 = isDataMapIdentical0 && isNodeMapIdentical0;
+      final boolean areBitmapsIdentical1 = isDataMapIdentical1 && isNodeMapIdentical1;
+
+      boolean isNodeMapReferenceEqual0 = true;
+      boolean isNodeMapReferenceEqual1 = true;
+
+      int bitsToSkip = Integer.numberOfTrailingZeros(unionedBitmap);
+
+      while (bitsToSkip < 32) {
+        final int bitpos = bitpos(bitsToSkip);
+
+        final int bitPattern0 = bitPattern(dataMap0, nodeMap0, bitpos);
+        final int bitPattern1 = bitPattern(dataMap1, nodeMap1, bitpos);
+
+        final int bitPattern = (bitPattern0 << 2) | bitPattern1;
+
+        switch (bitPattern) {
+          case PATTERN_DATA_AND_DATA: {
+            // case singleton x singleton
+            final int dataIndex0 = index(dataMap0, bitpos);
+            final int dataIndex1 = index(dataMap1, bitpos);
+
+            final K key0 = node0.getKey(dataIndex0);
+            final int keyHash0 = node0.getKeyHash(dataIndex0);
+
+            final K key1 = node1.getKey(dataIndex1);
+            final int keyHash1 = node1.getKeyHash(dataIndex1);
+
+//            if (keyHash0 == keyHash1 && cmp.compare(key0, key1) == 0) {
+            if (keyHash0 == keyHash1 && Objects.equals(key0, key1)) {
+              // singleton -> singleton
+              newBuffer.add(key0, keyHash0);
+              newDataMap |= bitpos;
+            } else {
+              // singleton -> node (=bitmap change);
+              final AbstractSetNode<K> node =
+                  mergeTwoKeyValPairs(key0, keyHash0, key1, keyHash1, shift + BIT_PARTITION_SIZE);
+
+              newBuffer.add(node);
+              newNodeMap |= bitpos;
+
+              newBuffer.addPayloadSize(2);
+              newBuffer.addPayloadHash(keyHash0 + keyHash1);
+            }
+            break;
+          }
+
+          case PATTERN_NODE_AND_DATA: {
+            // case node x singleton
+            final int nodeIndex0 = index(nodeMap0, bitpos);
+            final int dataIndex1 = index(dataMap1, bitpos);
+
+            final AbstractSetNode<K> node = node0.getNode(nodeIndex0);
+
+            final K key = node1.getKey(dataIndex1);
+            final int keyHash = node1.getKeyHash(dataIndex1);
+
+            boolean nodeContainsKey = node.contains(key, keyHash, shift + BIT_PARTITION_SIZE, cmp);
+
+            if (nodeContainsKey) {
+              // node -> node (=bitmap change)
+              newBuffer.add(node);
+              newNodeMap |= bitpos;
+            } else {
+              // node -> node (=bitmap change)
+              final AbstractSetNode<K> newNode = node
+                  .updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, SetResult.unchanged(),
+                      cmp);
+
+              newBuffer.add(newNode);
+              newNodeMap |= bitpos;
+
+              newBuffer.addPayloadSize(newNode.size());
+              newBuffer.addPayloadHash(newNode.recursivePayloadHashCode());
+
+              isNodeMapReferenceEqual0 = false;
+            }
+            break;
+          }
+
+          case PATTERN_DATA_AND_NODE: {
+            // case singleton x node
+            final int dataIndex0 = index(dataMap0, bitpos);
+            final int nodeIndex1 = index(nodeMap1, bitpos);
+
+            final K key = node0.getKey(dataIndex0);
+            final int keyHash = node0.getKeyHash(dataIndex0);
+
+            final AbstractSetNode<K> node = node1.getNode(nodeIndex1);
+
+            boolean nodeContainsKey = node.contains(key, keyHash, shift + BIT_PARTITION_SIZE, cmp);
+
+            if (nodeContainsKey) {
+              // singleton -> node
+              newBuffer.add(node);
+              newNodeMap |= bitpos;
+            } else {
+              // singleton -> node (=bitmap change)
+              final AbstractSetNode<K> newNode = node
+                  .updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, SetResult.unchanged(),
+                      cmp);
+
+              newBuffer.add(newNode);
+              newNodeMap |= bitpos;
+
+              newBuffer.addPayloadSize(newNode.size());
+              newBuffer.addPayloadHash(newNode.recursivePayloadHashCode());
+
+              isNodeMapReferenceEqual1 = false;
+            }
+            break;
+          }
+
+          case PATTERN_NODE_AND_NODE: {
+            // case node x node
+            final int nodeIndex0 = index(nodeMap0, bitpos);
+            final int nodeIndex1 = index(nodeMap1, bitpos);
+
+            final AbstractSetNode<K> subNode0 = node0.getNode(nodeIndex0);
+            final AbstractSetNode<K> subNode1 = node1.getNode(nodeIndex1);
+
+            final Preference recursiveDirectionPreference;
+            if (areBitmapsIdentical0 && areBitmapsIdentical1) {
+              recursiveDirectionPreference = directionPreference;
+            } else if (areBitmapsIdentical0) {
+              recursiveDirectionPreference = LEFT;
+            } else if (areBitmapsIdentical1) {
+              recursiveDirectionPreference = RIGHT;
+            } else {
+              recursiveDirectionPreference = INDIFFERENT;
+            }
+
+            AbstractSetNode<K> newNode = subNode0.union(mutator, subNode1,
+                shift + BIT_PARTITION_SIZE, details, cmp, recursiveDirectionPreference);
+
+            switch (newNode == null ? SIZE_MORE_THAN_ONE : newNode.sizePredicate()) {
+//              case SIZE_EMPTY: {
+//                // node -> none (=bitmap change)
+//                break;
+//              }
+//
+//              case SIZE_ONE: {
+//                // node -> singleton (=bitmap change)
+//                newBuffer.inline(newNode);
+//                newDataMap |= bitpos;
+//                break;
+//              }
+
+              case SIZE_MORE_THAN_ONE: {
+                // node -> node
+//                newBuffer.add(newNode);
+//                newNodeMap |= bitpos;
+
+                if (newNode != null) {
+                  newBuffer.add(newNode);
+                  newNodeMap |= bitpos;
+
+                  if (newNode != subNode0) {
+                    isNodeMapReferenceEqual0 = false;
+                  }
+
+                  if (newNode != subNode1) {
+                    isNodeMapReferenceEqual1 = false;
+                  }
+                } else {
+                  if (directionPreference == LEFT || directionPreference == INDIFFERENT) {
+                    newBuffer.add(subNode0);
+                    newNodeMap |= bitpos;
+                  } else {
+                    newBuffer.add(subNode1);
+                    newNodeMap |= bitpos;
+                  }
+                }
+
+                break;
+              }
+            }
+            break;
+          }
+
+          case PATTERN_EMPTY_AND_DATA: {
+            // case empty x singleton
+            final int dataIndex1 = index(dataMap1, bitpos);
+
+            final K key1 = node1.getKey(dataIndex1);
+            final int keyHash1 = node1.getKeyHash(dataIndex1);
+
+            newBuffer.add(key1, keyHash1);
+            newDataMap |= bitpos;
+            break;
+          }
+
+          case PATTERN_DATA_AND_EMPTY: {
+            // case singleton x empty
+            final int dataIndex0 = index(dataMap0, bitpos);
+
+            final K key0 = node0.getKey(dataIndex0);
+            final int keyHash0 = node0.getKeyHash(dataIndex0);
+
+            newBuffer.add(key0, keyHash0);
+            newDataMap |= bitpos;
+            break;
+          }
+
+          case PATTERN_EMPTY_AND_NODE: {
+            // case empty x node
+            final int nodeIndex1 = index(nodeMap1, bitpos);
+            final AbstractSetNode<K> subNode1 = node1.getNode(nodeIndex1);
+
+            // TODO: tackle incremental recalculation of hash + size
+            newBuffer.add(subNode1);
+            newNodeMap |= bitpos;
+
+            newBuffer.addPayloadSize(subNode1.size());
+            newBuffer.addPayloadHash(subNode1.recursivePayloadHashCode());
+            break;
+          }
+
+          case PATTERN_NODE_AND_EMPTY: {
+            // case node x empty
+            final int nodeIndex0 = index(nodeMap0, bitpos);
+            final AbstractSetNode<K> subNode0 = node0.getNode(nodeIndex0);
+
+            // TODO: tackle incremental recalculation of hash + size
+            newBuffer.add(subNode0);
+            newNodeMap |= bitpos;
+
+            newBuffer.addPayloadSize(subNode0.size());
+            newBuffer.addPayloadHash(subNode0.recursivePayloadHashCode());
+            break;
+          }
+        }
+
+        int trailingZeroCount = Integer
+            .numberOfTrailingZeros(unionedBitmap >> (bitsToSkip + 1));
+        bitsToSkip = bitsToSkip + 1 + trailingZeroCount;
+      }
+
+      // updated accumulated properties
+      details.addSize(newBuffer.getPayloadSize());
+      details.addHashCode(newBuffer.getPayloadHash());
+
+      boolean leftReferenceEqual =
+          isNodeMapReferenceEqual0 && ((newDataMap == dataMap0) && (newNodeMap == nodeMap0));
+
+      boolean rightReferenceEqual =
+          isNodeMapReferenceEqual1 && ((newDataMap == dataMap1) && (newNodeMap == nodeMap1));
+
+      if (leftReferenceEqual && rightReferenceEqual) {
+        return null;
+      }
+
+      // TODO: introduce preferLeftOverRightOnEquality
+      if (newBuffer.isEmpty()) {
+        return EMPTY_NODE;
+      }
+
+      if (directionPreference == LEFT || directionPreference == INDIFFERENT) {
+        if (leftReferenceEqual) {
+          assert node0.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
+              newDataMap, newBuffer.compactBuffer()));
+          return node0;
+        } else if (rightReferenceEqual) {
+          assert node1.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
+              newDataMap, newBuffer.compactBuffer()));
+          return node1;
+        }
+      } else {
+        if (rightReferenceEqual) {
+          assert node1.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
+              newDataMap, newBuffer.compactBuffer()));
+          return node1;
+        } else if (leftReferenceEqual) {
+          assert node0.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
+              newDataMap, newBuffer.compactBuffer()));
+          return node0;
+        }
+      }
+
+      // TODO: create singelton node that can unboxed easily
+      final CompactSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator, newNodeMap,
+          newDataMap, newBuffer.compactBuffer()); // newBuffer.compactHashes()
+
+      assert !newNode.equals(node0);
+      assert !newNode.equals(node1);
+
+      return newNode;
+    }
+
+    /*
+     * TODO: for incrementality: only consider intersecting elements
+     */
+    @Override
+    public final AbstractSetNode<K> intersect(AtomicReference<Thread> mutator,
+        AbstractSetNode<K> that, int shift, IntersectionResult details,
+        Comparator<Object> cmp, Preference directionPreference) {
+
+      final CompactSetNode<K> node0 = this;
+      final CompactSetNode<K> node1 = (CompactSetNode<K>) that;
+
+      if (node0 == node1) {
+        return node0;
+      }
+
+      final int dataMap0 = node0.dataMap();
+      final int nodeMap0 = node0.nodeMap();
+      final int dataMap1 = node1.dataMap();
+      final int nodeMap1 = node1.nodeMap();
+
+      final int bitmap0 = dataMap0 | nodeMap0;
+      final int bitmap1 = dataMap1 | nodeMap1;
+
+      int intersectedBitmap = bitmap0 & bitmap1;
+
+      if (intersectedBitmap == 0) {
+        return EMPTY_NODE;
+      }
+
+      final Buffer<K, AbstractSetNode<K>> newBuffer = new Buffer<>();
+      int newDataMap = 0;
+      int newNodeMap = 0;
+
+      final boolean isDataMapIdentical0 = (dataMap0 & dataMap1) == dataMap0;
+      final boolean isDataMapIdentical1 = (dataMap0 & dataMap1) == dataMap1;
+
+      final boolean isNodeMapIdentical0 = (nodeMap0 & nodeMap1) == nodeMap0;
+      final boolean isNodeMapIdentical1 = (nodeMap0 & nodeMap1) == nodeMap1;
+
+      final boolean areBitmapsIdentical0 = isDataMapIdentical0 && isNodeMapIdentical0;
+      final boolean areBitmapsIdentical1 = isDataMapIdentical1 && isNodeMapIdentical1;
+
+      boolean isNodeMapReferenceEqual0 = true;
+      boolean isNodeMapReferenceEqual1 = true;
+
+      int bitsToSkip = Integer.numberOfTrailingZeros(intersectedBitmap);
+
+      while (bitsToSkip < 32) {
+        final int bitpos = bitpos(bitsToSkip);
+
+        if (isBitInBitmap(dataMap0, bitpos)) {
+          if (isBitInBitmap(dataMap1, bitpos)) {
+            // case singleton x singleton
+            final int dataIndex0 = index(dataMap0, bitpos);
+            final int dataIndex1 = index(dataMap1, bitpos);
+
+            final K key0 = node0.getKey(dataIndex0);
+            final int keyHash0 = node0.getKeyHash(dataIndex0);
+
+            final K key1 = node1.getKey(dataIndex1);
+            final int keyHash1 = node1.getKeyHash(dataIndex1);
+
+//            if (keyHash0 == keyHash1 && cmp.compare(key0, key1) == 0) {
+            if (keyHash0 == keyHash1 && Objects.equals(key0, key1)) {
+              // singleton -> singleton
+              newBuffer.add(key0, keyHash0);
+              newDataMap |= bitpos;
+            } else {
+              // singleton -> none (=bitmap change);
+            }
+          } else {
+            // case singleton x node
+            final int dataIndex0 = index(dataMap0, bitpos);
+            final int nodeIndex1 = index(nodeMap1, bitpos);
+
+            final K key = node0.getKey(dataIndex0);
+            final int keyHash = node0.getKeyHash(dataIndex0);
+
+            final AbstractSetNode<K> node = node1.getNode(nodeIndex1);
+
+            boolean nodeContainsKey = node.contains(key, keyHash, shift + BIT_PARTITION_SIZE, cmp);
+
+            if (nodeContainsKey) {
+              // singleton -> singleton
+              newBuffer.add(key, keyHash);
+              newDataMap |= bitpos;
+            } else {
+              // singleton -> none (=bitmap change)
+            }
+          }
+        } else {
+          if (isBitInBitmap(dataMap1, bitpos)) {
+            // case node x singleton
+            final int nodeIndex0 = index(nodeMap0, bitpos);
+            final int dataIndex1 = index(dataMap1, bitpos);
+
+            final AbstractSetNode<K> node = node0.getNode(nodeIndex0);
+
+            final K key = node1.getKey(dataIndex1);
+            final int keyHash = node1.getKeyHash(dataIndex1);
+
+            boolean nodeContainsKey = node.contains(key, keyHash, shift + BIT_PARTITION_SIZE, cmp);
+
+            if (nodeContainsKey) {
+              // node -> singleton (=bitmap change)
+              newBuffer.add(key, keyHash);
+              newDataMap |= bitpos;
+            } else {
+              // node -> none (=bitmap change)
+            }
+          } else {
+            // case node x node
+            final int nodeIndex0 = index(nodeMap0, bitpos);
+            final int nodeIndex1 = index(nodeMap1, bitpos);
+
+            final AbstractSetNode<K> subNode0 = node0.getNode(nodeIndex0);
+            final AbstractSetNode<K> subNode1 = node1.getNode(nodeIndex1);
+
+            final Preference recursiveDirectionPreference;
+            if (areBitmapsIdentical0 && areBitmapsIdentical1) {
+              recursiveDirectionPreference = directionPreference;
+            } else if (areBitmapsIdentical0) {
+              recursiveDirectionPreference = LEFT;
+            } else if (areBitmapsIdentical1) {
+              recursiveDirectionPreference = RIGHT;
+            } else {
+              recursiveDirectionPreference = INDIFFERENT;
+            }
+
+//            if (isNodeMapIdentical0 && !isNodeMapIdentical1) {
+//              recursiveDirectionPreference = LEFT;
+//            } else if (!isNodeMapIdentical0 && isNodeMapIdentical1) {
+//              recursiveDirectionPreference = Preference.RIGHT;
+//            } else {
+//              recursiveDirectionPreference = INDIFFERENT;
+//            }
+
+            AbstractSetNode<K> newNode = subNode0.intersect(mutator, subNode1,
+                shift + BIT_PARTITION_SIZE, details, cmp, recursiveDirectionPreference);
+
+            switch (newNode == null ? SIZE_MORE_THAN_ONE : newNode.sizePredicate()) {
+              case SIZE_EMPTY: {
+                // node -> none (=bitmap change)
+                break;
+              }
+
+              case SIZE_ONE: {
+                // node -> singleton (=bitmap change)
+                newBuffer.inline(newNode);
+                newDataMap |= bitpos;
+                break;
+              }
+
+              case SIZE_MORE_THAN_ONE: {
+                // node -> node
+//                newBuffer.add(newNode);
+//                newNodeMap |= bitpos;
+
+                if (newNode != null) {
+                  newBuffer.add(newNode);
+                  newNodeMap |= bitpos;
+
+                  if (newNode != subNode0) {
+                    isNodeMapReferenceEqual0 = false;
+                  }
+
+                  if (newNode != subNode1) {
+                    isNodeMapReferenceEqual1 = false;
+                  }
+                } else {
+                  if (directionPreference == LEFT || directionPreference == INDIFFERENT) {
+                    newBuffer.add(subNode0);
+                    newNodeMap |= bitpos;
+                  } else {
+                    newBuffer.add(subNode1);
+                    newNodeMap |= bitpos;
+                  }
+                }
+
+                break;
+              }
+            }
+          }
+        }
+
+        int trailingZeroCount = Integer
+            .numberOfTrailingZeros(intersectedBitmap >> (bitsToSkip + 1));
+        bitsToSkip = bitsToSkip + 1 + trailingZeroCount;
+      }
+
+      // updated accumulated properties
+      details.addSize(newBuffer.getPayloadSize());
+      details.addHashCode(newBuffer.getPayloadHash());
+
+      boolean leftReferenceEqual =
+          isNodeMapReferenceEqual0 && ((newDataMap == dataMap0) && (newNodeMap == nodeMap0));
+
+      boolean rightReferenceEqual =
+          isNodeMapReferenceEqual1 && ((newDataMap == dataMap1) && (newNodeMap == nodeMap1));
+
+      if (leftReferenceEqual && rightReferenceEqual) {
+        return null;
+      }
+
+      // TODO: introduce preferLeftOverRightOnEquality
+      if (newBuffer.isEmpty()) {
+        return EMPTY_NODE;
+      }
+
+      if (directionPreference == LEFT || directionPreference == INDIFFERENT) {
+        if (leftReferenceEqual) {
+          assert node0.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
+              newDataMap, newBuffer.compactBuffer()));
+          return node0;
+        } else if (rightReferenceEqual) {
+          assert node1.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
+              newDataMap, newBuffer.compactBuffer()));
+          return node1;
+        }
+      } else {
+        if (rightReferenceEqual) {
+          assert node1.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
+              newDataMap, newBuffer.compactBuffer()));
+          return node1;
+        } else if (leftReferenceEqual) {
+          assert node0.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
+              newDataMap, newBuffer.compactBuffer()));
+          return node0;
+        }
+      }
+
+      // TODO: create singelton node that can unboxed easily
+      final CompactSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator, newNodeMap,
+          newDataMap, newBuffer.compactBuffer()); // newBuffer.compactHashes()
+
+      assert !newNode.equals(node0);
+      assert !newNode.equals(node1);
+
+      return newNode;
+    }
+
+    /*
+     * TODO: for incrementality: only consider matching elements
+     */
+    @Override
+    public final AbstractSetNode<K> difference(AtomicReference<Thread> mutator,
+        AbstractSetNode<K> that, int shift, IntersectionResult details,
+        Comparator<Object> cmp, Preference directionPreference) {
+
+      final CompactSetNode<K> node0 = this;
+      final CompactSetNode<K> node1 = (CompactSetNode<K>) that;
+
+      if (node0 == node1) {
+        return node0;
+      }
+
+      final int dataMap0 = node0.dataMap();
+      final int nodeMap0 = node0.nodeMap();
+      final int dataMap1 = node1.dataMap();
+      final int nodeMap1 = node1.nodeMap();
+
+      final int bitmap0 = dataMap0 | nodeMap0;
+      final int bitmap1 = dataMap1 | nodeMap1;
+
+      int intersectedBitmap = bitmap0 & bitmap1;
+
+      if (intersectedBitmap == 0) {
+        return null; // nothing to subtract
+      }
+
+      int unionedBitmap = bitmap0 | bitmap1;
+
+      final Buffer<K, AbstractSetNode<K>> newBuffer = new Buffer<>();
+      int newDataMap = 0;
+      int newNodeMap = 0;
+
+      final boolean isDataMapIdentical0 = (dataMap0 & dataMap1) == dataMap0;
+      final boolean isDataMapIdentical1 = (dataMap0 & dataMap1) == dataMap1;
+
+      final boolean isNodeMapIdentical0 = (nodeMap0 & nodeMap1) == nodeMap0;
+      final boolean isNodeMapIdentical1 = (nodeMap0 & nodeMap1) == nodeMap1;
+
+      final boolean areBitmapsIdentical0 = isDataMapIdentical0 && isNodeMapIdentical0;
+      final boolean areBitmapsIdentical1 = isDataMapIdentical1 && isNodeMapIdentical1;
+
+      boolean isNodeMapReferenceEqual0 = true;
+      boolean isNodeMapReferenceEqual1 = false; // can never be true
+
+      int bitsToSkip = Integer.numberOfTrailingZeros(unionedBitmap);
+
+      while (bitsToSkip < 32) {
+        final int bitpos = bitpos(bitsToSkip);
+
+        final int bitPattern0 = bitPattern(dataMap0, nodeMap0, bitpos);
+        final int bitPattern1 = bitPattern(dataMap1, nodeMap1, bitpos);
+
+        final int bitPattern = (bitPattern0 << 2) | bitPattern1;
+
+        switch (bitPattern) {
+          case PATTERN_DATA_AND_DATA: {
+            // case singleton x singleton
+            final int dataIndex0 = index(dataMap0, bitpos);
+            final int dataIndex1 = index(dataMap1, bitpos);
+
+            final K key0 = node0.getKey(dataIndex0);
+            final int keyHash0 = node0.getKeyHash(dataIndex0);
+
+            final K key1 = node1.getKey(dataIndex1);
+            final int keyHash1 = node1.getKeyHash(dataIndex1);
+
+//            if (keyHash0 == keyHash1 && cmp.compare(key0, key1) == 0) {
+            if (keyHash0 == keyHash1 && Objects.equals(key0, key1)) {
+              // singleton -> none
+            } else {
+              // singleton -> singleton
+              newBuffer.add(key0, keyHash0);
+              newDataMap |= bitpos;
+            }
+            break;
+          }
+
+          case PATTERN_NODE_AND_DATA: {
+            // case node x singleton
+            final int nodeIndex0 = index(nodeMap0, bitpos);
+            final int dataIndex1 = index(dataMap1, bitpos);
+
+            final AbstractSetNode<K> node = node0.getNode(nodeIndex0);
+
+            final K key = node1.getKey(dataIndex1);
+            final int keyHash = node1.getKeyHash(dataIndex1);
+
+            boolean nodeContainsKey = node.contains(key, keyHash, shift + BIT_PARTITION_SIZE, cmp);
+
+            if (nodeContainsKey) {
+              // node -> node (=bitmap change)
+              final AbstractSetNode<K> newNode = node
+                  .removed(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, SetResult.unchanged(),
+                      cmp);
+
+              switch (newNode.sizePredicate()) {
+                case SIZE_ONE: {
+                  // node -> singleton (=bitmap change)
+                  newBuffer.inline(newNode);
+                  newDataMap |= bitpos;
+
+                  newBuffer.addPayloadSize(newNode.size());
+                  newBuffer.addPayloadHash(newNode.recursivePayloadHashCode());
+                  break;
+                }
+
+                case SIZE_MORE_THAN_ONE: {
+                  // node -> node
+                  newBuffer.add(newNode);
+                  newNodeMap |= bitpos;
+
+                  newBuffer.addPayloadSize(newNode.size());
+                  newBuffer.addPayloadHash(newNode.recursivePayloadHashCode());
+                  break;
+                }
+              }
+
+              isNodeMapReferenceEqual0 = false; // move up to SIZE_MORE_THAN_ONE case?
+            } else {
+              // node -> node
+              newBuffer.add(node);
+              newNodeMap |= bitpos;
+
+              newBuffer.addPayloadSize(node.size());
+              newBuffer.addPayloadHash(node.recursivePayloadHashCode());
+            }
+            break;
+          }
+
+          case PATTERN_DATA_AND_NODE: {
+            // case singleton x node
+            final int dataIndex0 = index(dataMap0, bitpos);
+            final int nodeIndex1 = index(nodeMap1, bitpos);
+
+            final K key = node0.getKey(dataIndex0);
+            final int keyHash = node0.getKeyHash(dataIndex0);
+
+            final AbstractSetNode<K> node = node1.getNode(nodeIndex1);
+
+            boolean nodeContainsKey = node
+                .contains(key, keyHash, shift + BIT_PARTITION_SIZE, cmp);
+
+            if (nodeContainsKey) {
+              // singleton -> none
+            } else {
+              // singleton -> singleton
+              newBuffer.add(key, keyHash);
+              newDataMap |= bitpos;
+            }
+            break;
+          }
+
+          case PATTERN_NODE_AND_NODE: {
+            // case node x node
+            final int nodeIndex0 = index(nodeMap0, bitpos);
+            final int nodeIndex1 = index(nodeMap1, bitpos);
+
+            final AbstractSetNode<K> subNode0 = node0.getNode(nodeIndex0);
+            final AbstractSetNode<K> subNode1 = node1.getNode(nodeIndex1);
+
+//            final Preference recursiveDirectionPreference;
+//            if (areBitmapsIdentical0 && areBitmapsIdentical1) {
+//              recursiveDirectionPreference = directionPreference;
+//            } else if (areBitmapsIdentical0) {
+//              recursiveDirectionPreference = LEFT;
+//            } else if (areBitmapsIdentical1) {
+//              recursiveDirectionPreference = RIGHT;
+//            } else {
+//              recursiveDirectionPreference = INDIFFERENT;
+//            }
+
+            final Preference recursiveDirectionPreference = INDIFFERENT;
+
+            AbstractSetNode<K> newNode = subNode0.difference(mutator, subNode1,
+                shift + BIT_PARTITION_SIZE, details, cmp, recursiveDirectionPreference);
+
+            switch (newNode == null ? SIZE_MORE_THAN_ONE : newNode.sizePredicate()) {
+              case SIZE_EMPTY: {
+                // node -> none (=bitmap change)
+                break;
+              }
+
+              case SIZE_ONE: {
+                // node -> singleton (=bitmap change)
+                newBuffer.inline(newNode);
+                newDataMap |= bitpos;
+                break;
+              }
+
+              case SIZE_MORE_THAN_ONE: {
+                // node -> node
+//                newBuffer.add(newNode);
+//                newNodeMap |= bitpos;
+
+                if (newNode != null) {
+                  newBuffer.add(newNode);
+                  newNodeMap |= bitpos;
+
+                  if (newNode != subNode0) {
+                    isNodeMapReferenceEqual0 = false;
+                  }
+
+                  if (newNode != subNode1) {
+                    isNodeMapReferenceEqual1 = false;
+                  }
+                } else {
+//                  if (directionPreference == LEFT || directionPreference == INDIFFERENT) {
+                  newBuffer.add(subNode0);
+                  newNodeMap |= bitpos;
+
+                  newBuffer.addPayloadSize(subNode0.size());
+                  newBuffer.addPayloadHash(subNode0.recursivePayloadHashCode());
+//                  } else {
+//                    newBuffer.add(subNode1);
+//                    newNodeMap |= bitpos;
+//
+//                    newBuffer.addPayloadSize(subNode1.size());
+//                    newBuffer.addPayloadHash(subNode1.recursivePayloadHashCode());
+//                  }
+                }
+
+                break;
+              }
+            }
+            break;
+          }
+
+          case PATTERN_EMPTY_AND_DATA: {
+            // case empty x singleton
+//            final int dataIndex1 = index(dataMap1, bitpos);
+//
+//            final K key1 = node1.getKey(dataIndex1);
+//            final int keyHash1 = node1.getKeyHash(dataIndex1);
+//
+//            newBuffer.add(key1, keyHash1);
+//            newDataMap |= bitpos;
+            break;
+          }
+
+          case PATTERN_DATA_AND_EMPTY: {
+            // case singleton x empty
+            final int dataIndex0 = index(dataMap0, bitpos);
+
+            final K key0 = node0.getKey(dataIndex0);
+            final int keyHash0 = node0.getKeyHash(dataIndex0);
+
+            newBuffer.add(key0, keyHash0);
+            newDataMap |= bitpos;
+            break;
+          }
+
+          case PATTERN_EMPTY_AND_NODE: {
+            // case empty x node
+//            final int nodeIndex1 = index(nodeMap1, bitpos);
+//            final AbstractSetNode<K> subNode1 = node1.getNode(nodeIndex1);
+//
+//            // TODO: tackle incremental recalculation of hash + size
+//            newBuffer.add(subNode1);
+//            newNodeMap |= bitpos;
+//
+//            newBuffer.addPayloadSize(subNode1.size());
+//            newBuffer.addPayloadHash(subNode1.recursivePayloadHashCode());
+            break;
+          }
+
+          case PATTERN_NODE_AND_EMPTY: {
+            // case node x empty
+            final int nodeIndex0 = index(nodeMap0, bitpos);
+            final AbstractSetNode<K> subNode0 = node0.getNode(nodeIndex0);
+
+            // TODO: tackle incremental recalculation of hash + size
+            newBuffer.add(subNode0);
+            newNodeMap |= bitpos;
+
+            newBuffer.addPayloadSize(subNode0.size());
+            newBuffer.addPayloadHash(subNode0.recursivePayloadHashCode());
+            break;
+          }
+        }
+
+        int trailingZeroCount = Integer
+            .numberOfTrailingZeros(unionedBitmap >> (bitsToSkip + 1));
+        bitsToSkip = bitsToSkip + 1 + trailingZeroCount;
+      }
+
+      // updated accumulated properties
+      details.addSize(newBuffer.getPayloadSize());
+      details.addHashCode(newBuffer.getPayloadHash());
+
+      boolean leftReferenceEqual =
+          isNodeMapReferenceEqual0 && ((newDataMap == dataMap0) && (newNodeMap == nodeMap0));
+
+      boolean rightReferenceEqual =
+          isNodeMapReferenceEqual1 && ((newDataMap == dataMap1) && (newNodeMap == nodeMap1));
+
+      if (leftReferenceEqual && rightReferenceEqual) {
+        return null;
+      }
+
+      // TODO: introduce preferLeftOverRightOnEquality
+      if (newBuffer.isEmpty()) {
+        return EMPTY_NODE;
+      }
+
+      if (directionPreference == LEFT || directionPreference == INDIFFERENT) {
+        if (leftReferenceEqual) {
+          final CompactSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator, newNodeMap,
+              newDataMap, newBuffer.compactBuffer()); // newBuffer.compactHashes()
+          assert node0.equals(newNode);
+          return node0;
+        } else if (rightReferenceEqual) {
+          final CompactSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator, newNodeMap,
+              newDataMap, newBuffer.compactBuffer()); // newBuffer.compactHashes()
+          assert node1.equals(newNode);
+          return node1;
+        }
+      } else {
+        if (rightReferenceEqual) {
+          final CompactSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator, newNodeMap,
+              newDataMap, newBuffer.compactBuffer()); // newBuffer.compactHashes()
+          assert node1.equals(newNode);
+          return node1;
+        } else if (leftReferenceEqual) {
+          final CompactSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator, newNodeMap,
+              newDataMap, newBuffer.compactBuffer()); // newBuffer.compactHashes()
+          assert node0.equals(newNode);
+          return node0;
+        }
+      }
+
+      // TODO: create singelton node that can unboxed easily
+      final CompactSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator, newNodeMap,
+          newDataMap, newBuffer.compactBuffer()); // newBuffer.compactHashes()
+
+      assert !newNode.equals(node0);
+      assert !newNode.equals(node1);
+
+      return newNode;
+    }
+
   }
 
   private static final class HashCollisionSetNode<K> extends CompactSetNode<K> {
@@ -1682,7 +2888,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     }
 
     @Override
-    CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key, final int keyHash,
+    CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key,
+        final int keyHash,
         final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
       assert this.hash == keyHash;
 
@@ -1743,7 +2950,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     }
 
     @Override
-    CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key, final int keyHash,
+    CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key,
+        final int keyHash,
         final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
       for (int idx = 0; idx < keys.length; idx++) {
         if (cmp.compare(keys[idx], key) == 0) {
@@ -1776,12 +2984,12 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     }
 
     @Override
-    boolean hasPayload() {
+    public boolean hasPayload() {
       return true;
     }
 
     @Override
-    int payloadArity() {
+    public int payloadArity() {
       return keys.length;
     }
 
@@ -1806,8 +3014,13 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     }
 
     @Override
-    K getKey(final int index) {
+    public K getKey(final int index) {
       return keys[index];
+    }
+
+    @Override
+    public int getKeyHash(int index) {
+      return getKey(index).hashCode();
     }
 
     @Override
@@ -1833,6 +3046,11 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     @Override
     int slotArity() {
       throw new UnsupportedOperationException();
+    }
+
+    @Override
+    int localPayloadHashCode() {
+      return hash * keys.length;
     }
 
     @Override
@@ -1894,7 +3112,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     }
 
     @Override
-    CompactSetNode<K> copyAndRemoveValue(final AtomicReference<Thread> mutator, final int bitpos) {
+    CompactSetNode<K> copyAndRemoveValue(final AtomicReference<Thread> mutator,
+        final int bitpos) {
       throw new UnsupportedOperationException();
     }
 
@@ -1924,6 +3143,31 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     @Override
     final int dataMap() {
       throw new UnsupportedOperationException();
+    }
+
+    /* TODO: support tracking of changes with 'IntersectionResult'. */
+    @Override
+    public AbstractSetNode<K> intersect(AtomicReference<Thread> mutator, AbstractSetNode<K> other,
+        int shift, IntersectionResult details, Comparator<Object> cmp,
+        Preference directionPreference) {
+      assert other instanceof PersistentTrieSet.HashCollisionSetNode;
+
+      final HashCollisionSetNode that = (HashCollisionSetNode) other;
+
+      final List<K> buffer = new ArrayList<>();
+
+      final K[] newKeys = (K[]) Stream.of(keys)
+          .filter(key -> other.contains(key, hash, shift, cmp))
+          .toArray();
+
+      if (newKeys.length == 0) {
+        return EMPTY_NODE;
+      } else if (newKeys.length == 1) {
+        return CompactSetNode.<K>nodeOf(mutator)
+            .updated(mutator, newKeys[0], hash, 0, SetResult.unchanged(), cmp);
+      } else {
+        return new HashCollisionSetNode<>(hash, newKeys);
+      }
     }
 
   }
@@ -2087,15 +3331,15 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
   static abstract class AbstractTransientTrieSet<K> implements Set.Transient<K> {
 
     protected AbstractSetNode<K> rootNode;
-    protected int hashCode;
+    protected int cachedHashCode;
     protected int cachedSize;
 
     AbstractTransientTrieSet(PersistentTrieSet<K> trieSet) {
       this.rootNode = trieSet.rootNode;
-      this.hashCode = trieSet.hashCode;
+      this.cachedHashCode = trieSet.cachedHashCode;
       this.cachedSize = trieSet.cachedSize;
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
     }
 
@@ -2210,23 +3454,24 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       if (details.isModified()) {
 
         rootNode = newRootNode;
-        hashCode += keyHash;
+        cachedHashCode += keyHash;
         cachedSize += 1;
 
         if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
+          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
         }
         return true;
 
       }
 
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
       return false;
     }
 
-    protected boolean __insertEquivalentWithCapability(AtomicReference<Thread> mutator, final K key,
+    protected boolean __insertEquivalentWithCapability(AtomicReference<Thread> mutator,
+        final K key,
         final Comparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -2241,18 +3486,18 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       if (details.isModified()) {
 
         rootNode = newRootNode;
-        hashCode += keyHash;
+        cachedHashCode += keyHash;
         cachedSize += 1;
 
         if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
+          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
         }
         return true;
 
       }
 
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
       return false;
     }
@@ -2293,23 +3538,24 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
       if (details.isModified()) {
         rootNode = newRootNode;
-        hashCode = hashCode - keyHash;
+        cachedHashCode = cachedHashCode - keyHash;
         cachedSize = cachedSize - 1;
 
         if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
+          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
         }
         return true;
       }
 
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
 
       return false;
     }
 
-    protected boolean __removeEquivalentWithCapability(AtomicReference<Thread> mutator, final K key,
+    protected boolean __removeEquivalentWithCapability(AtomicReference<Thread> mutator,
+        final K key,
         final Comparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
@@ -2323,17 +3569,17 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
       if (details.isModified()) {
         rootNode = newRootNode;
-        hashCode = hashCode - keyHash;
+        cachedHashCode = cachedHashCode - keyHash;
         cachedSize = cachedSize - 1;
 
         if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
+          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
         }
         return true;
       }
 
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
 
       return false;
@@ -2493,7 +3739,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
           return false;
         }
 
-        if (this.hashCode != that.hashCode) {
+        if (this.cachedHashCode != that.cachedHashCode) {
           return false;
         }
 
@@ -2513,7 +3759,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
     @Override
     public int hashCode() {
-      return hashCode;
+      return cachedHashCode;
     }
 
   }
@@ -2554,7 +3800,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       }
 
       mutator.set(null);
-      return new PersistentTrieSet<K>(rootNode, hashCode, cachedSize);
+      return new PersistentTrieSet<K>(rootNode, cachedHashCode, cachedSize);
     }
 
   }
