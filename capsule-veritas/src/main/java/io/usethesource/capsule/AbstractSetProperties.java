@@ -102,9 +102,14 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
   }
 
   @Property(trials = DEFAULT_TRIALS)
-  public void intersectIdentity(@Size(min = 0, max = 0) final CT emptySet, final CT inputShared) {
+  public void intersectIdentityReference(@Size(min = 0, max = 0) final CT emptySet,
+      final CT inputShared) {
     assertEquals("intersect reference equal", inputShared, inputShared.intersect(inputShared));
+  }
 
+  @Property(trials = DEFAULT_TRIALS)
+  public void intersectIdentityStructural(@Size(min = 0, max = 0) final CT emptySet,
+      final CT inputShared) {
     final Set.Transient<T> builder = emptySet.asTransient();
     inputShared.forEach(builder::__insert);
 
@@ -166,13 +171,18 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
   }
 
   @Property(trials = DEFAULT_TRIALS)
-  public void unionIdentity(@Size(min = 0, max = 0) final CT emptySet, final CT inputShared) {
-    assertEquals("intersect reference equal", inputShared, inputShared.union(inputShared));
+  public void unionIdentityReference(@Size(min = 0, max = 0) final CT emptySet,
+      final CT inputShared) {
+    assertEquals("union reference equal", inputShared, inputShared.union(inputShared));
+  }
 
+  @Property(trials = DEFAULT_TRIALS)
+  public void unionIdentityStructural(@Size(min = 0, max = 0) final CT emptySet,
+      final CT inputShared) {
     final Set.Transient<T> builder = emptySet.asTransient();
     inputShared.forEach(builder::__insert);
 
-    assertEquals("intersect copy equal", inputShared, inputShared.union(builder.freeze()));
+    assertEquals("union copy equal", inputShared, inputShared.union(builder.freeze()));
   }
 
   @Property(trials = DEFAULT_TRIALS)
@@ -231,9 +241,14 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
   }
 
   @Property(trials = DEFAULT_TRIALS)
-  public void subtractIdentity(@Size(min = 0, max = 0) final CT emptySet, final CT inputShared) {
+  public void subtractIdentityReference(@Size(min = 0, max = 0) final CT emptySet,
+      final CT inputShared) {
     assertEquals("subtract reference equal", emptySet, inputShared.subtract(inputShared));
+  }
 
+  @Property(trials = DEFAULT_TRIALS)
+  public void subtractIdentityStructural(@Size(min = 0, max = 0) final CT emptySet,
+      final CT inputShared) {
     final Set.Transient<T> builder = emptySet.asTransient();
     inputShared.forEach(builder::__insert);
 

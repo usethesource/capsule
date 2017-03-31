@@ -32,7 +32,7 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
     throw new UnsupportedOperationException("Not implemented yet.");
   }
 
-  default R difference(final AtomicReference<Thread> mutator, R that,
+  default R subtract(final AtomicReference<Thread> mutator, R that,
       final int shift, final IntersectionResult details, final Comparator<Object> cmp,
       Preference directionPreference) {
     throw new UnsupportedOperationException("Not implemented yet.");

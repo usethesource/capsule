@@ -385,8 +385,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 //        return Set.Immutable.of();
     } else {
       return new PersistentTrieSet(newRootNode,
-          details.getAccumulatedHashCode(),
-          details.getAccumulatedSize());
+          unmodified.cachedHashCode + details.getAccumulatedHashCode(),
+          unmodified.cachedSize + details.getAccumulatedSize());
     }
   }
 
@@ -420,7 +420,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
     final SetNode.IntersectionResult details = new SetNode.IntersectionResult();
 
-    final AbstractSetNode<K> newRootNode = set1.rootNode.difference(null, set2.rootNode, 0,
+    final AbstractSetNode<K> newRootNode = set1.rootNode.subtract(null, set2.rootNode, 0,
         details, EqualityComparator.EQUALS.toComparator(), INDIFFERENT);
 
     assert unmodified.cachedHashCode != details.getAccumulatedHashCode()
@@ -1106,12 +1106,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     static final CompactSetNode EMPTY_NODE;
 
     static {
-
       EMPTY_NODE = new BitmapIndexedSetNode<>(null, (0), (0), new Object[]{});
-
     }
-
-    ;
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
         final int nodeMap, final int dataMap, final Object[] nodes) {
@@ -1899,25 +1895,11 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
       int unionedBitmap = bitmap0 | bitmap1;
 
-//      if (unionedBitmap == 0) {
-//        return EMPTY_NODE;
-//      }
-
       final Buffer<K, AbstractSetNode<K>> newBuffer = new Buffer<>();
       int newDataMap = 0;
       int newNodeMap = 0;
 
-      final boolean isDataMapIdentical0 = (dataMap0 | dataMap1) == dataMap0;
-      final boolean isDataMapIdentical1 = (dataMap0 | dataMap1) == dataMap1;
-
-      final boolean isNodeMapIdentical0 = (nodeMap0 | nodeMap1) == nodeMap0;
-      final boolean isNodeMapIdentical1 = (nodeMap0 | nodeMap1) == nodeMap1;
-
-      final boolean areBitmapsIdentical0 = isDataMapIdentical0 && isNodeMapIdentical0;
-      final boolean areBitmapsIdentical1 = isDataMapIdentical1 && isNodeMapIdentical1;
-
       boolean isNodeMapReferenceEqual0 = true;
-      boolean isNodeMapReferenceEqual1 = true;
 
       int bitsToSkip = Integer.numberOfTrailingZeros(unionedBitmap);
 
@@ -1954,8 +1936,9 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
               newBuffer.add(node);
               newNodeMap |= bitpos;
 
-              newBuffer.addPayloadSize(2);
-              newBuffer.addPayloadHash(keyHash0 + keyHash1);
+              // delta
+              details.addSize(1);
+              details.addHashCode(keyHash1);
             }
             break;
           }
@@ -1985,8 +1968,9 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
               newBuffer.add(newNode);
               newNodeMap |= bitpos;
 
-              newBuffer.addPayloadSize(newNode.size());
-              newBuffer.addPayloadHash(newNode.recursivePayloadHashCode());
+              // delta
+              details.addSize(1);
+              details.addHashCode(keyHash);
 
               isNodeMapReferenceEqual0 = false;
             }
@@ -2009,6 +1993,10 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
               // singleton -> node
               newBuffer.add(node);
               newNodeMap |= bitpos;
+
+              // delta
+              details.addSize(node.size() - 1);
+              details.addHashCode(node.recursivePayloadHashCode() - keyHash);
             } else {
               // singleton -> node (=bitmap change)
               final AbstractSetNode<K> newNode = node
@@ -2018,10 +2006,9 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
               newBuffer.add(newNode);
               newNodeMap |= bitpos;
 
-              newBuffer.addPayloadSize(newNode.size());
-              newBuffer.addPayloadHash(newNode.recursivePayloadHashCode());
-
-              isNodeMapReferenceEqual1 = false;
+              // delta
+              details.addSize(node.size());
+              details.addHashCode(node.recursivePayloadHashCode());
             }
             break;
           }
@@ -2034,61 +2021,17 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
             final AbstractSetNode<K> subNode0 = node0.getNode(nodeIndex0);
             final AbstractSetNode<K> subNode1 = node1.getNode(nodeIndex1);
 
-            final Preference recursiveDirectionPreference;
-            if (areBitmapsIdentical0 && areBitmapsIdentical1) {
-              recursiveDirectionPreference = directionPreference;
-            } else if (areBitmapsIdentical0) {
-              recursiveDirectionPreference = LEFT;
-            } else if (areBitmapsIdentical1) {
-              recursiveDirectionPreference = RIGHT;
-            } else {
-              recursiveDirectionPreference = INDIFFERENT;
-            }
+            final AbstractSetNode<K> newNode = subNode0.union(mutator, subNode1,
+                shift + BIT_PARTITION_SIZE, details, cmp, directionPreference);
 
-            AbstractSetNode<K> newNode = subNode0.union(mutator, subNode1,
-                shift + BIT_PARTITION_SIZE, details, cmp, recursiveDirectionPreference);
+            assert newNode.sizePredicate() == SIZE_MORE_THAN_ONE;
 
-            switch (newNode == null ? SIZE_MORE_THAN_ONE : newNode.sizePredicate()) {
-//              case SIZE_EMPTY: {
-//                // node -> none (=bitmap change)
-//                break;
-//              }
-//
-//              case SIZE_ONE: {
-//                // node -> singleton (=bitmap change)
-//                newBuffer.inline(newNode);
-//                newDataMap |= bitpos;
-//                break;
-//              }
+            // node -> node
+            newBuffer.add(newNode);
+            newNodeMap |= bitpos;
 
-              case SIZE_MORE_THAN_ONE: {
-                // node -> node
-//                newBuffer.add(newNode);
-//                newNodeMap |= bitpos;
-
-                if (newNode != null) {
-                  newBuffer.add(newNode);
-                  newNodeMap |= bitpos;
-
-                  if (newNode != subNode0) {
-                    isNodeMapReferenceEqual0 = false;
-                  }
-
-                  if (newNode != subNode1) {
-                    isNodeMapReferenceEqual1 = false;
-                  }
-                } else {
-                  if (directionPreference == LEFT || directionPreference == INDIFFERENT) {
-                    newBuffer.add(subNode0);
-                    newNodeMap |= bitpos;
-                  } else {
-                    newBuffer.add(subNode1);
-                    newNodeMap |= bitpos;
-                  }
-                }
-
-                break;
-              }
+            if (newNode != subNode0) {
+              isNodeMapReferenceEqual0 = false;
             }
             break;
           }
@@ -2102,6 +2045,10 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
             newBuffer.add(key1, keyHash1);
             newDataMap |= bitpos;
+
+            // delta
+            details.addSize(1);
+            details.addHashCode(keyHash1);
             break;
           }
 
@@ -2126,8 +2073,9 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
             newBuffer.add(subNode1);
             newNodeMap |= bitpos;
 
-            newBuffer.addPayloadSize(subNode1.size());
-            newBuffer.addPayloadHash(subNode1.recursivePayloadHashCode());
+            // delta
+            details.addSize(subNode1.size());
+            details.addHashCode(subNode1.recursivePayloadHashCode());
             break;
           }
 
@@ -2139,9 +2087,6 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
             // TODO: tackle incremental recalculation of hash + size
             newBuffer.add(subNode0);
             newNodeMap |= bitpos;
-
-            newBuffer.addPayloadSize(subNode0.size());
-            newBuffer.addPayloadHash(subNode0.recursivePayloadHashCode());
             break;
           }
         }
@@ -2151,45 +2096,18 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
         bitsToSkip = bitsToSkip + 1 + trailingZeroCount;
       }
 
-      // updated accumulated properties
-      details.addSize(newBuffer.getPayloadSize());
-      details.addHashCode(newBuffer.getPayloadHash());
-
       boolean leftReferenceEqual =
           isNodeMapReferenceEqual0 && ((newDataMap == dataMap0) && (newNodeMap == nodeMap0));
-
-      boolean rightReferenceEqual =
-          isNodeMapReferenceEqual1 && ((newDataMap == dataMap1) && (newNodeMap == nodeMap1));
-
-      if (leftReferenceEqual && rightReferenceEqual) {
-        return null;
-      }
 
       // TODO: introduce preferLeftOverRightOnEquality
       if (newBuffer.isEmpty()) {
         return EMPTY_NODE;
       }
 
-      if (directionPreference == LEFT || directionPreference == INDIFFERENT) {
-        if (leftReferenceEqual) {
-          assert node0.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-              newDataMap, newBuffer.compactBuffer()));
-          return node0;
-        } else if (rightReferenceEqual) {
-          assert node1.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-              newDataMap, newBuffer.compactBuffer()));
-          return node1;
-        }
-      } else {
-        if (rightReferenceEqual) {
-          assert node1.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-              newDataMap, newBuffer.compactBuffer()));
-          return node1;
-        } else if (leftReferenceEqual) {
-          assert node0.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-              newDataMap, newBuffer.compactBuffer()));
-          return node0;
-        }
+      if (leftReferenceEqual) {
+        assert node0.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
+            newDataMap, newBuffer.compactBuffer()));
+        return node0;
       }
 
       // TODO: create singelton node that can unboxed easily
@@ -2282,7 +2200,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
             final AbstractSetNode<K> node = node1.getNode(nodeIndex1);
 
-            boolean nodeContainsKey = node.contains(key, keyHash, shift + BIT_PARTITION_SIZE, cmp);
+            boolean nodeContainsKey = node
+                .contains(key, keyHash, shift + BIT_PARTITION_SIZE, cmp);
 
             if (nodeContainsKey) {
               // singleton -> singleton
@@ -2303,7 +2222,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
             final K key = node1.getKey(dataIndex1);
             final int keyHash = node1.getKeyHash(dataIndex1);
 
-            boolean nodeContainsKey = node.contains(key, keyHash, shift + BIT_PARTITION_SIZE, cmp);
+            boolean nodeContainsKey = node
+                .contains(key, keyHash, shift + BIT_PARTITION_SIZE, cmp);
 
             if (nodeContainsKey) {
               // node -> singleton (=bitmap change)
@@ -2447,7 +2367,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
      * TODO: for incrementality: only consider matching elements
      */
     @Override
-    public final AbstractSetNode<K> difference(AtomicReference<Thread> mutator,
+    public final AbstractSetNode<K> subtract(AtomicReference<Thread> mutator,
         AbstractSetNode<K> that, int shift, IntersectionResult details,
         Comparator<Object> cmp, Preference directionPreference) {
 
@@ -2455,7 +2375,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       final CompactSetNode<K> node1 = (CompactSetNode<K>) that;
 
       if (node0 == node1) {
-        return node0;
+        return EMPTY_NODE;
       }
 
       final int dataMap0 = node0.dataMap();
@@ -2469,7 +2389,11 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       int intersectedBitmap = bitmap0 & bitmap1;
 
       if (intersectedBitmap == 0) {
-        return null; // nothing to subtract
+        // updated accumulated properties
+        details.addSize(node0.size());
+        details.addHashCode(node0.recursivePayloadHashCode());
+
+        return node0; // nothing to subtract
       }
 
       int unionedBitmap = bitmap0 | bitmap1;
@@ -2478,17 +2402,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       int newDataMap = 0;
       int newNodeMap = 0;
 
-      final boolean isDataMapIdentical0 = (dataMap0 & dataMap1) == dataMap0;
-      final boolean isDataMapIdentical1 = (dataMap0 & dataMap1) == dataMap1;
-
-      final boolean isNodeMapIdentical0 = (nodeMap0 & nodeMap1) == nodeMap0;
-      final boolean isNodeMapIdentical1 = (nodeMap0 & nodeMap1) == nodeMap1;
-
-      final boolean areBitmapsIdentical0 = isDataMapIdentical0 && isNodeMapIdentical0;
-      final boolean areBitmapsIdentical1 = isDataMapIdentical1 && isNodeMapIdentical1;
-
       boolean isNodeMapReferenceEqual0 = true;
-      boolean isNodeMapReferenceEqual1 = false; // can never be true
 
       int bitsToSkip = Integer.numberOfTrailingZeros(unionedBitmap);
 
@@ -2533,12 +2447,14 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
             final K key = node1.getKey(dataIndex1);
             final int keyHash = node1.getKeyHash(dataIndex1);
 
-            boolean nodeContainsKey = node.contains(key, keyHash, shift + BIT_PARTITION_SIZE, cmp);
+            boolean nodeContainsKey = node
+                .contains(key, keyHash, shift + BIT_PARTITION_SIZE, cmp);
 
             if (nodeContainsKey) {
               // node -> node (=bitmap change)
               final AbstractSetNode<K> newNode = node
-                  .removed(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, SetResult.unchanged(),
+                  .removed(mutator, key, keyHash, shift + BIT_PARTITION_SIZE,
+                      SetResult.unchanged(),
                       cmp);
 
               switch (newNode.sizePredicate()) {
@@ -2606,23 +2522,10 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
             final AbstractSetNode<K> subNode0 = node0.getNode(nodeIndex0);
             final AbstractSetNode<K> subNode1 = node1.getNode(nodeIndex1);
 
-//            final Preference recursiveDirectionPreference;
-//            if (areBitmapsIdentical0 && areBitmapsIdentical1) {
-//              recursiveDirectionPreference = directionPreference;
-//            } else if (areBitmapsIdentical0) {
-//              recursiveDirectionPreference = LEFT;
-//            } else if (areBitmapsIdentical1) {
-//              recursiveDirectionPreference = RIGHT;
-//            } else {
-//              recursiveDirectionPreference = INDIFFERENT;
-//            }
+            final AbstractSetNode<K> newNode = subNode0.subtract(mutator, subNode1,
+                shift + BIT_PARTITION_SIZE, details, cmp, directionPreference);
 
-            final Preference recursiveDirectionPreference = INDIFFERENT;
-
-            AbstractSetNode<K> newNode = subNode0.difference(mutator, subNode1,
-                shift + BIT_PARTITION_SIZE, details, cmp, recursiveDirectionPreference);
-
-            switch (newNode == null ? SIZE_MORE_THAN_ONE : newNode.sizePredicate()) {
+            switch (newNode.sizePredicate()) {
               case SIZE_EMPTY: {
                 // node -> none (=bitmap change)
                 break;
@@ -2637,34 +2540,11 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
               case SIZE_MORE_THAN_ONE: {
                 // node -> node
-//                newBuffer.add(newNode);
-//                newNodeMap |= bitpos;
+                newBuffer.add(newNode);
+                newNodeMap |= bitpos;
 
-                if (newNode != null) {
-                  newBuffer.add(newNode);
-                  newNodeMap |= bitpos;
-
-                  if (newNode != subNode0) {
-                    isNodeMapReferenceEqual0 = false;
-                  }
-
-                  if (newNode != subNode1) {
-                    isNodeMapReferenceEqual1 = false;
-                  }
-                } else {
-//                  if (directionPreference == LEFT || directionPreference == INDIFFERENT) {
-                  newBuffer.add(subNode0);
-                  newNodeMap |= bitpos;
-
-                  newBuffer.addPayloadSize(subNode0.size());
-                  newBuffer.addPayloadHash(subNode0.recursivePayloadHashCode());
-//                  } else {
-//                    newBuffer.add(subNode1);
-//                    newNodeMap |= bitpos;
-//
-//                    newBuffer.addPayloadSize(subNode1.size());
-//                    newBuffer.addPayloadHash(subNode1.recursivePayloadHashCode());
-//                  }
+                if (newNode != subNode0) {
+                  isNodeMapReferenceEqual0 = false;
                 }
 
                 break;
@@ -2675,13 +2555,6 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
           case PATTERN_EMPTY_AND_DATA: {
             // case empty x singleton
-//            final int dataIndex1 = index(dataMap1, bitpos);
-//
-//            final K key1 = node1.getKey(dataIndex1);
-//            final int keyHash1 = node1.getKeyHash(dataIndex1);
-//
-//            newBuffer.add(key1, keyHash1);
-//            newDataMap |= bitpos;
             break;
           }
 
@@ -2699,15 +2572,6 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
           case PATTERN_EMPTY_AND_NODE: {
             // case empty x node
-//            final int nodeIndex1 = index(nodeMap1, bitpos);
-//            final AbstractSetNode<K> subNode1 = node1.getNode(nodeIndex1);
-//
-//            // TODO: tackle incremental recalculation of hash + size
-//            newBuffer.add(subNode1);
-//            newNodeMap |= bitpos;
-//
-//            newBuffer.addPayloadSize(subNode1.size());
-//            newBuffer.addPayloadHash(subNode1.recursivePayloadHashCode());
             break;
           }
 
@@ -2738,42 +2602,15 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       boolean leftReferenceEqual =
           isNodeMapReferenceEqual0 && ((newDataMap == dataMap0) && (newNodeMap == nodeMap0));
 
-      boolean rightReferenceEqual =
-          isNodeMapReferenceEqual1 && ((newDataMap == dataMap1) && (newNodeMap == nodeMap1));
-
-      if (leftReferenceEqual && rightReferenceEqual) {
-        return null;
-      }
-
-      // TODO: introduce preferLeftOverRightOnEquality
       if (newBuffer.isEmpty()) {
         return EMPTY_NODE;
       }
 
-      if (directionPreference == LEFT || directionPreference == INDIFFERENT) {
-        if (leftReferenceEqual) {
-          final CompactSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-              newDataMap, newBuffer.compactBuffer()); // newBuffer.compactHashes()
-          assert node0.equals(newNode);
-          return node0;
-        } else if (rightReferenceEqual) {
-          final CompactSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-              newDataMap, newBuffer.compactBuffer()); // newBuffer.compactHashes()
-          assert node1.equals(newNode);
-          return node1;
-        }
-      } else {
-        if (rightReferenceEqual) {
-          final CompactSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-              newDataMap, newBuffer.compactBuffer()); // newBuffer.compactHashes()
-          assert node1.equals(newNode);
-          return node1;
-        } else if (leftReferenceEqual) {
-          final CompactSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-              newDataMap, newBuffer.compactBuffer()); // newBuffer.compactHashes()
-          assert node0.equals(newNode);
-          return node0;
-        }
+      if (leftReferenceEqual) {
+        final CompactSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator, newNodeMap,
+            newDataMap, newBuffer.compactBuffer()); // newBuffer.compactHashes()
+        assert node0.equals(newNode);
+        return node0;
       }
 
       // TODO: create singelton node that can unboxed easily
