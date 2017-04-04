@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -35,6 +36,7 @@ import io.usethesource.capsule.util.EqualityComparator;
 import static io.usethesource.capsule.core.trie.SetNode.Preference.INDIFFERENT;
 import static io.usethesource.capsule.core.trie.SetNode.Preference.LEFT;
 import static io.usethesource.capsule.core.trie.SetNode.Preference.RIGHT;
+import static io.usethesource.capsule.core.trie.SetNode.TRACK_DELTA_OF_META_DATA_PER_COLLECTION;
 import static io.usethesource.capsule.util.BitmapUtils.isBitInBitmap;
 
 public class PersistentTrieSet<K> implements Set.Immutable<K> {
@@ -92,10 +94,9 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
   public static final <K> Set.Immutable<K> of(K key0) {
     final int keyHash0 = key0.hashCode();
 
-    final int nodeMap = 0;
     final int dataMap = CompactSetNode.bitpos(CompactSetNode.mask(keyHash0, 0));
 
-    final CompactSetNode<K> newRootNode = CompactSetNode.nodeOf(null, nodeMap, dataMap, key0);
+    final CompactSetNode<K> newRootNode = CompactSetNode.nodeOf(null, dataMap, key0, keyHash0);
 
     return new PersistentTrieSet<K>(newRootNode, keyHash0, 1);
   }
@@ -334,10 +335,6 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
   @Override
   public Set.Immutable<K> union(final Set.Immutable<K> other) {
 
-    if (!(other instanceof PersistentTrieSet)) {
-      return Set.Immutable.union(this, other);
-    }
-
     if (this == other) {
       return this;
     }
@@ -349,8 +346,13 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     if (this == EMPTY_SET || this.isEmpty()) {
       return other;
     }
+
     if (other == EMPTY_SET || other.isEmpty()) {
       return this;
+    }
+
+    if (!(other instanceof PersistentTrieSet)) {
+      return Set.Immutable.union(this, other);
     }
 
     final PersistentTrieSet<K> set1 = this;
@@ -381,12 +383,16 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
     if (newRootNode == unmodified.rootNode || newRootNode == null) {
       return unmodified;
-//      } else if (details.getAccumulatedSize() == 0) {
-//        return Set.Immutable.of();
-    } else {
+    }
+
+    if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
       return new PersistentTrieSet(newRootNode,
           unmodified.cachedHashCode + details.getAccumulatedHashCode(),
           unmodified.cachedSize + details.getAccumulatedSize());
+    } else {
+      return new PersistentTrieSet(newRootNode,
+          newRootNode.recursivePayloadHashCode(),
+          newRootNode.size());
     }
   }
 
@@ -764,6 +770,25 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     private boolean isModified;
     private boolean isReplaced;
 
+    private int deltaSize;
+    private int deltaHashCode;
+
+    public int getDeltaSize() {
+      return deltaSize;
+    }
+
+    public void updateDeltaSize(int deltaSize) {
+      this.deltaSize += deltaSize;
+    }
+
+    public int getDeltaHashCode() {
+      return deltaHashCode;
+    }
+
+    public void updateDeltaHashCode(int deltaHashCode) {
+      this.deltaHashCode += deltaHashCode;
+    }
+
     // update: inserted/removed single element, element count changed
     public void modified() {
       this.isModified = true;
@@ -969,7 +994,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
      * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
      * `protected` when experiments are finished.
      */
-    public /* protected */ final int size() {
+    @Override
+    public /* protected */ int size() {
 //      final Iterator<K> it = new SetKeyIterator<>(this);
 //
 //      int size = 0;
@@ -993,7 +1019,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
     abstract int localPayloadHashCode();
 
-    final int recursivePayloadHashCode() {
+    @Override
+    public int recursivePayloadHashCode() {
       final Iterator<? extends AbstractSetNode<K>> it = new TrieSetNodeIterator(this);
 
       int hashCode = 0;
@@ -1057,19 +1084,20 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     }
 
     abstract CompactSetNode<K> copyAndInsertValue(final AtomicReference<Thread> mutator,
-        final int bitpos, final K key);
+        final int bitpos, final K key, final int keyHash);
 
     abstract CompactSetNode<K> copyAndRemoveValue(final AtomicReference<Thread> mutator,
-        final int bitpos);
+        final int bitpos, final K key, final int keyHash);
 
     abstract CompactSetNode<K> copyAndSetNode(final AtomicReference<Thread> mutator,
-        final int bitpos, final CompactSetNode<K> node);
+        final int bitpos, final CompactSetNode<K> node,
+        SetResult<K> details);
 
     abstract CompactSetNode<K> copyAndMigrateFromInlineToNode(final AtomicReference<Thread> mutator,
-        final int bitpos, final CompactSetNode<K> node);
+        final int bitpos, final K newKey, final int newKeyHash, final CompactSetNode<K> node);
 
     abstract CompactSetNode<K> copyAndMigrateFromNodeToInline(final AtomicReference<Thread> mutator,
-        final int bitpos, final CompactSetNode<K> node);
+        final int bitpos, final K oldKey, final int oldKeyHash, final CompactSetNode<K> node);
 
     static final <K> CompactSetNode<K> mergeTwoKeyValPairs(final K key0, final int keyHash0,
         final K key1, final int keyHash1, final int shift) {
@@ -1089,9 +1117,9 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
         final int dataMap = bitpos(mask0) | bitpos(mask1);
 
         if (mask0 < mask1) {
-          return nodeOf(null, (0), dataMap, new Object[]{key0, key1});
+          return nodeOf(null, dataMap, key0, keyHash0, key1, keyHash1);
         } else {
-          return nodeOf(null, (0), dataMap, new Object[]{key1, key0});
+          return nodeOf(null, dataMap, key1, keyHash1, key0, keyHash0);
         }
       } else {
         final CompactSetNode<K> node =
@@ -1099,29 +1127,42 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
         // values fit on next level
 
         final int nodeMap = bitpos(mask0);
-        return nodeOf(null, nodeMap, (0), new Object[]{node});
+        return nodeOf(null, nodeMap, node);
       }
     }
 
     static final CompactSetNode EMPTY_NODE;
 
     static {
-      EMPTY_NODE = new BitmapIndexedSetNode<>(null, (0), (0), new Object[]{});
+      EMPTY_NODE = new BitmapIndexedSetNode<>(null, 0, 0, new Object[]{}, 0, 0);
     }
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
-        final int nodeMap, final int dataMap, final Object[] nodes) {
-      return new BitmapIndexedSetNode<>(mutator, nodeMap, dataMap, nodes);
+        final int nodeMap, final int dataMap, final Object[] nodes, final int cachedHashCode,
+        final int cachedSize) {
+      return new BitmapIndexedSetNode<>(mutator, nodeMap, dataMap, nodes, cachedHashCode,
+          cachedSize);
     }
 
     static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator) {
       return EMPTY_NODE;
     }
 
-    static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator, final int nodeMap,
-        final int dataMap, final K key) {
-      assert nodeMap == 0;
-      return nodeOf(mutator, (0), dataMap, new Object[]{key});
+    static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator,
+        final int dataMap, final K key, final int keyHash) {
+      return nodeOf(mutator, 0, dataMap, new Object[]{key}, keyHash, 1);
+    }
+
+    static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator, final int dataMap,
+        final K key0, final int keyHash0, final K key1, final int keyHash1) {
+      return nodeOf(mutator, 0, dataMap, new Object[]{key0, key1}, keyHash0 + keyHash1, 2);
+    }
+
+    // TODO: improve recursive properties
+    static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator,
+        final int nodeMap, final AbstractSetNode<K> node) {
+      return nodeOf(mutator, nodeMap, 0, new Object[]{node}, node.recursivePayloadHashCode(),
+          node.size());
     }
 
     static final int index(final int bitmap, final int bitpos) {
@@ -1243,6 +1284,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     @Override
     public /* protected */ CompactSetNode<K> updated(final AtomicReference<Thread> mutator,
         final K key, final int keyHash, final int shift, final SetResult<K> details) {
+
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1257,7 +1299,9 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
               transformHashCode(currentKey.hashCode()), key, keyHash, shift + BIT_PARTITION_SIZE);
 
           details.modified();
-          return copyAndMigrateFromInlineToNode(mutator, bitpos, subNodeNew);
+          details.updateDeltaSize(1);
+          details.updateDeltaHashCode(keyHash);
+          return copyAndMigrateFromInlineToNode(mutator, bitpos, key, keyHash, subNodeNew);
         }
       } else if ((nodeMap() & bitpos) != 0) { // node (not value)
         final CompactSetNode<K> subNode = nodeAt(bitpos);
@@ -1265,14 +1309,21 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
             subNode.updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, details);
 
         if (details.isModified()) {
-          return copyAndSetNode(mutator, bitpos, subNodeNew);
+          /*
+           * NOTE: subNode and subNodeNew may be referential equal if updated transiently in-place.
+           * Therefore diffing nodes is not an option. Changes to content and meta-data need to be
+           * explicitly tracked and passed when descending from recursion (i.e., {@code details}).
+           */
+          return copyAndSetNode(mutator, bitpos, subNodeNew, details);
         } else {
           return this;
         }
       } else {
         // no value
         details.modified();
-        return copyAndInsertValue(mutator, bitpos, key);
+        details.updateDeltaSize(1);
+        details.updateDeltaHashCode(keyHash);
+        return copyAndInsertValue(mutator, bitpos, key, keyHash);
       }
     }
 
@@ -1293,7 +1344,9 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
               transformHashCode(currentKey.hashCode()), key, keyHash, shift + BIT_PARTITION_SIZE);
 
           details.modified();
-          return copyAndMigrateFromInlineToNode(mutator, bitpos, subNodeNew);
+          details.updateDeltaSize(1);
+          details.updateDeltaHashCode(keyHash);
+          return copyAndMigrateFromInlineToNode(mutator, bitpos, key, keyHash, subNodeNew);
         }
       } else if ((nodeMap() & bitpos) != 0) { // node (not value)
         final CompactSetNode<K> subNode = nodeAt(bitpos);
@@ -1301,14 +1354,21 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
             subNode.updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, details, cmp);
 
         if (details.isModified()) {
-          return copyAndSetNode(mutator, bitpos, subNodeNew);
+          /*
+           * NOTE: subNode and subNodeNew may be referential equal if updated transiently in-place.
+           * Therefore diffing nodes is not an option. Changes to content and meta-data need to be
+           * explicitly tracked and passed when descending from recursion (i.e., {@code details}).
+           */
+          return copyAndSetNode(mutator, bitpos, subNodeNew, details);
         } else {
           return this;
         }
       } else {
         // no value
         details.modified();
-        return copyAndInsertValue(mutator, bitpos, key);
+        details.updateDeltaSize(1);
+        details.updateDeltaHashCode(keyHash);
+        return copyAndInsertValue(mutator, bitpos, key, keyHash);
       }
     }
 
@@ -1327,6 +1387,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
         if (getKey(dataIndex).equals(key)) {
           details.modified();
+          details.updateDeltaSize(-1);
+          details.updateDeltaHashCode(-keyHash);
 
           if (this.payloadArity() == 2 && this.nodeArity() == 0) {
             /*
@@ -1337,12 +1399,12 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
                 (shift == 0) ? (int) (dataMap() ^ bitpos) : bitpos(mask(keyHash, 0));
 
             if (dataIndex == 0) {
-              return CompactSetNode.<K>nodeOf(mutator, 0, newDataMap, getKey(1));
+              return CompactSetNode.<K>nodeOf(mutator, newDataMap, getKey(1), getKeyHash(1));
             } else {
-              return CompactSetNode.<K>nodeOf(mutator, 0, newDataMap, getKey(0));
+              return CompactSetNode.<K>nodeOf(mutator, newDataMap, getKey(0), getKeyHash(0));
             }
           } else {
-            return copyAndRemoveValue(mutator, bitpos);
+            return copyAndRemoveValue(mutator, bitpos, key, keyHash);
           }
         } else {
           return this;
@@ -1366,12 +1428,12 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
               return subNodeNew;
             } else {
               // inline value (move to front)
-              return copyAndMigrateFromNodeToInline(mutator, bitpos, subNodeNew);
+              return copyAndMigrateFromNodeToInline(mutator, bitpos, key, keyHash, subNodeNew);
             }
           }
           default: {
             // modify current node (set replacement node)
-            return copyAndSetNode(mutator, bitpos, subNodeNew);
+            return copyAndSetNode(mutator, bitpos, subNodeNew, details);
           }
         }
       }
@@ -1390,6 +1452,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
         if (cmp.compare(getKey(dataIndex), key) == 0) {
           details.modified();
+          details.updateDeltaSize(-1);
+          details.updateDeltaHashCode(-keyHash);
 
           if (this.payloadArity() == 2 && this.nodeArity() == 0) {
             /*
@@ -1400,12 +1464,12 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
                 (shift == 0) ? (int) (dataMap() ^ bitpos) : bitpos(mask(keyHash, 0));
 
             if (dataIndex == 0) {
-              return CompactSetNode.<K>nodeOf(mutator, 0, newDataMap, getKey(1));
+              return CompactSetNode.<K>nodeOf(mutator, newDataMap, getKey(1), getKeyHash(1));
             } else {
-              return CompactSetNode.<K>nodeOf(mutator, 0, newDataMap, getKey(0));
+              return CompactSetNode.<K>nodeOf(mutator, newDataMap, getKey(0), getKeyHash(0));
             }
           } else {
-            return copyAndRemoveValue(mutator, bitpos);
+            return copyAndRemoveValue(mutator, bitpos, key, keyHash);
           }
         } else {
           return this;
@@ -1429,12 +1493,12 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
               return subNodeNew;
             } else {
               // inline value (move to front)
-              return copyAndMigrateFromNodeToInline(mutator, bitpos, subNodeNew);
+              return copyAndMigrateFromNodeToInline(mutator, bitpos, key, keyHash, subNodeNew);
             }
           }
           default: {
             // modify current node (set replacement node)
-            return copyAndSetNode(mutator, bitpos, subNodeNew);
+            return copyAndSetNode(mutator, bitpos, subNodeNew, details);
           }
         }
       }
@@ -1529,12 +1593,56 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     final AtomicReference<Thread> mutator;
     final Object[] nodes;
 
+    int cachedHashCode;
+    int cachedSize;
+
+    private BitmapIndexedSetNode(final AtomicReference<Thread> mutator, final int nodeMap,
+        final int dataMap, final Object[] nodes, final int cachedHashCode, final int cachedSize) {
+      super(mutator, nodeMap, dataMap);
+
+      this.mutator = mutator;
+      this.nodes = nodes;
+
+      if (TRUST_NODE_SIZE_AND_HASHCODE) {
+        this.cachedHashCode = cachedHashCode;
+        this.cachedSize = cachedSize;
+
+        assert this.cachedHashCode == super.recursivePayloadHashCode();
+        assert this.cachedSize == super.size();
+      }
+
+//      if (TRUST_NODE_SIZE_AND_HASHCODE) {
+//        assert this.cachedHashCode == super.recursivePayloadHashCode();
+//        assert this.cachedSize == super.size();
+//      }
+
+      if (DEBUG) {
+        assert (TUPLE_LENGTH * java.lang.Integer.bitCount(dataMap)
+            + java.lang.Integer.bitCount(nodeMap) == nodes.length);
+
+        for (int i = 0; i < TUPLE_LENGTH * payloadArity(); i++) {
+          assert ((nodes[i] instanceof CompactSetNode) == false);
+        }
+        for (int i = TUPLE_LENGTH * payloadArity(); i < nodes.length; i++) {
+          assert ((nodes[i] instanceof CompactSetNode) == true);
+        }
+
+        assert nodeInvariant();
+      }
+    }
+
+    @Deprecated
     private BitmapIndexedSetNode(final AtomicReference<Thread> mutator, final int nodeMap,
         final int dataMap, final Object[] nodes) {
       super(mutator, nodeMap, dataMap);
 
       this.mutator = mutator;
       this.nodes = nodes;
+
+      if (TRUST_NODE_SIZE_AND_HASHCODE) {
+        this.cachedHashCode = super.recursivePayloadHashCode();
+        this.cachedSize = super.size();
+      }
 
       if (DEBUG) {
         assert (TUPLE_LENGTH * java.lang.Integer.bitCount(dataMap)
@@ -1706,14 +1814,57 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
     }
 
     @Override
-    CompactSetNode<K> copyAndSetNode(final AtomicReference<Thread> mutator, final int bitpos,
-        final CompactSetNode<K> node) {
+    public final int size() {
+      if (TRUST_NODE_SIZE_AND_HASHCODE) {
+        return cachedSize;
+      } else {
+        return super.size();
+      }
+    }
 
-      final int idx = this.nodes.length - 1 - nodeIndex(bitpos);
+    @Override
+    public int recursivePayloadHashCode() {
+      if (TRUST_NODE_SIZE_AND_HASHCODE) {
+        return cachedHashCode;
+      } else {
+        return super.recursivePayloadHashCode();
+      }
+    }
+
+    @Override
+    CompactSetNode<K> copyAndSetNode(final AtomicReference<Thread> mutator, final int bitpos,
+        final CompactSetNode<K> newNode,
+        SetResult<K> details) {
+
+      final int nodeIndex = nodeIndex(bitpos);
+      final AbstractSetNode<K> node = getNode(nodeIndex);
+
+      final int newCachedHashCode;
+      final int newCachedSize;
+
+      if (TRUST_NODE_SIZE_AND_HASHCODE) {
+        newCachedHashCode = cachedHashCode + details.getDeltaHashCode();
+        newCachedSize = cachedSize + details.getDeltaSize();
+      } else {
+        newCachedHashCode = cachedHashCode;
+        newCachedSize = cachedSize;
+      }
+
+      final int idx = this.nodes.length - 1 - nodeIndex;
 
       if (isAllowedToEdit(this.mutator, mutator)) {
         // no copying if already editable
-        this.nodes[idx] = node;
+
+//        assert cachedHashCode == super.recursivePayloadHashCode();
+//        assert cachedSize == super.size();
+
+        this.nodes[idx] = newNode;
+        this.cachedHashCode = newCachedHashCode;
+        this.cachedSize = newCachedSize;
+
+//        assert cachedHashCode == super.recursivePayloadHashCode();
+//        assert cachedSize == super.size();
+
         return this;
       } else {
         final Object[] src = this.nodes;
@@ -1721,15 +1872,15 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
         // copy 'src' and set 1 element(s) at position 'idx'
         System.arraycopy(src, 0, dst, 0, src.length);
-        dst[idx + 0] = node;
+        dst[idx + 0] = newNode;
 
-        return nodeOf(mutator, nodeMap(), dataMap(), dst);
+        return nodeOf(mutator, nodeMap(), dataMap(), dst, newCachedHashCode, newCachedSize);
       }
     }
 
     @Override
     CompactSetNode<K> copyAndInsertValue(final AtomicReference<Thread> mutator, final int bitpos,
-        final K key) {
+        final K key, final int keyHash) {
       final int idx = TUPLE_LENGTH * dataIndex(bitpos);
 
       final Object[] src = this.nodes;
@@ -1740,11 +1891,13 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       dst[idx + 0] = key;
       System.arraycopy(src, idx, dst, idx + 1, src.length - idx);
 
-      return nodeOf(mutator, nodeMap(), dataMap() | bitpos, dst);
+      return nodeOf(mutator, nodeMap(), dataMap() | bitpos, dst, cachedHashCode + keyHash,
+          cachedSize + 1);
     }
 
     @Override
-    CompactSetNode<K> copyAndRemoveValue(final AtomicReference<Thread> mutator, final int bitpos) {
+    CompactSetNode<K> copyAndRemoveValue(final AtomicReference<Thread> mutator, final int bitpos,
+        final K key, final int keyHash) {
       final int idx = TUPLE_LENGTH * dataIndex(bitpos);
 
       final Object[] src = this.nodes;
@@ -1754,12 +1907,13 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       System.arraycopy(src, 0, dst, 0, idx);
       System.arraycopy(src, idx + 1, dst, idx, src.length - idx - 1);
 
-      return nodeOf(mutator, nodeMap(), dataMap() ^ bitpos, dst);
+      return nodeOf(mutator, nodeMap(), dataMap() ^ bitpos, dst, cachedHashCode - keyHash,
+          cachedSize - 1);
     }
 
     @Override
     CompactSetNode<K> copyAndMigrateFromInlineToNode(final AtomicReference<Thread> mutator,
-        final int bitpos, final CompactSetNode<K> node) {
+        final int bitpos, K newKey, int newKeyHash, final CompactSetNode<K> node) {
 
       final int idxOld = TUPLE_LENGTH * dataIndex(bitpos);
       final int idxNew = this.nodes.length - TUPLE_LENGTH - nodeIndex(bitpos);
@@ -1775,12 +1929,13 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       dst[idxNew + 0] = node;
       System.arraycopy(src, idxNew + 1, dst, idxNew + 1, src.length - idxNew - 1);
 
-      return nodeOf(mutator, nodeMap() | bitpos, dataMap() ^ bitpos, dst);
+      return nodeOf(mutator, nodeMap() | bitpos, dataMap() ^ bitpos, dst,
+          cachedHashCode + newKeyHash, cachedSize + 1);
     }
 
     @Override
     CompactSetNode<K> copyAndMigrateFromNodeToInline(final AtomicReference<Thread> mutator,
-        final int bitpos, final CompactSetNode<K> node) {
+        final int bitpos, K oldKey, int oldKeyHash, final CompactSetNode<K> node) {
 
       final int idxOld = this.nodes.length - 1 - nodeIndex(bitpos);
       final int idxNew = TUPLE_LENGTH * dataIndex(bitpos);
@@ -1796,7 +1951,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       System.arraycopy(src, idxNew, dst, idxNew + 1, idxOld - idxNew);
       System.arraycopy(src, idxOld + 1, dst, idxOld + 1, src.length - idxOld - 1);
 
-      return nodeOf(mutator, nodeMap() ^ bitpos, dataMap() | bitpos, dst);
+      return nodeOf(mutator, nodeMap() ^ bitpos, dataMap() | bitpos, dst,
+          cachedHashCode - oldKeyHash, cachedSize - 1);
     }
 
     private final int bitPattern(int dataMap, int nodeMap, int bitpos) {
@@ -1890,16 +2046,13 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       final int dataMap1 = node1.dataMap();
       final int nodeMap1 = node1.nodeMap();
 
-      final int bitmap0 = dataMap0 | nodeMap0;
-      final int bitmap1 = dataMap1 | nodeMap1;
+      int unionedBitmap = dataMap0 | nodeMap0 | dataMap1 | nodeMap1;
 
-      int unionedBitmap = bitmap0 | bitmap1;
+      final Prototype<K, AbstractSetNode<K>> prototype = new Prototype<>();
+      int deltaSize = 0;
+      int deltaHashCode = 0;
 
-      final Buffer<K, AbstractSetNode<K>> newBuffer = new Buffer<>();
-      int newDataMap = 0;
-      int newNodeMap = 0;
-
-      boolean isNodeMapReferenceEqual0 = true;
+      boolean leftSubTreesUnmodified = true;
 
       int bitsToSkip = Integer.numberOfTrailingZeros(unionedBitmap);
 
@@ -1918,27 +2071,45 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
             final int dataIndex1 = index(dataMap1, bitpos);
 
             final K key0 = node0.getKey(dataIndex0);
-            final int keyHash0 = node0.getKeyHash(dataIndex0);
-
             final K key1 = node1.getKey(dataIndex1);
-            final int keyHash1 = node1.getKeyHash(dataIndex1);
 
+            // TODO: consider fast-fail if hashes are available for free
+            // TODO: consider comparator
+            if (Objects.equals(key0, key1)) {
 //            if (keyHash0 == keyHash1 && cmp.compare(key0, key1) == 0) {
-            if (keyHash0 == keyHash1 && Objects.equals(key0, key1)) {
+//            if (keyHash0 == keyHash1 && Objects.equals(key0, key1)) {
               // singleton -> singleton
-              newBuffer.add(key0, keyHash0);
-              newDataMap |= bitpos;
+              prototype.add(bitpos, key0);
+
+              if (MEMOIZE_HASH_CODE_OF_ELEMENT) {
+                prototype.addHash(node0.getKeyHash(dataIndex0));
+              }
             } else {
-              // singleton -> node (=bitmap change);
+              // singleton -> node (bitmap change)
+              final int keyHash0 = node0.getKeyHash(dataIndex0);
+              final int keyHash1 = node1.getKeyHash(dataIndex1);
+
               final AbstractSetNode<K> node =
                   mergeTwoKeyValPairs(key0, keyHash0, key1, keyHash1, shift + BIT_PARTITION_SIZE);
 
-              newBuffer.add(node);
-              newNodeMap |= bitpos;
+              prototype.add(bitpos, node);
 
-              // delta
-              details.addSize(1);
-              details.addHashCode(keyHash1);
+              if (TRACK_DELTA_OF_META_DATA) {
+                final int addedSize = 1;
+                final int addedHashCode = keyHash1;
+
+                if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+                  // delta @ node
+                  deltaSize += addedSize;
+                  deltaHashCode += addedHashCode;
+                }
+
+                if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+                  // delta @ collection
+                  details.addSize(addedSize);
+                  details.addHashCode(addedHashCode);
+                }
+              }
             }
             break;
           }
@@ -1953,26 +2124,32 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
             final K key = node1.getKey(dataIndex1);
             final int keyHash = node1.getKeyHash(dataIndex1);
 
-            boolean nodeContainsKey = node.contains(key, keyHash, shift + BIT_PARTITION_SIZE, cmp);
+            final SetResult<K> updateDetails = SetResult.unchanged();
+            final AbstractSetNode<K> newNode = node
+                .updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, updateDetails, cmp);
 
-            if (nodeContainsKey) {
-              // node -> node (=bitmap change)
-              newBuffer.add(node);
-              newNodeMap |= bitpos;
-            } else {
-              // node -> node (=bitmap change)
-              final AbstractSetNode<K> newNode = node
-                  .updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, SetResult.unchanged(),
-                      cmp);
+            // node -> node
+            prototype.add(bitpos, newNode);
 
-              newBuffer.add(newNode);
-              newNodeMap |= bitpos;
+            if (updateDetails.isModified()) {
+              leftSubTreesUnmodified = false;
 
-              // delta
-              details.addSize(1);
-              details.addHashCode(keyHash);
+              if (TRACK_DELTA_OF_META_DATA) {
+                final int addedSize = 1;
+                final int addedHashCode = keyHash;
 
-              isNodeMapReferenceEqual0 = false;
+                if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+                  // delta @ node
+                  deltaSize += addedSize;
+                  deltaHashCode += addedHashCode;
+                }
+
+                if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+                  // delta @ collection
+                  details.addSize(addedSize);
+                  details.addHashCode(addedHashCode);
+                }
+              }
             }
             break;
           }
@@ -1987,28 +2164,36 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
             final AbstractSetNode<K> node = node1.getNode(nodeIndex1);
 
-            boolean nodeContainsKey = node.contains(key, keyHash, shift + BIT_PARTITION_SIZE, cmp);
+            final SetResult<K> updateDetails = SetResult.unchanged();
+            final AbstractSetNode<K> newNode = node
+                .updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, updateDetails, cmp);
 
-            if (nodeContainsKey) {
-              // singleton -> node
-              newBuffer.add(node);
-              newNodeMap |= bitpos;
+            // singleton -> node
+            prototype.add(bitpos, newNode);
 
-              // delta
-              details.addSize(node.size() - 1);
-              details.addHashCode(node.recursivePayloadHashCode() - keyHash);
-            } else {
-              // singleton -> node (=bitmap change)
-              final AbstractSetNode<K> newNode = node
-                  .updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, SetResult.unchanged(),
-                      cmp);
+            if (TRACK_DELTA_OF_META_DATA) {
+              final int addedSize;
+              final int addedHashCode;
 
-              newBuffer.add(newNode);
-              newNodeMap |= bitpos;
+              if (updateDetails.isModified()) {
+                addedSize = node.size();
+                addedHashCode = node.recursivePayloadHashCode();
+              } else {
+                addedSize = node.size() - 1;
+                addedHashCode = node.recursivePayloadHashCode() - keyHash;
+              }
 
-              // delta
-              details.addSize(node.size());
-              details.addHashCode(node.recursivePayloadHashCode());
+              if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+                // delta @ node
+                deltaSize += addedSize;
+                deltaHashCode += addedHashCode;
+              }
+
+              if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+                // delta @ collection
+                details.addSize(addedSize);
+                details.addHashCode(addedHashCode);
+              }
             }
             break;
           }
@@ -2024,14 +2209,46 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
             final AbstractSetNode<K> newNode = subNode0.union(mutator, subNode1,
                 shift + BIT_PARTITION_SIZE, details, cmp, directionPreference);
 
-            assert newNode.sizePredicate() == SIZE_MORE_THAN_ONE;
-
             // node -> node
-            newBuffer.add(newNode);
-            newNodeMap |= bitpos;
+            prototype.add(bitpos, newNode);
 
             if (newNode != subNode0) {
-              isNodeMapReferenceEqual0 = false;
+              leftSubTreesUnmodified = false;
+
+              if (TRACK_DELTA_OF_META_DATA) {
+                // TODO: consider incremental recursive collection
+                final int addedSize = newNode.size() - subNode0.size();
+                final int addedHashCode =
+                    newNode.recursivePayloadHashCode() - subNode0.recursivePayloadHashCode();
+
+                // TODO: handle similar to copyAndSetNode -> pass remainder trough result???
+                // remainder -> subTreeDeltaSize ... subTreeDeltaHashCode
+                if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+                  // delta @ node
+                  deltaSize += addedSize;
+                  deltaHashCode += addedHashCode;
+                }
+
+                // global modification where already tracked ...
+//                if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+//                  // delta @ collection
+//                  details.addSize(addedSize);
+//                  details.addHashCode(addedHashCode);
+//                }
+              }
+            }
+            break;
+          }
+
+          case PATTERN_DATA_AND_EMPTY: {
+            // case singleton x empty
+            final int dataIndex0 = index(dataMap0, bitpos);
+            final K key0 = node0.getKey(dataIndex0);
+
+            prototype.add(bitpos, key0);
+
+            if (MEMOIZE_HASH_CODE_OF_ELEMENT) {
+              prototype.addHash(node1.getKeyHash(dataIndex0));
             }
             break;
           }
@@ -2039,43 +2256,30 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
           case PATTERN_EMPTY_AND_DATA: {
             // case empty x singleton
             final int dataIndex1 = index(dataMap1, bitpos);
-
             final K key1 = node1.getKey(dataIndex1);
-            final int keyHash1 = node1.getKeyHash(dataIndex1);
 
-            newBuffer.add(key1, keyHash1);
-            newDataMap |= bitpos;
+            prototype.add(bitpos, key1);
 
-            // delta
-            details.addSize(1);
-            details.addHashCode(keyHash1);
-            break;
-          }
+            if (MEMOIZE_HASH_CODE_OF_ELEMENT) {
+              prototype.addHash(node1.getKeyHash(dataIndex1));
+            }
 
-          case PATTERN_DATA_AND_EMPTY: {
-            // case singleton x empty
-            final int dataIndex0 = index(dataMap0, bitpos);
+            if (TRACK_DELTA_OF_META_DATA) {
+              final int addedSize = 1;
+              final int addedHashCode = node1.getKeyHash(dataIndex1);
 
-            final K key0 = node0.getKey(dataIndex0);
-            final int keyHash0 = node0.getKeyHash(dataIndex0);
+              if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+                // delta @ node
+                deltaSize += addedSize;
+                deltaHashCode += addedHashCode;
+              }
 
-            newBuffer.add(key0, keyHash0);
-            newDataMap |= bitpos;
-            break;
-          }
-
-          case PATTERN_EMPTY_AND_NODE: {
-            // case empty x node
-            final int nodeIndex1 = index(nodeMap1, bitpos);
-            final AbstractSetNode<K> subNode1 = node1.getNode(nodeIndex1);
-
-            // TODO: tackle incremental recalculation of hash + size
-            newBuffer.add(subNode1);
-            newNodeMap |= bitpos;
-
-            // delta
-            details.addSize(subNode1.size());
-            details.addHashCode(subNode1.recursivePayloadHashCode());
+              if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+                // delta @ collection
+                details.addSize(addedSize);
+                details.addHashCode(addedHashCode);
+              }
+            }
             break;
           }
 
@@ -2084,9 +2288,33 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
             final int nodeIndex0 = index(nodeMap0, bitpos);
             final AbstractSetNode<K> subNode0 = node0.getNode(nodeIndex0);
 
-            // TODO: tackle incremental recalculation of hash + size
-            newBuffer.add(subNode0);
-            newNodeMap |= bitpos;
+            prototype.add(bitpos, subNode0);
+            break;
+          }
+
+          case PATTERN_EMPTY_AND_NODE: {
+            // case empty x node
+            final int nodeIndex1 = index(nodeMap1, bitpos);
+            final AbstractSetNode<K> subNode1 = node1.getNode(nodeIndex1);
+
+            prototype.add(bitpos, subNode1);
+
+            if (TRACK_DELTA_OF_META_DATA) {
+              final int addedSize = subNode1.size();
+              final int addedHashCode = subNode1.recursivePayloadHashCode();
+
+              if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+                // delta @ node
+                deltaSize += addedSize;
+                deltaHashCode += addedHashCode;
+              }
+
+              if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+                // delta @ collection
+                details.addSize(addedSize);
+                details.addHashCode(addedHashCode);
+              }
+            }
             break;
           }
         }
@@ -2096,27 +2324,35 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
         bitsToSkip = bitsToSkip + 1 + trailingZeroCount;
       }
 
-      boolean leftReferenceEqual =
-          isNodeMapReferenceEqual0 && ((newDataMap == dataMap0) && (newNodeMap == nodeMap0));
+//      if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+//        // delta @ collection
+//        details.addSize(deltaSize);
+//        details.addHashCode(deltaHashCode);
+//      }
 
-      // TODO: introduce preferLeftOverRightOnEquality
-      if (newBuffer.isEmpty()) {
-        return EMPTY_NODE;
+      final BiFunction<Integer, Integer, CompactSetNode<K>> toNode;
+
+      if (TRUST_NODE_SIZE_AND_HASHCODE) {
+        toNode = (newHashCode, newSize) -> new BitmapIndexedSetNode<K>(mutator,
+            prototype.nodeMap(), prototype.dataMap(), prototype.compactBuffer(),
+            node0.recursivePayloadHashCode() + newHashCode, node0.size() + newSize);
+      } else {
+        toNode = (newHashCode, newSize) -> new BitmapIndexedSetNode<K>(mutator,
+            prototype.nodeMap(), prototype.dataMap(), prototype.compactBuffer(), 0, 0);
       }
 
-      if (leftReferenceEqual) {
-        assert node0.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-            newDataMap, newBuffer.compactBuffer()));
+      boolean leftNodeUnmodified = leftSubTreesUnmodified
+          && prototype.dataMap() == dataMap0
+          && prototype.nodeMap() == nodeMap0;
+
+      if (leftNodeUnmodified) {
+        assert node0.equals(toNode.apply(deltaHashCode, deltaSize));
         return node0;
       }
 
-      // TODO: create singelton node that can unboxed easily
-      final CompactSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-          newDataMap, newBuffer.compactBuffer()); // newBuffer.compactHashes()
-
-      assert !newNode.equals(node0);
-      assert !newNode.equals(node1);
-
+      final CompactSetNode<K> newNode = toNode.apply(deltaHashCode, deltaSize);
+      assert !node0.equals(newNode);
+      assert !node1.equals(newNode);
       return newNode;
     }
 
@@ -2149,7 +2385,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
         return EMPTY_NODE;
       }
 
-      final Buffer<K, AbstractSetNode<K>> newBuffer = new Buffer<>();
+      final Prototype<K, AbstractSetNode<K>> newBuffer = new Prototype<>();
       int newDataMap = 0;
       int newNodeMap = 0;
 
@@ -2334,28 +2570,33 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
       if (directionPreference == LEFT || directionPreference == INDIFFERENT) {
         if (leftReferenceEqual) {
           assert node0.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-              newDataMap, newBuffer.compactBuffer()));
+              newDataMap, newBuffer.compactBuffer(), newBuffer.getNodeHashCode(),
+              newBuffer.getNodeSize()));
           return node0;
         } else if (rightReferenceEqual) {
           assert node1.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-              newDataMap, newBuffer.compactBuffer()));
+              newDataMap, newBuffer.compactBuffer(), newBuffer.getNodeHashCode(),
+              newBuffer.getNodeSize()));
           return node1;
         }
       } else {
         if (rightReferenceEqual) {
           assert node1.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-              newDataMap, newBuffer.compactBuffer()));
+              newDataMap, newBuffer.compactBuffer(), newBuffer.getNodeHashCode(),
+              newBuffer.getNodeSize()));
           return node1;
         } else if (leftReferenceEqual) {
           assert node0.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-              newDataMap, newBuffer.compactBuffer()));
+              newDataMap, newBuffer.compactBuffer(), newBuffer.getNodeHashCode(),
+              newBuffer.getNodeSize()));
           return node0;
         }
       }
 
       // TODO: create singelton node that can unboxed easily
       final CompactSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-          newDataMap, newBuffer.compactBuffer()); // newBuffer.compactHashes()
+          newDataMap, newBuffer.compactBuffer(), newBuffer.getNodeHashCode(),
+          newBuffer.getNodeSize()); // newBuffer.compactHashes()
 
       assert !newNode.equals(node0);
       assert !newNode.equals(node1);
@@ -2398,7 +2639,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
       int unionedBitmap = bitmap0 | bitmap1;
 
-      final Buffer<K, AbstractSetNode<K>> newBuffer = new Buffer<>();
+      final Prototype<K, AbstractSetNode<K>> newBuffer = new Prototype<>();
       int newDataMap = 0;
       int newNodeMap = 0;
 
@@ -2608,14 +2849,16 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
       if (leftReferenceEqual) {
         final CompactSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-            newDataMap, newBuffer.compactBuffer()); // newBuffer.compactHashes()
+            newDataMap, newBuffer.compactBuffer(), newBuffer.getNodeHashCode(),
+            newBuffer.getNodeSize()); // newBuffer.compactHashes()
         assert node0.equals(newNode);
         return node0;
       }
 
       // TODO: create singelton node that can unboxed easily
       final CompactSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-          newDataMap, newBuffer.compactBuffer()); // newBuffer.compactHashes()
+          newDataMap, newBuffer.compactBuffer(), newBuffer.getNodeHashCode(),
+          newBuffer.getNodeSize()); // newBuffer.compactHashes()
 
       assert !newNode.equals(node0);
       assert !newNode.equals(node1);
@@ -2944,31 +3187,32 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
     @Override
     CompactSetNode<K> copyAndInsertValue(final AtomicReference<Thread> mutator, final int bitpos,
-        final K key) {
+        final K key, int keyHash) {
       throw new UnsupportedOperationException();
     }
 
     @Override
     CompactSetNode<K> copyAndRemoveValue(final AtomicReference<Thread> mutator,
-        final int bitpos) {
+        final int bitpos, K key, int keyHash) {
       throw new UnsupportedOperationException();
     }
 
     @Override
     CompactSetNode<K> copyAndSetNode(final AtomicReference<Thread> mutator, final int bitpos,
-        final CompactSetNode<K> node) {
+        final CompactSetNode<K> node,
+        SetResult<K> details) {
       throw new UnsupportedOperationException();
     }
 
     @Override
     CompactSetNode<K> copyAndMigrateFromInlineToNode(final AtomicReference<Thread> mutator,
-        final int bitpos, final CompactSetNode<K> node) {
+        final int bitpos, K newKey, int newKeyHash, final CompactSetNode<K> node) {
       throw new UnsupportedOperationException();
     }
 
     @Override
     CompactSetNode<K> copyAndMigrateFromNodeToInline(final AtomicReference<Thread> mutator,
-        final int bitpos, final CompactSetNode<K> node) {
+        final int bitpos, K oldKey, int oldKeyHash, final CompactSetNode<K> node) {
       throw new UnsupportedOperationException();
     }
 
