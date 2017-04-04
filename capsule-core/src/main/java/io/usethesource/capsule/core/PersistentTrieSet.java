@@ -446,10 +446,6 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
   @Override
   public Set.Immutable<K> intersect(final Set.Immutable<K> other) {
 
-    if (!(other instanceof PersistentTrieSet)) {
-      return Set.Immutable.intersect(this, other);
-    }
-
     if (this == other) {
       return this;
     }
@@ -464,6 +460,10 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
     if (other == EMPTY_SET || other.isEmpty()) {
       return other; // return Set.Immutable.of();
+    }
+
+    if (!(other instanceof PersistentTrieSet)) {
+      return Set.Immutable.intersect(this, other);
     }
 
     final PersistentTrieSet<K> set1 = this;
@@ -494,13 +494,26 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
     if (newRootNode == unmodified.rootNode || newRootNode == null) {
       return unmodified;
-    } else if (details.getAccumulatedSize() == 0) {
-      return Set.Immutable.of();
-    } else {
+    }
+
+    if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+      if (details.getAccumulatedSize() == 0) {
+        return Set.Immutable.of();
+      }
+
       return new PersistentTrieSet(newRootNode,
           details.getAccumulatedHashCode(),
           details.getAccumulatedSize());
+    } else {
+      if (rootNode.size() == 0) {
+        return Set.Immutable.of();
+      }
+
+      return new PersistentTrieSet(newRootNode,
+          newRootNode.recursivePayloadHashCode(),
+          newRootNode.size());
     }
+
   }
 
   @Override
@@ -2385,9 +2398,9 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
         return EMPTY_NODE;
       }
 
-      final Prototype<K, AbstractSetNode<K>> newBuffer = new Prototype<>();
-      int newDataMap = 0;
-      int newNodeMap = 0;
+      final Prototype<K, AbstractSetNode<K>> prototype = new Prototype<>();
+      int deltaSize = 0;
+      int deltaHashCode = 0;
 
       final boolean isDataMapIdentical0 = (dataMap0 & dataMap1) == dataMap0;
       final boolean isDataMapIdentical1 = (dataMap0 & dataMap1) == dataMap1;
@@ -2413,16 +2426,37 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
             final int dataIndex1 = index(dataMap1, bitpos);
 
             final K key0 = node0.getKey(dataIndex0);
-            final int keyHash0 = node0.getKeyHash(dataIndex0);
-
             final K key1 = node1.getKey(dataIndex1);
-            final int keyHash1 = node1.getKeyHash(dataIndex1);
 
-//            if (keyHash0 == keyHash1 && cmp.compare(key0, key1) == 0) {
-            if (keyHash0 == keyHash1 && Objects.equals(key0, key1)) {
+//            final int keyHash0 = node0.getKeyHash(dataIndex0);
+//            final int keyHash1 = node1.getKeyHash(dataIndex1);
+
+            // TODO: consider fast-fail if hashes are available for free
+            // TODO: consider comparator
+            if (Objects.equals(key0, key1)) {
               // singleton -> singleton
-              newBuffer.add(key0, keyHash0);
-              newDataMap |= bitpos;
+              prototype.add(bitpos, key0);
+
+              if (MEMOIZE_HASH_CODE_OF_ELEMENT) {
+                prototype.addHash(node0.getKeyHash(dataIndex0));
+              }
+
+              if (TRACK_DELTA_OF_META_DATA) {
+                final int remainingSize = 1;
+                final int remainingHashCode = node0.getKeyHash(dataIndex0);
+
+                if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+                  // delta @ node
+                  deltaSize += remainingSize;
+                  deltaHashCode += remainingHashCode;
+                }
+
+                if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+                  // delta @ collection
+                  details.addSize(remainingSize);
+                  details.addHashCode(remainingHashCode);
+                }
+              }
             } else {
               // singleton -> none (=bitmap change);
             }
@@ -2441,8 +2475,28 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
             if (nodeContainsKey) {
               // singleton -> singleton
-              newBuffer.add(key, keyHash);
-              newDataMap |= bitpos;
+              prototype.add(bitpos, key);
+
+              if (MEMOIZE_HASH_CODE_OF_ELEMENT) {
+                prototype.addHash(keyHash);
+              }
+
+              if (TRACK_DELTA_OF_META_DATA) {
+                final int remainingSize = 1;
+                final int remainingHashCode = keyHash;
+
+                if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+                  // delta @ node
+                  deltaSize += remainingSize;
+                  deltaHashCode += remainingHashCode;
+                }
+
+                if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+                  // delta @ collection
+                  details.addSize(remainingSize);
+                  details.addHashCode(remainingHashCode);
+                }
+              }
             } else {
               // singleton -> none (=bitmap change)
             }
@@ -2463,8 +2517,28 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
             if (nodeContainsKey) {
               // node -> singleton (=bitmap change)
-              newBuffer.add(key, keyHash);
-              newDataMap |= bitpos;
+              prototype.add(bitpos, key);
+
+              if (MEMOIZE_HASH_CODE_OF_ELEMENT) {
+                prototype.addHash(keyHash);
+              }
+
+              if (TRACK_DELTA_OF_META_DATA) {
+                final int remainingSize = 1;
+                final int remainingHashCode = keyHash;
+
+                if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+                  // delta @ node
+                  deltaSize += remainingSize;
+                  deltaHashCode += remainingHashCode;
+                }
+
+                if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+                  // delta @ collection
+                  details.addSize(remainingSize);
+                  details.addHashCode(remainingHashCode);
+                }
+              }
             } else {
               // node -> none (=bitmap change)
             }
@@ -2487,14 +2561,6 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
               recursiveDirectionPreference = INDIFFERENT;
             }
 
-//            if (isNodeMapIdentical0 && !isNodeMapIdentical1) {
-//              recursiveDirectionPreference = LEFT;
-//            } else if (!isNodeMapIdentical0 && isNodeMapIdentical1) {
-//              recursiveDirectionPreference = Preference.RIGHT;
-//            } else {
-//              recursiveDirectionPreference = INDIFFERENT;
-//            }
-
             AbstractSetNode<K> newNode = subNode0.intersect(mutator, subNode1,
                 shift + BIT_PARTITION_SIZE, details, cmp, recursiveDirectionPreference);
 
@@ -2506,8 +2572,28 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
               case SIZE_ONE: {
                 // node -> singleton (=bitmap change)
-                newBuffer.inline(newNode);
-                newDataMap |= bitpos;
+                prototype.add(bitpos, newNode.getKey(0));
+
+                if (MEMOIZE_HASH_CODE_OF_ELEMENT) {
+                  prototype.addHash(newNode.getKeyHash(0));
+                }
+
+                if (TRACK_DELTA_OF_META_DATA) {
+                  final int remainingSize = 1;
+                  final int remainingHashCode = newNode.getKeyHash(0);
+
+                  if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+                    // delta @ node
+                    deltaSize += remainingSize;
+                    deltaHashCode += remainingHashCode;
+                  }
+
+//                  if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+//                    // delta @ collection
+//                    details.addSize(remainingSize);
+//                    details.addHashCode(remainingHashCode);
+//                  }
+                }
                 break;
               }
 
@@ -2517,8 +2603,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 //                newNodeMap |= bitpos;
 
                 if (newNode != null) {
-                  newBuffer.add(newNode);
-                  newNodeMap |= bitpos;
+                  prototype.add(bitpos, newNode);
 
                   if (newNode != subNode0) {
                     isNodeMapReferenceEqual0 = false;
@@ -2527,13 +2612,47 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
                   if (newNode != subNode1) {
                     isNodeMapReferenceEqual1 = false;
                   }
+
+                  // TODO: introduce remainder from subnodes ...
+                  if (TRACK_DELTA_OF_META_DATA) {
+                    final int remainingSize = newNode.size();
+                    final int remainingHashCode = newNode.recursivePayloadHashCode();
+
+                    if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+                      // delta @ node
+                      deltaSize += remainingSize;
+                      deltaHashCode += remainingHashCode;
+                    }
+
+//                    if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+//                      // delta @ collection
+//                      details.addSize(remainingSize);
+//                      details.addHashCode(remainingHashCode);
+//                    }
+                  }
                 } else {
                   if (directionPreference == LEFT || directionPreference == INDIFFERENT) {
-                    newBuffer.add(subNode0);
-                    newNodeMap |= bitpos;
+                    prototype.add(bitpos, subNode0);
                   } else {
-                    newBuffer.add(subNode1);
-                    newNodeMap |= bitpos;
+                    prototype.add(bitpos, subNode1);
+                  }
+
+                  // TODO: introduce remainder from subnodes ...
+                  if (TRACK_DELTA_OF_META_DATA) {
+                    final int remainingSize = subNode0.size();
+                    final int remainingHashCode = subNode0.recursivePayloadHashCode();
+
+                    if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+                      // delta @ node
+                      deltaSize += remainingSize;
+                      deltaHashCode += remainingHashCode;
+                    }
+
+//                    if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+//                      // delta @ collection
+//                      details.addSize(remainingSize);
+//                      details.addHashCode(remainingHashCode);
+//                    }
                   }
                 }
 
@@ -2548,59 +2667,49 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
         bitsToSkip = bitsToSkip + 1 + trailingZeroCount;
       }
 
-      // updated accumulated properties
-      details.addSize(newBuffer.getPayloadSize());
-      details.addHashCode(newBuffer.getPayloadHash());
+//      // updated accumulated properties
+//      details.addSize(prototype.getPayloadSize());
+//      details.addHashCode(prototype.getPayloadHash());
 
-      boolean leftReferenceEqual =
-          isNodeMapReferenceEqual0 && ((newDataMap == dataMap0) && (newNodeMap == nodeMap0));
+      boolean leftReferenceEqual = isNodeMapReferenceEqual0 &&
+          ((prototype.dataMap() == dataMap0) && (prototype.nodeMap() == nodeMap0));
 
-      boolean rightReferenceEqual =
-          isNodeMapReferenceEqual1 && ((newDataMap == dataMap1) && (newNodeMap == nodeMap1));
+      boolean rightReferenceEqual = isNodeMapReferenceEqual1 &&
+          ((prototype.dataMap() == dataMap1) && (prototype.nodeMap() == nodeMap1));
 
       if (leftReferenceEqual && rightReferenceEqual) {
         return null;
       }
 
       // TODO: introduce preferLeftOverRightOnEquality
-      if (newBuffer.isEmpty()) {
+      if (prototype.isEmpty()) {
         return EMPTY_NODE;
       }
 
+      // TODO: create singelton node that can unboxed easily
+      final CompactSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator, prototype.nodeMap(),
+          prototype.dataMap(), prototype.compactBuffer(), deltaHashCode, deltaSize);
+
       if (directionPreference == LEFT || directionPreference == INDIFFERENT) {
         if (leftReferenceEqual) {
-          assert node0.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-              newDataMap, newBuffer.compactBuffer(), newBuffer.getNodeHashCode(),
-              newBuffer.getNodeSize()));
+          assert node0.equals(newNode);
           return node0;
         } else if (rightReferenceEqual) {
-          assert node1.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-              newDataMap, newBuffer.compactBuffer(), newBuffer.getNodeHashCode(),
-              newBuffer.getNodeSize()));
+          assert node1.equals(newNode);
           return node1;
         }
       } else {
         if (rightReferenceEqual) {
-          assert node1.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-              newDataMap, newBuffer.compactBuffer(), newBuffer.getNodeHashCode(),
-              newBuffer.getNodeSize()));
+          assert node1.equals(newNode);
           return node1;
         } else if (leftReferenceEqual) {
-          assert node0.equals(new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-              newDataMap, newBuffer.compactBuffer(), newBuffer.getNodeHashCode(),
-              newBuffer.getNodeSize()));
+          assert node0.equals(newNode);
           return node0;
         }
       }
 
-      // TODO: create singelton node that can unboxed easily
-      final CompactSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator, newNodeMap,
-          newDataMap, newBuffer.compactBuffer(), newBuffer.getNodeHashCode(),
-          newBuffer.getNodeSize()); // newBuffer.compactHashes()
-
       assert !newNode.equals(node0);
       assert !newNode.equals(node1);
-
       return newNode;
     }
 
