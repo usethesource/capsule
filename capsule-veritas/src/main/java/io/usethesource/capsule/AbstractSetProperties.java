@@ -182,8 +182,8 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     CT twoWithShared = (CT) inputTwo.__insertAll(inputShared);
     CT intersectedWithShared = (CT) oneWithShared.intersect(twoWithShared);
 
-    convertToJavaSetAndCheckHashCode(intersectedWithShared);
     convertToJavaSetAndCheckSize(intersectedWithShared);
+    convertToJavaSetAndCheckHashCode(intersectedWithShared);
   }
 
   @Property(trials = DEFAULT_TRIALS)
@@ -234,8 +234,8 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 
     CT unioned = (CT) inputOne.union(inputTwo);
 
-    convertToJavaSetAndCheckHashCode(unioned);
     convertToJavaSetAndCheckSize(unioned);
+    convertToJavaSetAndCheckHashCode(unioned);
   }
 
   @Property(trials = DEFAULT_TRIALS)
@@ -267,8 +267,8 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 
     CT subtracted = (CT) inputOne.subtract(inputTwo);
 
-    convertToJavaSetAndCheckHashCode(subtracted);
     convertToJavaSetAndCheckSize(subtracted);
+    convertToJavaSetAndCheckHashCode(subtracted);
   }
 
   @Property(trials = DEFAULT_TRIALS)
@@ -310,7 +310,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     assertTrue(subtractedWithShared.stream().allMatch(oneWithoutShared::contains));
     assertTrue(subtractedWithShared.stream().noneMatch(twoWithoutShared::contains));
   }
-
+  
   @Property(trials = DEFAULT_TRIALS)
   public void subtractMaintainsSizeAndHashCode(
       @Size(min = 0, max = MAX_SIZE) final CT inputOne,
@@ -321,8 +321,8 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     CT twoWithShared = (CT) inputTwo.__insertAll(inputShared);
     CT subtractedWithShared = (CT) oneWithShared.subtract(twoWithShared);
 
-    convertToJavaSetAndCheckHashCode(subtractedWithShared);
     convertToJavaSetAndCheckSize(subtractedWithShared);
+    convertToJavaSetAndCheckHashCode(subtractedWithShared);
   }
 
   @Property(trials = DEFAULT_TRIALS)
