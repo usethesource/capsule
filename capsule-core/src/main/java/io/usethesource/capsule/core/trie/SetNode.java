@@ -84,8 +84,8 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
 
   final class Prototype<K, R extends SetNode<K, R>> {
 
-    private int newDataMap = 0;
-    private int newNodeMap = 0;
+    private int dataMap = 0;
+    private int nodeMap = 0;
 
     private final Object[] buffer = new Object[32];
     private int dataIndex = 0;
@@ -94,122 +94,42 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
     private final int[] hashes = new int[32];
     private int hashIndex = 0;
 
-    private int sumOfDeltaSize = 0;
-    private int sumOfDeltaHashCode = 0;
-
-    private int sumOfAbsoluteSize = 0;
-    private int sumOfAbsoluteHashCode = 0;
-
     public final int dataMap() {
-      return newDataMap;
+      return dataMap;
     }
 
     public final int nodeMap() {
-      return newNodeMap;
+      return nodeMap;
     }
 
     public final boolean isEmpty() {
-      return dataIndex == 0 && nodeIndex == buffer.length - 1;
-    }
-
-    @Deprecated
-    public final void addPayloadSize(int size) {
-      sumOfDeltaSize += size;
-    }
-
-    @Deprecated
-    public final void addPayloadHash(int hash) {
-      sumOfDeltaHashCode += hash;
-    }
-
-    public final int getPayloadSize() {
-      return sumOfDeltaSize;
-    }
-
-    public final int getPayloadHash() {
-      return sumOfDeltaHashCode;
+      return dataMap == 0 && nodeMap == 0;
     }
 
     public final void add(int bitpos, K key) {
       // add element
       buffer[dataIndex] = key;
-      newDataMap |= bitpos;
+      dataMap |= bitpos;
+
       // advance cursor
       dataIndex = dataIndex + 1;
-      // update meta data
-      if (TRACK_DELTA_OF_META_DATA) {
-        sumOfDeltaSize = sumOfDeltaSize + 1;
-      }
     }
 
     public final void addHash(int hash) {
       // add hash
       hashes[hashIndex] = hash;
+
       // advance cursor
       hashIndex = hashIndex + 1;
-      // update meta data
-      if (TRACK_DELTA_OF_META_DATA) {
-        sumOfDeltaHashCode = sumOfDeltaHashCode + hash;
-      }
     }
 
     public final void add(int bitpos, R node) {
       // add node
       buffer[nodeIndex] = node;
-      newNodeMap |= bitpos;
+      nodeMap |= bitpos;
 
       // advance cursor
       nodeIndex = nodeIndex - 1;
-
-//      // update meta data
-//      sumOfAbsoluteSize = sumOfAbsoluteSize + node.size();
-//      sumOfAbsoluteHashCode = sumOfAbsoluteHashCode + node.recursivePayloadHashCode();
-    }
-
-    private void add0(K key, int keyHash) {
-      buffer[dataIndex] = key;
-      hashes[dataIndex] = keyHash;
-      dataIndex = dataIndex + 1;
-
-      // update meta data
-      sumOfAbsoluteSize = sumOfAbsoluteSize + 1;
-      sumOfAbsoluteHashCode = sumOfAbsoluteHashCode + keyHash;
-    }
-
-    /**
-     * Add key / keyHash tuple to buffer and increment meta data counters.
-     */
-    @Deprecated
-    public final void add(K key, int keyHash) {
-      add0(key, keyHash);
-
-      // update meta data
-      if (TRACK_DELTA_OF_META_DATA) {
-        sumOfDeltaSize = sumOfDeltaSize + 1;
-        sumOfDeltaHashCode = sumOfDeltaHashCode + keyHash;
-      }
-    }
-
-    /**
-     * Add node to buffer without updating meta data counters
-     * (already done in sub-node's buffer).
-     */
-    @Deprecated
-    public final void add(R node) {
-      buffer[nodeIndex] = node;
-      nodeIndex = nodeIndex - 1;
-
-      // update meta data
-      sumOfAbsoluteSize = sumOfAbsoluteSize + node.size();
-      sumOfAbsoluteHashCode = sumOfAbsoluteHashCode + node.recursivePayloadHashCode();
-    }
-
-    /**
-     * Unbox and inline node into buffer without updating meta data counters
-     * (already done in sub-node's buffer).
-     */
-    public final void inline(R node) {
-      add0(node.getKey(0), node.getKeyHash(0));
     }
 
     public final Object[] compactBuffer() {
@@ -223,14 +143,6 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
       final int[] compactedHashes = new int[hashIndex];
       System.arraycopy(hashes, 0, compactedHashes, 0, hashIndex);
       return compactedHashes;
-    }
-
-    final public int getNodeHashCode() {
-      return sumOfAbsoluteHashCode;
-    }
-
-    final public int getNodeSize() {
-      return sumOfAbsoluteSize;
     }
   }
 
