@@ -10,6 +10,7 @@ package io.usethesource.capsule.experimental.multimap;
 import java.util.AbstractCollection;
 import java.util.AbstractSet;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,11 +33,13 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import io.usethesource.capsule.SetMultimap;
+import io.usethesource.capsule.core.trie.ArrayView;
 import io.usethesource.capsule.core.trie.EitherSingletonOrCollection;
 import io.usethesource.capsule.core.trie.EitherSingletonOrCollection.Type;
 import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
 
+import static io.usethesource.capsule.core.AbstractTrieSetMultimap.tupleHash;
 import static io.usethesource.capsule.core.trie.EitherSingletonOrCollection.Type.COLLECTION;
 import static io.usethesource.capsule.core.trie.EitherSingletonOrCollection.Type.SINGLETON;
 import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_COLLECTION;
@@ -45,6 +48,7 @@ import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PAT
 import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_NODE;
 import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setBitPattern;
 import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setOf;
+import static io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT.CompactSetMultimapNode.EMPTY_NODE;
 import static io.usethesource.capsule.util.BitmapUtils.filter;
 import static io.usethesource.capsule.util.BitmapUtils.index;
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
@@ -54,7 +58,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
   private final EqualityComparator<Object> cmp;
 
   private static final TrieSetMultimap_HHAMT EMPTY_SETMULTIMAP =
-      new TrieSetMultimap_HHAMT(EqualityComparator.EQUALS, CompactSetMultimapNode.EMPTY_NODE, 0, 0);
+      new TrieSetMultimap_HHAMT(EqualityComparator.EQUALS, EMPTY_NODE, 0, 0);
 
   private static final boolean DEBUG = false;
 
@@ -79,7 +83,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
 
   public static final <K, V> SetMultimap.Immutable<K, V> of(EqualityComparator<Object> cmp) {
     // TODO: unify with `of()`
-    return new TrieSetMultimap_HHAMT(cmp, CompactSetMultimapNode.EMPTY_NODE, 0, 0);
+    return new TrieSetMultimap_HHAMT(cmp, EMPTY_NODE, 0, 0);
   }
 
   public static final <K, V> SetMultimap.Immutable<K, V> of(K key, V... values) {
@@ -233,6 +237,149 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
     final SetMultimap.Transient<K, V> tmpTransient = this.asTransient();
     tmpTransient.union(setMultimap);
     return tmpTransient.freeze();
+  }
+
+  @Override
+  public SetMultimap.Immutable<V, K> inverseMap() {
+    final SetMultimap.Transient<V, K> builder = TrieSetMultimap_HHAMT.transientOf();
+
+    entryIterator().forEachRemaining(tuple -> builder.__insert(tuple.getValue(), tuple.getKey()));
+
+    return builder.freeze();
+  }
+
+  public static final <T1, T2> SetMultimap.Immutable<?, ?> joinReduce(
+      TrieSetMultimap_HHAMT<T1, T2> preds,
+      TrieSetMultimap_HHAMT<T2, T1> dom) {
+
+    final Iterator<? extends AbstractSetMultimapNode<T1, T2>> predsNodeIterator = preds
+        .nodeIterator();
+
+    final AtomicReference<Thread> mutator = new AtomicReference<Thread>(Thread.currentThread());
+
+    AbstractSetMultimapNode<T1, T1> newRootNode = EMPTY_NODE;
+    int newHashCode = 0;
+    int newCachedSize = 0;
+
+    while (predsNodeIterator.hasNext()) {
+      final AbstractSetMultimapNode<T1, T2> predNode = predsNodeIterator.next();
+
+      {
+        final ArrayView<T1> keyArray = predNode.dataArray(0, 0);
+        final ArrayView<T2> valueArray = predNode.dataArray(0, 1);
+
+        for (int i = 0; i < keyArray.size(); i++) {
+
+          final T1 key = keyArray.get(i);
+          final int keyHash = key.hashCode();
+
+          final T2 value = valueArray.get(i);
+          final int valueHash = value.hashCode();
+
+          final Optional<io.usethesource.capsule.Set.Immutable<T1>> rangeAfterCompose = dom
+              .getRootNode().findByKey(value, valueHash, 0, EqualityComparator.EQUALS);
+
+          // do compose
+          if (rangeAfterCompose.isPresent()) {
+            final io.usethesource.capsule.Set.Immutable<T1> rangeSet = rangeAfterCompose.get();
+
+            SetMultimapResult mmUpdate = SetMultimapResult.unchanged();
+
+            newRootNode = newRootNode.updated(mutator, key, rangeSet, keyHash, 0,
+                mmUpdate, EqualityComparator.EQUALS);
+
+            if (mmUpdate.isModified()) {
+              newHashCode += tupleHash(keyHash, rangeAfterCompose);
+              newCachedSize += rangeSet.size();
+            }
+          }
+
+          // do add identity
+          SetMultimapResult mmUpdate = SetMultimapResult.unchanged();
+          newRootNode = newRootNode
+              .inserted(mutator, key, key, keyHash, 0, mmUpdate, EqualityComparator.EQUALS);
+
+          if (mmUpdate.isModified()) {
+            newHashCode += tupleHash(keyHash, keyHash);
+            newCachedSize += 1;
+          }
+        }
+      }
+
+      {
+        final ArrayView<T1> keyArray = predNode.dataArray(1, 0);
+        final ArrayView<io.usethesource.capsule.Set.Immutable<T2>> valueArray = predNode
+            .dataArray(1, 1);
+
+        for (int i = 0; i < keyArray.size(); i++) {
+
+          final T1 key = keyArray.get(i);
+          final int keyHash = key.hashCode();
+
+          final io.usethesource.capsule.Set.Immutable<T2> values = valueArray.get(i);
+
+//          ArrayView<T2> nestedDataArray = values.dataArray(0, 0);
+          ArrayList<T2> nestedDataArray = (ArrayList<T2>) Arrays.asList(values.toArray());
+
+          final ArrayList<io.usethesource.capsule.Set.Immutable<T1>> compositionResults =
+              new ArrayList<>(nestedDataArray.size());
+
+          // mapping
+          boolean encounteredEmpty = false;
+          for (int j = 0; j < nestedDataArray.size(); j++) {
+
+            final T2 value = nestedDataArray.get(i);
+            final int valueHash = value.hashCode();
+
+            final Optional<io.usethesource.capsule.Set.Immutable<T1>> rangeAfterCompose = dom
+                .getRootNode().findByKey(value, valueHash, 0, EqualityComparator.EQUALS);
+
+            if (rangeAfterCompose.isPresent()) {
+              compositionResults.add(rangeAfterCompose.get());
+            } else {
+              encounteredEmpty = true;
+            }
+          }
+
+          // reduce
+          if (encounteredEmpty) {
+            newRootNode = newRootNode.inserted(mutator, key, key, keyHash, 0,
+                SetMultimapResult.unchanged(), EqualityComparator.EQUALS);
+
+            newHashCode += tupleHash(keyHash, keyHash);
+            newCachedSize += 1;
+          } else {
+            // intersect ...
+            io.usethesource.capsule.Set.Immutable<T1> intersectedResults = compositionResults
+                .get(0);
+
+            for (int k = 1; k < compositionResults.size(); k++) {
+              intersectedResults = intersectedResults.intersect(compositionResults.get(k));
+            }
+
+            SetMultimapResult mmUpdate = SetMultimapResult.unchanged();
+            newRootNode = newRootNode.updated(mutator, key, intersectedResults, keyHash, 0,
+                mmUpdate, EqualityComparator.EQUALS);
+            if (mmUpdate.isModified()) {
+              newHashCode += tupleHash(keyHash, intersectedResults);
+              newCachedSize += intersectedResults.size();
+            }
+
+            SetMultimapResult mmUpdate1 = SetMultimapResult.unchanged();
+            newRootNode = newRootNode
+                .inserted(mutator, key, key, keyHash, 0, mmUpdate1,
+                    EqualityComparator.EQUALS);
+            if (mmUpdate1.isModified()) {
+              newHashCode += tupleHash(keyHash, keyHash);
+              newCachedSize += 1;
+            }
+          }
+        }
+      }
+    }
+
+    return new TrieSetMultimap_HHAMT<T1, T1>(preds.cmp, newRootNode, newHashCode, newCachedSize);
+//    return new TrieSetMultimap_HHAMT<T1, T1>(preds.cmp, newRootNode);
   }
 
   @Override
@@ -665,6 +812,57 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
 
     static final boolean isAllowedToEdit(AtomicReference<Thread> x, AtomicReference<Thread> y) {
       return x != null && y != null && (x == y || x.get() == y.get());
+    }
+
+    public <T> ArrayView<T> dataArray(final int category, final int component) {
+      switch (category) {
+        case 0:
+          return categoryArrayView0(component);
+        case 1:
+          return categoryArrayView1(component);
+        default:
+          throw new IllegalArgumentException("Category %i is not supported.");
+      }
+    }
+
+    private <T> ArrayView<T> categoryArrayView0(final int component) {
+      return new ArrayView<T>() {
+        @Override
+        public int size() {
+          return payloadArity(SINGLETON);
+        }
+
+        @Override
+        public T get(int index) {
+          switch (component) {
+            case 0:
+              return (T) getSingletonKey(index);
+            case 1:
+              return (T) getSingletonValue(index);
+          }
+          throw new IllegalStateException();
+        }
+      };
+    }
+
+    private <T> ArrayView<T> categoryArrayView1(final int component) {
+      return new ArrayView<T>() {
+        @Override
+        public int size() {
+          return payloadArity(COLLECTION);
+        }
+
+        @Override
+        public T get(int index) {
+          switch (component) {
+            case 0:
+              return (T) getCollectionKey(index);
+            case 1:
+              return (T) getCollectionValue(index);
+          }
+          throw new IllegalStateException();
+        }
+      };
     }
 
     abstract boolean hasNodes();
