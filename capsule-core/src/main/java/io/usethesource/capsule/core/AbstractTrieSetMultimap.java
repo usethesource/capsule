@@ -61,25 +61,25 @@ public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R ext
 
   protected abstract Set.Immutable<V> internalFormatToCollection(C values);
 
-  private static final <K, V> int tupleHash(final int keyHash, final int valueHash) {
+  public static final <K, V> int tupleHash(final int keyHash, final int valueHash) {
     return keyHash ^ valueHash;
   }
 
-  private static final <K, V> int tupleHash(final int keyHash, final V value) {
+  public static final <K, V> int tupleHash(final int keyHash, final V value) {
     return tupleHash(keyHash, Objects.hashCode(value));
   }
 
-  private static final <K, V> int tupleHash(final K key, final V value) {
+  public static final <K, V> int tupleHash(final K key, final V value) {
     return tupleHash(Objects.hashCode(key), Objects.hashCode(value));
   }
 
-  private static final <K, V, C extends java.util.Collection<V>> int tupleHash(final int keyHash,
+  public static final <K, V, C extends java.util.Collection<V>> int tupleHash(final int keyHash,
       final C values) {
     return values.stream().mapToInt(Objects::hashCode)
         .map(valueHash -> tupleHash(keyHash, valueHash)).sum();
   }
 
-  private static final <K, V, C extends java.util.Collection<V>> int tupleHash(final K key,
+  public static final <K, V, C extends java.util.Collection<V>> int tupleHash(final K key,
       final C values) {
     return tupleHash(Objects.hashCode(key), values);
   }
