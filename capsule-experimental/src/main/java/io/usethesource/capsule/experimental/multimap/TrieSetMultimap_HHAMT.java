@@ -50,10 +50,8 @@ import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutab
 
 public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> {
 
-  private final EqualityComparator<Object> cmp;
-
   private static final TrieSetMultimap_HHAMT EMPTY_SETMULTIMAP =
-      new TrieSetMultimap_HHAMT(EqualityComparator.EQUALS, CompactSetMultimapNode.EMPTY_NODE, 0, 0);
+      new TrieSetMultimap_HHAMT(CompactSetMultimapNode.EMPTY_NODE, 0, 0);
 
   private static final boolean DEBUG = false;
 
@@ -61,9 +59,8 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
   private final int hashCode;
   private final int cachedSize;
 
-  TrieSetMultimap_HHAMT(EqualityComparator<Object> cmp, AbstractSetMultimapNode<K, V> rootNode,
+  TrieSetMultimap_HHAMT(AbstractSetMultimapNode<K, V> rootNode,
       int hashCode, int cachedSize) {
-    this.cmp = cmp;
     this.rootNode = rootNode;
     this.hashCode = hashCode;
     this.cachedSize = cachedSize;
@@ -78,7 +75,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
 
   public static final <K, V> SetMultimap.Immutable<K, V> of(EqualityComparator<Object> cmp) {
     // TODO: unify with `of()`
-    return new TrieSetMultimap_HHAMT(cmp, CompactSetMultimapNode.EMPTY_NODE, 0, 0);
+    return of();
   }
 
   public static final <K, V> SetMultimap.Immutable<K, V> of(K key, V... values) {
@@ -139,7 +136,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
   @Override
   public boolean containsValue(final Object o) {
     for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
-      if (cmp.equals(iterator.next(), o)) {
+      if (iterator.next().equals(0)) {
         return true;
       }
     }
@@ -188,7 +185,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
           final int valHashOld = details.getReplacedValue().hashCode();
           final int valHashNew = val.hashCode();
 
-          return new TrieSetMultimap_HHAMT<K, V>(cmp, newRootNode,
+          return new TrieSetMultimap_HHAMT<K, V>(newRootNode,
               hashCode + ((keyHash ^ valHashNew)) - ((keyHash ^ valHashOld)), cachedSize);
         } else {
           int sumOfReplacedHashes = 0;
@@ -199,14 +196,14 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
 
           final int valHashNew = val.hashCode();
 
-          return new TrieSetMultimap_HHAMT<K, V>(cmp, newRootNode,
+          return new TrieSetMultimap_HHAMT<K, V>(newRootNode,
               hashCode + ((keyHash ^ valHashNew)) - sumOfReplacedHashes,
               cachedSize - details.getReplacedCollection().size() + 1);
         }
       }
 
       final int valHash = val.hashCode();
-      return new TrieSetMultimap_HHAMT<K, V>(cmp, newRootNode, hashCode + ((keyHash ^ valHash)),
+      return new TrieSetMultimap_HHAMT<K, V>(newRootNode, hashCode + ((keyHash ^ valHash)),
           cachedSize + 1);
     }
 
@@ -223,7 +220,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
 
     if (details.isModified()) {
       final int valHash = val.hashCode();
-      return new TrieSetMultimap_HHAMT<K, V>(cmp, newRootNode, hashCode + ((keyHash ^ valHash)),
+      return new TrieSetMultimap_HHAMT<K, V>(newRootNode, hashCode + ((keyHash ^ valHash)),
           cachedSize + 1);
     }
 
@@ -249,7 +246,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
     if (details.isModified()) {
       assert details.hasReplacedValue();
       final int valHash = details.getReplacedValue().hashCode();
-      return new TrieSetMultimap_HHAMT<K, V>(cmp, newRootNode, hashCode - ((keyHash ^ valHash)),
+      return new TrieSetMultimap_HHAMT<K, V>(newRootNode, hashCode - ((keyHash ^ valHash)),
           cachedSize - 1);
     }
 
@@ -269,7 +266,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
 
       if (details.getType() == EitherSingletonOrCollection.Type.SINGLETON) {
         final int valHash = details.getReplacedValue().hashCode();
-        return new TrieSetMultimap_HHAMT<K, V>(cmp, newRootNode, hashCode - ((keyHash ^ valHash)),
+        return new TrieSetMultimap_HHAMT<K, V>(newRootNode, hashCode - ((keyHash ^ valHash)),
             cachedSize - 1);
       } else {
         int sumOfReplacedHashes = 0;
@@ -278,7 +275,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
           sumOfReplacedHashes += (keyHash ^ replaceValue.hashCode());
         }
 
-        return new TrieSetMultimap_HHAMT<K, V>(cmp, newRootNode, hashCode - sumOfReplacedHashes,
+        return new TrieSetMultimap_HHAMT<K, V>(newRootNode, hashCode - sumOfReplacedHashes,
             cachedSize - details.getReplacedCollection().size());
       }
     }
@@ -510,7 +507,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
             final io.usethesource.capsule.Set.Immutable<V> valColl = (io.usethesource.capsule.Set.Immutable<V>) entry
                 .getValue();
 
-            if (!cmp.equals(result.get(), valColl)) {
+            if (!result.get().equals(valColl)) {
               return false;
             }
           }
@@ -1151,17 +1148,17 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
     }
 
     @Deprecated
-    int dataIndex(final long doubledBitpos) {
+    final int dataIndex(final long doubledBitpos) {
       return index(bitmap, PATTERN_DATA_SINGLETON, doubledBitpos);
     }
 
     @Deprecated
-    int collIndex(final long doubledBitpos) {
+    final int collIndex(final long doubledBitpos) {
       return index(bitmap, PATTERN_DATA_COLLECTION, doubledBitpos);
     }
 
     @Deprecated
-    int nodeIndex(final long doubledBitpos) {
+    final int nodeIndex(final long doubledBitpos) {
       return index(bitmap, PATTERN_NODE, doubledBitpos);
     }
 
@@ -3479,8 +3476,6 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
   static final class TransientTrieSetMultimap_BleedingEdge<K, V>
       implements SetMultimap.Transient<K, V> {
 
-    private final EqualityComparator<Object> cmp;
-
     final private AtomicReference<Thread> mutator;
     private AbstractSetMultimapNode<K, V> rootNode;
     private int hashCode;
@@ -3488,7 +3483,6 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
 
     TransientTrieSetMultimap_BleedingEdge(
         TrieSetMultimap_HHAMT<K, V> trieSetMultimap_BleedingEdge) {
-      this.cmp = trieSetMultimap_BleedingEdge.cmp;
       this.mutator = new AtomicReference<Thread>(Thread.currentThread());
       this.rootNode = trieSetMultimap_BleedingEdge.rootNode;
       this.hashCode = trieSetMultimap_BleedingEdge.hashCode;
@@ -3527,7 +3521,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
     @Override
     public boolean containsValue(final Object o) {
       for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
-        if (cmp.equals(iterator.next(), o)) {
+        if (iterator.next().equals(o)) {
           return true;
         }
       }
@@ -4010,7 +4004,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
               final io.usethesource.capsule.Set.Immutable<V> valColl = (io.usethesource.capsule.Set.Immutable<V>) entry
                   .getValue();
 
-              if (!cmp.equals(result.get(), valColl)) {
+              if (!result.get().equals(valColl)) {
                 return false;
               }
             }
@@ -4037,7 +4031,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
       }
 
       mutator.set(null);
-      return new TrieSetMultimap_HHAMT<K, V>(cmp, rootNode, hashCode, cachedSize);
+      return new TrieSetMultimap_HHAMT<K, V>(rootNode, hashCode, cachedSize);
     }
   }
 
