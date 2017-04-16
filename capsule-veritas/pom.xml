@@ -9,7 +9,7 @@
 
   <groupId>io.usethesource</groupId>
   <artifactId>capsule-veritas</artifactId>
-  <version>0.3.0</version>
+  <version>0.3.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <properties>
@@ -42,12 +42,12 @@
     <dependency>
       <groupId>io.usethesource</groupId>
       <artifactId>capsule</artifactId>
-      <version>0.3.0</version>
+      <version>0.3.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.usethesource</groupId>
       <artifactId>capsule-experimental</artifactId>
-      <version>0.3.0</version>
+      <version>0.3.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.pholser</groupId>
