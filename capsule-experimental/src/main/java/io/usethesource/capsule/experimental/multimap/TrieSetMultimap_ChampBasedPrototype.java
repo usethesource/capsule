@@ -499,25 +499,17 @@ public class TrieSetMultimap_ChampBasedPrototype<K, V> implements SetMultimap.Im
         return false;
       }
 
-      for (
-          Iterator<io.usethesource.capsule.Map.Entry> it = that.entrySet().iterator();
-          it.hasNext(); ) {
-        io.usethesource.capsule.Map.Entry entry = it.next();
+      for (Iterator<java.util.Map.Entry> it = that.entrySet().iterator(); it.hasNext(); ) {
+        final java.util.Map.Entry entry = it.next();
 
         try {
           final K key = (K) entry.getKey();
-          final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
-              rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
+          final V value = (V) entry.getValue();
 
-          if (!result.isPresent()) {
+          boolean containsTuple = this.containsEntry(key, value);
+
+          if (!containsTuple) {
             return false;
-          } else {
-            final io.usethesource.capsule.Set.Immutable<V> valColl = (io.usethesource.capsule.Set.Immutable<V>) entry
-                .getValue();
-
-            if (!result.get().equals(valColl)) {
-              return false;
-            }
           }
         } catch (ClassCastException unused) {
           return false;

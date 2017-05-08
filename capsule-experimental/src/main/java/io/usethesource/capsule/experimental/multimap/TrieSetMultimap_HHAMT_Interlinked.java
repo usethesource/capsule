@@ -104,8 +104,8 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> extends
 
   @Override
   protected final SetMultimap.Immutable<K, V> wrap(EqualityComparator<Object> cmp,
-      AbstractSetMultimapNode<K, V> rootNode, int cachedSize, int cachedKeySetSize,
-      int cachedKeySetHashCode) {
+      AbstractSetMultimapNode<K, V> rootNode, int cachedSize, int cachedKeySetHashCode,
+      int cachedKeySetSize) {
     return new TrieSetMultimap_HHAMT_Interlinked<K, V>(cmp, rootNode, cachedSize,
         cachedKeySetHashCode, cachedKeySetSize);
   }
@@ -295,7 +295,7 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> extends
 
   @Override
   public SetMultimap.Transient<K, V> asTransient() {
-    return new TransientTrieSetMultimap_BleedingEdge<K, V>(this);
+    return new TransientTrieSetMultimap<K, V>(this);
   }
 
   /*
@@ -3073,10 +3073,10 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> extends
     }
   }
 
-  static final class TransientTrieSetMultimap_BleedingEdge<K, V> extends
+  static final class TransientTrieSetMultimap<K, V> extends
       AbstractTransientTrieSetMultimap<K, V, AbstractSetNode<V>, AbstractSetMultimapNode<K, V>> {
 
-    TransientTrieSetMultimap_BleedingEdge(
+    TransientTrieSetMultimap(
         TrieSetMultimap_HHAMT_Interlinked<K, V> trieSetMultimap) {
       super(trieSetMultimap);
     }

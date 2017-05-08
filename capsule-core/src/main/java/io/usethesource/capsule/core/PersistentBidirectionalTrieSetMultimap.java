@@ -59,6 +59,15 @@ public class PersistentBidirectionalTrieSetMultimap<K, V> implements
         bwdMerger.apply(value, key));
   }
 
+  private static <K, V> BinaryRelation.Immutable<K, V> batchWireTuple(K key,
+      Set.Immutable<V> values,
+      final BiFunction<K, Set.Immutable<V>, ? extends SetMultimap.Immutable<K, V>> fwdMerger,
+      final BiFunction<Set.Immutable<V>, K, ? extends SetMultimap.Immutable<V, K>> bwdMerger) {
+
+    return new PersistentBidirectionalTrieSetMultimap(fwdMerger.apply(key, values),
+        bwdMerger.apply(values, key));
+  }
+
   @Override
   public BinaryRelation<V, K> inverse() {
     return new PersistentBidirectionalTrieSetMultimap<>(bwd, fwd);
@@ -160,6 +169,14 @@ public class PersistentBidirectionalTrieSetMultimap<K, V> implements
   @Override
   public SetMultimap.Immutable<K, V> __insert(K key, V value) {
     return wireTuple(key, value, fwd::__insert, bwd::__insert);
+  }
+
+  /*
+   * NOTE: transient counterpart not yet implemented
+   */
+  @Override
+  public SetMultimap.Immutable<K, V> __insert(K key, Set.Immutable<V> values) {
+    return batchWireTuple(key, values, fwd::__insert, bwd::__insert);
   }
 
   @Override

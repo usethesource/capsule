@@ -492,24 +492,18 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
         return false;
       }
 
-      for (
-          Iterator<Map.Entry> it = that.entrySet().iterator(); it.hasNext(); ) {
-        Map.Entry entry = it.next();
+      for (Iterator<java.util.Map.Entry> it = that.entrySet().iterator(); it.hasNext(); ) {
+        final java.util.Map.Entry entry = it.next();
 
         try {
           final K key = (K) entry.getKey();
-          final Optional<io.usethesource.capsule.Set.Immutable<V>> result =
-              rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
+          final V value = (V) entry.getValue();
 
-          if (!result.isPresent()) {
+          boolean containsTuple =
+              getRootNode().containsTuple(key, value, transformHashCode(key.hashCode()), 0, cmp);
+
+          if (!containsTuple) {
             return false;
-          } else {
-            final io.usethesource.capsule.Set.Immutable<V> valColl = (io.usethesource.capsule.Set.Immutable<V>) entry
-                .getValue();
-
-            if (!cmp.equals(result.get(), valColl)) {
-              return false;
-            }
           }
         } catch (ClassCastException unused) {
           return false;

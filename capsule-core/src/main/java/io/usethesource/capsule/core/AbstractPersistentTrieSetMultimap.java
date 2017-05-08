@@ -44,8 +44,9 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
     this.cachedKeySetSize = keySetSize;
 
     if (DEBUG) {
-//      assert checkHashCodeAndSize(cachedHashCode, cachedSize, entryIterator());
-//      assert checkKeySetHashCodeAndSize(cachedKeySetHashCode, cachedKeySetSize, keyIterator());
+      assert cachedSize == size(rootNode);
+      assert keySetHashCode == keySetHashCode(rootNode);
+      assert keySetSize == keySetSize(rootNode);
     }
   }
 
@@ -87,7 +88,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
   }
 
   protected abstract SetMultimap.Immutable<K, V> wrap(EqualityComparator<Object> cmp, R rootNode,
-      int cachedSize, int cachedKeySetSize, int cachedKeySetHashCode);
+      int cachedSize, int cachedKeySetHashCode, int cachedKeySetSize);
 
   @Override
   public final SetMultimap.Immutable<K, V> __insert(final K key, final V value) {
