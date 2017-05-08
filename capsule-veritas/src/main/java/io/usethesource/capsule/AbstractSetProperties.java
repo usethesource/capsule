@@ -7,6 +7,12 @@
  */
 package io.usethesource.capsule;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.HashSet;
 
 import com.pholser.junit.quickcheck.Property;
@@ -99,6 +105,34 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
   @Property(trials = DEFAULT_TRIALS)
   public void notContainedAfterInsertRemove(CT input, T item) {
     assertFalse(input.__insert(item).__remove(item).contains(item));
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void serializationRoundtripIfSerializable(CT input) throws Exception {
+    if (input instanceof java.io.Serializable) {
+      assertEquals(input, deserialize(serialize((java.io.Serializable) input), input.getClass()));
+    }
+  }
+
+  private static <T extends Serializable> byte[] serialize(T item) throws IOException {
+    try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+      oos.writeObject(item);
+      return baos.toByteArray();
+    } catch (IOException e) {
+      throw e;
+    }
+  }
+
+  private static <T> T deserialize(byte[] bytes, Class<T> itemClass)
+      throws IOException, ClassNotFoundException {
+    try (ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        ObjectInputStream ois = new ObjectInputStream(bais)) {
+      Object item = ois.readObject();
+      return itemClass.cast(item);
+    } catch (IOException | ClassNotFoundException e) {
+      throw e;
+    }
   }
 
 }

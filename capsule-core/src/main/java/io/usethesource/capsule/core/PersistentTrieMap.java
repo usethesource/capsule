@@ -29,7 +29,10 @@ import io.usethesource.capsule.util.ArrayUtils;
 
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
-public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immutable<K, V> {
+public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immutable<K, V>,
+    java.io.Serializable {
+
+  private static final long serialVersionUID = 42L;
 
   private static final PersistentTrieMap EMPTY_MAP = new PersistentTrieMap(
       CompactMapNode.EMPTY_NODE, 0, 0);
@@ -686,7 +689,10 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
   }
 
-  protected static abstract class AbstractMapNode<K, V> implements INode<K, V> {
+  protected static abstract class AbstractMapNode<K, V> implements INode<K, V>,
+      java.io.Serializable {
+
+    private static final long serialVersionUID = 42L;
 
     static final int TUPLE_LENGTH = 2;
 
@@ -1325,7 +1331,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
   private static final class BitmapIndexedMapNode<K, V> extends CompactMixedMapNode<K, V> {
 
-    final AtomicReference<Thread> mutator;
+    transient final AtomicReference<Thread> mutator;
     final Object[] nodes;
 
     private BitmapIndexedMapNode(final AtomicReference<Thread> mutator, final int nodeMap,

@@ -18,7 +18,9 @@ import io.usethesource.capsule.Set;
 import io.usethesource.capsule.SetMultimap;
 
 public class PersistentBidirectionalTrieSetMultimap<K, V> implements
-    BinaryRelation.Immutable<K, V> {
+    BinaryRelation.Immutable<K, V>, java.io.Serializable {
+
+  private static final long serialVersionUID = 42L;
 
   private final SetMultimap.Immutable<K, V> fwd;
   private final SetMultimap.Immutable<V, K> bwd;
