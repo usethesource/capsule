@@ -18,6 +18,9 @@ public interface BinaryRelation<T, U> extends SetMultimap<T, U> {
   interface Immutable<K, V> extends BinaryRelation<K, V>, SetMultimap.Immutable<K, V> {
 
     @Override
+    BinaryRelation.Immutable<V, K> inverse();
+
+    @Override
     boolean isTransientSupported();
 
     @Override
@@ -97,6 +100,9 @@ public interface BinaryRelation<T, U> extends SetMultimap<T, U> {
   }
 
   interface Transient<K, V> extends BinaryRelation<K, V>, SetMultimap.Transient<K, V> {
+
+    @Override
+    BinaryRelation.Transient<V, K> inverse();
 
     @Override
     BinaryRelation.Immutable<K, V> freeze();

@@ -69,7 +69,7 @@ public class PersistentBidirectionalTrieSetMultimap<K, V> implements
   }
 
   @Override
-  public BinaryRelation<V, K> inverse() {
+  public BinaryRelation.Immutable<V, K> inverse() {
     return new PersistentBidirectionalTrieSetMultimap<>(bwd, fwd);
   }
 
@@ -230,7 +230,7 @@ class TransientBidirectionalTrieSetMultimap<K, V> implements BinaryRelation.Tran
   }
 
   @Override
-  public BinaryRelation<V, K> inverse() {
+  public BinaryRelation.Transient<V, K> inverse() {
     return new TransientBidirectionalTrieSetMultimap<>(bwd, fwd);
   }
 
