@@ -117,8 +117,16 @@ public interface SetMultimap<K, V> {
 
     SetMultimap.Immutable<K, V> __insert(final K key, final V value);
 
+//    SetMultimap.Immutable<K, V> __insert(final K key, final Set.Immutable<V> values);
+
     default SetMultimap.Immutable<K, V> __insert(final K key, final Set.Immutable<V> values) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
+    }
+
+    default SetMultimap.Immutable<K, V> __insert(final Set.Immutable<K> keys, final V value) {
+      final SetMultimap.Transient<K, V> tmp = this.asTransient();
+      keys.forEach(key -> tmp.__insert(key, value));
+      return tmp.freeze();
     }
 
     // removes all mappings with 'key'

@@ -88,11 +88,11 @@ public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R ext
     return hash;
   }
 
-  protected int hashCode(R rootNode) {
+  protected static <K, V, C extends Iterable<V>, R extends MultimapNode<K, V, C, R>> int hashCode(
+      R rootNode) {
     int hash = 0;
 
-    final Iterator<Entry<K, V>> it = new SetMultimapTupleIterator<K, V, C, R, Entry<K, V>>(
-        rootNode,
+    final Iterator<Entry<K, V>> it = new SetMultimapTupleIterator<>(rootNode,
         AbstractSpecialisedImmutableMap::entryOf);
 
     while (it.hasNext()) {
@@ -106,7 +106,8 @@ public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R ext
     return hash;
   }
 
-  protected int size(R rootNode) {
+  protected static <K, V, C extends Iterable<V>, R extends MultimapNode<K, V, C, R>> int size(
+      R rootNode) {
     int size = 0;
 
     final Iterator<Entry<K, V>> it = new SetMultimapTupleIterator<>(rootNode,
@@ -120,7 +121,8 @@ public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R ext
     return size;
   }
 
-  private int keySetHashCode(R rootNode) {
+  protected static <K, V, C extends Iterable<V>, R extends MultimapNode<K, V, C, R>> int keySetHashCode(
+      R rootNode) {
     int hash = 0;
 
     final Iterator<K> it = new SetMultimapKeyIterator<>(rootNode);
@@ -133,7 +135,8 @@ public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R ext
     return hash;
   }
 
-  private int keySetSize(R rootNode) {
+  protected static <K, V, C extends Iterable<V>, R extends MultimapNode<K, V, C, R>> int keySetSize(
+      R rootNode) {
     int size = 0;
 
     final Iterator<K> it = new SetMultimapKeyIterator<>(rootNode);
@@ -475,7 +478,7 @@ public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R ext
 
         try {
           final K key = (K) entry.getKey();
-          final V value = (V) entry.getKey();
+          final V value = (V) entry.getValue();
 
           boolean containsTuple =
               getRootNode().containsTuple(key, value, transformHashCode(key.hashCode()), 0, cmp);

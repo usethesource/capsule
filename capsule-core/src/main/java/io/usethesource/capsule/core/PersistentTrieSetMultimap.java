@@ -59,7 +59,10 @@ import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutab
  * Persistent trie-based set multi-map implementing the HCHAMP encoding.
  */
 public class PersistentTrieSetMultimap<K, V> extends
-    AbstractPersistentTrieSetMultimap<K, V, io.usethesource.capsule.Set.Immutable<V>, AbstractSetMultimapNode<K, V>> {
+    AbstractPersistentTrieSetMultimap<K, V, io.usethesource.capsule.Set.Immutable<V>, AbstractSetMultimapNode<K, V>>
+    implements java.io.Serializable {
+
+  private static final long serialVersionUID = 42L;
 
   private static final PersistentTrieSetMultimap EMPTY_SETMULTIMAP = new PersistentTrieSetMultimap(
       EqualityComparator.EQUALS, CompactSetMultimapNode.EMPTY_NODE, 0, 0, 0);
@@ -204,7 +207,10 @@ public class PersistentTrieSetMultimap<K, V> extends
   }
 
   protected static abstract class AbstractSetMultimapNode<K, V> implements
-      MultimapNode<K, V, io.usethesource.capsule.Set.Immutable<V>, AbstractSetMultimapNode<K, V>> {
+      MultimapNode<K, V, io.usethesource.capsule.Set.Immutable<V>, AbstractSetMultimapNode<K, V>>,
+      java.io.Serializable {
+
+    private static final long serialVersionUID = 42L;
 
     static final int TUPLE_LENGTH = 2;
 
@@ -1531,7 +1537,7 @@ public class PersistentTrieSetMultimap<K, V> extends
   private static final class BitmapIndexedSetMultimapNode<K, V>
       extends CompactMixedSetMultimapNode<K, V> {
 
-    final AtomicReference<Thread> mutator;
+    transient final AtomicReference<Thread> mutator;
     final Object[] nodes;
 
     private BitmapIndexedSetMultimapNode(final AtomicReference<Thread> mutator, final int rawMap1,

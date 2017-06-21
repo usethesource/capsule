@@ -39,7 +39,9 @@ import static io.usethesource.capsule.core.trie.SetNode.Preference.RIGHT;
 import static io.usethesource.capsule.core.trie.SetNode.TRACK_DELTA_OF_META_DATA_PER_COLLECTION;
 import static io.usethesource.capsule.util.BitmapUtils.isBitInBitmap;
 
-public class PersistentTrieSet<K> implements Set.Immutable<K> {
+public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializable {
+
+  private static final long serialVersionUID = 42L;
 
   private static final PersistentTrieSet EMPTY_SET = new PersistentTrieSet(
       CompactSetNode.EMPTY_NODE, 0, 0);
@@ -850,8 +852,10 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
    * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
    * `protected` when experiments are finished.
    */
-  public /* protected */ static abstract class AbstractSetNode<K> implements
-      SetNode<K, AbstractSetNode<K>>, Iterable<K> {
+  public /* protected */ static abstract class AbstractSetNode<K> implements SetNode<K, AbstractSetNode<K>>, Iterable<K>,
+      java.io.Serializable {
+
+    private static final long serialVersionUID = 42L;
 
     static final int TUPLE_LENGTH = 1;
 
@@ -1615,7 +1619,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K> {
 
   private static final class BitmapIndexedSetNode<K> extends CompactMixedSetNode<K> {
 
-    final AtomicReference<Thread> mutator;
+    transient final AtomicReference<Thread> mutator;
     final Object[] nodes;
 
     int cachedHashCode;

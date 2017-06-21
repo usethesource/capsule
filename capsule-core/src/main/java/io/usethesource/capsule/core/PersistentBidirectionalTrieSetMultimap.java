@@ -18,7 +18,9 @@ import io.usethesource.capsule.Set;
 import io.usethesource.capsule.SetMultimap;
 
 public class PersistentBidirectionalTrieSetMultimap<K, V> implements
-    BinaryRelation.Immutable<K, V> {
+    BinaryRelation.Immutable<K, V>, java.io.Serializable {
+
+  private static final long serialVersionUID = 42L;
 
   private final SetMultimap.Immutable<K, V> fwd;
   private final SetMultimap.Immutable<V, K> bwd;
@@ -57,8 +59,17 @@ public class PersistentBidirectionalTrieSetMultimap<K, V> implements
         bwdMerger.apply(value, key));
   }
 
+  private static <K, V> BinaryRelation.Immutable<K, V> batchWireTuple(K key,
+      Set.Immutable<V> values,
+      final BiFunction<K, Set.Immutable<V>, ? extends SetMultimap.Immutable<K, V>> fwdMerger,
+      final BiFunction<Set.Immutable<V>, K, ? extends SetMultimap.Immutable<V, K>> bwdMerger) {
+
+    return new PersistentBidirectionalTrieSetMultimap(fwdMerger.apply(key, values),
+        bwdMerger.apply(values, key));
+  }
+
   @Override
-  public BinaryRelation<V, K> inverse() {
+  public BinaryRelation.Immutable<V, K> inverse() {
     return new PersistentBidirectionalTrieSetMultimap<>(bwd, fwd);
   }
 
@@ -160,6 +171,14 @@ public class PersistentBidirectionalTrieSetMultimap<K, V> implements
     return wireTuple(key, value, fwd::__insert, bwd::__insert);
   }
 
+  /*
+   * NOTE: transient counterpart not yet implemented
+   */
+  @Override
+  public SetMultimap.Immutable<K, V> __insert(K key, Set.Immutable<V> values) {
+    return batchWireTuple(key, values, fwd::__insert, bwd::__insert);
+  }
+
   @Override
   public SetMultimap.Immutable<K, V> __remove(K key, V value) {
     return wireTuple(key, value, fwd::__remove, bwd::__remove);
@@ -211,7 +230,7 @@ class TransientBidirectionalTrieSetMultimap<K, V> implements BinaryRelation.Tran
   }
 
   @Override
-  public BinaryRelation<V, K> inverse() {
+  public BinaryRelation.Transient<V, K> inverse() {
     return new TransientBidirectionalTrieSetMultimap<>(bwd, fwd);
   }
 
