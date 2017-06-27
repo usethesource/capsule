@@ -68,22 +68,22 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
 //  }
 
   @Override
-  final R getRootNode() {
+  protected final R getRootNode() {
     return rootNode;
   }
 
   @Override
-  final int getCachedSize() {
+  protected final int getCachedSize() {
     return cachedSize;
   }
 
   @Override
-  final int getCachedKeySetHashCode() {
+  protected final int getCachedKeySetHashCode() {
     return cachedKeySetHashCode;
   }
 
   @Override
-  final int getCachedKeySetSize() {
+  protected final int getCachedKeySetSize() {
     return cachedKeySetSize;
   }
 

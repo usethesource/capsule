@@ -298,36 +298,6 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> extends
     return new TransientTrieSetMultimap<K, V>(this);
   }
 
-  /*
- * For analysis purposes only.
- */
-  protected AbstractSetMultimapNode<K, V> getRootNode() {
-    return rootNode;
-  }
-
-  /*
- * For analysis purposes only.
- */
-  @Override
-  protected Iterator<AbstractSetMultimapNode<K, V>> nodeIterator() {
-    return new TrieSetMultimap_BleedingEdgeNodeIterator<>(rootNode);
-  }
-
-  /*
- * For analysis purposes only.
- */
-  @Override
-  protected int getNodeCount() {
-    final Iterator<AbstractSetMultimapNode<K, V>> it = nodeIterator();
-    int sumNodes = 0;
-
-    for (; it.hasNext(); it.next()) {
-      sumNodes += 1;
-    }
-
-    return sumNodes;
-  }
-
 // /*
 // * For analysis purposes only. Payload X Node
 // */
@@ -419,35 +389,6 @@ public class TrieSetMultimap_HHAMT_Interlinked<K, V> extends
       assert mustUnbox(valuesNode);
       return valuesNode.findFirst().get();
     }
-
-    @Override
-    public abstract AbstractSetMultimapNode<K, V> insertedSingle(
-        final AtomicReference<Thread> mutator,
-        final K key, final V value, final int keyHash, final int shift,
-        final MultimapResult<K, V, AbstractSetNode<V>> details, EqualityComparator<Object> cmp);
-
-    @Override
-    public abstract AbstractSetMultimapNode<K, V> updatedSingle(
-        final AtomicReference<Thread> mutator,
-        final K key, final V value, final int keyHash, final int shift,
-        final MultimapResult<K, V, AbstractSetNode<V>> details, EqualityComparator<Object> cmp);
-
-    @Override
-    public abstract AbstractSetMultimapNode<K, V> updatedMultiple(
-        final AtomicReference<Thread> mutator,
-        final K key, final AbstractSetNode<V> values, final int keyHash, final int shift,
-        final MultimapResult<K, V, AbstractSetNode<V>> details, EqualityComparator<Object> cmp);
-
-    @Override
-    public abstract AbstractSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator,
-        final K key, final V value, final int keyHash, final int shift,
-        final MultimapResult<K, V, AbstractSetNode<V>> details, EqualityComparator<Object> cmp);
-
-    @Override
-    public abstract AbstractSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator,
-        final K key, final int keyHash, final int shift,
-        final MultimapResult<K, V, AbstractSetNode<V>> details,
-        EqualityComparator<Object> cmp);
 
     static final boolean isAllowedToEdit(AtomicReference<?> x, AtomicReference<?> y) {
       return x != null && y != null && (x == y || x.get() == y.get());
