@@ -47,10 +47,12 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
     this.cachedSize = trieSetMultimap.cachedSize;
     this.cachedKeySetHashCode = trieSetMultimap.cachedKeySetHashCode;
     this.cachedKeySetSize = trieSetMultimap.cachedKeySetSize;
-//    if (DEBUG) {
-//      // assert checkHashCodeAndSize(cachedHashCode, cachedSize, entryIterator());
-//      assert checkKeySetHashCodeAndSize(cachedKeySetHashCode, cachedKeySetSize, keyIterator());
-//    }
+
+    if (DEBUG) {
+      assert cachedSize == size(rootNode);
+      assert cachedKeySetHashCode == keySetHashCode(rootNode);
+      assert cachedKeySetSize == keySetSize(rootNode);
+    }
   }
 
   @Override

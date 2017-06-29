@@ -117,10 +117,11 @@ public interface SetMultimap<K, V> {
 
     SetMultimap.Immutable<K, V> __insert(final K key, final V value);
 
-//    SetMultimap.Immutable<K, V> __insert(final K key, final Set.Immutable<V> values);
-
+    // SetMultimap.Immutable<K, V> __insert(final K key, final Set.Immutable<V> values);
     default SetMultimap.Immutable<K, V> __insert(final K key, final Set.Immutable<V> values) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
+      final SetMultimap.Transient<K, V> builder = this.asTransient();
+      values.forEach(value -> builder.__insert(key, value));
+      return builder.freeze();
     }
 
     default SetMultimap.Immutable<K, V> __insert(final Set.Immutable<K> keys, final V value) {

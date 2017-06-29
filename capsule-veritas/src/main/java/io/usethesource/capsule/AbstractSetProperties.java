@@ -28,6 +28,7 @@ import static org.junit.Assert.assertTrue;
 public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 
   private final int DEFAULT_TRIALS = 1_000;
+  private final int MORE_TRIALS = 10_000;
   private final int MAX_SIZE = 1_000;
   private final Class<?> type;
 
@@ -208,6 +209,25 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
   }
 
   @Property(trials = DEFAULT_TRIALS)
+  public void intersectIdentityMostlyReference(
+      @Size(min = 0, max = MAX_SIZE) final CT input, T key) {
+
+    final CT inputCopy;
+
+    if (input.contains(key)) {
+      inputCopy = (CT) input.__remove(key).__insert(key);
+    } else {
+      inputCopy = (CT) input.__insert(key).__remove(key);
+    }
+
+    CT intersectionL = (CT) input.intersect(inputCopy);
+    CT intersectionR = (CT) inputCopy.intersect(input);
+
+    assertEquals(input, intersectionL);
+    assertEquals(input, intersectionR);
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
   public void unionIdentityReference(@Size(min = 0, max = 0) final CT emptySet,
       @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
     assertEquals("union reference equal", inputShared, inputShared.union(inputShared));
@@ -316,7 +336,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     assertTrue(subtractedWithShared.stream().allMatch(oneWithoutShared::contains));
     assertTrue(subtractedWithShared.stream().noneMatch(twoWithoutShared::contains));
   }
-  
+
   @Property(trials = DEFAULT_TRIALS)
   public void subtractMaintainsSizeAndHashCode(
       @Size(min = 0, max = MAX_SIZE) final CT inputOne,

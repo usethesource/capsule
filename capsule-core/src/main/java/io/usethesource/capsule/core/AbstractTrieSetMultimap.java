@@ -149,38 +149,6 @@ public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R ext
     return size;
   }
 
-  private static final <K, V> boolean checkHashCodeAndSize(final int targetHash,
-      final int targetSize, final Iterator<java.util.Map.Entry<K, V>> iterator) {
-    int hash = 0;
-    int size = 0;
-
-    while (iterator.hasNext()) {
-      final java.util.Map.Entry<K, V> entry = iterator.next();
-      final K key = entry.getKey();
-      final V val = entry.getValue();
-
-      hash += key.hashCode() ^ val.hashCode();
-      size += 1;
-    }
-
-    return hash == targetHash && size == targetSize;
-  }
-
-  private static final <K> boolean checkKeySetHashCodeAndSize(final int targetHash,
-      final int targetSize, final Iterator<K> iterator) {
-    int hash = 0;
-    int size = 0;
-
-    while (iterator.hasNext()) {
-      final K key = iterator.next();
-
-      hash += key.hashCode();
-      size += 1;
-    }
-
-    return hash == targetHash && size == targetSize;
-  }
-
   /*
    * For analysis purposes only.
    */

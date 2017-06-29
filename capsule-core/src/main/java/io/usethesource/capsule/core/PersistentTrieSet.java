@@ -515,6 +515,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         return Set.Immutable.of();
       }
 
+      // assert details.getAccumulatedSize() == size(newRootNode);
+      // assert details.getAccumulatedHashCode() == hashCode(newRootNode);
       return new PersistentTrieSet(newRootNode,
           details.getAccumulatedHashCode(),
           details.getAccumulatedSize());
@@ -523,6 +525,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         return Set.Immutable.of();
       }
 
+      // assert newRootNode.size() == size(newRootNode);
+      // assert newRootNode.recursivePayloadHashCode() == hashCode(newRootNode);
       return new PersistentTrieSet(newRootNode,
           newRootNode.recursivePayloadHashCode(),
           newRootNode.size());
@@ -852,7 +856,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
    * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
    * `protected` when experiments are finished.
    */
-  public /* protected */ static abstract class AbstractSetNode<K> implements SetNode<K, AbstractSetNode<K>>, Iterable<K>,
+  public /* protected */ static abstract class AbstractSetNode<K> implements
+      SetNode<K, AbstractSetNode<K>>, Iterable<K>,
       java.io.Serializable {
 
     private static final long serialVersionUID = 42L;
@@ -2397,6 +2402,15 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       final CompactSetNode<K> node1 = (CompactSetNode<K>) that;
 
       if (node0 == node1) {
+        if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+          final int remainingSize = node0.size();
+          final int remainingHashCode = node0.recursivePayloadHashCode();
+
+          // delta @ collection
+          details.addSize(remainingSize);
+          details.addHashCode(remainingHashCode);
+        }
+
         return node0;
       }
 

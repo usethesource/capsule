@@ -18,7 +18,6 @@ import java.util.stream.StreamSupport;
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.generator.Size;
 import io.usethesource.capsule.core.PersistentTrieSet;
-import org.junit.Ignore;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -197,12 +196,42 @@ public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap
   }
 
   // TODO: interlinked does not work yet with Set.Immutable<V>
-  @Ignore(value = "Temporary ignoring until __insert(key, values) is mandatory to implement.")
   @Property(trials = DEFAULT_TRIALS)
   public void sizeAfterInsertKeyValues(CT input, K key, PersistentTrieSet<V> values) {
     int sizeDelta = values.__insertAll(input.get(key)).__removeAll(input.get(key)).size();
 
     CT updatedInput = (CT) input.__insert(key, values);
+    assertEquals(sizeDelta, updatedInput.size() - input.size());
+
+    // invoke other properties
+    convertToJavaSetAndCheckSize(updatedInput);
+  }
+
+  /*
+   * NOTE: tests transient insertion and variations of operations
+   * TODO: make explicit sets of transient tests and tests for chained operations
+   */
+  @Property(trials = DEFAULT_TRIALS)
+  public void sizeAfterTransientInsertKeyValues(CT input, K key, PersistentTrieSet<V> values) {
+    int sizeDelta = values.__insertAll(input.get(key)).__removeAll(input.get(key)).size();
+
+    SetMultimap.Transient<K, V> builder = input.asTransient();
+    builder.__remove(key);
+    builder.__put(key, values);
+
+    builder.__remove(key);
+    builder.__insert(key, values);
+
+    builder.__remove(key);
+    builder.__put(key, values);
+    builder.__insert(key, values);
+
+    builder.__remove(key);
+    builder.__insert(key, values);
+    builder.__put(key, values);
+
+    SetMultimap.Immutable<K, V> updatedInput = builder.freeze();
+
     assertEquals(sizeDelta, updatedInput.size() - input.size());
 
     // invoke other properties
