@@ -230,7 +230,7 @@ public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap
     builder.__insert(key, values);
     builder.__put(key, values);
 
-    SetMultimap.Immutable<K, V> updatedInput = builder.freeze();
+    CT updatedInput = (CT) builder.freeze();
 
     assertEquals(sizeDelta, updatedInput.size() - input.size());
 
