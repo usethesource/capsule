@@ -2,7 +2,7 @@
 
 Capsule aims to become a full-fledged (immutable) collections library for Java 8+ (with backport to Java 7) that is solely built around persistent tries.
 
-Capsule was recently extracted from the [usethesource/vallang](https://github.com/usethesource/vallang) project and still has to undergo some incubation before it can ship as a well-rounded collection library. Nevertheless, the code is stable and performance is already solid. Feel free to use it and let us about your experiences!
+Capsule was recently extracted from the [usethesource/vallang](https://github.com/usethesource/vallang) project and still has to undergo some incubation before it can ship as a well-rounded collection library. Nevertheless, the code is stable and performance is already solid. Feel free to use it and let us know about your experiences!
 
 More extensive tests and performance benchmarks will be added soon. The preliminary API for the immutable interfaces will be reworked as soon as possible as well.
 
