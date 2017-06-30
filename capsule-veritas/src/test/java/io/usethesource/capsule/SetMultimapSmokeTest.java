@@ -9,61 +9,77 @@ package io.usethesource.capsule;
 
 import java.util.Collection;
 
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized_Path_Interlinked;
-import org.junit.Test;
+import com.pholser.junit.quickcheck.Property;
+import com.pholser.junit.quickcheck.generator.Size;
+import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
+import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-public class SetMultimapSmokeTest {
+@RunWith(JUnitQuickcheck.class)
+public class SetMultimapSmokeTest<K, V, CT extends SetMultimap.Immutable<K, V>> {
 
-  final static int size = 64;
+  @Property
+  public void testInsertTwoTuplesThatShareSameKey(
+      @Size(min = 0, max = 0) final SetMultimap.Immutable<Integer, String> emptyCollection) {
 
-  @Test
-  public void testInsertTwoTuplesThatShareSameKey() {
-    SetMultimap.Immutable<Integer, String> map =
-        TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.<Integer, String>of().__insert(1, "x")
-            .__insert(1, "y");
+    SetMultimap.Immutable<Integer, String> map = emptyCollection
+        .__insert(1, "x")
+        .__insert(1, "y");
 
     assertEquals(2, map.size());
     assertTrue(map.containsKey(1));
   }
 
-  @Test
-  public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyX() {
-    SetMultimap.Immutable<Integer, String> map = TrieSetMultimap_HHAMT_Specialized_Path_Interlinked
-        .<Integer, String>of().__insert(1, "x").__insert(1, "y").__remove(1, "x");
+  @Property
+  public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyX(
+      @Size(min = 0, max = 0) final SetMultimap.Immutable<Integer, String> emptyCollection) {
+
+    SetMultimap.Immutable<Integer, String> map = emptyCollection
+        .__insert(1, "x")
+        .__insert(1, "y")
+        .__remove(1, "x");
 
     assertEquals(1, map.size());
     assertTrue(map.containsKey(1));
   }
 
-  @Test
-  public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyY() {
-    SetMultimap.Immutable<Integer, String> map = TrieSetMultimap_HHAMT_Specialized_Path_Interlinked
-        .<Integer, String>of().__insert(1, "x").__insert(1, "y").__remove(1, "y");
+  @Property
+  public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyY(
+      @Size(min = 0, max = 0) final SetMultimap.Immutable<Integer, String> emptyCollection) {
+
+    SetMultimap.Immutable<Integer, String> map = emptyCollection
+        .__insert(1, "x")
+        .__insert(1, "y")
+        .__remove(1, "y");
 
     assertEquals(1, map.size());
     assertTrue(map.containsKey(1));
   }
 
-  @Test
-  public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyXY() {
-    SetMultimap.Immutable<Integer, String> map =
-        TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.<Integer, String>of().__insert(1, "x")
-            .__insert(1, "y")
-            .__remove(1, "x").__remove(1, "y");
+  @Property
+  public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyXY(
+      @Size(min = 0, max = 0) final SetMultimap.Immutable<Integer, String> emptyCollection) {
+
+    SetMultimap.Immutable<Integer, String> map = emptyCollection
+        .__insert(1, "x")
+        .__insert(1, "y")
+        .__remove(1, "x").__remove(1, "y");
 
     assertEquals(0, map.size());
     assertFalse(map.containsKey(1));
   }
 
-  @Test
-  public void testInsertTwoTuplesThatShareSameKey_Iterate() {
-    SetMultimap.Immutable<Integer, String> map =
-        TrieSetMultimap_HHAMT_Specialized_Path_Interlinked.<Integer, String>of().__insert(1, "x")
-            .__insert(1, "y");
+  @Property
+  public void testInsertTwoTuplesThatShareSameKey_Iterate(
+      @Size(min = 0, max = 0) final SetMultimap.Immutable<Integer, String> emptyCollection) {
+
+    SetMultimap.Immutable<Integer, String> map = emptyCollection
+        .__insert(1, "x")
+        .__insert(1, "y");
 
     Collection<String> values = map.values();
 
@@ -72,4 +88,47 @@ public class SetMultimapSmokeTest {
     assertTrue(values.contains("y"));
   }
 
+  @Property
+  public void testHashCollisionReproduction(
+      @Size(min = 0, max = 0) final SetMultimap.Immutable<Object, String> emptyCollection) {
+
+    Object a = new Object() {
+      public int hashCode() {
+        return 0;
+      }
+    };
+
+    Object b = new Object() {
+      public int hashCode() {
+        return 0;
+      }
+    };
+
+    Object c = new Object() {
+      public int hashCode() {
+        return 0;
+      }
+    };
+
+    final SetMultimap.Immutable<Object, String> map =
+        emptyCollection.__insert(a, "x").__insert(b, "y");
+
+    final SetMultimap.Immutable<Object, String> mapDuplicate =
+        emptyCollection.__insert(a, "x").__insert(b, "y");
+
+    final SetMultimap.Immutable<Object, String> mapDuplicateWithDifferentOrder =
+        emptyCollection.__insert(b, "y").__insert(a, "x");
+
+    final SetMultimap.Immutable<Object, String> mapDifferent =
+        emptyCollection.__insert(a, "x").__insert(c, "z");
+
+    assertEquals(map, mapDuplicate);
+    assertEquals(map, mapDuplicateWithDifferentOrder);
+
+    assertEquals(mapDuplicate, map);
+    assertEquals(mapDuplicateWithDifferentOrder, map);
+
+    assertNotEquals(map, mapDifferent);
+    assertNotEquals(mapDifferent, map);
+  }
 }

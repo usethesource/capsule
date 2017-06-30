@@ -2316,6 +2316,34 @@ public class PersistentTrieSetMultimap<K, V> extends
     // }
 
     @Override
+    public boolean equals(final Object other) {
+      if (null == other) {
+        return false;
+      }
+      if (this == other) {
+        return true;
+      }
+      if (getClass() != other.getClass()) {
+        return false;
+      }
+
+      HashCollisionNode<?, ?> that = (HashCollisionNode<?, ?>) other;
+
+      if (hash != that.hash) {
+        return false;
+      }
+
+      if (collisionContent.size() != that.collisionContent.size()) {
+        return false;
+      }
+
+      /*
+       * Linear scan for each payload entry due to arbitrary element order.
+       */
+      return collisionContent.stream().allMatch(that.collisionContent::contains);
+    }
+
+    @Override
     public byte sizePredicate() {
       return SIZE_MORE_THAN_ONE;
     }
