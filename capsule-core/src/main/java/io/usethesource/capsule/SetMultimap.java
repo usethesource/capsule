@@ -149,7 +149,13 @@ public interface SetMultimap<K, V> {
 
     default SetMultimap.Immutable<K, V> complement(
         final SetMultimap<? extends K, ? extends V> setMultimap) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
+      final SetMultimap.Transient<K, V> builder = SetMultimap.Transient.of();
+
+      setMultimap.entrySet().stream()
+          .filter(entry -> !this.containsEntry(entry.getKey(), entry.getValue()))
+          .forEach(entry -> builder.__insert(entry.getKey(), entry.getValue()));
+
+      return builder.freeze();
     }
 
     /*

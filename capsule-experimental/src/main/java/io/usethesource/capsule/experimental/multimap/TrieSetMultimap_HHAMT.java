@@ -7,11 +7,8 @@
  */
 package io.usethesource.capsule.experimental.multimap;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Deque;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
@@ -318,7 +315,7 @@ public class TrieSetMultimap_HHAMT<K, V>
               final MultimapResult mmUpdate = MultimapResult.unchanged();
 
               // NOTE: updated dispatches between updatedSingle and updatedMultiple
-              newRootNode = newRootNode.inserted(mutator, key, intersectedResults, keyHash, 0,
+              newRootNode = newRootNode.updated(mutator, key, intersectedResults, keyHash, 0,
                   mmUpdate, EqualityComparator.EQUALS);
               if (mmUpdate.getModificationEffect() != Modification.NOTHING) {
                 // newHashCode += tupleHash(keyHash, intersectedResults);
@@ -383,46 +380,23 @@ public class TrieSetMultimap_HHAMT<K, V>
   }
 
   @Override
-  public Iterator<K> keyIterator() {
-    // return new SetMultimapKeyIterator<>(rootNode);
-    return new SetMultimapKeyIteratorSlotHistogram<>(rootNode);
-  }
-
-  @Override
   public Iterator<V> valueIterator() {
-    return valueCollectionsStream().flatMap(Set::stream).iterator();
+    return super.valueIterator(io.usethesource.capsule.Set.Immutable::of);
   }
 
-  @Override
-  public Iterator<Map.Entry<K, V>> entryIterator() {
-    // return new SetMultimapTupleIterator<>(rootNode, AbstractSpecialisedImmutableMap::entryOf);
-    return new SetMultimapFlattenedTupleIteratorSlotHistogram<>(rootNode);
-  }
-
-  @Override
-  public Iterator<Map.Entry<K, Object>> nativeEntryIterator() {
-    // return new SetMultimapNativeTupleIterator<>(rootNode);
-    return new SetMultimapNativeTupleIteratorSlotHistogram<>(rootNode);
-  }
-
-  @Override
-  public <T> Iterator<T> tupleIterator(final BiFunction<K, V, T> tupleOf) {
-    return new SetMultimapTupleIterator<>(rootNode, tupleOf);
-  }
-
-  private Spliterator<io.usethesource.capsule.Set.Immutable<V>> valueCollectionsSpliterator() {
-    /*
-     * TODO: specialize between mutable / SetMultimap.Immutable<K, V> ({@see Spliterator.IMMUTABLE})
-     */
-    int characteristics = Spliterator.NONNULL | Spliterator.SIZED | Spliterator.SUBSIZED;
-    return Spliterators.spliterator(new SetMultimapValueIterator<>(rootNode), size(),
-        characteristics);
-  }
-
-  private Stream<io.usethesource.capsule.Set.Immutable<V>> valueCollectionsStream() {
-    boolean isParallel = false;
-    return StreamSupport.stream(valueCollectionsSpliterator(), isParallel);
-  }
+//  private Spliterator<io.usethesource.capsule.Set.Immutable<V>> valueCollectionsSpliterator() {
+//    /*
+//     * TODO: specialize between mutable / SetMultimap.Immutable<K, V> ({@see Spliterator.IMMUTABLE})
+//     */
+//    int characteristics = Spliterator.NONNULL | Spliterator.SIZED | Spliterator.SUBSIZED;
+//    return Spliterators.spliterator(new SetMultimapValueIterator<>(rootNode), size(),
+//        characteristics);
+//  }
+//
+//  private Stream<io.usethesource.capsule.Set.Immutable<V>> valueCollectionsStream() {
+//    boolean isParallel = false;
+//    return StreamSupport.stream(valueCollectionsSpliterator(), isParallel);
+//  }
 
   @Override
   public boolean isTransientSupported() {
@@ -2868,555 +2842,555 @@ public class TrieSetMultimap_HHAMT<K, V>
     }
   }
 
-  /**
-   * Iterator skeleton that uses a fixed stack in depth.
-   */
-  private static abstract class AbstractSetMultimapIteratorSlotHistogram<K, V> {
-
-    private static final int MAX_DEPTH = 7;
-    private static final int START_CATEGORY = PATTERN_DATA_SINGLETON;
-
-    protected AbstractSetMultimapNode<K, V> payloadNode;
-    protected int payloadCategoryCursor;
-
-    protected int payloadCategoryOffset;
-    protected int payloadCategoryOffsetEnd;
-
-    protected int payloadTotalOffsetEnd;
-
-    private int stackLevel = -1;
-    private final int[] stackOfOffsetsAndOutOfBounds = new int[MAX_DEPTH * 2];
-    private final AbstractSetMultimapNode<K, V>[] stackOfNodes =
-        new AbstractSetMultimapNode[MAX_DEPTH];
-
-    AbstractSetMultimapNode<K, V> topOfStackNode;
-    int nodeCursorAddress;
-    int nodeLengthAddress;
-
-    AbstractSetMultimapIteratorSlotHistogram(AbstractSetMultimapNode<K, V> rootNode) {
-      final int offsetNodesEnd = rootNode.slotArity();
-      final int offsetNodes = offsetNodesEnd - rootNode.nodeArity();
-      final int offsetPayload = 0;
-
-      if (offsetNodes < offsetNodesEnd) {
-        pushNode(rootNode, offsetNodes, offsetNodesEnd);
-      }
-
-      if (offsetPayload < offsetNodes) {
-        setPayloadNode(rootNode, offsetPayload, offsetNodes);
-      }
-    }
-
-    private void pushNode(AbstractSetMultimapNode<K, V> node, int offsetStart, int offsetEnd) {
-      if (stackLevel >= 0) {
-        // save current cursor
-        stackOfOffsetsAndOutOfBounds[stackLevel * 2] = nodeCursorAddress;
-      }
-
-      final int nextStackLevel = ++stackLevel;
-      final int nextCursorIndex = nextStackLevel * 2;
-      final int nextLengthIndex = nextCursorIndex + 1;
-
-      stackOfNodes[nextStackLevel] = node;
-      stackOfOffsetsAndOutOfBounds[nextCursorIndex] = offsetStart;
-      stackOfOffsetsAndOutOfBounds[nextLengthIndex] = offsetEnd;
-
-      // load next cursor
-      topOfStackNode = node;
-      nodeCursorAddress = offsetStart;
-      nodeLengthAddress = offsetEnd;
-    }
-
-    private final void popNode() {
-      stackOfNodes[stackLevel--] = null;
-
-      if (stackLevel >= 0) {
-        // load prevous cursor
-        final int previousStackLevel = stackLevel;
-        final int previousCursorIndex = previousStackLevel * 2;
-        final int previousLengthIndex = previousCursorIndex + 1;
-
-        topOfStackNode = stackOfNodes[previousStackLevel];
-        nodeCursorAddress = stackOfOffsetsAndOutOfBounds[previousCursorIndex];
-        nodeLengthAddress = stackOfOffsetsAndOutOfBounds[previousLengthIndex];
-      }
-    }
-
-    private final AbstractSetMultimapNode<K, V> consumeNode() {
-      AbstractSetMultimapNode<K, V> nextNode =
-          (AbstractSetMultimapNode<K, V>) topOfStackNode.getSlot(nodeCursorAddress++);
-
-      if (nodeCursorAddress == nodeLengthAddress) {
-        popNode();
-      }
-
-      return nextNode;
-    }
-
-    private void setPayloadNode(final AbstractSetMultimapNode<K, V> node, int categoryOffsetStart,
-        int overallOffsetEnd) {
-      payloadNode = node;
-      payloadCategoryCursor = START_CATEGORY;
-
-      payloadCategoryOffset = categoryOffsetStart;
-      payloadCategoryOffsetEnd =
-          categoryOffsetStart + (node.arity(START_CATEGORY) * AbstractSetMultimapNode.TUPLE_LENGTH);
-
-      payloadTotalOffsetEnd = overallOffsetEnd;
-    }
-
-    protected boolean searchNextPayloadCategory() {
-      do {
-        payloadCategoryOffsetEnd +=
-            (payloadNode.arity(++payloadCategoryCursor) * AbstractSetMultimapNode.TUPLE_LENGTH);
-      } while (payloadCategoryOffset == payloadCategoryOffsetEnd);
-
-      return true;
-    }
-
-    /*
-     * search for next node that contains values
-     */
-    private boolean searchNextValueNode() {
-      boolean found = false;
-      while (!found && stackLevel >= 0) {
-        final AbstractSetMultimapNode<K, V> nextNode = consumeNode();
-
-        final int offsetNodesEnd = nextNode.slotArity();
-        final int offsetNodes = offsetNodesEnd - nextNode.nodeArity();
-        final int offsetPayload = 0;
-
-        if (offsetNodes < offsetNodesEnd) {
-          pushNode(nextNode, offsetNodes, offsetNodesEnd);
-        }
-
-        if (offsetPayload < offsetNodes) {
-          setPayloadNode(nextNode, offsetPayload, offsetNodes);
-          found = true;
-        }
-      }
-
-      return found;
-    }
-
-    protected boolean advanceToNext() {
-      return (payloadCategoryOffset < payloadTotalOffsetEnd && searchNextPayloadCategory())
-          || searchNextValueNode();
-    }
-
-    public boolean hasNext() {
-      return payloadCategoryOffset < payloadCategoryOffsetEnd || advanceToNext();
-    }
-
-    public void remove() {
-      throw new UnsupportedOperationException();
-    }
-  }
-
-  protected static class SetMultimapKeyIteratorSlotHistogram<K, V>
-      extends AbstractSetMultimapIteratorSlotHistogram<K, V> implements Iterator<K> {
-
-    SetMultimapKeyIteratorSlotHistogram(AbstractSetMultimapNode<K, V> rootNode) {
-      super(rootNode);
-    }
-
-    @Override
-    public K next() {
-      if (!hasNext()) {
-        throw new NoSuchElementException();
-      } else {
-        switch (payloadCategoryCursor) {
-          case PATTERN_DATA_SINGLETON:
-          case PATTERN_DATA_COLLECTION:
-            int nextSlot = payloadCategoryOffset;
-            payloadCategoryOffset = nextSlot + 2;
-
-            return (K) payloadNode.getSlot(nextSlot);
-          default:
-            throw new IllegalStateException();
-        }
-      }
-    }
-
-  }
-
-  protected static class SetMultimapNativeTupleIteratorSlotHistogram<K, V> extends
-      AbstractSetMultimapIteratorSlotHistogram<K, V> implements Iterator<Map.Entry<K, Object>> {
-
-    SetMultimapNativeTupleIteratorSlotHistogram(AbstractSetMultimapNode<K, V> rootNode) {
-      super(rootNode);
-    }
-
-    @Override
-    public Map.Entry<K, Object> next() {
-      if (!hasNext()) {
-        throw new NoSuchElementException();
-      } else {
-        switch (payloadCategoryCursor) {
-          case PATTERN_DATA_SINGLETON:
-          case PATTERN_DATA_COLLECTION:
-            int nextSlot = payloadCategoryOffset;
-
-            K nextKey = (K) payloadNode.getSlot(nextSlot++);
-            // nextSlot += 1;
-            Object nextVal = payloadNode.getSlot(nextSlot++);
-            // nextSlot += 1;
-
-            payloadCategoryOffset = nextSlot;
-
-            return entryOf(nextKey, nextVal);
-          default:
-            throw new IllegalStateException();
-        }
-      }
-    }
-
-  }
-
-  protected static class SetMultimapFlattenedTupleIteratorSlotHistogram<K, V>
-      extends AbstractSetMultimapIteratorSlotHistogram<K, V> implements Iterator<Map.Entry<K, V>> {
-
-    private K cachedKey = null;
-    private Iterator<V> cachedValueSetIterator = Collections.emptyIterator();
-
-    SetMultimapFlattenedTupleIteratorSlotHistogram(AbstractSetMultimapNode<K, V> rootNode) {
-      super(rootNode);
-    }
-
-    @Override
-    public boolean hasNext() {
-      return cachedValueSetIterator.hasNext() || super.hasNext();
-    }
-
-    @Override
-    public Map.Entry<K, V> next() {
-      if (!hasNext()) {
-        throw new NoSuchElementException();
-      }
-
-      switch (payloadCategoryCursor) {
-        case PATTERN_DATA_SINGLETON: {
-          int nextSlot = payloadCategoryOffset;
-
-          K nextKey = (K) payloadNode.getSlot(nextSlot++);
-          // nextSlot += 1;
-          V nextVal = (V) payloadNode.getSlot(nextSlot++);
-          // nextSlot += 1;
-
-          payloadCategoryOffset = nextSlot;
-
-          return entryOf(nextKey, nextVal);
-        }
-        case PATTERN_DATA_COLLECTION: {
-          if (cachedValueSetIterator.hasNext() == false) {
-            int nextSlot = payloadCategoryOffset;
-
-            K nextKey = (K) payloadNode.getSlot(nextSlot++);
-            // nextSlot += 1;
-            io.usethesource.capsule.Set.Immutable<V> nextValueSet = (io.usethesource.capsule.Set.Immutable<V>) payloadNode
-                .getSlot(nextSlot++);
-            // nextSlot += 1;
-
-            payloadCategoryOffset = nextSlot;
-
-            cachedKey = nextKey;
-            cachedValueSetIterator = nextValueSet.iterator();
-          }
-
-          return entryOf(cachedKey, cachedValueSetIterator.next());
-        }
-        default:
-          throw new IllegalStateException();
-      }
-    }
-  }
-
-  /**
-   * Iterator skeleton that uses a fixed stack in depth.
-   */
-  private static abstract class AbstractSetMultimapIterator<K, V> {
-
-    private static final int MAX_DEPTH = 7;
-
-    protected int currentValueSingletonCursor;
-    protected int currentValueSingletonLength;
-    protected int currentValueCollectionCursor;
-    protected int currentValueCollectionLength;
-    protected AbstractSetMultimapNode<K, V> currentValueNode;
-
-    private int currentStackLevel = -1;
-    private final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
-
-    AbstractSetMultimapNode<K, V>[] nodes = new AbstractSetMultimapNode[MAX_DEPTH];
-
-    AbstractSetMultimapIterator(AbstractSetMultimapNode<K, V> rootNode) {
-      int nodeArity = rootNode.nodeArity();
-      if (nodeArity != 0) {
-        currentStackLevel = 0;
-
-        nodes[0] = rootNode;
-        nodeCursorsAndLengths[0] = 0;
-        nodeCursorsAndLengths[1] = nodeArity;
-      }
-
-      int emptyArity = rootNode.emptyArity();
-      if (emptyArity + nodeArity < 32) {
-        currentValueNode = rootNode;
-        currentValueSingletonCursor = 0;
-        currentValueSingletonLength = rootNode.payloadArity(SINGLETON);
-        currentValueCollectionCursor = 0;
-        currentValueCollectionLength = rootNode.payloadArity(COLLECTION);
-      }
-    }
-
-    /*
-     * search for next node that contains values
-     */
-    private boolean searchNextValueNode() {
-      while (currentStackLevel >= 0) {
-        final int currentCursorIndex = currentStackLevel * 2;
-        final int currentLengthIndex = currentCursorIndex + 1;
-
-        final int nodeCursor = nodeCursorsAndLengths[currentCursorIndex];
-        final int nodeLength = nodeCursorsAndLengths[currentLengthIndex];
-
-        if (nodeCursor < nodeLength) {
-          final AbstractSetMultimapNode<K, V> nextNode =
-              nodes[currentStackLevel].getNode(nodeCursor);
-          nodeCursorsAndLengths[currentCursorIndex]++;
-
-          int nodeArity = nextNode.nodeArity();
-          if (nodeArity != 0) {
-            /*
-             * put node on next stack level for depth-first traversal
-             */
-            final int nextStackLevel = ++currentStackLevel;
-            final int nextCursorIndex = nextStackLevel * 2;
-            final int nextLengthIndex = nextCursorIndex + 1;
-
-            nodes[nextStackLevel] = nextNode;
-            nodeCursorsAndLengths[nextCursorIndex] = 0;
-            nodeCursorsAndLengths[nextLengthIndex] = nodeArity;
-          }
-
-          // int emptyArity = nextNode.emptyArity();
-          // if (emptyArity + nodeArity < 32) {
-          if (nextNode.hasPayload(SINGLETON) || nextNode.hasPayload(COLLECTION)) {
-            // if (payloadAritySingleton != 0 || payloadArityCollection != 0) {
-            /*
-             * found next node that contains values
-             */
-            currentValueNode = nextNode;
-            currentValueSingletonCursor = 0;
-            currentValueSingletonLength = nextNode.payloadArity(SINGLETON);
-            currentValueCollectionCursor = 0;
-            currentValueCollectionLength = nextNode.payloadArity(Type.COLLECTION);
-            return true;
-          }
-        } else {
-          currentStackLevel--;
-        }
-      }
-
-      return false;
-    }
-
-    public boolean hasNext() {
-      if (currentValueSingletonCursor < currentValueSingletonLength
-          || currentValueCollectionCursor < currentValueCollectionLength) {
-        return true;
-      } else {
-        return searchNextValueNode();
-      }
-    }
-
-    public void remove() {
-      throw new UnsupportedOperationException();
-    }
-  }
-
-  protected static class SetMultimapKeyIterator<K, V> extends AbstractSetMultimapIterator<K, V>
-      implements Iterator<K> {
-
-    SetMultimapKeyIterator(AbstractSetMultimapNode<K, V> rootNode) {
-      super(rootNode);
-    }
-
-    @Override
-    public K next() {
-      if (!hasNext()) {
-        throw new NoSuchElementException();
-      } else {
-        // TODO: check case distinction
-        if (currentValueSingletonCursor < currentValueSingletonLength) {
-          return currentValueNode.getSingletonKey(currentValueSingletonCursor++);
-        } else {
-          return currentValueNode.getCollectionKey(currentValueCollectionCursor++);
-        }
-      }
-    }
-
-  }
-
-  protected static class SetMultimapValueIterator<K, V> extends AbstractSetMultimapIterator<K, V>
-      implements Iterator<io.usethesource.capsule.Set.Immutable<V>> {
-
-    SetMultimapValueIterator(AbstractSetMultimapNode<K, V> rootNode) {
-      super(rootNode);
-    }
-
-    @Override
-    public io.usethesource.capsule.Set.Immutable<V> next() {
-      if (!hasNext()) {
-        throw new NoSuchElementException();
-      } else {
-        // TODO: check case distinction
-        if (currentValueSingletonCursor < currentValueSingletonLength) {
-          return setOf(currentValueNode.getSingletonValue(currentValueSingletonCursor++));
-        } else {
-          return currentValueNode.getCollectionValue(currentValueCollectionCursor++);
-        }
-      }
-    }
-
-  }
-
-  protected static class SetMultimapNativeTupleIterator<K, V>
-      extends AbstractSetMultimapIterator<K, V> implements Iterator<Map.Entry<K, Object>> {
-
-    SetMultimapNativeTupleIterator(AbstractSetMultimapNode<K, V> rootNode) {
-      super(rootNode);
-    }
-
-    @Override
-    public Map.Entry<K, Object> next() {
-      if (!hasNext()) {
-        throw new NoSuchElementException();
-      } else {
-        // TODO: check case distinction
-        if (currentValueSingletonCursor < currentValueSingletonLength) {
-          final K currentKey = currentValueNode.getSingletonKey(currentValueSingletonCursor);
-          final Object currentValue =
-              currentValueNode.getSingletonValue(currentValueSingletonCursor);
-          currentValueSingletonCursor++;
-
-          return AbstractSpecialisedImmutableMap.entryOf(currentKey, currentValue);
-        } else {
-          final K currentKey = currentValueNode.getCollectionKey(currentValueCollectionCursor);
-          final Object currentValue =
-              currentValueNode.getCollectionValue(currentValueCollectionCursor);
-          currentValueCollectionCursor++;
-
-          return AbstractSpecialisedImmutableMap.entryOf(currentKey, currentValue);
-        }
-      }
-    }
-
-  }
-
-  protected static class SetMultimapTupleIterator<K, V, T> extends AbstractSetMultimapIterator<K, V>
-      implements Iterator<T> {
-
-    final BiFunction<K, V, T> tupleOf;
-
-    K currentKey = null;
-    V currentValue = null;
-    Iterator<V> currentSetIterator = Collections.emptyIterator();
-
-    SetMultimapTupleIterator(AbstractSetMultimapNode<K, V> rootNode,
-        final BiFunction<K, V, T> tupleOf) {
-      super(rootNode);
-      this.tupleOf = tupleOf;
-    }
-
-    @Override
-    public boolean hasNext() {
-      if (currentSetIterator.hasNext()) {
-        return true;
-      } else {
-        if (super.hasNext()) {
-          // TODO: check case distinction
-          if (currentValueSingletonCursor < currentValueSingletonLength) {
-            currentKey = currentValueNode.getSingletonKey(currentValueSingletonCursor);
-            currentSetIterator = Collections
-                .singleton(currentValueNode.getSingletonValue(currentValueSingletonCursor))
-                .iterator();
-            currentValueSingletonCursor++;
-          } else {
-            currentKey = currentValueNode.getCollectionKey(currentValueCollectionCursor);
-            currentSetIterator =
-                currentValueNode.getCollectionValue(currentValueCollectionCursor).iterator();
-            currentValueCollectionCursor++;
-          }
-
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }
-
-    @Override
-    public T next() {
-      if (!hasNext()) {
-        throw new NoSuchElementException();
-      } else {
-        currentValue = currentSetIterator.next();
-        return tupleOf.apply(currentKey, currentValue);
-      }
-    }
-
-  }
-
-  /**
-   * Iterator that first iterates over inlined-values and then continues depth first recursively.
-   */
-  private static class TrieSetMultimap_BleedingEdgeNodeIterator<K, V>
-      implements Iterator<AbstractSetMultimapNode<K, V>> {
-
-    final Deque<Iterator<? extends AbstractSetMultimapNode<K, V>>> nodeIteratorStack;
-
-    TrieSetMultimap_BleedingEdgeNodeIterator(AbstractSetMultimapNode<K, V> rootNode) {
-      nodeIteratorStack = new ArrayDeque<>();
-      nodeIteratorStack.push(Collections.singleton(rootNode).iterator());
-    }
-
-    @Override
-    public boolean hasNext() {
-      while (true) {
-        if (nodeIteratorStack.isEmpty()) {
-          return false;
-        } else {
-          if (nodeIteratorStack.peek().hasNext()) {
-            return true;
-          } else {
-            nodeIteratorStack.pop();
-            continue;
-          }
-        }
-      }
-    }
-
-    @Override
-    public AbstractSetMultimapNode<K, V> next() {
-      if (!hasNext()) {
-        throw new NoSuchElementException();
-      }
-
-      AbstractSetMultimapNode<K, V> innerNode = nodeIteratorStack.peek().next();
-
-      if (innerNode.hasNodes()) {
-        nodeIteratorStack.push(innerNode.nodeIterator());
-      }
-
-      return innerNode;
-    }
-
-    @Override
-    public void remove() {
-      throw new UnsupportedOperationException();
-    }
-  }
+//  /**
+//   * Iterator skeleton that uses a fixed stack in depth.
+//   */
+//  private static abstract class AbstractSetMultimapIteratorSlotHistogram<K, V> {
+//
+//    private static final int MAX_DEPTH = 7;
+//    private static final int START_CATEGORY = PATTERN_DATA_SINGLETON;
+//
+//    protected AbstractSetMultimapNode<K, V> payloadNode;
+//    protected int payloadCategoryCursor;
+//
+//    protected int payloadCategoryOffset;
+//    protected int payloadCategoryOffsetEnd;
+//
+//    protected int payloadTotalOffsetEnd;
+//
+//    private int stackLevel = -1;
+//    private final int[] stackOfOffsetsAndOutOfBounds = new int[MAX_DEPTH * 2];
+//    private final AbstractSetMultimapNode<K, V>[] stackOfNodes =
+//        new AbstractSetMultimapNode[MAX_DEPTH];
+//
+//    AbstractSetMultimapNode<K, V> topOfStackNode;
+//    int nodeCursorAddress;
+//    int nodeLengthAddress;
+//
+//    AbstractSetMultimapIteratorSlotHistogram(AbstractSetMultimapNode<K, V> rootNode) {
+//      final int offsetNodesEnd = rootNode.slotArity();
+//      final int offsetNodes = offsetNodesEnd - rootNode.nodeArity();
+//      final int offsetPayload = 0;
+//
+//      if (offsetNodes < offsetNodesEnd) {
+//        pushNode(rootNode, offsetNodes, offsetNodesEnd);
+//      }
+//
+//      if (offsetPayload < offsetNodes) {
+//        setPayloadNode(rootNode, offsetPayload, offsetNodes);
+//      }
+//    }
+//
+//    private void pushNode(AbstractSetMultimapNode<K, V> node, int offsetStart, int offsetEnd) {
+//      if (stackLevel >= 0) {
+//        // save current cursor
+//        stackOfOffsetsAndOutOfBounds[stackLevel * 2] = nodeCursorAddress;
+//      }
+//
+//      final int nextStackLevel = ++stackLevel;
+//      final int nextCursorIndex = nextStackLevel * 2;
+//      final int nextLengthIndex = nextCursorIndex + 1;
+//
+//      stackOfNodes[nextStackLevel] = node;
+//      stackOfOffsetsAndOutOfBounds[nextCursorIndex] = offsetStart;
+//      stackOfOffsetsAndOutOfBounds[nextLengthIndex] = offsetEnd;
+//
+//      // load next cursor
+//      topOfStackNode = node;
+//      nodeCursorAddress = offsetStart;
+//      nodeLengthAddress = offsetEnd;
+//    }
+//
+//    private final void popNode() {
+//      stackOfNodes[stackLevel--] = null;
+//
+//      if (stackLevel >= 0) {
+//        // load prevous cursor
+//        final int previousStackLevel = stackLevel;
+//        final int previousCursorIndex = previousStackLevel * 2;
+//        final int previousLengthIndex = previousCursorIndex + 1;
+//
+//        topOfStackNode = stackOfNodes[previousStackLevel];
+//        nodeCursorAddress = stackOfOffsetsAndOutOfBounds[previousCursorIndex];
+//        nodeLengthAddress = stackOfOffsetsAndOutOfBounds[previousLengthIndex];
+//      }
+//    }
+//
+//    private final AbstractSetMultimapNode<K, V> consumeNode() {
+//      AbstractSetMultimapNode<K, V> nextNode =
+//          (AbstractSetMultimapNode<K, V>) topOfStackNode.getSlot(nodeCursorAddress++);
+//
+//      if (nodeCursorAddress == nodeLengthAddress) {
+//        popNode();
+//      }
+//
+//      return nextNode;
+//    }
+//
+//    private void setPayloadNode(final AbstractSetMultimapNode<K, V> node, int categoryOffsetStart,
+//        int overallOffsetEnd) {
+//      payloadNode = node;
+//      payloadCategoryCursor = START_CATEGORY;
+//
+//      payloadCategoryOffset = categoryOffsetStart;
+//      payloadCategoryOffsetEnd =
+//          categoryOffsetStart + (node.arity(START_CATEGORY) * AbstractSetMultimapNode.TUPLE_LENGTH);
+//
+//      payloadTotalOffsetEnd = overallOffsetEnd;
+//    }
+//
+//    protected boolean searchNextPayloadCategory() {
+//      do {
+//        payloadCategoryOffsetEnd +=
+//            (payloadNode.arity(++payloadCategoryCursor) * AbstractSetMultimapNode.TUPLE_LENGTH);
+//      } while (payloadCategoryOffset == payloadCategoryOffsetEnd);
+//
+//      return true;
+//    }
+//
+//    /*
+//     * search for next node that contains values
+//     */
+//    private boolean searchNextValueNode() {
+//      boolean found = false;
+//      while (!found && stackLevel >= 0) {
+//        final AbstractSetMultimapNode<K, V> nextNode = consumeNode();
+//
+//        final int offsetNodesEnd = nextNode.slotArity();
+//        final int offsetNodes = offsetNodesEnd - nextNode.nodeArity();
+//        final int offsetPayload = 0;
+//
+//        if (offsetNodes < offsetNodesEnd) {
+//          pushNode(nextNode, offsetNodes, offsetNodesEnd);
+//        }
+//
+//        if (offsetPayload < offsetNodes) {
+//          setPayloadNode(nextNode, offsetPayload, offsetNodes);
+//          found = true;
+//        }
+//      }
+//
+//      return found;
+//    }
+//
+//    protected boolean advanceToNext() {
+//      return (payloadCategoryOffset < payloadTotalOffsetEnd && searchNextPayloadCategory())
+//          || searchNextValueNode();
+//    }
+//
+//    public boolean hasNext() {
+//      return payloadCategoryOffset < payloadCategoryOffsetEnd || advanceToNext();
+//    }
+//
+//    public void remove() {
+//      throw new UnsupportedOperationException();
+//    }
+//  }
+//
+//  protected static class SetMultimapKeyIteratorSlotHistogram<K, V>
+//      extends AbstractSetMultimapIteratorSlotHistogram<K, V> implements Iterator<K> {
+//
+//    SetMultimapKeyIteratorSlotHistogram(AbstractSetMultimapNode<K, V> rootNode) {
+//      super(rootNode);
+//    }
+//
+//    @Override
+//    public K next() {
+//      if (!hasNext()) {
+//        throw new NoSuchElementException();
+//      } else {
+//        switch (payloadCategoryCursor) {
+//          case PATTERN_DATA_SINGLETON:
+//          case PATTERN_DATA_COLLECTION:
+//            int nextSlot = payloadCategoryOffset;
+//            payloadCategoryOffset = nextSlot + 2;
+//
+//            return (K) payloadNode.getSlot(nextSlot);
+//          default:
+//            throw new IllegalStateException();
+//        }
+//      }
+//    }
+//
+//  }
+//
+//  protected static class SetMultimapNativeTupleIteratorSlotHistogram<K, V> extends
+//      AbstractSetMultimapIteratorSlotHistogram<K, V> implements Iterator<Map.Entry<K, Object>> {
+//
+//    SetMultimapNativeTupleIteratorSlotHistogram(AbstractSetMultimapNode<K, V> rootNode) {
+//      super(rootNode);
+//    }
+//
+//    @Override
+//    public Map.Entry<K, Object> next() {
+//      if (!hasNext()) {
+//        throw new NoSuchElementException();
+//      } else {
+//        switch (payloadCategoryCursor) {
+//          case PATTERN_DATA_SINGLETON:
+//          case PATTERN_DATA_COLLECTION:
+//            int nextSlot = payloadCategoryOffset;
+//
+//            K nextKey = (K) payloadNode.getSlot(nextSlot++);
+//            // nextSlot += 1;
+//            Object nextVal = payloadNode.getSlot(nextSlot++);
+//            // nextSlot += 1;
+//
+//            payloadCategoryOffset = nextSlot;
+//
+//            return entryOf(nextKey, nextVal);
+//          default:
+//            throw new IllegalStateException();
+//        }
+//      }
+//    }
+//
+//  }
+//
+//  protected static class SetMultimapFlattenedTupleIteratorSlotHistogram<K, V>
+//      extends AbstractSetMultimapIteratorSlotHistogram<K, V> implements Iterator<Map.Entry<K, V>> {
+//
+//    private K cachedKey = null;
+//    private Iterator<V> cachedValueSetIterator = Collections.emptyIterator();
+//
+//    SetMultimapFlattenedTupleIteratorSlotHistogram(AbstractSetMultimapNode<K, V> rootNode) {
+//      super(rootNode);
+//    }
+//
+//    @Override
+//    public boolean hasNext() {
+//      return cachedValueSetIterator.hasNext() || super.hasNext();
+//    }
+//
+//    @Override
+//    public Map.Entry<K, V> next() {
+//      if (!hasNext()) {
+//        throw new NoSuchElementException();
+//      }
+//
+//      switch (payloadCategoryCursor) {
+//        case PATTERN_DATA_SINGLETON: {
+//          int nextSlot = payloadCategoryOffset;
+//
+//          K nextKey = (K) payloadNode.getSlot(nextSlot++);
+//          // nextSlot += 1;
+//          V nextVal = (V) payloadNode.getSlot(nextSlot++);
+//          // nextSlot += 1;
+//
+//          payloadCategoryOffset = nextSlot;
+//
+//          return entryOf(nextKey, nextVal);
+//        }
+//        case PATTERN_DATA_COLLECTION: {
+//          if (cachedValueSetIterator.hasNext() == false) {
+//            int nextSlot = payloadCategoryOffset;
+//
+//            K nextKey = (K) payloadNode.getSlot(nextSlot++);
+//            // nextSlot += 1;
+//            io.usethesource.capsule.Set.Immutable<V> nextValueSet = (io.usethesource.capsule.Set.Immutable<V>) payloadNode
+//                .getSlot(nextSlot++);
+//            // nextSlot += 1;
+//
+//            payloadCategoryOffset = nextSlot;
+//
+//            cachedKey = nextKey;
+//            cachedValueSetIterator = nextValueSet.iterator();
+//          }
+//
+//          return entryOf(cachedKey, cachedValueSetIterator.next());
+//        }
+//        default:
+//          throw new IllegalStateException();
+//      }
+//    }
+//  }
+//
+//  /**
+//   * Iterator skeleton that uses a fixed stack in depth.
+//   */
+//  private static abstract class AbstractSetMultimapIterator<K, V> {
+//
+//    private static final int MAX_DEPTH = 7;
+//
+//    protected int currentValueSingletonCursor;
+//    protected int currentValueSingletonLength;
+//    protected int currentValueCollectionCursor;
+//    protected int currentValueCollectionLength;
+//    protected AbstractSetMultimapNode<K, V> currentValueNode;
+//
+//    private int currentStackLevel = -1;
+//    private final int[] nodeCursorsAndLengths = new int[MAX_DEPTH * 2];
+//
+//    AbstractSetMultimapNode<K, V>[] nodes = new AbstractSetMultimapNode[MAX_DEPTH];
+//
+//    AbstractSetMultimapIterator(AbstractSetMultimapNode<K, V> rootNode) {
+//      int nodeArity = rootNode.nodeArity();
+//      if (nodeArity != 0) {
+//        currentStackLevel = 0;
+//
+//        nodes[0] = rootNode;
+//        nodeCursorsAndLengths[0] = 0;
+//        nodeCursorsAndLengths[1] = nodeArity;
+//      }
+//
+//      int emptyArity = rootNode.emptyArity();
+//      if (emptyArity + nodeArity < 32) {
+//        currentValueNode = rootNode;
+//        currentValueSingletonCursor = 0;
+//        currentValueSingletonLength = rootNode.payloadArity(SINGLETON);
+//        currentValueCollectionCursor = 0;
+//        currentValueCollectionLength = rootNode.payloadArity(COLLECTION);
+//      }
+//    }
+//
+//    /*
+//     * search for next node that contains values
+//     */
+//    private boolean searchNextValueNode() {
+//      while (currentStackLevel >= 0) {
+//        final int currentCursorIndex = currentStackLevel * 2;
+//        final int currentLengthIndex = currentCursorIndex + 1;
+//
+//        final int nodeCursor = nodeCursorsAndLengths[currentCursorIndex];
+//        final int nodeLength = nodeCursorsAndLengths[currentLengthIndex];
+//
+//        if (nodeCursor < nodeLength) {
+//          final AbstractSetMultimapNode<K, V> nextNode =
+//              nodes[currentStackLevel].getNode(nodeCursor);
+//          nodeCursorsAndLengths[currentCursorIndex]++;
+//
+//          int nodeArity = nextNode.nodeArity();
+//          if (nodeArity != 0) {
+//            /*
+//             * put node on next stack level for depth-first traversal
+//             */
+//            final int nextStackLevel = ++currentStackLevel;
+//            final int nextCursorIndex = nextStackLevel * 2;
+//            final int nextLengthIndex = nextCursorIndex + 1;
+//
+//            nodes[nextStackLevel] = nextNode;
+//            nodeCursorsAndLengths[nextCursorIndex] = 0;
+//            nodeCursorsAndLengths[nextLengthIndex] = nodeArity;
+//          }
+//
+//          // int emptyArity = nextNode.emptyArity();
+//          // if (emptyArity + nodeArity < 32) {
+//          if (nextNode.hasPayload(SINGLETON) || nextNode.hasPayload(COLLECTION)) {
+//            // if (payloadAritySingleton != 0 || payloadArityCollection != 0) {
+//            /*
+//             * found next node that contains values
+//             */
+//            currentValueNode = nextNode;
+//            currentValueSingletonCursor = 0;
+//            currentValueSingletonLength = nextNode.payloadArity(SINGLETON);
+//            currentValueCollectionCursor = 0;
+//            currentValueCollectionLength = nextNode.payloadArity(Type.COLLECTION);
+//            return true;
+//          }
+//        } else {
+//          currentStackLevel--;
+//        }
+//      }
+//
+//      return false;
+//    }
+//
+//    public boolean hasNext() {
+//      if (currentValueSingletonCursor < currentValueSingletonLength
+//          || currentValueCollectionCursor < currentValueCollectionLength) {
+//        return true;
+//      } else {
+//        return searchNextValueNode();
+//      }
+//    }
+//
+//    public void remove() {
+//      throw new UnsupportedOperationException();
+//    }
+//  }
+//
+//  protected static class SetMultimapKeyIterator<K, V> extends AbstractSetMultimapIterator<K, V>
+//      implements Iterator<K> {
+//
+//    SetMultimapKeyIterator(AbstractSetMultimapNode<K, V> rootNode) {
+//      super(rootNode);
+//    }
+//
+//    @Override
+//    public K next() {
+//      if (!hasNext()) {
+//        throw new NoSuchElementException();
+//      } else {
+//        // TODO: check case distinction
+//        if (currentValueSingletonCursor < currentValueSingletonLength) {
+//          return currentValueNode.getSingletonKey(currentValueSingletonCursor++);
+//        } else {
+//          return currentValueNode.getCollectionKey(currentValueCollectionCursor++);
+//        }
+//      }
+//    }
+//
+//  }
+//
+//  protected static class SetMultimapValueIterator<K, V> extends AbstractSetMultimapIterator<K, V>
+//      implements Iterator<io.usethesource.capsule.Set.Immutable<V>> {
+//
+//    SetMultimapValueIterator(AbstractSetMultimapNode<K, V> rootNode) {
+//      super(rootNode);
+//    }
+//
+//    @Override
+//    public io.usethesource.capsule.Set.Immutable<V> next() {
+//      if (!hasNext()) {
+//        throw new NoSuchElementException();
+//      } else {
+//        // TODO: check case distinction
+//        if (currentValueSingletonCursor < currentValueSingletonLength) {
+//          return setOf(currentValueNode.getSingletonValue(currentValueSingletonCursor++));
+//        } else {
+//          return currentValueNode.getCollectionValue(currentValueCollectionCursor++);
+//        }
+//      }
+//    }
+//
+//  }
+//
+//  protected static class SetMultimapNativeTupleIterator<K, V>
+//      extends AbstractSetMultimapIterator<K, V> implements Iterator<Map.Entry<K, Object>> {
+//
+//    SetMultimapNativeTupleIterator(AbstractSetMultimapNode<K, V> rootNode) {
+//      super(rootNode);
+//    }
+//
+//    @Override
+//    public Map.Entry<K, Object> next() {
+//      if (!hasNext()) {
+//        throw new NoSuchElementException();
+//      } else {
+//        // TODO: check case distinction
+//        if (currentValueSingletonCursor < currentValueSingletonLength) {
+//          final K currentKey = currentValueNode.getSingletonKey(currentValueSingletonCursor);
+//          final Object currentValue =
+//              currentValueNode.getSingletonValue(currentValueSingletonCursor);
+//          currentValueSingletonCursor++;
+//
+//          return AbstractSpecialisedImmutableMap.entryOf(currentKey, currentValue);
+//        } else {
+//          final K currentKey = currentValueNode.getCollectionKey(currentValueCollectionCursor);
+//          final Object currentValue =
+//              currentValueNode.getCollectionValue(currentValueCollectionCursor);
+//          currentValueCollectionCursor++;
+//
+//          return AbstractSpecialisedImmutableMap.entryOf(currentKey, currentValue);
+//        }
+//      }
+//    }
+//
+//  }
+//
+//  protected static class SetMultimapTupleIterator<K, V, T> extends AbstractSetMultimapIterator<K, V>
+//      implements Iterator<T> {
+//
+//    final BiFunction<K, V, T> tupleOf;
+//
+//    K currentKey = null;
+//    V currentValue = null;
+//    Iterator<V> currentSetIterator = Collections.emptyIterator();
+//
+//    SetMultimapTupleIterator(AbstractSetMultimapNode<K, V> rootNode,
+//        final BiFunction<K, V, T> tupleOf) {
+//      super(rootNode);
+//      this.tupleOf = tupleOf;
+//    }
+//
+//    @Override
+//    public boolean hasNext() {
+//      if (currentSetIterator.hasNext()) {
+//        return true;
+//      } else {
+//        if (super.hasNext()) {
+//          // TODO: check case distinction
+//          if (currentValueSingletonCursor < currentValueSingletonLength) {
+//            currentKey = currentValueNode.getSingletonKey(currentValueSingletonCursor);
+//            currentSetIterator = Collections
+//                .singleton(currentValueNode.getSingletonValue(currentValueSingletonCursor))
+//                .iterator();
+//            currentValueSingletonCursor++;
+//          } else {
+//            currentKey = currentValueNode.getCollectionKey(currentValueCollectionCursor);
+//            currentSetIterator =
+//                currentValueNode.getCollectionValue(currentValueCollectionCursor).iterator();
+//            currentValueCollectionCursor++;
+//          }
+//
+//          return true;
+//        } else {
+//          return false;
+//        }
+//      }
+//    }
+//
+//    @Override
+//    public T next() {
+//      if (!hasNext()) {
+//        throw new NoSuchElementException();
+//      } else {
+//        currentValue = currentSetIterator.next();
+//        return tupleOf.apply(currentKey, currentValue);
+//      }
+//    }
+//
+//  }
+//
+//  /**
+//   * Iterator that first iterates over inlined-values and then continues depth first recursively.
+//   */
+//  private static class TrieSetMultimap_BleedingEdgeNodeIterator<K, V>
+//      implements Iterator<AbstractSetMultimapNode<K, V>> {
+//
+//    final Deque<Iterator<? extends AbstractSetMultimapNode<K, V>>> nodeIteratorStack;
+//
+//    TrieSetMultimap_BleedingEdgeNodeIterator(AbstractSetMultimapNode<K, V> rootNode) {
+//      nodeIteratorStack = new ArrayDeque<>();
+//      nodeIteratorStack.push(Collections.singleton(rootNode).iterator());
+//    }
+//
+//    @Override
+//    public boolean hasNext() {
+//      while (true) {
+//        if (nodeIteratorStack.isEmpty()) {
+//          return false;
+//        } else {
+//          if (nodeIteratorStack.peek().hasNext()) {
+//            return true;
+//          } else {
+//            nodeIteratorStack.pop();
+//            continue;
+//          }
+//        }
+//      }
+//    }
+//
+//    @Override
+//    public AbstractSetMultimapNode<K, V> next() {
+//      if (!hasNext()) {
+//        throw new NoSuchElementException();
+//      }
+//
+//      AbstractSetMultimapNode<K, V> innerNode = nodeIteratorStack.peek().next();
+//
+//      if (innerNode.hasNodes()) {
+//        nodeIteratorStack.push(innerNode.nodeIterator());
+//      }
+//
+//      return innerNode;
+//    }
+//
+//    @Override
+//    public void remove() {
+//      throw new UnsupportedOperationException();
+//    }
+//  }
 
   static final class TransientTrieSetMultimap_BleedingEdge<K, V> extends
       AbstractTransientTrieSetMultimap<K, V, io.usethesource.capsule.Set.Immutable<V>, AbstractSetMultimapNode<K, V>> {

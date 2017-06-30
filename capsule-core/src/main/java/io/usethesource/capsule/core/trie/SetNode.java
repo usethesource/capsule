@@ -18,7 +18,8 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
   boolean TRACK_DELTA_OF_META_DATA =
       TRACK_DELTA_OF_META_DATA_PER_NODE || TRACK_DELTA_OF_META_DATA_PER_COLLECTION;
 
-  boolean TRUST_NODE_SIZE_AND_HASHCODE = true;
+  // NOTE: was true
+  boolean TRUST_NODE_SIZE_AND_HASHCODE = false;
 
   boolean MEMOIZE_HASH_CODE_OF_ELEMENT = false;
   boolean MEMOIZE_HASH_CODE_OF_COLLECTION = true;

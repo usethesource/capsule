@@ -577,7 +577,7 @@ public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R ext
   protected static class SetMultimapKeyIterator<K, V, C, R extends MultimapNode<K, V, C, R>>
       extends AbstractSetMultimapIterator<K, V, C, R> implements Iterator<K> {
 
-    SetMultimapKeyIterator(R rootNode) {
+    public SetMultimapKeyIterator(R rootNode) {
       super(rootNode);
     }
 

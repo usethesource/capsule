@@ -72,7 +72,7 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
 
   @Override
   final int getCachedKeySetSize() {
-    return getCachedKeySetSize();
+    return cachedKeySetSize;
   }
 
   @Override
@@ -125,7 +125,7 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
   public final boolean __put(K key, V value) {
     return __put(key, valueToTemporaryBox(value));
   }
-  
+
   @Override
   public final boolean __put(K key, io.usethesource.capsule.Set.Immutable<V> valueCollection) {
     if (mutator.get() == null) {
