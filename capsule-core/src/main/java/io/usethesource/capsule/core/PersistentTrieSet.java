@@ -3496,7 +3496,9 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       throw new UnsupportedOperationException();
     }
 
-    /* TODO: support tracking of changes with 'IntersectionResult'. */
+    /*
+     * TODO: factor out common part of union/subtract/intersect; differ only in stream ops.
+     */
     @Override
     public AbstractSetNode<K> intersect(AtomicReference<Thread> mutator, AbstractSetNode<K> other,
         int shift, IntersectionResult details, Comparator<Object> cmp,
@@ -3505,22 +3507,102 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
       final HashCollisionSetNode that = (HashCollisionSetNode) other;
 
-      final List<K> buffer = new ArrayList<>();
+      final List<K> thisContent = Arrays.asList(this.keys);
+      final List<?> thatContent = Arrays.asList(that.keys);
 
-      final K[] newKeys = (K[]) Stream.of(keys)
-          .filter(key -> other.contains(key, hash, shift, cmp))
+      final K[] newItemArray = (K[]) thisContent.stream()
+          .filter(item -> thatContent.contains(item))
           .toArray();
 
-      if (newKeys.length == 0) {
-        return EMPTY_NODE;
-      } else if (newKeys.length == 1) {
-        return CompactSetNode.<K>nodeOf(mutator)
-            .updated(mutator, newKeys[0], hash, 0, SetResult.unchanged(), cmp);
-      } else {
-        return new HashCollisionSetNode<>(hash, newKeys);
+      // delta @ collection
+      details.addSize(newItemArray.length);
+      details.addHashCode(newItemArray.length * this.hash);
+
+      if (newItemArray.length == thisContent.size()) {
+        return this;
+      }
+
+      switch (newItemArray.length) {
+        case 0:
+          return EMPTY_NODE;
+        case 1:
+          return EMPTY_NODE.updated(mutator, newItemArray[0], hash, 0, SetResult.unchanged(), cmp);
+        default:
+          return new HashCollisionSetNode<>(hash, newItemArray);
       }
     }
 
+    /*
+     * TODO: factor out common part of union/subtract/intersect; differ only in stream ops.
+     */
+    @Override
+    public AbstractSetNode<K> union(AtomicReference<Thread> mutator, AbstractSetNode<K> other,
+        int shift, IntersectionResult details, Comparator<Object> cmp,
+        Preference directionPreference) {
+      assert other instanceof PersistentTrieSet.HashCollisionSetNode;
+
+      final HashCollisionSetNode that = (HashCollisionSetNode) other;
+
+      final List<K> thisContent = Arrays.asList(this.keys);
+      final List<?> thatContent = Arrays.asList(that.keys);
+
+      final K[] newItemArray = (K[]) Stream.concat(thisContent.stream(), thatContent.stream())
+          .distinct().toArray();
+
+      // delta @ collection
+      details.addSize(newItemArray.length);
+      details.addHashCode(newItemArray.length * this.hash);
+
+      if (newItemArray.length == thisContent.size()) {
+        return this;
+      }
+
+      switch (newItemArray.length) {
+        case 0:
+          return EMPTY_NODE;
+        case 1:
+          return EMPTY_NODE.updated(mutator, newItemArray[0], hash, 0, SetResult.unchanged(), cmp);
+        default:
+          return new HashCollisionSetNode<>(hash, newItemArray);
+      }
+    }
+
+    /*
+     * TODO: factor out common part of union/subtract/intersect; differ only in stream ops.
+     */
+    @Override
+    public AbstractSetNode<K> subtract(AtomicReference<Thread> mutator, AbstractSetNode<K> other,
+        int shift, IntersectionResult details, Comparator<Object> cmp,
+        Preference directionPreference) {
+      assert other instanceof PersistentTrieSet.HashCollisionSetNode;
+
+      final HashCollisionSetNode that = (HashCollisionSetNode) other;
+
+      final List<K> thisContent = Arrays.asList(this.keys);
+      final List<?> thatContent = Arrays.asList(that.keys);
+
+      final K[] newItemArray = (K[]) thisContent.stream()
+          .filter(item -> !thatContent.contains(item))
+          .toArray();
+
+      // delta @ collection
+      details.addSize(newItemArray.length);
+      details.addHashCode(newItemArray.length * this.hash);
+
+      if (newItemArray.length == thisContent.size()) {
+        return this;
+      }
+
+      switch (newItemArray.length) {
+        case 0:
+          return EMPTY_NODE;
+        case 1:
+          return EMPTY_NODE
+              .updated(mutator, newItemArray[0], hash, 0, SetResult.unchanged(), cmp);
+        default:
+          return new HashCollisionSetNode<>(hash, newItemArray);
+      }
+    }
   }
 
   /**
