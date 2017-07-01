@@ -209,7 +209,14 @@ public interface SetMultimap<K, V> {
     }
 
     default boolean __remove(final K key) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
+      int oldSize = this.size();
+
+      final Set.Immutable<V> values = this.get(key);
+      values.forEach(value -> this.__remove(key, value));
+
+      int newSize = this.size();
+
+      return oldSize != newSize;
     }
 
     boolean __remove(final K key, final V val);

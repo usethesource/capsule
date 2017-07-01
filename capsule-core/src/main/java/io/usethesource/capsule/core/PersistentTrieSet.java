@@ -380,8 +380,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     final AbstractSetNode<K> newRootNode = bigger.rootNode.union(null, smaller.rootNode, 0,
         details, EqualityComparator.EQUALS.toComparator(), INDIFFERENT);
 
-    assert unmodified.cachedHashCode != details.getAccumulatedHashCode()
-        || unmodified.rootNode == newRootNode || null == newRootNode;
+//    assert unmodified.cachedHashCode != details.getAccumulatedHashCode()
+//        || unmodified.rootNode == newRootNode || null == newRootNode;
 
     if (newRootNode == unmodified.rootNode || newRootNode == null) {
       return unmodified;
@@ -431,8 +431,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     final AbstractSetNode<K> newRootNode = set1.rootNode.subtract(null, set2.rootNode, 0,
         details, EqualityComparator.EQUALS.toComparator(), INDIFFERENT);
 
-    assert unmodified.cachedHashCode != details.getAccumulatedHashCode()
-        || unmodified.rootNode == newRootNode || null == newRootNode;
+//    assert unmodified.cachedHashCode != details.getAccumulatedHashCode()
+//        || unmodified.rootNode == newRootNode || null == newRootNode;
 
     if (newRootNode == unmodified.rootNode || newRootNode == null) {
       return unmodified;

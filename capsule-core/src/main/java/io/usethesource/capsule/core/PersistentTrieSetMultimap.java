@@ -1112,7 +1112,9 @@ public class PersistentTrieSetMultimap<K, V> extends
           final V currentVal = getSingletonValue(dataIndex);
 
           // replace singleton value with collection
-          details.modified(REPLACED_PAYLOAD, EnumSet.of(REPLACED_VALUE));
+          details.modified(REPLACED_PAYLOAD, EnumSet.of(REPLACED_VALUE),
+              io.usethesource.capsule.Set.Immutable.of(currentVal));
+
           return copyAndMigrateFromSingletonToCollection(mutator, bitpos, key, values);
         } else {
           // prefix-collision (case: singleton x collection)
@@ -1136,7 +1138,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               getCollectionValue(collIndex);
 
           // update collection
-          details.modified(REPLACED_PAYLOAD, EnumSet.of(REPLACED_VALUE_COLLECTION));
+          details.modified(REPLACED_PAYLOAD, EnumSet.of(REPLACED_VALUE_COLLECTION), currentCollVal);
           return copyAndSetCollectionValue(mutator, bitpos, values);
         } else {
           // prefix-collision (case: collection x collection)
