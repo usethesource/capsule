@@ -43,7 +43,7 @@ public class RuntimeCodeGenerationTestSuite extends Suite {
     final List<Class<?>> suiteClasses = new ArrayList<Class<?>>();
 
     // @formatter:off
-    final List<Class> componentTypes = Arrays.asList(Integer.class);
+    final List<Class> componentTypes = Arrays.asList(Integer.class, String.class);
     final List<Class> setTypes = Arrays.asList(
         PersistentTrieSet.class
         , TrieSet_5Bits_Spec0To8.class

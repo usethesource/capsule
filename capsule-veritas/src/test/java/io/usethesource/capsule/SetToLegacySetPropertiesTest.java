@@ -19,6 +19,7 @@ import org.junit.runners.Suite;
     SetToLegacySetPropertiesTest.StringSetPropertiesTest.class})
 public class SetToLegacySetPropertiesTest {
 
+  @Ignore("Semantic difference in equality is not yet resolved.")
   @RunWith(JUnitQuickcheck.class)
   public static class IntegerSetPropertiesTest
       extends AbstractSetProperties<Integer, SetToLegacySetConverter<Integer>> {
@@ -28,6 +29,7 @@ public class SetToLegacySetPropertiesTest {
     }
   }
 
+  @Ignore("Semantic difference in equality is not yet resolved.")
   @RunWith(JUnitQuickcheck.class)
   public static class StringSetPropertiesTest
       extends AbstractSetProperties<String, SetToLegacySetConverter<String>> {

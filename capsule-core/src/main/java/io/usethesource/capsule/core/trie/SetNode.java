@@ -36,23 +36,17 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
 
   int recursivePayloadHashCode();
 
-  default R union(final AtomicReference<Thread> mutator, R that,
+  R union(final AtomicReference<Thread> mutator, R that,
       final int shift, final IntersectionResult details, final Comparator<Object> cmp,
-      Preference directionPreference) {
-    throw new UnsupportedOperationException("Not implemented yet.");
-  }
+      Preference directionPreference);
 
-  default R intersect(final AtomicReference<Thread> mutator, R that,
+  R intersect(final AtomicReference<Thread> mutator, R that,
       final int shift, final IntersectionResult details, final Comparator<Object> cmp,
-      Preference directionPreference) {
-    throw new UnsupportedOperationException("Not implemented yet.");
-  }
+      Preference directionPreference);
 
-  default R subtract(final AtomicReference<Thread> mutator, R that,
+  R subtract(final AtomicReference<Thread> mutator, R that,
       final int shift, final IntersectionResult details, final Comparator<Object> cmp,
-      Preference directionPreference) {
-    throw new UnsupportedOperationException("Not implemented yet.");
-  }
+      Preference directionPreference);
 
   enum Preference {
     INDIFFERENT,

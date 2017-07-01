@@ -199,13 +199,31 @@ public interface SetMultimap<K, V> {
     }
 
     default boolean __put(final K key, final Set.Immutable<V> values) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
+      final Set.Immutable<V> oldValues = this.get(key);
+
+      if (values.equals(oldValues)) {
+        return false;
+      } else {
+        this.__remove(key);
+        this.__insert(key, values);
+
+        return true;
+      }
     }
 
     boolean __insert(final K key, final V value);
 
     default boolean __insert(final K key, final Set.Immutable<V> values) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
+      final Set.Immutable<V> oldValues = this.get(key);
+
+      if (values.equals(oldValues)) {
+        return false;
+      } else {
+        values.forEach(value -> this.__insert(key, value));
+        this.__insert(key, values);
+
+        return true;
+      }
     }
 
     default boolean __remove(final K key) {
