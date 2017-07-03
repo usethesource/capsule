@@ -9,8 +9,10 @@ package io.usethesource.capsule;
 
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HCHAMP;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 
+@Ignore("no generator available for HCHAMP")
 @RunWith(JUnitQuickcheck.class)
 public class SetMultimapPropertiesOfHchampTest extends
     AbstractSetMultimapProperties<Integer, Integer, TrieSetMultimap_HCHAMP<Integer, Integer>> {
