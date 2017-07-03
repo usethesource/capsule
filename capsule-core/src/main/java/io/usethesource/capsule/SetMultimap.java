@@ -220,7 +220,6 @@ public interface SetMultimap<K, V> {
         return false;
       } else {
         values.forEach(value -> this.__insert(key, value));
-        this.__insert(key, values);
 
         return true;
       }
