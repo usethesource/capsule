@@ -234,6 +234,25 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
   }
 
   @Property(trials = DEFAULT_TRIALS)
+  public void unionIdentityMostlyReference(@Size(min = 0, max = 0) final CT emptySet,
+      @Size(min = 0, max = MAX_SIZE) final CT input, T key) {
+
+    final CT inputCopy;
+
+    if (input.contains(key)) {
+      inputCopy = (CT) input.__remove(key).__insert(key);
+    } else {
+      inputCopy = (CT) input.__insert(key).__remove(key);
+    }
+
+    CT unionL = (CT) input.union(inputCopy);
+    CT unionR = (CT) inputCopy.union(input);
+
+    assertEquals(input, unionL);
+    assertEquals(input, unionR);
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
   public void unionIdentityStructural(@Size(min = 0, max = 0) final CT emptySet,
       @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
     final Set.Transient<T> builder = emptySet.asTransient();
@@ -301,6 +320,25 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
   public void subtractIdentityReference(@Size(min = 0, max = 0) final CT emptySet,
       @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
     assertEquals("subtract reference equal", emptySet, inputShared.subtract(inputShared));
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void subtractIdentityMostlyReference(@Size(min = 0, max = 0) final CT emptySet,
+      @Size(min = 0, max = MAX_SIZE) final CT input, T key) {
+
+    final CT inputCopy;
+
+    if (input.contains(key)) {
+      inputCopy = (CT) input.__remove(key).__insert(key);
+    } else {
+      inputCopy = (CT) input.__insert(key).__remove(key);
+    }
+
+    CT subtractionL = (CT) input.subtract(inputCopy);
+    CT subtractionR = (CT) inputCopy.subtract(input);
+
+    assertEquals(emptySet, subtractionL);
+    assertEquals(emptySet, subtractionR);
   }
 
   @Property(trials = DEFAULT_TRIALS)
