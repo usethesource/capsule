@@ -8,6 +8,7 @@
 package io.usethesource.capsule.core.trie;
 
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public interface SetNode<K, R extends SetNode<K, R>> extends Node {
@@ -19,7 +20,7 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
       TRACK_DELTA_OF_META_DATA_PER_NODE || TRACK_DELTA_OF_META_DATA_PER_COLLECTION;
 
   // NOTE: was true
-  boolean TRUST_NODE_SIZE_AND_HASHCODE = false;
+  boolean TRUST_NODE_SIZE_AND_HASHCODE = true;
 
   boolean MEMOIZE_HASH_CODE_OF_ELEMENT = false;
   boolean MEMOIZE_HASH_CODE_OF_COLLECTION = true;
@@ -101,6 +102,15 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
       return dataMap == 0 && nodeMap == 0;
     }
 
+    public final void add(int bitpos, ImmutablePayloadTuple<K> key) {
+      // add element
+      buffer[dataIndex] = key;
+      dataMap |= bitpos;
+
+      // advance cursor
+      dataIndex = dataIndex + 1;
+    }
+
     public final void add(int bitpos, K key) {
       // add element
       buffer[dataIndex] = key;
@@ -139,6 +149,65 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
       System.arraycopy(hashes, 0, compactedHashes, 0, hashIndex);
       return compactedHashes;
     }
+  }
+
+  final class ImmutablePayloadTuple<T> implements
+      Comparable<ImmutablePayloadTuple<T>>, java.io.Serializable {
+
+    private static final long serialVersionUID = 42L;
+
+    private final int hash;
+    private final T payload;
+
+    private ImmutablePayloadTuple(final int hash, final T payload) {
+      this.hash = hash;
+      this.payload = payload;
+    }
+
+    public static final <K> ImmutablePayloadTuple<K> of(final int hash, final K payload) {
+      return new ImmutablePayloadTuple<>(hash, payload);
+    }
+
+    public T get() {
+      return payload;
+    }
+
+    public int keyHash() {
+      return hash;
+    }
+
+    @Override
+    public int compareTo(ImmutablePayloadTuple<T> other) {
+      return hash - other.hash;
+    }
+
+    @Override
+    public int hashCode() {
+      return hash;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+      if (null == other) {
+        return false;
+      }
+      if (this == other) {
+        return true;
+      }
+      if (getClass() != other.getClass()) {
+        return false;
+      }
+
+      ImmutablePayloadTuple that = (ImmutablePayloadTuple) other;
+
+      return hash == that.hash && Objects.equals(payload, that.payload);
+    }
+
+    @Override
+    public String toString() {
+      return String.format("%d", hash);
+    }
+
   }
 
 }
