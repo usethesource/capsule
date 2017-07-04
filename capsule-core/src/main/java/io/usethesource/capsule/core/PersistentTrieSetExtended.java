@@ -56,35 +56,12 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
    * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
    * `protected` when experiments are finished.
    */
-  public /* protected */ PersistentTrieSetExtended(BitmapIndexedSetNode<K> rootNode) {
-    this.rootNode = rootNode;
-//    this.cachedHashCode = rootNode.recursivePayloadHashCode();
-//    this.cachedSize = rootNode.size();
-
-    final Iterator<? extends BitmapIndexedSetNode<K>> it = nodeIterator();
-
-    int size = 0;
-    int hashCode = 0;
-    while (it.hasNext()) {
-      final BitmapIndexedSetNode<K> node = it.next();
-      size += node.payloadArity();
-      hashCode += node.recursivePayloadHashCode();
-    }
-
-    this.cachedHashCode = hashCode;
-    this.cachedSize = size;
-  }
-
-  /*
-   * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-   * `protected` when experiments are finished.
-   */
   public /* protected */ PersistentTrieSetExtended(BitmapIndexedSetNode<K> rootNode,
-      int cachedHashCode,
-      int cachedSize) {
+      int cachedHashCode, int cachedSize) {
     this.rootNode = rootNode;
     this.cachedHashCode = cachedHashCode;
     this.cachedSize = cachedSize;
+
     if (DEBUG) {
       assert checkHashCodeAndSize(cachedHashCode, cachedSize);
     }
@@ -894,49 +871,14 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
     private BitmapIndexedSetNode(final AtomicReference<Thread> mutator, final int nodeMap,
         final int dataMap, final Object[] nodes, final int cachedHashCode, final int cachedSize) {
 
-      this.mutator = mutator;
       this.dataMap = dataMap;
       this.nodeMap = nodeMap;
-      this.nodes = nodes;
-
-      if (TRUST_NODE_SIZE_AND_HASHCODE) {
-        this.cachedHashCode = cachedHashCode;
-        this.cachedSize = cachedSize;
-
-//        assert this.cachedHashCode == super.recursivePayloadHashCode();
-//        assert this.cachedSize == super.size();
-      }
-
-      if (DEBUG) {
-        assert (TUPLE_LENGTH * Integer.bitCount(dataMap)
-            + Integer.bitCount(nodeMap) == nodes.length);
-
-        for (int i = 0; i < TUPLE_LENGTH * payloadArity(); i++) {
-          assert ((nodes[i] instanceof BitmapIndexedSetNode) == false);
-        }
-        for (int i = TUPLE_LENGTH * payloadArity(); i < nodes.length; i++) {
-          assert ((nodes[i] instanceof BitmapIndexedSetNode) == true);
-        }
-
-        assert nodeInvariant();
-      }
-    }
-
-    @Deprecated
-    private BitmapIndexedSetNode(final AtomicReference<Thread> mutator, final int nodeMap,
-        final int dataMap, final Object[] nodes) {
 
       this.mutator = mutator;
-      this.dataMap = dataMap;
-      this.nodeMap = nodeMap;
       this.nodes = nodes;
 
-      if (TRUST_NODE_SIZE_AND_HASHCODE) {
-        throw new IllegalStateException();
-
-//        this.cachedHashCode = super.recursivePayloadHashCode();
-//        this.cachedSize = super.size();
-      }
+      this.cachedHashCode = cachedHashCode;
+      this.cachedSize = cachedSize;
 
       if (DEBUG) {
         assert (TUPLE_LENGTH * Integer.bitCount(dataMap)
@@ -1055,22 +997,6 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
       assert cnt1 != i_th;
       throw new RuntimeException("Called with invalid arguments.");
-    }
-
-    // factory method to construct trie from outer classes
-    // TODO: find alternative solution that does not violate information hiding
-    public static <K> BitmapIndexedSetNode<K> newHashCollisonNode(final int hash, K... keys) {
-      throw new IllegalStateException("Hash collision not yet fixed.");
-      // return new HashCollisionSetNode<>(hash, keys);
-    }
-
-    // factory method to construct trie from outer classes
-    // TODO: find alternative solution that does not violate information hiding
-    public static <K> BitmapIndexedSetNode<K> newBitmapIndexedNode(
-        final AtomicReference<Thread> mutator,
-        final int nodeMap, final int dataMap, final Object[] content) {
-      // content is assumed to be effectivle immutable to avoid defensive copying
-      return new BitmapIndexedSetNode<>(mutator, nodeMap, dataMap, content);
     }
 
     static final <T> boolean isAllowedToEdit(AtomicReference<?> x, AtomicReference<?> y) {
@@ -2996,7 +2922,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
       return StreamSupport.stream(spliterator(), false);
     }
   }
-  
+
   /**
    * Iterator skeleton that uses a fixed stack in depth.
    */
