@@ -879,7 +879,8 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
     // factory method to construct trie from outer classes
     // TODO: find alternative solution that does not violate information hiding
     public static <K> AbstractSetNode<K> newHashCollisonNode(final int hash, K... keys) {
-      return new HashCollisionSetNode<>(hash, keys);
+      throw new IllegalStateException("Hash collision not yet fixed.");
+      // return new HashCollisionSetNode<>(hash, keys);
     }
 
     // factory method to construct trie from outer classes
@@ -1101,6 +1102,15 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
     static final int BIT_PARTITION_SIZE = 5;
     static final int BIT_PARTITION_MASK = 0b11111;
 
+    protected final int nodeMap;
+    protected final int dataMap;
+
+    protected CompactSetNode(
+        final int dataMap, final int nodeMap) {
+      this.dataMap = dataMap;
+      this.nodeMap = nodeMap;
+    }
+
     static final int mask(final int keyHash, final int shift) {
       return (keyHash >>> shift) & BIT_PARTITION_MASK;
     }
@@ -1109,9 +1119,13 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
       return 1 << mask;
     }
 
-    abstract int nodeMap();
+    final int nodeMap() {
+      return nodeMap;
+    }
 
-    abstract int dataMap();
+    final int dataMap() {
+      return dataMap;
+    }
 
     @Override
     abstract CompactSetNode<K> getNode(final int index);
@@ -1150,9 +1164,8 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
       assert !(key0.equals(key1));
 
       if (shift >= HASH_CODE_LENGTH) {
-        // throw new
-        // IllegalStateException("Hash collision not yet fixed.");
-        return new HashCollisionSetNode<>(keyHash0, (K[]) new Object[]{key0, key1});
+        throw new IllegalStateException("Hash collision not yet fixed.");
+        // return new HashCollisionSetNode<>(keyHash0, (K[]) new Object[]{key0, key1});
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -1611,30 +1624,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
   }
 
-  protected static abstract class CompactMixedSetNode<K> extends CompactSetNode<K> {
-
-    private final int nodeMap;
-    private final int dataMap;
-
-    CompactMixedSetNode(final AtomicReference<Thread> mutator, final int nodeMap,
-        final int dataMap) {
-      this.nodeMap = nodeMap;
-      this.dataMap = dataMap;
-    }
-
-    @Override
-    final int nodeMap() {
-      return nodeMap;
-    }
-
-    @Override
-    final int dataMap() {
-      return dataMap;
-    }
-
-  }
-
-  private static final class BitmapIndexedSetNode<K> extends CompactMixedSetNode<K> {
+  private static final class BitmapIndexedSetNode<K> extends CompactSetNode<K> {
 
     transient final AtomicReference<Thread> mutator;
     final Object[] nodes;
@@ -1644,7 +1634,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
     private BitmapIndexedSetNode(final AtomicReference<Thread> mutator, final int nodeMap,
         final int dataMap, final Object[] nodes, final int cachedHashCode, final int cachedSize) {
-      super(mutator, nodeMap, dataMap);
+      super(nodeMap, dataMap);
 
       this.mutator = mutator;
       this.nodes = nodes;
@@ -1680,7 +1670,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
     @Deprecated
     private BitmapIndexedSetNode(final AtomicReference<Thread> mutator, final int nodeMap,
         final int dataMap, final Object[] nodes) {
-      super(mutator, nodeMap, dataMap);
+      super(nodeMap, dataMap);
 
       this.mutator = mutator;
       this.nodes = nodes;
@@ -3170,476 +3160,476 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
   }
 
-  private static final class HashCollisionSetNode<K> extends CompactSetNode<K> {
-
-    private final K[] keys;
-
-    private final int hash;
-
-    HashCollisionSetNode(final int hash, final K[] keys) {
-      this.keys = keys;
-
-      this.hash = hash;
-
-      assert payloadArity() >= 2;
-    }
-
-    @Override
-    public ArrayView<AbstractSetNode<K>> nodeArray() {
-      return ArrayView.empty();
-    }
-
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
-    @Override
-    public /* protected */ boolean contains(final K key, final int keyHash, final int shift) {
-      if (this.hash == keyHash) {
-        for (K k : keys) {
-          if (k.equals(key)) {
-            return true;
-          }
-        }
-      }
-      return false;
-    }
-
-    @Override
-    boolean contains(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
-      if (this.hash == keyHash) {
-        for (K k : keys) {
-          if (cmp.compare(k, key) == 0) {
-            return true;
-          }
-        }
-      }
-      return false;
-    }
-
-    @Override
-    Optional<K> findByKey(final K key, final int keyHash, final int shift) {
-      for (int i = 0; i < keys.length; i++) {
-        final K _key = keys[i];
-        if (key.equals(_key)) {
-          return Optional.of(_key);
-        }
-      }
-      return Optional.empty();
-    }
-
-    @Override
-    Optional<K> findByKey(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
-      for (int i = 0; i < keys.length; i++) {
-        final K _key = keys[i];
-        if (cmp.compare(key, _key) == 0) {
-          return Optional.of(_key);
-        }
-      }
-      return Optional.empty();
-    }
-
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
-    @Override
-    public /* protected */ CompactSetNode<K> updated(final AtomicReference<Thread> mutator,
-        final K key, final int keyHash, final int shift, final SetResult<K> details) {
-      assert this.hash == keyHash;
-
-      for (int idx = 0; idx < keys.length; idx++) {
-        if (keys[idx].equals(key)) {
-          return this;
-        }
-      }
-
-      final K[] keysNew = (K[]) new Object[this.keys.length + 1];
-
-      // copy 'this.keys' and insert 1 element(s) at position
-      // 'keys.length'
-      System.arraycopy(this.keys, 0, keysNew, 0, keys.length);
-      keysNew[keys.length + 0] = key;
-      System.arraycopy(this.keys, keys.length, keysNew, keys.length + 1,
-          this.keys.length - keys.length);
-
-      details.modified();
-      return new HashCollisionSetNode<>(keyHash, keysNew);
-    }
-
-    @Override
-    CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key,
-        final int keyHash,
-        final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
-      assert this.hash == keyHash;
-
-      for (int idx = 0; idx < keys.length; idx++) {
-        if (cmp.compare(keys[idx], key) == 0) {
-          return this;
-        }
-      }
-
-      final K[] keysNew = (K[]) new Object[this.keys.length + 1];
-
-      // copy 'this.keys' and insert 1 element(s) at position
-      // 'keys.length'
-      System.arraycopy(this.keys, 0, keysNew, 0, keys.length);
-      keysNew[keys.length + 0] = key;
-      System.arraycopy(this.keys, keys.length, keysNew, keys.length + 1,
-          this.keys.length - keys.length);
-
-      details.modified();
-      return new HashCollisionSetNode<>(keyHash, keysNew);
-    }
-
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
-    @Override
-    public /* protected */ CompactSetNode<K> removed(final AtomicReference<Thread> mutator,
-        final K key, final int keyHash, final int shift, final SetResult<K> details) {
-      for (int idx = 0; idx < keys.length; idx++) {
-        if (keys[idx].equals(key)) {
-          details.modified();
-          details.updateDeltaSize(-1);
-          details.updateDeltaHashCode(-keyHash);
-
-          if (this.arity() == 1) {
-            return nodeOf(mutator);
-          } else if (this.arity() == 2) {
-            /*
-             * Create root node with singleton element. This node will be a) either be the new root
-             * returned, or b) unwrapped and inlined.
-             */
-            final K theOtherKey = (idx == 0) ? keys[1] : keys[0];
-
-            return CompactSetNode.<K>nodeOf(mutator).updated(mutator, theOtherKey, keyHash, 0,
-                SetResult.unchanged());
-          } else {
-            final K[] keysNew = (K[]) new Object[this.keys.length - 1];
-
-            // copy 'this.keys' and remove 1 element(s) at position
-            // 'idx'
-            System.arraycopy(this.keys, 0, keysNew, 0, idx);
-            System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
-
-            return new HashCollisionSetNode<>(keyHash, keysNew);
-          }
-        }
-      }
-      return this;
-    }
-
-    @Override
-    CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key,
-        final int keyHash,
-        final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
-      for (int idx = 0; idx < keys.length; idx++) {
-        if (cmp.compare(keys[idx], key) == 0) {
-          details.modified();
-          details.updateDeltaSize(-1);
-          details.updateDeltaHashCode(-keyHash);
-
-          if (this.arity() == 1) {
-            return nodeOf(mutator);
-          } else if (this.arity() == 2) {
-            /*
-             * Create root node with singleton element. This node will be a) either be the new root
-             * returned, or b) unwrapped and inlined.
-             */
-            final K theOtherKey = (idx == 0) ? keys[1] : keys[0];
-
-            return CompactSetNode.<K>nodeOf(mutator).updated(mutator, theOtherKey, keyHash, 0,
-                SetResult.unchanged(), cmp);
-          } else {
-            final K[] keysNew = (K[]) new Object[this.keys.length - 1];
-
-            // copy 'this.keys' and remove 1 element(s) at position
-            // 'idx'
-            System.arraycopy(this.keys, 0, keysNew, 0, idx);
-            System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
-
-            return new HashCollisionSetNode<>(keyHash, keysNew);
-          }
-        }
-      }
-      return this;
-    }
-
-    @Override
-    public boolean hasPayload() {
-      return true;
-    }
-
-    @Override
-    public int payloadArity() {
-      return keys.length;
-    }
-
-    @Override
-    boolean hasNodes() {
-      return false;
-    }
-
-    @Override
-    int nodeArity() {
-      return 0;
-    }
-
-    @Override
-    int arity() {
-      return payloadArity();
-    }
-
-    @Override
-    public byte sizePredicate() {
-      return SIZE_MORE_THAN_ONE;
-    }
-
-    @Override
-    public K getKey(final int index) {
-      return keys[index];
-    }
-
-    @Override
-    public int getKeyHash(int index) {
-      return getKey(index).hashCode();
-    }
-
-    @Override
-    public CompactSetNode<K> getNode(int index) {
-      throw new IllegalStateException("Is leaf node.");
-    }
-
+//  private static final class HashCollisionSetNode<K> extends CompactSetNode<K> {
+//
+//    private final K[] keys;
+//
+//    private final int hash;
+//
+//    HashCollisionSetNode(final int hash, final K[] keys) {
+//      this.keys = keys;
+//
+//      this.hash = hash;
+//
+//      assert payloadArity() >= 2;
+//    }
+//
 //    @Override
-//    public void setNode(AtomicReference<Thread> mutator, int index, AbstractSetNode<K> node) {
+//    public ArrayView<AbstractSetNode<K>> nodeArray() {
+//      return ArrayView.empty();
+//    }
+//
+//    /*
+//     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
+//     * `protected` when experiments are finished.
+//     */
+//    @Override
+//    public /* protected */ boolean contains(final K key, final int keyHash, final int shift) {
+//      if (this.hash == keyHash) {
+//        for (K k : keys) {
+//          if (k.equals(key)) {
+//            return true;
+//          }
+//        }
+//      }
+//      return false;
+//    }
+//
+//    @Override
+//    boolean contains(final K key, final int keyHash, final int shift,
+//        final Comparator<Object> cmp) {
+//      if (this.hash == keyHash) {
+//        for (K k : keys) {
+//          if (cmp.compare(k, key) == 0) {
+//            return true;
+//          }
+//        }
+//      }
+//      return false;
+//    }
+//
+//    @Override
+//    Optional<K> findByKey(final K key, final int keyHash, final int shift) {
+//      for (int i = 0; i < keys.length; i++) {
+//        final K _key = keys[i];
+//        if (key.equals(_key)) {
+//          return Optional.of(_key);
+//        }
+//      }
+//      return Optional.empty();
+//    }
+//
+//    @Override
+//    Optional<K> findByKey(final K key, final int keyHash, final int shift,
+//        final Comparator<Object> cmp) {
+//      for (int i = 0; i < keys.length; i++) {
+//        final K _key = keys[i];
+//        if (cmp.compare(key, _key) == 0) {
+//          return Optional.of(_key);
+//        }
+//      }
+//      return Optional.empty();
+//    }
+//
+//    /*
+//     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
+//     * `protected` when experiments are finished.
+//     */
+//    @Override
+//    public /* protected */ CompactSetNode<K> updated(final AtomicReference<Thread> mutator,
+//        final K key, final int keyHash, final int shift, final SetResult<K> details) {
+//      assert this.hash == keyHash;
+//
+//      for (int idx = 0; idx < keys.length; idx++) {
+//        if (keys[idx].equals(key)) {
+//          return this;
+//        }
+//      }
+//
+//      final K[] keysNew = (K[]) new Object[this.keys.length + 1];
+//
+//      // copy 'this.keys' and insert 1 element(s) at position
+//      // 'keys.length'
+//      System.arraycopy(this.keys, 0, keysNew, 0, keys.length);
+//      keysNew[keys.length + 0] = key;
+//      System.arraycopy(this.keys, keys.length, keysNew, keys.length + 1,
+//          this.keys.length - keys.length);
+//
+//      details.modified();
+//      return new HashCollisionSetNode<>(keyHash, keysNew);
+//    }
+//
+//    @Override
+//    CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key,
+//        final int keyHash,
+//        final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
+//      assert this.hash == keyHash;
+//
+//      for (int idx = 0; idx < keys.length; idx++) {
+//        if (cmp.compare(keys[idx], key) == 0) {
+//          return this;
+//        }
+//      }
+//
+//      final K[] keysNew = (K[]) new Object[this.keys.length + 1];
+//
+//      // copy 'this.keys' and insert 1 element(s) at position
+//      // 'keys.length'
+//      System.arraycopy(this.keys, 0, keysNew, 0, keys.length);
+//      keysNew[keys.length + 0] = key;
+//      System.arraycopy(this.keys, keys.length, keysNew, keys.length + 1,
+//          this.keys.length - keys.length);
+//
+//      details.modified();
+//      return new HashCollisionSetNode<>(keyHash, keysNew);
+//    }
+//
+//    /*
+//     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
+//     * `protected` when experiments are finished.
+//     */
+//    @Override
+//    public /* protected */ CompactSetNode<K> removed(final AtomicReference<Thread> mutator,
+//        final K key, final int keyHash, final int shift, final SetResult<K> details) {
+//      for (int idx = 0; idx < keys.length; idx++) {
+//        if (keys[idx].equals(key)) {
+//          details.modified();
+//          details.updateDeltaSize(-1);
+//          details.updateDeltaHashCode(-keyHash);
+//
+//          if (this.arity() == 1) {
+//            return nodeOf(mutator);
+//          } else if (this.arity() == 2) {
+//            /*
+//             * Create root node with singleton element. This node will be a) either be the new root
+//             * returned, or b) unwrapped and inlined.
+//             */
+//            final K theOtherKey = (idx == 0) ? keys[1] : keys[0];
+//
+//            return CompactSetNode.<K>nodeOf(mutator).updated(mutator, theOtherKey, keyHash, 0,
+//                SetResult.unchanged());
+//          } else {
+//            final K[] keysNew = (K[]) new Object[this.keys.length - 1];
+//
+//            // copy 'this.keys' and remove 1 element(s) at position
+//            // 'idx'
+//            System.arraycopy(this.keys, 0, keysNew, 0, idx);
+//            System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
+//
+//            return new HashCollisionSetNode<>(keyHash, keysNew);
+//          }
+//        }
+//      }
+//      return this;
+//    }
+//
+//    @Override
+//    CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key,
+//        final int keyHash,
+//        final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
+//      for (int idx = 0; idx < keys.length; idx++) {
+//        if (cmp.compare(keys[idx], key) == 0) {
+//          details.modified();
+//          details.updateDeltaSize(-1);
+//          details.updateDeltaHashCode(-keyHash);
+//
+//          if (this.arity() == 1) {
+//            return nodeOf(mutator);
+//          } else if (this.arity() == 2) {
+//            /*
+//             * Create root node with singleton element. This node will be a) either be the new root
+//             * returned, or b) unwrapped and inlined.
+//             */
+//            final K theOtherKey = (idx == 0) ? keys[1] : keys[0];
+//
+//            return CompactSetNode.<K>nodeOf(mutator).updated(mutator, theOtherKey, keyHash, 0,
+//                SetResult.unchanged(), cmp);
+//          } else {
+//            final K[] keysNew = (K[]) new Object[this.keys.length - 1];
+//
+//            // copy 'this.keys' and remove 1 element(s) at position
+//            // 'idx'
+//            System.arraycopy(this.keys, 0, keysNew, 0, idx);
+//            System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
+//
+//            return new HashCollisionSetNode<>(keyHash, keysNew);
+//          }
+//        }
+//      }
+//      return this;
+//    }
+//
+//    @Override
+//    public boolean hasPayload() {
+//      return true;
+//    }
+//
+//    @Override
+//    public int payloadArity() {
+//      return keys.length;
+//    }
+//
+//    @Override
+//    boolean hasNodes() {
+//      return false;
+//    }
+//
+//    @Override
+//    int nodeArity() {
+//      return 0;
+//    }
+//
+//    @Override
+//    int arity() {
+//      return payloadArity();
+//    }
+//
+//    @Override
+//    public byte sizePredicate() {
+//      return SIZE_MORE_THAN_ONE;
+//    }
+//
+//    @Override
+//    public K getKey(final int index) {
+//      return keys[index];
+//    }
+//
+//    @Override
+//    public int getKeyHash(int index) {
+//      return getKey(index).hashCode();
+//    }
+//
+//    @Override
+//    public CompactSetNode<K> getNode(int index) {
 //      throw new IllegalStateException("Is leaf node.");
 //    }
-
-    @Override
-    Object getSlot(final int index) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    boolean hasSlots() {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    int slotArity() {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    int localPayloadHashCode() {
-      return hash * keys.length;
-    }
-
-    @Override
-    public int hashCode() {
-      final int prime = 31;
-      int result = 0;
-      result = prime * result + hash;
-      result = prime * result + Arrays.hashCode(keys);
-      return result;
-    }
-
-    @Override
-    public boolean equals(Object other) {
-      if (null == other) {
-        return false;
-      }
-      if (this == other) {
-        return true;
-      }
-      if (getClass() != other.getClass()) {
-        return false;
-      }
-
-      HashCollisionSetNode<?> that = (HashCollisionSetNode<?>) other;
-
-      if (hash != that.hash) {
-        return false;
-      }
-
-      if (arity() != that.arity()) {
-        return false;
-      }
-
-      /*
-       * Linear scan for each key, because of arbitrary element order.
-       */
-      outerLoop:
-      for (int i = 0; i < that.payloadArity(); i++) {
-        final Object otherKey = that.getKey(i);
-
-        for (int j = 0; j < keys.length; j++) {
-          final K key = keys[j];
-
-          if (key.equals(otherKey)) {
-            continue outerLoop;
-          }
-        }
-        return false;
-
-      }
-
-      return true;
-    }
-
-    @Override
-    CompactSetNode<K> copyAndInsertValue(final AtomicReference<Thread> mutator, final int bitpos,
-        final K key, int keyHash) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    CompactSetNode<K> copyAndRemoveValue(final AtomicReference<Thread> mutator,
-        final int bitpos, K key, int keyHash) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    CompactSetNode<K> copyAndSetNode(final AtomicReference<Thread> mutator, final int bitpos,
-        final CompactSetNode<K> node,
-        SetResult<K> details) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    CompactSetNode<K> copyAndMigrateFromInlineToNode(final AtomicReference<Thread> mutator,
-        final int bitpos, K newKey, int newKeyHash, final CompactSetNode<K> node) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    CompactSetNode<K> copyAndMigrateFromNodeToInline(final AtomicReference<Thread> mutator,
-        final int bitpos, K oldKey, int oldKeyHash, final CompactSetNode<K> node) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    final int nodeMap() {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    final int dataMap() {
-      throw new UnsupportedOperationException();
-    }
-
-    /*
-     * TODO: factor out common part of union/subtract/intersect; differ only in stream ops.
-     */
-    @Override
-    public AbstractSetNode<K> intersect(AtomicReference<Thread> mutator, AbstractSetNode<K> other,
-        int shift, IntersectionResult details, Comparator<Object> cmp,
-        Preference directionPreference) {
-      assert other instanceof PersistentTrieSetExtended.HashCollisionSetNode;
-
-      final HashCollisionSetNode that = (HashCollisionSetNode) other;
-
-      final List<K> thisContent = Arrays.asList(this.keys);
-      final List<?> thatContent = Arrays.asList(that.keys);
-
-      final K[] newItemArray = (K[]) thisContent.stream()
-          .filter(item -> thatContent.contains(item))
-          .toArray();
-
-      // delta @ collection
-      details.addSize(newItemArray.length);
-      details.addHashCode(newItemArray.length * this.hash);
-
-      if (newItemArray.length == thisContent.size()) {
-        return this;
-      }
-
-      switch (newItemArray.length) {
-        case 0:
-          return EMPTY_NODE;
-        case 1:
-          return EMPTY_NODE.updated(mutator, newItemArray[0], hash, 0, SetResult.unchanged(), cmp);
-        default:
-          return new HashCollisionSetNode<>(hash, newItemArray);
-      }
-    }
-
-    /*
-     * TODO: factor out common part of union/subtract/intersect; differ only in stream ops.
-     */
-    @Override
-    public AbstractSetNode<K> union(AtomicReference<Thread> mutator, AbstractSetNode<K> other,
-        int shift, IntersectionResult details, Comparator<Object> cmp,
-        Preference directionPreference) {
-      assert other instanceof PersistentTrieSetExtended.HashCollisionSetNode;
-
-      final HashCollisionSetNode that = (HashCollisionSetNode) other;
-
-      final List<K> thisContent = Arrays.asList(this.keys);
-      final List<?> thatContent = Arrays.asList(that.keys);
-
-      final K[] newItemArray = (K[]) Stream.concat(thisContent.stream(), thatContent.stream())
-          .distinct().toArray();
-
-      // delta @ collection
-      details.addSize(newItemArray.length);
-      details.addHashCode(newItemArray.length * this.hash);
-
-      if (newItemArray.length == thisContent.size()) {
-        return this;
-      }
-
-      switch (newItemArray.length) {
-        case 0:
-          return EMPTY_NODE;
-        case 1:
-          return EMPTY_NODE.updated(mutator, newItemArray[0], hash, 0, SetResult.unchanged(), cmp);
-        default:
-          return new HashCollisionSetNode<>(hash, newItemArray);
-      }
-    }
-
-    /*
-     * TODO: factor out common part of union/subtract/intersect; differ only in stream ops.
-     */
-    @Override
-    public AbstractSetNode<K> subtract(AtomicReference<Thread> mutator, AbstractSetNode<K> other,
-        int shift, IntersectionResult details, Comparator<Object> cmp,
-        Preference directionPreference) {
-      assert other instanceof PersistentTrieSetExtended.HashCollisionSetNode;
-
-      final HashCollisionSetNode that = (HashCollisionSetNode) other;
-
-      final List<K> thisContent = Arrays.asList(this.keys);
-      final List<?> thatContent = Arrays.asList(that.keys);
-
-      final K[] newItemArray = (K[]) thisContent.stream()
-          .filter(item -> !thatContent.contains(item))
-          .toArray();
-
-      // delta @ collection
-      details.addSize(newItemArray.length);
-      details.addHashCode(newItemArray.length * this.hash);
-
-      if (newItemArray.length == thisContent.size()) {
-        return this;
-      }
-
-      switch (newItemArray.length) {
-        case 0:
-          return EMPTY_NODE;
-        case 1:
-          return EMPTY_NODE
-              .updated(mutator, newItemArray[0], hash, 0, SetResult.unchanged(), cmp);
-        default:
-          return new HashCollisionSetNode<>(hash, newItemArray);
-      }
-    }
-  }
+//
+////    @Override
+////    public void setNode(AtomicReference<Thread> mutator, int index, AbstractSetNode<K> node) {
+////      throw new IllegalStateException("Is leaf node.");
+////    }
+//
+//    @Override
+//    Object getSlot(final int index) {
+//      throw new UnsupportedOperationException();
+//    }
+//
+//    @Override
+//    boolean hasSlots() {
+//      throw new UnsupportedOperationException();
+//    }
+//
+//    @Override
+//    int slotArity() {
+//      throw new UnsupportedOperationException();
+//    }
+//
+//    @Override
+//    int localPayloadHashCode() {
+//      return hash * keys.length;
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//      final int prime = 31;
+//      int result = 0;
+//      result = prime * result + hash;
+//      result = prime * result + Arrays.hashCode(keys);
+//      return result;
+//    }
+//
+//    @Override
+//    public boolean equals(Object other) {
+//      if (null == other) {
+//        return false;
+//      }
+//      if (this == other) {
+//        return true;
+//      }
+//      if (getClass() != other.getClass()) {
+//        return false;
+//      }
+//
+//      HashCollisionSetNode<?> that = (HashCollisionSetNode<?>) other;
+//
+//      if (hash != that.hash) {
+//        return false;
+//      }
+//
+//      if (arity() != that.arity()) {
+//        return false;
+//      }
+//
+//      /*
+//       * Linear scan for each key, because of arbitrary element order.
+//       */
+//      outerLoop:
+//      for (int i = 0; i < that.payloadArity(); i++) {
+//        final Object otherKey = that.getKey(i);
+//
+//        for (int j = 0; j < keys.length; j++) {
+//          final K key = keys[j];
+//
+//          if (key.equals(otherKey)) {
+//            continue outerLoop;
+//          }
+//        }
+//        return false;
+//
+//      }
+//
+//      return true;
+//    }
+//
+//    @Override
+//    CompactSetNode<K> copyAndInsertValue(final AtomicReference<Thread> mutator, final int bitpos,
+//        final K key, int keyHash) {
+//      throw new UnsupportedOperationException();
+//    }
+//
+//    @Override
+//    CompactSetNode<K> copyAndRemoveValue(final AtomicReference<Thread> mutator,
+//        final int bitpos, K key, int keyHash) {
+//      throw new UnsupportedOperationException();
+//    }
+//
+//    @Override
+//    CompactSetNode<K> copyAndSetNode(final AtomicReference<Thread> mutator, final int bitpos,
+//        final CompactSetNode<K> node,
+//        SetResult<K> details) {
+//      throw new UnsupportedOperationException();
+//    }
+//
+//    @Override
+//    CompactSetNode<K> copyAndMigrateFromInlineToNode(final AtomicReference<Thread> mutator,
+//        final int bitpos, K newKey, int newKeyHash, final CompactSetNode<K> node) {
+//      throw new UnsupportedOperationException();
+//    }
+//
+//    @Override
+//    CompactSetNode<K> copyAndMigrateFromNodeToInline(final AtomicReference<Thread> mutator,
+//        final int bitpos, K oldKey, int oldKeyHash, final CompactSetNode<K> node) {
+//      throw new UnsupportedOperationException();
+//    }
+//
+//    @Override
+//    final int nodeMap() {
+//      throw new UnsupportedOperationException();
+//    }
+//
+//    @Override
+//    final int dataMap() {
+//      throw new UnsupportedOperationException();
+//    }
+//
+//    /*
+//     * TODO: factor out common part of union/subtract/intersect; differ only in stream ops.
+//     */
+//    @Override
+//    public AbstractSetNode<K> intersect(AtomicReference<Thread> mutator, AbstractSetNode<K> other,
+//        int shift, IntersectionResult details, Comparator<Object> cmp,
+//        Preference directionPreference) {
+//      assert other instanceof PersistentTrieSetExtended.HashCollisionSetNode;
+//
+//      final HashCollisionSetNode that = (HashCollisionSetNode) other;
+//
+//      final List<K> thisContent = Arrays.asList(this.keys);
+//      final List<?> thatContent = Arrays.asList(that.keys);
+//
+//      final K[] newItemArray = (K[]) thisContent.stream()
+//          .filter(item -> thatContent.contains(item))
+//          .toArray();
+//
+//      // delta @ collection
+//      details.addSize(newItemArray.length);
+//      details.addHashCode(newItemArray.length * this.hash);
+//
+//      if (newItemArray.length == thisContent.size()) {
+//        return this;
+//      }
+//
+//      switch (newItemArray.length) {
+//        case 0:
+//          return EMPTY_NODE;
+//        case 1:
+//          return EMPTY_NODE.updated(mutator, newItemArray[0], hash, 0, SetResult.unchanged(), cmp);
+//        default:
+//          return new HashCollisionSetNode<>(hash, newItemArray);
+//      }
+//    }
+//
+//    /*
+//     * TODO: factor out common part of union/subtract/intersect; differ only in stream ops.
+//     */
+//    @Override
+//    public AbstractSetNode<K> union(AtomicReference<Thread> mutator, AbstractSetNode<K> other,
+//        int shift, IntersectionResult details, Comparator<Object> cmp,
+//        Preference directionPreference) {
+//      assert other instanceof PersistentTrieSetExtended.HashCollisionSetNode;
+//
+//      final HashCollisionSetNode that = (HashCollisionSetNode) other;
+//
+//      final List<K> thisContent = Arrays.asList(this.keys);
+//      final List<?> thatContent = Arrays.asList(that.keys);
+//
+//      final K[] newItemArray = (K[]) Stream.concat(thisContent.stream(), thatContent.stream())
+//          .distinct().toArray();
+//
+//      // delta @ collection
+//      details.addSize(newItemArray.length);
+//      details.addHashCode(newItemArray.length * this.hash);
+//
+//      if (newItemArray.length == thisContent.size()) {
+//        return this;
+//      }
+//
+//      switch (newItemArray.length) {
+//        case 0:
+//          return EMPTY_NODE;
+//        case 1:
+//          return EMPTY_NODE.updated(mutator, newItemArray[0], hash, 0, SetResult.unchanged(), cmp);
+//        default:
+//          return new HashCollisionSetNode<>(hash, newItemArray);
+//      }
+//    }
+//
+//    /*
+//     * TODO: factor out common part of union/subtract/intersect; differ only in stream ops.
+//     */
+//    @Override
+//    public AbstractSetNode<K> subtract(AtomicReference<Thread> mutator, AbstractSetNode<K> other,
+//        int shift, IntersectionResult details, Comparator<Object> cmp,
+//        Preference directionPreference) {
+//      assert other instanceof PersistentTrieSetExtended.HashCollisionSetNode;
+//
+//      final HashCollisionSetNode that = (HashCollisionSetNode) other;
+//
+//      final List<K> thisContent = Arrays.asList(this.keys);
+//      final List<?> thatContent = Arrays.asList(that.keys);
+//
+//      final K[] newItemArray = (K[]) thisContent.stream()
+//          .filter(item -> !thatContent.contains(item))
+//          .toArray();
+//
+//      // delta @ collection
+//      details.addSize(newItemArray.length);
+//      details.addHashCode(newItemArray.length * this.hash);
+//
+//      if (newItemArray.length == thisContent.size()) {
+//        return this;
+//      }
+//
+//      switch (newItemArray.length) {
+//        case 0:
+//          return EMPTY_NODE;
+//        case 1:
+//          return EMPTY_NODE
+//              .updated(mutator, newItemArray[0], hash, 0, SetResult.unchanged(), cmp);
+//        default:
+//          return new HashCollisionSetNode<>(hash, newItemArray);
+//      }
+//    }
+//  }
 
   /**
    * Iterator skeleton that uses a fixed stack in depth.
