@@ -89,11 +89,11 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
     }
   }
 
-  public static final <K> Immutable<K> of() {
+  public static final <K> Set.Immutable<K> of() {
     return PersistentTrieSetExtended.EMPTY_SET;
   }
 
-  public static final <K> Immutable<K> of(K key0) {
+  public static final <K> Set.Immutable<K> of(K key0) {
     final int keyHash0 = key0.hashCode();
 
     final int dataMap = CompactSetNode.bitpos(CompactSetNode.mask(keyHash0, 0));
@@ -103,7 +103,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
     return new PersistentTrieSetExtended<K>(newRootNode, keyHash0, 1);
   }
 
-  public static final <K> Immutable<K> of(K key0, K key1) {
+  public static final <K> Set.Immutable<K> of(K key0, K key1) {
     assert !Objects.equals(key0, key1);
 
     final int keyHash0 = key0.hashCode();
@@ -115,8 +115,8 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
     return new PersistentTrieSetExtended<K>(newRootNode, keyHash0 + keyHash1, 2);
   }
 
-  public static final <K> Immutable<K> of(K... keys) {
-    Immutable<K> result = PersistentTrieSetExtended.EMPTY_SET;
+  public static final <K> Set.Immutable<K> of(K... keys) {
+    Set.Immutable<K> result = PersistentTrieSetExtended.EMPTY_SET;
 
     for (final K key : keys) {
       result = result.__insert(key);
@@ -125,12 +125,12 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
     return result;
   }
 
-  public static final <K> Transient<K> transientOf() {
+  public static final <K> Set.Transient<K> transientOf() {
     return PersistentTrieSetExtended.EMPTY_SET.asTransient();
   }
 
-  public static final <K> Transient<K> transientOf(K... keys) {
-    final Transient<K> result = PersistentTrieSetExtended.EMPTY_SET.asTransient();
+  public static final <K> Set.Transient<K> transientOf(K... keys) {
+    final Set.Transient<K> result = PersistentTrieSetExtended.EMPTY_SET.asTransient();
 
     for (final K key : keys) {
       result.__insert(key);
@@ -230,7 +230,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
   }
 
   @Override
-  public Immutable<K> __insert(final K key) {
+  public Set.Immutable<K> __insert(final K key) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -246,7 +246,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
   }
 
   @Override
-  public Immutable<K> __insertEquivalent(final K key, final Comparator<Object> cmp) {
+  public Set.Immutable<K> __insertEquivalent(final K key, final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -262,22 +262,22 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
   }
 
   @Override
-  public Immutable<K> __insertAll(final java.util.Set<? extends K> set) {
-    final Transient<K> tmpTransient = this.asTransient();
+  public Set.Immutable<K> __insertAll(final java.util.Set<? extends K> set) {
+    final Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__insertAll(set);
     return tmpTransient.freeze();
   }
 
   @Override
-  public Immutable<K> __insertAllEquivalent(final java.util.Set<? extends K> set,
+  public Set.Immutable<K> __insertAllEquivalent(final java.util.Set<? extends K> set,
       final Comparator<Object> cmp) {
-    final Transient<K> tmpTransient = this.asTransient();
+    final Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__insertAllEquivalent(set, cmp);
     return tmpTransient.freeze();
   }
 
   @Override
-  public Immutable<K> __remove(final K key) {
+  public Set.Immutable<K> __remove(final K key) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -293,7 +293,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
   }
 
   @Override
-  public Immutable<K> __removeEquivalent(final K key, final Comparator<Object> cmp) {
+  public Set.Immutable<K> __removeEquivalent(final K key, final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -309,37 +309,37 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
   }
 
   @Override
-  public Immutable<K> __removeAll(final java.util.Set<? extends K> set) {
-    final Transient<K> tmpTransient = this.asTransient();
+  public Set.Immutable<K> __removeAll(final java.util.Set<? extends K> set) {
+    final Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__removeAll(set);
     return tmpTransient.freeze();
   }
 
   @Override
-  public Immutable<K> __removeAllEquivalent(final java.util.Set<? extends K> set,
+  public Set.Immutable<K> __removeAllEquivalent(final java.util.Set<? extends K> set,
       final Comparator<Object> cmp) {
-    final Transient<K> tmpTransient = this.asTransient();
+    final Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__removeAllEquivalent(set, cmp);
     return tmpTransient.freeze();
   }
 
   @Override
-  public Immutable<K> __retainAll(final java.util.Set<? extends K> set) {
-    final Transient<K> tmpTransient = this.asTransient();
+  public Set.Immutable<K> __retainAll(final java.util.Set<? extends K> set) {
+    final Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__retainAll(set);
     return tmpTransient.freeze();
   }
 
   @Override
-  public Immutable<K> __retainAllEquivalent(final Transient<? extends K> transientSet,
+  public Set.Immutable<K> __retainAllEquivalent(final Set.Transient<? extends K> transientSet,
       final Comparator<Object> cmp) {
-    final Transient<K> tmpTransient = this.asTransient();
+    final Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__retainAllEquivalent(transientSet, cmp);
     return tmpTransient.freeze();
   }
 
   @Override
-  public Immutable<K> union(final Immutable<K> other) {
+  public Set.Immutable<K> union(final Set.Immutable<K> other) {
 
     if (this == other) {
       return this;
@@ -358,7 +358,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
     }
 
     if (!(other instanceof PersistentTrieSetExtended)) {
-      return Immutable.union(this, other);
+      return Set.Immutable.union(this, other);
     }
 
     final PersistentTrieSetExtended<K> set1 = this;
@@ -407,10 +407,10 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
   }
 
   @Override
-  public Immutable<K> subtract(final Immutable<K> other) {
+  public Set.Immutable<K> subtract(final Set.Immutable<K> other) {
 
     if (this == other) {
-      return Immutable.of();
+      return Set.Immutable.of();
     }
 
     if (other == null) {
@@ -426,7 +426,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
     }
 
     if (!(other instanceof PersistentTrieSetExtended)) {
-      return Immutable.subtract(this, other);
+      return Set.Immutable.subtract(this, other);
     }
 
     final PersistentTrieSetExtended<K> set1 = this;
@@ -448,7 +448,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
     if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
       if (details.getAccumulatedSize() == 0) {
-        return Immutable.of();
+        return Set.Immutable.of();
       }
 
       assert details.getAccumulatedSize() == size(newRootNode);
@@ -458,7 +458,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
           details.getAccumulatedSize());
     } else {
       if (rootNode.size() == 0) {
-        return Immutable.of();
+        return Set.Immutable.of();
       }
 
       assert newRootNode.size() == size(newRootNode);
@@ -470,14 +470,14 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
   }
 
   @Override
-  public Immutable<K> intersect(final Immutable<K> other) {
+  public Set.Immutable<K> intersect(final Set.Immutable<K> other) {
 
     if (this == other) {
       return this;
     }
 
     if (other == null) {
-      return Immutable.of();
+      return Set.Immutable.of();
     }
 
     if (this == EMPTY_SET || this.isEmpty()) {
@@ -489,7 +489,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
     }
 
     if (!(other instanceof PersistentTrieSetExtended)) {
-      return Immutable.intersect(this, other);
+      return Set.Immutable.intersect(this, other);
     }
 
     final PersistentTrieSetExtended<K> set1 = this;
@@ -524,7 +524,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
     if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
       if (details.getAccumulatedSize() == 0) {
-        return Immutable.of();
+        return Set.Immutable.of();
       }
 
       assert details.getAccumulatedSize() == size(newRootNode);
@@ -534,7 +534,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
           details.getAccumulatedSize());
     } else {
       if (rootNode.size() == 0) {
-        return Immutable.of();
+        return Set.Immutable.of();
       }
 
       assert newRootNode.size() == size(newRootNode);
@@ -691,7 +691,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
   }
 
   @Override
-  public Transient<K> asTransient() {
+  public Set.Transient<K> asTransient() {
     return new TransientTrieSet<K>(this);
   }
 
@@ -3797,7 +3797,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
     }
   }
 
-  static abstract class AbstractTransientTrieSet<K> implements Transient<K> {
+  static abstract class AbstractTransientTrieSet<K> implements Set.Transient<K> {
 
     protected AbstractSetNode<K> rootNode;
     protected int cachedHashCode;
@@ -4093,7 +4093,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
     }
 
     @Override
-    public boolean __retainAllEquivalent(final Transient<? extends K> transientSet,
+    public boolean __retainAllEquivalent(final Set.Transient<? extends K> transientSet,
         final Comparator<Object> cmp) {
       boolean modified = false;
 
@@ -4233,6 +4233,59 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
   }
 
+  protected static class ImmutablePayloadTuple<T> implements
+      Comparable<ImmutablePayloadTuple<T>> {
+
+    private final int hash;
+    private final T payload;
+
+    private ImmutablePayloadTuple(final int hash, final T payload) {
+      this.hash = hash;
+      this.payload = payload;
+    }
+
+    static final <K> ImmutablePayloadTuple<K> of(final int hash, final K payload) {
+      return new ImmutablePayloadTuple<>(hash, payload);
+    }
+
+    public T get() {
+      return payload;
+    }
+
+    @Override
+    public int compareTo(ImmutablePayloadTuple<T> other) {
+      return hash - other.hash;
+    }
+
+    @Override
+    public int hashCode() {
+      return hash;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+      if (null == other) {
+        return false;
+      }
+      if (this == other) {
+        return true;
+      }
+      if (getClass() != other.getClass()) {
+        return false;
+      }
+
+      ImmutablePayloadTuple that = (ImmutablePayloadTuple) other;
+
+      return hash == that.hash && Objects.equals(payload, that.payload);
+    }
+
+    @Override
+    public String toString() {
+      return String.format("%d", hash);
+    }
+
+  }
+
   static final class TransientTrieSet<K> extends AbstractTransientTrieSet<K> {
 
     final private AtomicReference<Thread> mutator;
@@ -4263,7 +4316,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
     }
 
     @Override
-    public Immutable<K> freeze() {
+    public Set.Immutable<K> freeze() {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
