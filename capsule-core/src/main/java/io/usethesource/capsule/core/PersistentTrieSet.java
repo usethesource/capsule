@@ -388,10 +388,14 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+      assert unmodified.cachedSize + details.getAccumulatedSize() == size(newRootNode);
+      assert unmodified.cachedHashCode + details.getAccumulatedHashCode() == hashCode(newRootNode);
       return new PersistentTrieSet(newRootNode,
           unmodified.cachedHashCode + details.getAccumulatedHashCode(),
           unmodified.cachedSize + details.getAccumulatedSize());
     } else {
+      assert newRootNode.size() == size(newRootNode);
+      assert newRootNode.recursivePayloadHashCode() == hashCode(newRootNode);
       return new PersistentTrieSet(newRootNode,
           newRootNode.recursivePayloadHashCode(),
           newRootNode.size());
@@ -443,6 +447,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         return Set.Immutable.of();
       }
 
+      assert details.getAccumulatedSize() == size(newRootNode);
+      assert details.getAccumulatedHashCode() == hashCode(newRootNode);
       return new PersistentTrieSet(newRootNode,
           details.getAccumulatedHashCode(),
           details.getAccumulatedSize());
@@ -451,6 +457,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         return Set.Immutable.of();
       }
 
+      assert newRootNode.size() == size(newRootNode);
+      assert newRootNode.recursivePayloadHashCode() == hashCode(newRootNode);
       return new PersistentTrieSet(newRootNode,
           newRootNode.recursivePayloadHashCode(),
           newRootNode.size());
@@ -515,8 +523,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         return Set.Immutable.of();
       }
 
-      // assert details.getAccumulatedSize() == size(newRootNode);
-      // assert details.getAccumulatedHashCode() == hashCode(newRootNode);
+      assert details.getAccumulatedSize() == size(newRootNode);
+      assert details.getAccumulatedHashCode() == hashCode(newRootNode);
       return new PersistentTrieSet(newRootNode,
           details.getAccumulatedHashCode(),
           details.getAccumulatedSize());
@@ -525,8 +533,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         return Set.Immutable.of();
       }
 
-      // assert newRootNode.size() == size(newRootNode);
-      // assert newRootNode.recursivePayloadHashCode() == hashCode(newRootNode);
+      assert newRootNode.size() == size(newRootNode);
+      assert newRootNode.recursivePayloadHashCode() == hashCode(newRootNode);
       return new PersistentTrieSet(newRootNode,
           newRootNode.recursivePayloadHashCode(),
           newRootNode.size());
@@ -2072,6 +2080,16 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       final CompactSetNode<K> node1 = (CompactSetNode<K>) that;
 
       if (node0 == node1) {
+        // TODO: direction preference?
+        if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+          final int remainingSize = node0.size();
+          final int remainingHashCode = node0.recursivePayloadHashCode();
+
+          // delta @ collection
+          details.addSize(remainingSize);
+          details.addHashCode(remainingHashCode);
+        }
+
         return node0;
       }
 
@@ -2755,6 +2773,15 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       final CompactSetNode<K> node1 = (CompactSetNode<K>) that;
 
       if (node0 == node1) {
+//        if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+//          final int remainingSize = node0.size();
+//          final int remainingHashCode = node0.recursivePayloadHashCode();
+//
+//          // delta @ collection
+//          details.addSize(remainingSize);
+//          details.addHashCode(remainingHashCode);
+//        }
+
         return EMPTY_NODE;
       }
 
@@ -3272,6 +3299,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       for (int idx = 0; idx < keys.length; idx++) {
         if (keys[idx].equals(key)) {
           details.modified();
+          details.updateDeltaSize(-1);
+          details.updateDeltaHashCode(-keyHash);
 
           if (this.arity() == 1) {
             return nodeOf(mutator);
@@ -3283,7 +3312,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
             final K theOtherKey = (idx == 0) ? keys[1] : keys[0];
 
             return CompactSetNode.<K>nodeOf(mutator).updated(mutator, theOtherKey, keyHash, 0,
-                details);
+                SetResult.unchanged());
           } else {
             final K[] keysNew = (K[]) new Object[this.keys.length - 1];
 
@@ -3306,6 +3335,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       for (int idx = 0; idx < keys.length; idx++) {
         if (cmp.compare(keys[idx], key) == 0) {
           details.modified();
+          details.updateDeltaSize(-1);
+          details.updateDeltaHashCode(-keyHash);
 
           if (this.arity() == 1) {
             return nodeOf(mutator);
@@ -3317,7 +3348,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
             final K theOtherKey = (idx == 0) ? keys[1] : keys[0];
 
             return CompactSetNode.<K>nodeOf(mutator).updated(mutator, theOtherKey, keyHash, 0,
-                details, cmp);
+                SetResult.unchanged(), cmp);
           } else {
             final K[] keysNew = (K[]) new Object[this.keys.length - 1];
 
