@@ -854,7 +854,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
     private static final long serialVersionUID = 42L;
 
     static {
-      EMPTY_NODE = new BitmapIndexedSetNode<>(null, 0, 0, new Object[]{}, 0, 0);
+      EMPTY_NODE = new BitmapIndexedSetNode<>(null, 0, 0, 0, new Object[]{}, 0, 0);
     }
 
     static final int HASH_CODE_LENGTH = 32;
@@ -865,6 +865,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
     final int nodeMap;
     final int dataMap;
+    final int hashMap;
 
     final Object[] nodes;
 
@@ -872,10 +873,12 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
     int cachedSize;
 
     private BitmapIndexedSetNode(final AtomicReference<Thread> mutator, final int nodeMap,
-        final int dataMap, final Object[] nodes, final int cachedHashCode, final int cachedSize) {
+        final int dataMap, final int hashMap, final Object[] nodes, final int cachedHashCode,
+        final int cachedSize) {
 
       this.dataMap = dataMap;
       this.nodeMap = nodeMap;
+      this.hashMap = hashMap;
 
       this.mutator = mutator;
       this.nodes = nodes;
@@ -904,6 +907,10 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
     final int dataMap() {
       return dataMap;
+    }
+
+    final int hashMap() {
+      return hashMap;
     }
 
     static final int mask(final int keyHash, final int shift) {
@@ -948,10 +955,30 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
       }
     }
 
+    static final <K> BitmapIndexedSetNode<K> mergeCollisionsWithPayload(
+        final Set<ImmutablePayloadTuple<K>> collisions,
+        final ImmutablePayloadTuple<K> payload,
+        final int shift) {
+
+      final int maskC = mask(collisions.findFirst().get().keyHash(), shift);
+      final int maskP = mask(payload.keyHash(), shift);
+
+      if (maskC != maskP) {
+        // both nodes fit on same level
+        return nodeOf(null, bitpos(maskP), bitpos(maskC), payload, collisions);
+      } else {
+        final BitmapIndexedSetNode<K> node = mergeCollisionsWithPayload(collisions, payload,
+            shift + BIT_PARTITION_SIZE);
+        // values fit on next level
+        return nodeOf(null, bitpos(maskC) & bitpos(maskP), node);
+      }
+    }
+
     static final <K> BitmapIndexedSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
-        final int nodeMap, final int dataMap, final Object[] nodes, final int cachedHashCode,
+        final int nodeMap, final int dataMap, final int hashMap, final Object[] nodes,
+        final int cachedHashCode,
         final int cachedSize) {
-      return new BitmapIndexedSetNode<>(mutator, nodeMap, dataMap, nodes, cachedHashCode,
+      return new BitmapIndexedSetNode<>(mutator, nodeMap, dataMap, hashMap, nodes, cachedHashCode,
           cachedSize);
     }
 
@@ -962,22 +989,25 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
     static final <K> BitmapIndexedSetNode<K> nodeOf(AtomicReference<Thread> mutator,
         final int dataMap, final ImmutablePayloadTuple<K> payload) {
       return BitmapIndexedSetNode
-          .nodeOf(mutator, 0, dataMap, new Object[]{payload}, payload.keyHash(), 1);
+          .nodeOf(mutator, 0, 0, dataMap, new Object[]{payload}, payload.keyHash(), 1);
     }
 
     static final <K> BitmapIndexedSetNode<K> nodeOf(AtomicReference<Thread> mutator,
         final int dataMap,
         final ImmutablePayloadTuple<K> payload0, final ImmutablePayloadTuple<K> payload1) {
       return BitmapIndexedSetNode
-          .nodeOf(mutator, 0, dataMap, new Object[]{payload0, payload1},
+          .nodeOf(mutator, 0, 0, dataMap, new Object[]{payload0, payload1},
               payload0.keyHash() + payload1.keyHash(), 2);
+      Optional<K> op = null;
+
+      
     }
 
     // TODO: improve recursive properties
     static final <K> BitmapIndexedSetNode<K> nodeOf(AtomicReference<Thread> mutator,
         final int nodeMap, final BitmapIndexedSetNode<K> node) {
       return BitmapIndexedSetNode
-          .nodeOf(mutator, nodeMap, 0, new Object[]{node}, node.recursivePayloadHashCode(),
+          .nodeOf(mutator, nodeMap, 0, 0, new Object[]{node}, node.recursivePayloadHashCode(),
               node.size());
     }
 
@@ -1069,6 +1099,10 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
     ImmutablePayloadTuple<K> getPayload(final int index) {
       return (ImmutablePayloadTuple<K>) nodes[TUPLE_LENGTH * index];
+    }
+
+    Set.Immutable<ImmutablePayloadTuple<K>> getCollisions(final int index) {
+      return (Set.Immutable<ImmutablePayloadTuple<K>>) nodes[TUPLE_LENGTH * payloadArity() + index];
     }
 
     BitmapIndexedSetNode<K> getNode(final int index) {
@@ -1209,7 +1243,40 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
         System.arraycopy(src, 0, dst, 0, src.length);
         dst[idx + 0] = newNode;
 
-        return nodeOf(mutator, nodeMap(), dataMap(), dst, newCachedHashCode, newCachedSize);
+        return nodeOf(mutator, nodeMap(), dataMap(), hashMap(), dst, newCachedHashCode,
+            newCachedSize);
+      }
+    }
+
+    BitmapIndexedSetNode<K> copyAndSetCollisions(final AtomicReference<Thread> mutator,
+        final int bitpos, final Set.Immutable<ImmutablePayloadTuple<K>> newCollisions,
+        SetResult<K> details) {
+
+      final int hashIndex = hashIndex(bitpos);
+
+      final int newCachedHashCode = cachedHashCode + details.getDeltaHashCode();
+      final int newCachedSize = cachedSize + details.getDeltaSize();
+
+      final int idx = payloadArity() + hashIndex;
+
+      if (isAllowedToEdit(this.mutator, mutator)) {
+        // no copying if already editable
+
+        this.nodes[idx] = newCollisions;
+        this.cachedHashCode = newCachedHashCode;
+        this.cachedSize = newCachedSize;
+
+        return this;
+      } else {
+        final Object[] src = this.nodes;
+        final Object[] dst = new Object[src.length];
+
+        // copy 'src' and set 1 element(s) at position 'idx'
+        System.arraycopy(src, 0, dst, 0, src.length);
+        dst[idx + 0] = newCollisions;
+
+        return nodeOf(mutator, nodeMap(), dataMap(), hashMap(), dst, newCachedHashCode,
+            newCachedSize);
       }
     }
 
@@ -1225,7 +1292,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
       dst[idx + 0] = payload;
       System.arraycopy(src, idx, dst, idx + 1, src.length - idx);
 
-      return nodeOf(mutator, nodeMap(), dataMap() | bitpos, dst,
+      return nodeOf(mutator, nodeMap(), dataMap() | bitpos, hashMap(), dst,
           cachedHashCode + payload.keyHash(), cachedSize + 1);
     }
 
@@ -1240,7 +1307,8 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
       System.arraycopy(src, 0, dst, 0, idx);
       System.arraycopy(src, idx + 1, dst, idx, src.length - idx - 1);
 
-      return nodeOf(mutator, nodeMap(), dataMap() ^ bitpos, dst, cachedHashCode - payload.keyHash(),
+      return nodeOf(mutator, nodeMap(), dataMap() ^ bitpos, hashMap(), dst,
+          cachedHashCode - payload.keyHash(),
           cachedSize - 1);
     }
 
@@ -1261,7 +1329,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
       dst[idxNew + 0] = node;
       System.arraycopy(src, idxNew + 1, dst, idxNew + 1, src.length - idxNew - 1);
 
-      return nodeOf(mutator, nodeMap() | bitpos, dataMap() ^ bitpos, dst,
+      return nodeOf(mutator, nodeMap() | bitpos, dataMap() ^ bitpos, hashMap(), dst,
           cachedHashCode + newPayload.keyHash(), cachedSize + 1);
     }
 
@@ -1283,7 +1351,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
       System.arraycopy(src, idxNew, dst, idxNew + 1, idxOld - idxNew);
       System.arraycopy(src, idxOld + 1, dst, idxOld + 1, src.length - idxOld - 1);
 
-      return nodeOf(mutator, nodeMap() ^ bitpos, dataMap() | bitpos, dst,
+      return nodeOf(mutator, nodeMap() ^ bitpos, dataMap() | bitpos, hashMap(), dst,
           cachedHashCode - oldPayload.keyHash(), cachedSize - 1);
     }
 
@@ -1592,7 +1660,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
       final BiFunction<Integer, Integer, BitmapIndexedSetNode<K>> toNode =
           (newHashCode, newSize) -> new BitmapIndexedSetNode<K>(mutator, prototype.nodeMap(),
-              prototype.dataMap(), prototype.compactBuffer(),
+              prototype.dataMap(), prototype.hashMap(), prototype.compactBuffer(),
               this.recursivePayloadHashCode() + newHashCode, this.size() + newSize);
 
       boolean leftNodeUnmodified = leftSubTreesUnmodified
@@ -1827,8 +1895,8 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
       // TODO: create singelton node that can unboxed easily
       final BitmapIndexedSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator,
-          prototype.nodeMap(),
-          prototype.dataMap(), prototype.compactBuffer(), deltaHashCode, deltaSize);
+          prototype.nodeMap(), prototype.dataMap(), prototype.hashMap(), prototype.compactBuffer(),
+          deltaHashCode, deltaSize);
 
       if (directionPreference == LEFT || directionPreference == INDIFFERENT) {
         if (leftReferenceEqual) {
@@ -2097,8 +2165,8 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
       // TODO: create singelton node that can unboxed easily
       final BitmapIndexedSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator,
-          prototype.nodeMap(),
-          prototype.dataMap(), prototype.compactBuffer(), deltaHashCode, deltaSize);
+          prototype.nodeMap(), prototype.dataMap(), prototype.hashMap(), prototype.compactBuffer(),
+          deltaHashCode, deltaSize);
 
       if (leftReferenceEqual) {
         assert this.equals(newNode);
@@ -2125,6 +2193,10 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
     int dataIndex(final int bitpos) {
       return Integer.bitCount(dataMap() & (bitpos - 1));
+    }
+
+    int hashIndex(final int bitpos) {
+      return payloadArity() + Integer.bitCount(hashMap() & (bitpos - 1));
     }
 
     int nodeIndex(final int bitpos) {
@@ -2236,6 +2308,34 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
       final int mask = mask(payload.hashCode(), shift);
       final int bitpos = bitpos(mask);
+
+      if ((hashMap() & bitpos) != 0) { // hash collision
+        final int hashIndex = hashIndex(bitpos);
+        final Set.Immutable<ImmutablePayloadTuple<K>> collisions = getCollisions(hashIndex);
+
+        if (payload.keyHash() == collisions.findFirst().get().keyHash()) {
+          final Set.Immutable<ImmutablePayloadTuple<K>> newCollisions =
+              collisions.__insert(payload);
+
+          if (collisions == newCollisions) {
+            return this;
+          } else {
+            details.modified();
+            details.updateDeltaSize(1);
+            details.updateDeltaHashCode(payload.keyHash());
+
+            return copyAndSetCollisions(mutator, bitpos, newCollisions, details);
+          }
+        } else {
+          final BitmapIndexedSetNode<K> subNodeNew = BitmapIndexedSetNode
+              .mergeCollisionsWithPayload(collisions, payload, shift + BIT_PARTITION_SIZE);
+
+          details.modified();
+          details.updateDeltaSize(1);
+          details.updateDeltaHashCode(payload.keyHash());
+          return copyAndMigrateFromInlineToNode(mutator, bitpos, payload, subNodeNew);
+        }
+      }
 
       if ((dataMap() & bitpos) != 0) { // inplace value
         final int dataIndex = dataIndex(bitpos);

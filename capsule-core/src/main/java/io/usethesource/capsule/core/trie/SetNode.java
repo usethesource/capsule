@@ -94,6 +94,10 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
       return dataMap;
     }
 
+    public final int hashMap() {
+      return dataMap;
+    }
+
     public final int nodeMap() {
       return nodeMap;
     }
