@@ -50,6 +50,7 @@ We introduce CHAMP (Compressed Hash-Array Mapped Prefix-tree), an evolutionary i
 
 ## Talks
 * [JVM Language Summit 2016 - Efficient and Expressive Immutable Collections (Speaker: Michael Steindorfer)](https://www.youtube.com/watch?v=pUXeNAeyY34)
+* [JVM Language Summit 2017 - Lightweight Relations (Speaker: Michael Steindorfer)](https://www.youtube.com/watch?v=D8Y294vHdqI)
 * [Clojure/west 2016 - Hash Maps: More Room on the Bottom (Speaker: Peter Schuck)](https://www.youtube.com/watch?v=GibNOQVelFY)
 
 ## Publications
