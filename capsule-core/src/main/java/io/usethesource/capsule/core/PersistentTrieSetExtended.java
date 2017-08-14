@@ -580,7 +580,8 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
   @Override
   public int size() {
-    return cachedSize;
+    // return cachedSize;
+    return rootNode.cachedSize;
   }
 
   @Override
@@ -657,7 +658,8 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
   @Override
   public int hashCode() {
-    return cachedHashCode;
+//    return cachedHashCode;
+    return rootNode.cachedHashCode;
   }
 
   @Override
@@ -928,13 +930,18 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
       assert !(payload0.equals(payload1));
 
-      if (shift >= HASH_CODE_LENGTH) {
-        throw new IllegalStateException("Hash collision not yet fixed.");
-        // return new HashCollisionSetNode<>(keyHash0, (K[]) new Object[]{key0, key1});
-      }
-
       final int mask0 = mask(payload0.keyHash(), shift);
       final int mask1 = mask(payload1.keyHash(), shift);
+
+      if (shift >= HASH_CODE_LENGTH) {
+        throw new IllegalStateException("Hash collision not yet fixed.");
+
+//        // both nodes fit on same level
+//        final int hashMap = bitpos(mask0) | bitpos(mask1);
+//
+//        // TODO fill in new Object[]{ Set.Immutable<ImmutablePayloadTuple<K>> newCollisions }
+//        return nodeOf(null, 0, 0, hashMap, new Object[]{}, payload0.hashCode() + payload1.hashCode(), 2);
+      }
 
       if (mask0 != mask1) {
         // both nodes fit on same level
@@ -965,7 +972,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
       if (maskC != maskP) {
         // both nodes fit on same level
-        return nodeOf(null, bitpos(maskP), bitpos(maskC), payload, collisions);
+        return nodeOf(null, 0, bitpos(maskP), bitpos(maskC), payload, collisions);
       } else {
         final BitmapIndexedSetNode<K> node = mergeCollisionsWithPayload(collisions, payload,
             shift + BIT_PARTITION_SIZE);
@@ -989,19 +996,25 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
     static final <K> BitmapIndexedSetNode<K> nodeOf(AtomicReference<Thread> mutator,
         final int dataMap, final ImmutablePayloadTuple<K> payload) {
       return BitmapIndexedSetNode
-          .nodeOf(mutator, 0, 0, dataMap, new Object[]{payload}, payload.keyHash(), 1);
+          .nodeOf(mutator, 0, dataMap, 0, new Object[]{payload}, payload.keyHash(), 1);
     }
 
     static final <K> BitmapIndexedSetNode<K> nodeOf(AtomicReference<Thread> mutator,
-        final int dataMap,
-        final ImmutablePayloadTuple<K> payload0, final ImmutablePayloadTuple<K> payload1) {
+                                                    final int dataMap,
+                                                    final ImmutablePayloadTuple<K> payload0, final ImmutablePayloadTuple<K> payload1) {
       return BitmapIndexedSetNode
-          .nodeOf(mutator, 0, 0, dataMap, new Object[]{payload0, payload1},
-              payload0.keyHash() + payload1.keyHash(), 2);
-      Optional<K> op = null;
-
-      
+              .nodeOf(mutator, 0, dataMap, 0, new Object[]{payload0, payload1},
+                      payload0.keyHash() + payload1.keyHash(), 2);
     }
+
+    static final <K> BitmapIndexedSetNode<K> nodeOf(AtomicReference<Thread> mutator,
+                                                    final int nodeMap, final int dataMap, final int hashMap,
+                                                    final ImmutablePayloadTuple<K> payload, final Set<ImmutablePayloadTuple<K>> collisions) {
+      return BitmapIndexedSetNode
+              .nodeOf(mutator, 0, dataMap, hashMap, new Object[]{payload, collisions},
+                      payload.keyHash() + collisions.hashCode(), 1 + collisions.size());
+    }
+
 
     // TODO: improve recursive properties
     static final <K> BitmapIndexedSetNode<K> nodeOf(AtomicReference<Thread> mutator,
