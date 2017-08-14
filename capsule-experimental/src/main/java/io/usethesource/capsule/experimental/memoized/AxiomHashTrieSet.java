@@ -14,11 +14,16 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class AxiomSet_Memoized_LazyHashCode<K> implements
-    io.usethesource.capsule.Set.Immutable<K> {
+/*
+ * Features:
+ *     * CHAMP design (will be converted towards AXIOM)
+ *     * Memoizes hash codes of keys
+ *     * Lazily calculates collection hash code
+ */
+public class AxiomHashTrieSet<K> implements io.usethesource.capsule.Set.Immutable<K> {
 
-  private static final AxiomSet_Memoized_LazyHashCode EMPTY_SET =
-      new AxiomSet_Memoized_LazyHashCode(CompactSetNode.EMPTY_NODE, 0);
+  private static final AxiomHashTrieSet EMPTY_SET =
+      new AxiomHashTrieSet(CompactSetNode.EMPTY_NODE, 0);
 
   private static final boolean DEBUG = false;
 
@@ -26,7 +31,7 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
   private int hashCode = -1;
   private final int cachedSize;
 
-  AxiomSet_Memoized_LazyHashCode(AbstractSetNode<K> rootNode, int cachedSize) {
+  AxiomHashTrieSet(AbstractSetNode<K> rootNode, int cachedSize) {
     this.rootNode = rootNode;
     this.cachedSize = cachedSize;
     if (DEBUG) {
@@ -34,12 +39,12 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
     }
   }
 
-  public static final <K> Immutable<K> of() {
-    return AxiomSet_Memoized_LazyHashCode.EMPTY_SET;
+  public static final <K> io.usethesource.capsule.Set.Immutable<K> of() {
+    return AxiomHashTrieSet.EMPTY_SET;
   }
 
-  public static final <K> Immutable<K> of(K... keys) {
-    Immutable<K> result = AxiomSet_Memoized_LazyHashCode.EMPTY_SET;
+  public static final <K> io.usethesource.capsule.Set.Immutable<K> of(K... keys) {
+    io.usethesource.capsule.Set.Immutable<K> result = AxiomHashTrieSet.EMPTY_SET;
 
     for (final K key : keys) {
       result = result.__insert(key);
@@ -48,12 +53,12 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
     return result;
   }
 
-  public static final <K> Transient<K> transientOf() {
-    return AxiomSet_Memoized_LazyHashCode.EMPTY_SET.asTransient();
+  public static final <K> io.usethesource.capsule.Set.Transient<K> transientOf() {
+    return AxiomHashTrieSet.EMPTY_SET.asTransient();
   }
 
-  public static final <K> Transient<K> transientOf(K... keys) {
-    final Transient<K> result = AxiomSet_Memoized_LazyHashCode.EMPTY_SET
+  public static final <K> io.usethesource.capsule.Set.Transient<K> transientOf(K... keys) {
+    final io.usethesource.capsule.Set.Transient<K> result = AxiomHashTrieSet.EMPTY_SET
         .asTransient();
 
     for (final K key : keys) {
@@ -134,7 +139,7 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
   }
 
   @Override
-  public Immutable<K> __insert(final K key) {
+  public io.usethesource.capsule.Set.Immutable<K> __insert(final K key) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -142,14 +147,14 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
         rootNode.updated(null, key, transformHashCode(keyHash), 0, details);
 
     if (details.isModified()) {
-      return new AxiomSet_Memoized_LazyHashCode<K>(newRootNode, cachedSize + 1);
+      return new AxiomHashTrieSet<K>(newRootNode, cachedSize + 1);
     }
 
     return this;
   }
 
   @Override
-  public Immutable<K> __insertEquivalent(final K key,
+  public io.usethesource.capsule.Set.Immutable<K> __insertEquivalent(final K key,
       final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
@@ -158,29 +163,29 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
         rootNode.updated(null, key, transformHashCode(keyHash), 0, details, cmp);
 
     if (details.isModified()) {
-      return new AxiomSet_Memoized_LazyHashCode<K>(newRootNode, cachedSize + 1);
+      return new AxiomHashTrieSet<K>(newRootNode, cachedSize + 1);
     }
 
     return this;
   }
 
   @Override
-  public Immutable<K> __insertAll(final Set<? extends K> set) {
-    final Transient<K> tmpTransient = this.asTransient();
+  public io.usethesource.capsule.Set.Immutable<K> __insertAll(final Set<? extends K> set) {
+    final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__insertAll(set);
     return tmpTransient.freeze();
   }
 
   @Override
-  public Immutable<K> __insertAllEquivalent(final Set<? extends K> set,
+  public io.usethesource.capsule.Set.Immutable<K> __insertAllEquivalent(final Set<? extends K> set,
       final Comparator<Object> cmp) {
-    final Transient<K> tmpTransient = this.asTransient();
+    final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__insertAllEquivalent(set, cmp);
     return tmpTransient.freeze();
   }
 
   @Override
-  public Immutable<K> __remove(final K key) {
+  public io.usethesource.capsule.Set.Immutable<K> __remove(final K key) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -188,14 +193,14 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
         rootNode.removed(null, key, transformHashCode(keyHash), 0, details);
 
     if (details.isModified()) {
-      return new AxiomSet_Memoized_LazyHashCode<K>(newRootNode, cachedSize - 1);
+      return new AxiomHashTrieSet<K>(newRootNode, cachedSize - 1);
     }
 
     return this;
   }
 
   @Override
-  public Immutable<K> __removeEquivalent(final K key,
+  public io.usethesource.capsule.Set.Immutable<K> __removeEquivalent(final K key,
       final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
@@ -204,39 +209,39 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
         rootNode.removed(null, key, transformHashCode(keyHash), 0, details, cmp);
 
     if (details.isModified()) {
-      return new AxiomSet_Memoized_LazyHashCode<K>(newRootNode, cachedSize - 1);
+      return new AxiomHashTrieSet<K>(newRootNode, cachedSize - 1);
     }
 
     return this;
   }
 
   @Override
-  public Immutable<K> __removeAll(final Set<? extends K> set) {
-    final Transient<K> tmpTransient = this.asTransient();
+  public io.usethesource.capsule.Set.Immutable<K> __removeAll(final Set<? extends K> set) {
+    final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__removeAll(set);
     return tmpTransient.freeze();
   }
 
   @Override
-  public Immutable<K> __removeAllEquivalent(final Set<? extends K> set,
+  public io.usethesource.capsule.Set.Immutable<K> __removeAllEquivalent(final Set<? extends K> set,
       final Comparator<Object> cmp) {
-    final Transient<K> tmpTransient = this.asTransient();
+    final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__removeAllEquivalent(set, cmp);
     return tmpTransient.freeze();
   }
 
   @Override
-  public Immutable<K> __retainAll(final Set<? extends K> set) {
-    final Transient<K> tmpTransient = this.asTransient();
+  public io.usethesource.capsule.Set.Immutable<K> __retainAll(final Set<? extends K> set) {
+    final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__retainAll(set);
     return tmpTransient.freeze();
   }
 
   @Override
-  public Immutable<K> __retainAllEquivalent(
-      final Transient<? extends K> transientSet,
+  public io.usethesource.capsule.Set.Immutable<K> __retainAllEquivalent(
+      final io.usethesource.capsule.Set.Transient<? extends K> transientSet,
       final Comparator<Object> cmp) {
-    final Transient<K> tmpTransient = this.asTransient();
+    final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__retainAllEquivalent(transientSet, cmp);
     return tmpTransient.freeze();
   }
@@ -343,8 +348,8 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
       return false;
     }
 
-    if (other instanceof AxiomSet_Memoized_LazyHashCode) {
-      AxiomSet_Memoized_LazyHashCode<?> that = (AxiomSet_Memoized_LazyHashCode<?>) other;
+    if (other instanceof AxiomHashTrieSet) {
+      AxiomHashTrieSet<?> that = (AxiomHashTrieSet<?>) other;
 
       if (this.cachedSize != that.cachedSize) {
         return false;
@@ -384,8 +389,8 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
   }
 
   @Override
-  public Transient<K> asTransient() {
-    return new TransientTrieSet_5Bits<K>(this);
+  public io.usethesource.capsule.Set.Transient<K> asTransient() {
+    return new TransientTrieSet<K>(this);
   }
 
   /*
@@ -399,7 +404,7 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
    * For analysis purposes only.
    */
   protected Iterator<AbstractSetNode<K>> nodeIterator() {
-    return new TrieSet_5BitsNodeIterator<>(rootNode);
+    return new TrieSetNodeIterator<>(rootNode);
   }
 
   /*
@@ -706,7 +711,7 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
       if (shift >= HASH_CODE_LENGTH) {
         // throw new
         // IllegalStateException("Hash collision not yet fixed.");
-        return new HashCollisionSetNode_5Bits<>(keyHash0, (K[]) new Object[]{key0, key1});
+        return new HashCollisionSetNode<>(keyHash0, (K[]) new Object[]{key0, key1});
       }
 
       final int mask0 = mask(keyHash0, shift);
@@ -1429,13 +1434,13 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
 
   }
 
-  private static final class HashCollisionSetNode_5Bits<K> extends CompactSetNode<K> {
+  private static final class HashCollisionSetNode<K> extends CompactSetNode<K> {
 
     private final K[] keys;
 
     private final int hash;
 
-    HashCollisionSetNode_5Bits(final int hash, final K[] keys) {
+    HashCollisionSetNode(final int hash, final K[] keys) {
       this.keys = keys;
 
       this.hash = hash;
@@ -1512,7 +1517,7 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
           this.keys.length - keys.length);
 
       details.modified();
-      return new HashCollisionSetNode_5Bits<>(keyHash, keysNew);
+      return new HashCollisionSetNode<>(keyHash, keysNew);
     }
 
     @Override
@@ -1536,7 +1541,7 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
           this.keys.length - keys.length);
 
       details.modified();
-      return new HashCollisionSetNode_5Bits<>(keyHash, keysNew);
+      return new HashCollisionSetNode<>(keyHash, keysNew);
     }
 
     @Override
@@ -1565,7 +1570,7 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
             System.arraycopy(this.keys, 0, keysNew, 0, idx);
             System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
 
-            return new HashCollisionSetNode_5Bits<>(keyHash, keysNew);
+            return new HashCollisionSetNode<>(keyHash, keysNew);
           }
         }
       }
@@ -1598,7 +1603,7 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
             System.arraycopy(this.keys, 0, keysNew, 0, idx);
             System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
 
-            return new HashCollisionSetNode_5Bits<>(keyHash, keysNew);
+            return new HashCollisionSetNode<>(keyHash, keysNew);
           }
         }
       }
@@ -1686,7 +1691,7 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
         return false;
       }
 
-      HashCollisionSetNode_5Bits<?> that = (HashCollisionSetNode_5Bits<?>) other;
+      HashCollisionSetNode<?> that = (HashCollisionSetNode<?>) other;
 
       if (hash != that.hash) {
         return false;
@@ -1868,11 +1873,11 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
   /**
    * Iterator that first iterates over inlined-values and then continues depth first recursively.
    */
-  private static class TrieSet_5BitsNodeIterator<K> implements Iterator<AbstractSetNode<K>> {
+  private static class TrieSetNodeIterator<K> implements Iterator<AbstractSetNode<K>> {
 
     final Deque<Iterator<? extends AbstractSetNode<K>>> nodeIteratorStack;
 
-    TrieSet_5BitsNodeIterator(AbstractSetNode<K> rootNode) {
+    TrieSetNodeIterator(AbstractSetNode<K> rootNode) {
       nodeIteratorStack = new ArrayDeque<>();
       nodeIteratorStack.push(Collections.singleton(rootNode).iterator());
     }
@@ -1914,16 +1919,16 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
     }
   }
 
-  static final class TransientTrieSet_5Bits<K> implements Transient<K> {
+  static final class TransientTrieSet<K> implements io.usethesource.capsule.Set.Transient<K> {
 
     final private AtomicReference<Thread> mutator;
     private AbstractSetNode<K> rootNode;
     private int cachedSize;
 
-    TransientTrieSet_5Bits(AxiomSet_Memoized_LazyHashCode<K> trieSet_5Bits) {
+    TransientTrieSet(AxiomHashTrieSet<K> trieSet) {
       this.mutator = new AtomicReference<Thread>(Thread.currentThread());
-      this.rootNode = trieSet_5Bits.rootNode;
-      this.cachedSize = trieSet_5Bits.cachedSize;
+      this.rootNode = trieSet.rootNode;
+      this.cachedSize = trieSet.cachedSize;
     }
 
     private boolean checkHashCodeAndSize(final int targetHash, final int targetSize) {
@@ -2176,7 +2181,7 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
 
     @Override
     public boolean __retainAllEquivalent(
-        final Transient<? extends K> transientSet,
+        final io.usethesource.capsule.Set.Transient<? extends K> transientSet,
         final Comparator<Object> cmp) {
       boolean modified = false;
 
@@ -2233,10 +2238,10 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
 
     public static class TransientSetKeyIterator<K> extends SetKeyIterator<K> {
 
-      final TransientTrieSet_5Bits<K> collection;
+      final TransientTrieSet<K> collection;
       K lastKey;
 
-      public TransientSetKeyIterator(final TransientTrieSet_5Bits<K> collection) {
+      public TransientSetKeyIterator(final TransientTrieSet<K> collection) {
         super(collection.rootNode);
         this.collection = collection;
       }
@@ -2285,8 +2290,8 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
         return false;
       }
 
-      if (other instanceof TransientTrieSet_5Bits) {
-        TransientTrieSet_5Bits<?> that = (TransientTrieSet_5Bits<?>) other;
+      if (other instanceof AxiomHashTrieSet.TransientTrieSet) {
+        TransientTrieSet<?> that = (TransientTrieSet<?>) other;
 
         if (this.cachedSize != that.cachedSize) {
           return false;
@@ -2317,13 +2322,13 @@ public class AxiomSet_Memoized_LazyHashCode<K> implements
     }
 
     @Override
-    public Immutable<K> freeze() {
+    public io.usethesource.capsule.Set.Immutable<K> freeze() {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
 
       mutator.set(null);
-      return new AxiomSet_Memoized_LazyHashCode<K>(rootNode, cachedSize);
+      return new AxiomHashTrieSet<K>(rootNode, cachedSize);
     }
   }
 
