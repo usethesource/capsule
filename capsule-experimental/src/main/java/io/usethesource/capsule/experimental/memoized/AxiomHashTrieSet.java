@@ -9,9 +9,19 @@ package io.usethesource.capsule.experimental.memoized;
 
 import io.usethesource.capsule.util.ArrayUtils;
 import io.usethesource.capsule.util.ArrayUtilsInt;
-
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 /*
@@ -170,14 +180,14 @@ public class AxiomHashTrieSet<K> implements io.usethesource.capsule.Set.Immutabl
   }
 
   @Override
-  public io.usethesource.capsule.Set.Immutable<K> __insertAll(final Set<? extends K> set) {
+  public io.usethesource.capsule.Set.Immutable<K> __insertAll(final java.util.Set<? extends K> set) {
     final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__insertAll(set);
     return tmpTransient.freeze();
   }
 
   @Override
-  public io.usethesource.capsule.Set.Immutable<K> __insertAllEquivalent(final Set<? extends K> set,
+  public io.usethesource.capsule.Set.Immutable<K> __insertAllEquivalent(final java.util.Set<? extends K> set,
       final Comparator<Object> cmp) {
     final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__insertAllEquivalent(set, cmp);
@@ -216,14 +226,14 @@ public class AxiomHashTrieSet<K> implements io.usethesource.capsule.Set.Immutabl
   }
 
   @Override
-  public io.usethesource.capsule.Set.Immutable<K> __removeAll(final Set<? extends K> set) {
+  public io.usethesource.capsule.Set.Immutable<K> __removeAll(final java.util.Set<? extends K> set) {
     final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__removeAll(set);
     return tmpTransient.freeze();
   }
 
   @Override
-  public io.usethesource.capsule.Set.Immutable<K> __removeAllEquivalent(final Set<? extends K> set,
+  public io.usethesource.capsule.Set.Immutable<K> __removeAllEquivalent(final java.util.Set<? extends K> set,
       final Comparator<Object> cmp) {
     final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__removeAllEquivalent(set, cmp);
@@ -231,7 +241,7 @@ public class AxiomHashTrieSet<K> implements io.usethesource.capsule.Set.Immutabl
   }
 
   @Override
-  public io.usethesource.capsule.Set.Immutable<K> __retainAll(final Set<? extends K> set) {
+  public io.usethesource.capsule.Set.Immutable<K> __retainAll(final java.util.Set<? extends K> set) {
     final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__retainAll(set);
     return tmpTransient.freeze();
@@ -356,8 +366,8 @@ public class AxiomHashTrieSet<K> implements io.usethesource.capsule.Set.Immutabl
       }
 
       return rootNode.equals(that.rootNode);
-    } else if (other instanceof Set) {
-      Set that = (Set) other;
+    } else if (other instanceof java.util.Set) {
+      java.util.Set that = (java.util.Set) other;
 
       if (this.size() != that.size()) {
         return false;
@@ -2077,7 +2087,7 @@ public class AxiomHashTrieSet<K> implements io.usethesource.capsule.Set.Immutabl
     }
 
     @Override
-    public boolean __insertAll(final Set<? extends K> set) {
+    public boolean __insertAll(final java.util.Set<? extends K> set) {
       boolean modified = false;
 
       for (final K key : set) {
@@ -2088,7 +2098,7 @@ public class AxiomHashTrieSet<K> implements io.usethesource.capsule.Set.Immutabl
     }
 
     @Override
-    public boolean __insertAllEquivalent(final Set<? extends K> set, final Comparator<Object> cmp) {
+    public boolean __insertAllEquivalent(final java.util.Set<? extends K> set, final Comparator<Object> cmp) {
       boolean modified = false;
 
       for (final K key : set) {
@@ -2143,7 +2153,7 @@ public class AxiomHashTrieSet<K> implements io.usethesource.capsule.Set.Immutabl
     }
 
     @Override
-    public boolean __removeAll(final Set<? extends K> set) {
+    public boolean __removeAll(final java.util.Set<? extends K> set) {
       boolean modified = false;
 
       for (final K key : set) {
@@ -2154,7 +2164,7 @@ public class AxiomHashTrieSet<K> implements io.usethesource.capsule.Set.Immutabl
     }
 
     @Override
-    public boolean __removeAllEquivalent(final Set<? extends K> set, final Comparator<Object> cmp) {
+    public boolean __removeAllEquivalent(final java.util.Set<? extends K> set, final Comparator<Object> cmp) {
       boolean modified = false;
 
       for (final K key : set) {
@@ -2165,7 +2175,7 @@ public class AxiomHashTrieSet<K> implements io.usethesource.capsule.Set.Immutabl
     }
 
     @Override
-    public boolean __retainAll(final Set<? extends K> set) {
+    public boolean __retainAll(final java.util.Set<? extends K> set) {
       boolean modified = false;
 
       Iterator<K> thisIterator = iterator();
@@ -2298,8 +2308,8 @@ public class AxiomHashTrieSet<K> implements io.usethesource.capsule.Set.Immutabl
         }
 
         return rootNode.equals(that.rootNode);
-      } else if (other instanceof Set) {
-        Set that = (Set) other;
+      } else if (other instanceof java.util.Set) {
+        java.util.Set that = (java.util.Set) other;
 
         if (this.size() != that.size()) {
           return false;
