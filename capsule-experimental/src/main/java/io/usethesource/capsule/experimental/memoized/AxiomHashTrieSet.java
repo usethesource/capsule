@@ -1778,6 +1778,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 
     /*
      * TODO: for incrementality: only consider duplicate elements
+     * TODO: use comparator instead of Objects.equals
      */
     @Override
     public final AbstractSetNode<K> union(AtomicReference<Thread> mutator,
@@ -1788,16 +1789,16 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       final CompactSetNode<K> node1 = (CompactSetNode<K>) that;
 
       if (node0 == node1) {
-        // TODO: direction preference?
-        if (false && TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
-          final int remainingSize = node0.size();
-          final int remainingHashCode = node0.recursivePayloadHashCode();
-
-          // delta @ collection
-          details.addSize(remainingSize);
-          details.addHashCode(remainingHashCode);
-        }
-
+//        // TODO: direction preference?
+//        if (false && TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+//          final int remainingSize = node0.size();
+//          final int remainingHashCode = node0.recursivePayloadHashCode();
+//
+//          // delta @ collection
+//          details.addSize(remainingSize);
+//          // details.addHashCode(remainingHashCode);
+//        }
+//
         return node0;
       }
 
@@ -1845,7 +1846,8 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
               prototype.add(bitpos, key0);
 
               if (true || MEMOIZE_HASH_CODE_OF_ELEMENT) {
-                prototype.addHash(node0.getKeyHash(dataIndex0));
+                prototype.addHash(keyHash0);
+                // prototype.addHash(node0.getKeyHash(dataIndex0));
               }
             } else {
               // singleton -> node (bitmap change)
@@ -1859,18 +1861,18 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 
               if (TRACK_DELTA_OF_META_DATA) {
                 final int addedSize = 1;
-                final int addedHashCode = keyHash1;
+                // final int // addedHashCode = keyHash1;
 
                 if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
                   // delta @ node
                   deltaSize += addedSize;
-                  deltaHashCode += addedHashCode;
+                  // deltaHashCode += addedHashCode;
                 }
 
                 if (false && TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
                   // delta @ collection
                   details.addSize(addedSize);
-                  details.addHashCode(addedHashCode);
+                  // // details.addHashCode(addedHashCode);
                 }
               }
             }
@@ -1899,18 +1901,18 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 
               if (TRACK_DELTA_OF_META_DATA) {
                 final int addedSize = 1;
-                final int addedHashCode = keyHash;
+                // final int // addedHashCode = keyHash;
 
                 if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
                   // delta @ node
                   deltaSize += addedSize;
-                  deltaHashCode += addedHashCode;
+                  // deltaHashCode += addedHashCode;
                 }
 
                 if (false && TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
                   // delta @ collection
                   details.addSize(addedSize);
-                  details.addHashCode(addedHashCode);
+                  // details.addHashCode(addedHashCode);
                 }
               }
             }
@@ -1940,22 +1942,22 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 
               if (updateDetails.isModified()) {
                 addedSize = node.size();
-                addedHashCode = node.recursivePayloadHashCode();
+                // addedHashCode = node.recursivePayloadHashCode();
               } else {
                 addedSize = node.size() - 1;
-                addedHashCode = node.recursivePayloadHashCode() - keyHash;
+                // addedHashCode = node.recursivePayloadHashCode() - keyHash;
               }
 
               if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
                 // delta @ node
                 deltaSize += addedSize;
-                deltaHashCode += addedHashCode;
+                // deltaHashCode += addedHashCode;
               }
 
               if (false && TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
                 // delta @ collection
                 details.addSize(addedSize);
-                details.addHashCode(addedHashCode);
+                // details.addHashCode(addedHashCode);
               }
             }
             break;
@@ -1981,22 +1983,21 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
               if (TRACK_DELTA_OF_META_DATA) {
                 // TODO: consider incremental recursive collection
                 final int addedSize = newNode.size() - subNode0.size();
-                final int addedHashCode =
-                    newNode.recursivePayloadHashCode() - subNode0.recursivePayloadHashCode();
+                // final int addedHashCode = newNode.recursivePayloadHashCode() - subNode0.recursivePayloadHashCode();
 
                 // TODO: handle similar to copyAndSetNode -> pass remainder trough result???
                 // remainder -> subTreeDeltaSize ... subTreeDeltaHashCode
                 if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
                   // delta @ node
                   deltaSize += addedSize;
-                  deltaHashCode += addedHashCode;
+                  // deltaHashCode += addedHashCode;
                 }
 
                 // global modification where already tracked ...
 //                if (false && TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
 //                  // delta @ collection
 //                  details.addSize(addedSize);
-//                  details.addHashCode(addedHashCode);
+//                  // details.addHashCode(addedHashCode);
 //                }
               }
             }
@@ -2029,18 +2030,18 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 
             if (TRACK_DELTA_OF_META_DATA) {
               final int addedSize = 1;
-              final int addedHashCode = node1.getKeyHash(dataIndex1);
+              // final int // addedHashCode = node1.getKeyHash(dataIndex1);
 
               if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
                 // delta @ node
                 deltaSize += addedSize;
-                deltaHashCode += addedHashCode;
+                // deltaHashCode += addedHashCode;
               }
 
               if (false && TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
                 // delta @ collection
                 details.addSize(addedSize);
-                details.addHashCode(addedHashCode);
+                // details.addHashCode(addedHashCode);
               }
             }
             break;
@@ -2064,18 +2065,18 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 
             if (TRACK_DELTA_OF_META_DATA) {
               final int addedSize = subNode1.size();
-              final int addedHashCode = subNode1.recursivePayloadHashCode();
+              // final int // addedHashCode = subNode1.recursivePayloadHashCode();
 
               if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
                 // delta @ node
                 deltaSize += addedSize;
-                deltaHashCode += addedHashCode;
+                // deltaHashCode += addedHashCode;
               }
 
               if (false && TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
                 // delta @ collection
                 details.addSize(addedSize);
-                details.addHashCode(addedHashCode);
+                // details.addHashCode(addedHashCode);
               }
             }
             break;
@@ -2090,7 +2091,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 //      if (false && TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
 //        // delta @ collection
 //        details.addSize(deltaSize);
-//        details.addHashCode(deltaHashCode);
+//        // details.addHashCode(deltaHashCode);
 //      }
 
       final BiFunction<Integer, Integer, CompactSetNode<K>> toNode =
