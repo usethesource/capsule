@@ -12,6 +12,7 @@ import static io.usethesource.capsule.util.BitmapUtils.isBitInBitmap;
 
 import io.usethesource.capsule.Set;
 import io.usethesource.capsule.core.trie.ArrayView;
+import io.usethesource.capsule.core.trie.ImmutablePayloadTuple;
 import io.usethesource.capsule.core.trie.SetNode;
 import io.usethesource.capsule.util.ArrayUtils;
 import io.usethesource.capsule.util.ArrayUtilsInt;
@@ -1827,11 +1828,9 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       final ObjectIntConsumer<CompactSetNode<K>> unionData =
           (one, bitpos) -> {
             final int dataIndex = index(one.dataMap(), bitpos);
+            final ImmutablePayloadTuple<K> payload = one.getPayload(dataIndex);
 
-            final K key = one.getKey(dataIndex);
-            final int keyHash = one.getKeyHash(dataIndex);
-
-            prototype.add(bitpos, key, keyHash);
+            prototype.add(bitpos, payload);
           };
 
       final ObjectIntConsumer<CompactSetNode<K>> unionNode =
@@ -1847,23 +1846,17 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
             final int dataIndex0 = index(one.dataMap(), bitpos);
             final int dataIndex1 = index(two.dataMap(), bitpos);
 
-            final int keyHash0 = one.getKeyHash(dataIndex0);
-            final int keyHash1 = two.getKeyHash(dataIndex1);
+            final ImmutablePayloadTuple<K> payload0 = one.getPayload(dataIndex0);
+            final ImmutablePayloadTuple<K> payload1 = two.getPayload(dataIndex1);
 
             // TODO: consider comparator
-            if (keyHash0 == keyHash1) {
-              final K key0 = one.getKey(dataIndex0);
-              final K key1 = two.getKey(dataIndex1);
-
-              if (Objects.equals(key0, key1)) {
-                prototype.add(bitpos, key0, keyHash0);
-              }
+            if (Objects.equals(payload0, payload1)) {
+                prototype.add(bitpos, payload0);
             } else {
-              final K key0 = one.getKey(dataIndex0);
-              final K key1 = two.getKey(dataIndex1);
-
+              // TODO: mergeTwoPayloadTuples
               final AbstractSetNode<K> node =
-                  mergeTwoKeyValPairs(key0, keyHash0, key1, keyHash1, shift + BIT_PARTITION_SIZE);
+                  mergeTwoKeyValPairs(payload0.get(), payload0.keyHash(), payload1.get(),
+                      payload1.keyHash(), shift + BIT_PARTITION_SIZE);
 
               prototype.add(bitpos, node);
             }
@@ -1874,12 +1867,11 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
             final int dataIndex = index(one.dataMap(), bitpos);
             final int nodeIndex = index(two.nodeMap(), bitpos);
 
-            final K key = one.getKey(dataIndex);
-            final int keyHash = one.getKeyHash(dataIndex);
+            final ImmutablePayloadTuple<K> payload = one.getPayload(dataIndex);
             final AbstractSetNode<K> node = two.getNode(nodeIndex);
 
             final AbstractSetNode<K> newNode = node.updated(
-                mutator, key, keyHash, shift + BIT_PARTITION_SIZE, SetResult.unchanged(), cmp);
+                mutator, payload.get(), payload.keyHash(), shift + BIT_PARTITION_SIZE, SetResult.unchanged(), cmp);
 
             prototype.add(bitpos, newNode);
           };

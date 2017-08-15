@@ -124,6 +124,11 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
 
       // advance cursor
       dataIndex = dataIndex + 1;
+
+      // increase cached properties
+      if (trackSize) {
+        cachedSize += 1;
+      }
     }
 
     public final void add(int bitpos, K key, int hash) {
