@@ -8,7 +8,6 @@
 package io.usethesource.capsule.experimental.memoized;
 
 import static io.usethesource.capsule.core.trie.SetNode.Preference.INDIFFERENT;
-import static io.usethesource.capsule.core.trie.SetNode.TRACK_DELTA_OF_META_DATA_PER_COLLECTION;
 import static io.usethesource.capsule.util.BitmapUtils.isBitInBitmap;
 
 import io.usethesource.capsule.Set;
@@ -33,9 +32,6 @@ import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -1135,6 +1131,8 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       } else {
         // no value
         details.modified();
+        details.updateDeltaSize(1);
+        details.updateDeltaHashCode(keyHash);
         return copyAndInsertValue(mutator, bitpos, key, keyHash);
       }
     }
@@ -1175,6 +1173,8 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       } else {
         // no value
         details.modified();
+        details.updateDeltaSize(1);
+        details.updateDeltaHashCode(keyHash);
         return copyAndInsertValue(mutator, bitpos, key, keyHash);
       }
     }
@@ -1613,7 +1613,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       final int idx = this.nodes.length - 1 - nodeIndex(bitpos);
 
       // final int newCachedHashCode = cachedHashCode + details.getDeltaHashCode();
-      final int newCachedSize = details.getDeltaSize();
+      final int newCachedSize = cachedSize + details.getDeltaSize();
 
       if (isAllowedToEdit(this.mutator, mutator)) {
         // no copying if already editable
@@ -1772,6 +1772,31 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     private final static int PATTERN_NODE_AND_NODE   = 0b0101;
     // @formatter:on
 
+    @FunctionalInterface
+    private interface ObjectIntConsumer<T> {
+
+      /**
+       * Performs this operation on the given arguments.
+       *
+       * @param t the first input argument
+       * @param u the second input argument
+       */
+      void accept(T t, int u);
+    }
+
+    @FunctionalInterface
+    private interface ObjectObjectIntConsumer<T, U> {
+
+      /**
+       * Performs this operation on the given arguments.
+       *
+       * @param t the first input argument
+       * @param u the second input argument
+       * @param v the third input argument
+       */
+      void accept(T t, U u, int v);
+    }
+
     /*
      * TODO: for incrementality: only consider duplicate elements
      * TODO: use comparator instead of Objects.equals
@@ -1795,10 +1820,83 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 
       int unionedBitmap = dataMap0 | nodeMap0 | dataMap1 | nodeMap1;
 
-      final Prototype<K, AbstractSetNode<K>> prototype = new Prototype<>();
-      int deltaSize = 0;
+      final Prototype<K, AbstractSetNode<K>> prototype = new Prototype<>(true);
 
       int bitsToSkip = Integer.numberOfTrailingZeros(unionedBitmap);
+
+      final ObjectIntConsumer<CompactSetNode<K>> unionData =
+          (one, bitpos) -> {
+            final int dataIndex = index(one.dataMap(), bitpos);
+
+            final K key = one.getKey(dataIndex);
+            final int keyHash = one.getKeyHash(dataIndex);
+
+            prototype.add(bitpos, key, keyHash);
+          };
+
+      final ObjectIntConsumer<CompactSetNode<K>> unionNode =
+          (one, bitpos) -> {
+            final int nodeIndex = index(one.nodeMap(), bitpos);
+            final AbstractSetNode<K> subNode = one.getNode(nodeIndex);
+
+            prototype.add(bitpos, subNode);
+          };
+
+      final ObjectObjectIntConsumer<CompactSetNode<K>, CompactSetNode<K>> unionDataAndData =
+          (one, two, bitpos) -> {
+            final int dataIndex0 = index(one.dataMap(), bitpos);
+            final int dataIndex1 = index(two.dataMap(), bitpos);
+
+            final int keyHash0 = one.getKeyHash(dataIndex0);
+            final int keyHash1 = two.getKeyHash(dataIndex1);
+
+            // TODO: consider comparator
+            if (keyHash0 == keyHash1) {
+              final K key0 = one.getKey(dataIndex0);
+              final K key1 = two.getKey(dataIndex1);
+
+              if (Objects.equals(key0, key1)) {
+                prototype.add(bitpos, key0, keyHash0);
+              }
+            } else {
+              final K key0 = one.getKey(dataIndex0);
+              final K key1 = two.getKey(dataIndex1);
+
+              final AbstractSetNode<K> node =
+                  mergeTwoKeyValPairs(key0, keyHash0, key1, keyHash1, shift + BIT_PARTITION_SIZE);
+
+              prototype.add(bitpos, node);
+            }
+          };
+
+      final ObjectObjectIntConsumer<CompactSetNode<K>, CompactSetNode<K>> unionDataAndNode =
+          (one, two, bitpos) -> {
+            final int dataIndex = index(one.dataMap(), bitpos);
+            final int nodeIndex = index(two.nodeMap(), bitpos);
+
+            final K key = one.getKey(dataIndex);
+            final int keyHash = one.getKeyHash(dataIndex);
+            final AbstractSetNode<K> node = two.getNode(nodeIndex);
+
+            final AbstractSetNode<K> newNode = node.updated(
+                mutator, key, keyHash, shift + BIT_PARTITION_SIZE, SetResult.unchanged(), cmp);
+
+            prototype.add(bitpos, newNode);
+          };
+
+      final ObjectObjectIntConsumer<CompactSetNode<K>, CompactSetNode<K>> unionNodeAndNode =
+          (one, two, bitpos) -> {
+            final int nodeIndex0 = index(one.nodeMap(), bitpos);
+            final int nodeIndex1 = index(two.nodeMap(), bitpos);
+
+            final AbstractSetNode<K> subNode0 = one.getNode(nodeIndex0);
+            final AbstractSetNode<K> subNode1 = two.getNode(nodeIndex1);
+
+            final AbstractSetNode<K> newNode = subNode0.union(mutator, subNode1,
+                shift + BIT_PARTITION_SIZE, details, cmp, directionPreference);
+
+            prototype.add(bitpos, newNode);
+          };
 
       while (bitsToSkip < 32) {
         final int bitpos = bitpos(bitsToSkip);
@@ -1809,153 +1907,37 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
         final int bitPattern = (bitPattern0 << 2) | bitPattern1;
 
         switch (bitPattern) {
-          case PATTERN_DATA_AND_DATA: {
-            // case singleton x singleton
-            final int dataIndex0 = index(dataMap0, bitpos);
-            final int dataIndex1 = index(dataMap1, bitpos);
-
-            final int keyHash0 = node0.getKeyHash(dataIndex0);
-            final int keyHash1 = node1.getKeyHash(dataIndex1);
-
-//            final K key0 = node0.getKey(dataIndex0);
-//            final K key1 = node1.getKey(dataIndex1);
-
-            // TODO: consider comparator
-            if (keyHash0 == keyHash1) {
-              final K key0 = node0.getKey(dataIndex0);
-              final K key1 = node1.getKey(dataIndex1);
-
-              if (Objects.equals(key0, key1)) {
-                prototype.add(bitpos, key0);
-                prototype.addHash(keyHash0);
-              }
-            } else {
-              // singleton -> node (bitmap change)
-              final K key0 = node0.getKey(dataIndex0);
-              final K key1 = node1.getKey(dataIndex1);
-
-              final AbstractSetNode<K> node =
-                  mergeTwoKeyValPairs(key0, keyHash0, key1, keyHash1, shift + BIT_PARTITION_SIZE);
-
-              prototype.add(bitpos, node);
-              deltaSize += 1;
-            }
+          case PATTERN_DATA_AND_EMPTY:
+            unionData.accept(node0, bitpos);
             break;
-          }
 
-          case PATTERN_NODE_AND_DATA: {
-            // case node x singleton
-            final int nodeIndex0 = index(nodeMap0, bitpos);
-            final int dataIndex1 = index(dataMap1, bitpos);
-
-            final AbstractSetNode<K> node = node0.getNode(nodeIndex0);
-
-            final K key = node1.getKey(dataIndex1);
-            final int keyHash = node1.getKeyHash(dataIndex1);
-
-            final SetResult<K> updateDetails = SetResult.unchanged();
-            final AbstractSetNode<K> newNode = node
-                .updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, updateDetails, cmp);
-
-            // node -> node
-            prototype.add(bitpos, newNode);
-
-            if (updateDetails.isModified()) {
-              deltaSize += 1;
-            }
+          case PATTERN_EMPTY_AND_DATA:
+            unionData.accept(node1, bitpos);
             break;
-          }
 
-          case PATTERN_DATA_AND_NODE: {
-            // case singleton x node
-            final int dataIndex0 = index(dataMap0, bitpos);
-            final int nodeIndex1 = index(nodeMap1, bitpos);
-
-            final K key = node0.getKey(dataIndex0);
-            final int keyHash = node0.getKeyHash(dataIndex0);
-
-            final AbstractSetNode<K> node = node1.getNode(nodeIndex1);
-
-            final SetResult<K> updateDetails = SetResult.unchanged();
-            final AbstractSetNode<K> newNode = node
-                .updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, updateDetails, cmp);
-
-            // singleton -> node
-            prototype.add(bitpos, newNode);
-
-            if (TRACK_DELTA_OF_META_DATA) {
-              final int addedSize;
-
-              if (updateDetails.isModified()) {
-                addedSize = node.size();
-              } else {
-                addedSize = node.size() - 1;
-              }
-
-              deltaSize += addedSize;
-            }
+          case PATTERN_NODE_AND_EMPTY:
+            unionNode.accept(node0, bitpos);
             break;
-          }
 
-          case PATTERN_NODE_AND_NODE: {
-            // case node x node
-            final int nodeIndex0 = index(nodeMap0, bitpos);
-            final int nodeIndex1 = index(nodeMap1, bitpos);
-
-            final AbstractSetNode<K> subNode0 = node0.getNode(nodeIndex0);
-            final AbstractSetNode<K> subNode1 = node1.getNode(nodeIndex1);
-
-            final AbstractSetNode<K> newNode = subNode0.union(mutator, subNode1,
-                shift + BIT_PARTITION_SIZE, details, cmp, directionPreference);
-
-            // node -> node
-            prototype.add(bitpos, newNode);
-
-            if (newNode != subNode0) {
-              deltaSize += newNode.size() - subNode0.size();
-            }
+          case PATTERN_EMPTY_AND_NODE:
+            unionNode.accept(node1, bitpos);
             break;
-          }
 
-          case PATTERN_DATA_AND_EMPTY: {
-            // case singleton x empty
-            final int dataIndex0 = index(dataMap0, bitpos);
-            final K key0 = node0.getKey(dataIndex0);
-
-            prototype.add(bitpos, key0);
-            prototype.addHash(node0.getKeyHash(dataIndex0));
+          case PATTERN_DATA_AND_DATA:
+            unionDataAndData.accept(node0, node1, bitpos);
             break;
-          }
 
-          case PATTERN_EMPTY_AND_DATA: {
-            // case empty x singleton
-            final int dataIndex1 = index(dataMap1, bitpos);
-            final K key1 = node1.getKey(dataIndex1);
-
-            prototype.add(bitpos, key1);
-            prototype.addHash(node1.getKeyHash(dataIndex1));
-            deltaSize += 1;
+          case PATTERN_NODE_AND_DATA:
+            unionDataAndNode.accept(node1, node0, bitpos);
             break;
-          }
 
-          case PATTERN_NODE_AND_EMPTY: {
-            // case node x empty
-            final int nodeIndex0 = index(nodeMap0, bitpos);
-            final AbstractSetNode<K> subNode0 = node0.getNode(nodeIndex0);
-
-            prototype.add(bitpos, subNode0);
+          case PATTERN_DATA_AND_NODE:
+            unionDataAndNode.accept(node0, node1, bitpos);
             break;
-          }
 
-          case PATTERN_EMPTY_AND_NODE: {
-            // case empty x node
-            final int nodeIndex1 = index(nodeMap1, bitpos);
-            final AbstractSetNode<K> subNode1 = node1.getNode(nodeIndex1);
-
-            prototype.add(bitpos, subNode1);
-            deltaSize += subNode1.size();
+          case PATTERN_NODE_AND_NODE:
+            unionNodeAndNode.accept(node0, node1, bitpos);
             break;
-          }
         }
 
         int trailingZeroCount = Integer
@@ -1965,10 +1947,8 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 
       final CompactSetNode<K> newNode = new BitmapIndexedSetNode<K>(mutator,
           prototype.nodeMap(), prototype.dataMap(), prototype.compactBuffer(),
-          prototype.compactHashes(), node0.size() + deltaSize);
+          prototype.compactHashes(), prototype.getCachedSize());
 
-      assert !node0.equals(newNode);
-      assert !node1.equals(newNode);
       return newNode;
     }
 

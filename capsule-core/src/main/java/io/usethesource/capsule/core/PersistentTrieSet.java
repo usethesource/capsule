@@ -2100,7 +2100,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
       int unionedBitmap = dataMap0 | nodeMap0 | dataMap1 | nodeMap1;
 
-      final Prototype<K, AbstractSetNode<K>> prototype = new Prototype<>();
+      final Prototype<K, AbstractSetNode<K>> prototype = new Prototype<>(false);
       int deltaSize = 0;
       int deltaHashCode = 0;
 
@@ -2446,7 +2446,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         return EMPTY_NODE;
       }
 
-      final Prototype<K, AbstractSetNode<K>> prototype = new Prototype<>();
+      final Prototype<K, AbstractSetNode<K>> prototype = new Prototype<>(false);
       int deltaSize = 0;
       int deltaHashCode = 0;
 
@@ -2805,7 +2805,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
       int unionedBitmap = bitmap0 | bitmap1;
 
-      final Prototype<K, AbstractSetNode<K>> prototype = new Prototype<>();
+      final Prototype<K, AbstractSetNode<K>> prototype = new Prototype<>(false);
       int deltaSize = 0;
       int deltaHashCode = 0;
 

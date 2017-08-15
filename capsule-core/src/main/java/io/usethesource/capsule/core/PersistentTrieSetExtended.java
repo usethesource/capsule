@@ -30,7 +30,7 @@ import java.util.stream.StreamSupport;
 import io.usethesource.capsule.Set;
 import io.usethesource.capsule.core.trie.ArrayView;
 import io.usethesource.capsule.core.trie.SetNode;
-import io.usethesource.capsule.core.trie.SetNode.ImmutablePayloadTuple;
+import io.usethesource.capsule.core.trie.ImmutablePayloadTuple;
 import io.usethesource.capsule.util.ArrayUtils;
 import io.usethesource.capsule.util.EqualityComparator;
 
@@ -1458,7 +1458,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
       int unionedBitmap = dataMap0 | nodeMap0 | dataMap1 | nodeMap1;
 
-      final Prototype<K, BitmapIndexedSetNode<K>> prototype = new Prototype<>();
+      final Prototype<K, BitmapIndexedSetNode<K>> prototype = new Prototype<>(false);
       int deltaSize = 0;
       int deltaHashCode = 0;
 
@@ -1717,7 +1717,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
         return EMPTY_NODE;
       }
 
-      final Prototype<K, BitmapIndexedSetNode<K>> prototype = new Prototype<>();
+      final Prototype<K, BitmapIndexedSetNode<K>> prototype = new Prototype<>(false);
       int deltaSize = 0;
       int deltaHashCode = 0;
 
@@ -1962,7 +1962,7 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
 
       int unionedBitmap = bitmap0 | bitmap1;
 
-      final Prototype<K, BitmapIndexedSetNode<K>> prototype = new Prototype<>();
+      final Prototype<K, BitmapIndexedSetNode<K>> prototype = new Prototype<>(false);
       int deltaSize = 0;
       int deltaHashCode = 0;
 

@@ -8,7 +8,6 @@
 package io.usethesource.capsule.core.trie;
 
 import java.util.Comparator;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public interface SetNode<K, R extends SetNode<K, R>> extends Node {
@@ -80,8 +79,12 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
 
   final class Prototype<K, R extends SetNode<K, R>> {
 
+    final boolean trackSize;
+
     private int dataMap = 0;
     private int nodeMap = 0;
+
+    private int cachedSize = 0;
 
     private final Object[] buffer = new Object[32];
     private int dataIndex = 0;
@@ -89,6 +92,10 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
 
     private final int[] hashes = new int[32];
     private int hashIndex = 0;
+
+    public Prototype(boolean trackSize) {
+      this.trackSize = trackSize;
+    }
 
     public final int dataMap() {
       return dataMap;
@@ -115,6 +122,11 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
       dataIndex = dataIndex + 1;
     }
 
+    public final void add(int bitpos, K key, int hash) {
+      add(bitpos, key);
+      addHash(hash);
+    }
+
     public final void add(int bitpos, K key) {
       // add element
       buffer[dataIndex] = key;
@@ -122,6 +134,11 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
 
       // advance cursor
       dataIndex = dataIndex + 1;
+
+      // increase cached properties
+      if (trackSize) {
+        cachedSize += 1;
+      }
     }
 
     public final void addHash(int hash) {
@@ -139,6 +156,11 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
 
       // advance cursor
       nodeIndex = nodeIndex - 1;
+
+      // increase cached properties
+      if (trackSize) {
+        cachedSize += node.size();
+      }
     }
 
     public final Object[] compactBuffer() {
@@ -153,65 +175,10 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
       System.arraycopy(hashes, 0, compactedHashes, 0, hashIndex);
       return compactedHashes;
     }
-  }
 
-  final class ImmutablePayloadTuple<T> implements
-      Comparable<ImmutablePayloadTuple<T>>, java.io.Serializable {
-
-    private static final long serialVersionUID = 42L;
-
-    private final int hash;
-    private final T payload;
-
-    private ImmutablePayloadTuple(final int hash, final T payload) {
-      this.hash = hash;
-      this.payload = payload;
+    public final int getCachedSize() {
+      return cachedSize;
     }
-
-    public static final <K> ImmutablePayloadTuple<K> of(final int hash, final K payload) {
-      return new ImmutablePayloadTuple<>(hash, payload);
-    }
-
-    public T get() {
-      return payload;
-    }
-
-    public int keyHash() {
-      return hash;
-    }
-
-    @Override
-    public int compareTo(ImmutablePayloadTuple<T> other) {
-      return hash - other.hash;
-    }
-
-    @Override
-    public int hashCode() {
-      return hash;
-    }
-
-    @Override
-    public boolean equals(Object other) {
-      if (null == other) {
-        return false;
-      }
-      if (this == other) {
-        return true;
-      }
-      if (getClass() != other.getClass()) {
-        return false;
-      }
-
-      ImmutablePayloadTuple that = (ImmutablePayloadTuple) other;
-
-      return hash == that.hash && Objects.equals(payload, that.payload);
-    }
-
-    @Override
-    public String toString() {
-      return String.format("%d", hash);
-    }
-
   }
 
 }
