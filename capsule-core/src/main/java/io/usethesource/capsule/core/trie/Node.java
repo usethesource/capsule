@@ -32,6 +32,11 @@ public interface Node {
    */
   <T> ArrayView<T> dataArray(int category, int component);
 
+  // TODO adapt dataView and invoke hashCode()
+  default ArrayView<Integer> hashArray(int category, int component) {
+    throw new UnsupportedOperationException();
+  }
+
   ArrayView<? extends Node> nodeArray();
 
 }

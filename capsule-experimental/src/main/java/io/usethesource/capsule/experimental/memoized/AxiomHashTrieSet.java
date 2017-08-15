@@ -7,9 +7,22 @@
  */
 package io.usethesource.capsule.experimental.memoized;
 
+import static io.usethesource.capsule.core.trie.SetNode.MEMOIZE_HASH_CODE_OF_ELEMENT;
+import static io.usethesource.capsule.core.trie.SetNode.Preference.INDIFFERENT;
+import static io.usethesource.capsule.core.trie.SetNode.TRACK_DELTA_OF_META_DATA;
+import static io.usethesource.capsule.core.trie.SetNode.TRACK_DELTA_OF_META_DATA_PER_COLLECTION;
+import static io.usethesource.capsule.core.trie.SetNode.TRACK_DELTA_OF_META_DATA_PER_NODE;
+import static io.usethesource.capsule.core.trie.SetNode.TRUST_NODE_SIZE_AND_HASHCODE;
+
 import io.usethesource.capsule.Set;
+import io.usethesource.capsule.core.trie.ArrayView;
+import io.usethesource.capsule.core.trie.SetNode;
+import io.usethesource.capsule.core.trie.SetNode.IntersectionResult;
+import io.usethesource.capsule.core.trie.SetNode.Preference;
+import io.usethesource.capsule.core.trie.SetNode.Prototype;
 import io.usethesource.capsule.util.ArrayUtils;
 import io.usethesource.capsule.util.ArrayUtilsInt;
+import io.usethesource.capsule.util.EqualityComparator;
 import java.text.DecimalFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -23,7 +36,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /*
  * Features:
@@ -256,6 +274,74 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     tmpTransient.__retainAllEquivalent(transientSet, cmp);
     return tmpTransient.freeze();
   }
+
+//  @Override
+//  public Set.Immutable<K> union(final Set.Immutable<K> other) {
+//
+//    if (this == other) {
+//      return this;
+//    }
+//
+//    if (other == null) {
+//      return this;
+//    }
+//
+//    if (this == EMPTY_SET || this.isEmpty()) {
+//      return other;
+//    }
+//
+//    if (other == EMPTY_SET || other.isEmpty()) {
+//      return this;
+//    }
+//
+//    if (!(other instanceof AxiomHashTrieSet)) {
+//      return Set.Immutable.union(this, other);
+//    }
+//
+//    final AxiomHashTrieSet<K> set1 = this;
+//    final AxiomHashTrieSet<K> set2 = (AxiomHashTrieSet<K>) other;
+//
+//    final AxiomHashTrieSet<K> smaller;
+//    final AxiomHashTrieSet<K> bigger;
+//
+//    final AxiomHashTrieSet<K> unmodified;
+//
+//    if (set2.size() >= set1.size()) {
+//      unmodified = set2;
+//      smaller = set1;
+//      bigger = set2;
+//    } else {
+//      unmodified = set1;
+//      smaller = set2;
+//      bigger = set1;
+//    }
+//
+//    final SetNode.IntersectionResult details = new SetNode.IntersectionResult();
+//
+//    final AbstractSetNode<K> newRootNode = bigger.rootNode.union(null, smaller.rootNode, 0,
+//        details, EqualityComparator.EQUALS.toComparator(), INDIFFERENT);
+//
+////    assert unmodified.cachedHashCode != details.getAccumulatedHashCode()
+////        || unmodified.rootNode == newRootNode || null == newRootNode;
+//
+//    if (newRootNode == unmodified.rootNode || newRootNode == null) {
+//      return unmodified;
+//    }
+//
+//    if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+//      assert unmodified.cachedSize + details.getAccumulatedSize() == size(newRootNode);
+//      assert unmodified.cachedHashCode + details.getAccumulatedHashCode() == hashCode(newRootNode);
+//      return new AxiomHashTrieSet(newRootNode,
+//          unmodified.cachedHashCode + details.getAccumulatedHashCode(),
+//          unmodified.cachedSize + details.getAccumulatedSize());
+//    } else {
+//      assert newRootNode.size() == size(newRootNode);
+//      assert newRootNode.recursivePayloadHashCode() == hashCode(newRootNode);
+//      return new AxiomHashTrieSet(newRootNode,
+//          newRootNode.recursivePayloadHashCode(),
+//          newRootNode.size());
+//    }
+//  }
 
   @Override
   public boolean add(final K key) {
@@ -546,11 +632,10 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     }
   }
 
-  protected static interface INode<K, V> {
+  protected static abstract class AbstractSetNode<K> implements
+      SetNode<K, AbstractSetNode<K>>, java.lang.Iterable<K>, java.io.Serializable {
 
-  }
-
-  protected static abstract class AbstractSetNode<K> implements INode<K, Void> {
+    private static final long serialVersionUID = 42L;
 
     static final int TUPLE_LENGTH = 1;
 
@@ -578,9 +663,62 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
         final int keyHash, final int shift, final SetResult<K> details,
         final Comparator<Object> cmp);
 
-    static final boolean isAllowedToEdit(AtomicReference<Thread> x, AtomicReference<Thread> y) {
+    // static final <T> boolean isAllowedToEdit(AtomicReference<T> x, AtomicReference<T> y) {
+    // return x != null && y != null && (x == y || x.get() == y.get());
+    // }
+
+    static final <T> boolean isAllowedToEdit(AtomicReference<?> x, AtomicReference<?> y) {
       return x != null && y != null && (x == y || x.get() == y.get());
     }
+
+    @Override
+    public <T> ArrayView<T> dataArray(final int category, final int component) {
+      if (category == 0 && component == 0) {
+        return categoryArrayView0();
+      } else {
+        throw new IllegalArgumentException("Category %i is not supported.");
+      }
+    }
+
+    private <T> ArrayView<T> categoryArrayView0() {
+      return new ArrayView<T>() {
+        @Override
+        public int size() {
+          return payloadArity();
+        }
+
+        @Override
+        public T get(int index) {
+          return (T) getKey(index);
+        }
+      };
+    }
+
+    @Override
+    public ArrayView<Integer> hashArray(final int category, final int component) {
+      if (category == 0 && component == 0) {
+        return categoryHashArrayView0();
+      } else {
+        throw new IllegalArgumentException("Category %i is not supported.");
+      }
+    }
+
+    private ArrayView<Integer> categoryHashArrayView0() {
+      return new ArrayView() {
+        @Override
+        public int size() {
+          return payloadArity();
+        }
+
+        @Override
+        public Integer get(int index) {
+          return getKeyHash(index);
+        }
+      };
+    }
+
+    @Override
+    public abstract ArrayView<AbstractSetNode<K>> nodeArray();
 
     abstract boolean hasNodes();
 
@@ -615,13 +753,13 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       };
     }
 
-    abstract boolean hasPayload();
+    public abstract boolean hasPayload();
 
-    abstract int payloadArity();
+    public abstract int payloadArity();
 
-    abstract K getKey(final int index);
+    public abstract K getKey(final int index);
 
-    abstract int getKeyHash(final int index);
+    public abstract int getKeyHash(final int index);
 
     @Deprecated
     abstract boolean hasSlots();
@@ -640,7 +778,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       return payloadArity() + nodeArity();
     }
 
-    int size() {
+    public int size() {
       final Iterator<K> it = new SetKeyIterator<>(this);
 
       int size = 0;
@@ -650,6 +788,56 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       }
 
       return size;
+    }
+
+    abstract int localPayloadHashCode();
+
+    @Override
+    public int recursivePayloadHashCode() {
+      final Iterator<? extends AbstractSetNode<K>> it = new TrieSetNodeIterator(this);
+
+      int hashCode = 0;
+      while (it.hasNext()) {
+        final AbstractSetNode<K> node = it.next();
+        hashCode += node.localPayloadHashCode();
+      }
+
+      return hashCode;
+    }
+
+    @Override
+    public Iterator<K> iterator() {
+      return new SetKeyIterator<>(this);
+    }
+
+    @Override
+    public Spliterator<K> spliterator() {
+      return Spliterators.spliteratorUnknownSize(iterator(), Spliterator.DISTINCT);
+    }
+
+    public Stream<K> stream() {
+      return StreamSupport.stream(spliterator(), false);
+    }
+
+    @Override
+    public AbstractSetNode<K> union(AtomicReference<Thread> mutator, AbstractSetNode<K> that,
+        int shift, IntersectionResult details, Comparator<Object> cmp,
+        Preference directionPreference) {
+      throw new UnsupportedOperationException("Not yet implemented.");
+    }
+
+    @Override
+    public AbstractSetNode<K> intersect(AtomicReference<Thread> mutator,
+        AbstractSetNode<K> that, int shift, IntersectionResult details,
+        Comparator<Object> cmp, Preference directionPreference) {
+      throw new UnsupportedOperationException("Not yet implemented.");
+    }
+
+    @Override
+    public AbstractSetNode<K> subtract(AtomicReference<Thread> mutator, AbstractSetNode<K> that,
+        int shift, IntersectionResult details, Comparator<Object> cmp,
+        Preference directionPreference) {
+      throw new UnsupportedOperationException("Not yet implemented.");
     }
   }
 
@@ -682,7 +870,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
      *
      * @return size predicate
      */
-    abstract byte sizePredicate();
+    public abstract byte sizePredicate();
 
     @Override
     abstract CompactSetNode<K> getNode(final int index);
@@ -1189,7 +1377,6 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       this.keyHashes = keyHashes;
 
       if (DEBUG) {
-
         assert (TUPLE_LENGTH * Integer.bitCount(dataMap)
             + Integer.bitCount(nodeMap) == nodes.length);
 
@@ -1205,12 +1392,49 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     }
 
     @Override
-    K getKey(final int index) {
+    public ArrayView<AbstractSetNode<K>> nodeArray() {
+      return new ArrayView<AbstractSetNode<K>>() {
+        @Override
+        public int size() {
+          return BitmapIndexedSetNode.this.nodeArity();
+        }
+
+        @Override
+        public AbstractSetNode<K> get(int index) {
+          return BitmapIndexedSetNode.this.getNode(index);
+        }
+
+        /**
+         * TODO: replace with {{@link #set(int, AbstractSetNode, AtomicReference)}}
+         */
+        @Override
+        public void set(int index, AbstractSetNode<K> item) {
+          // if (!isAllowedToEdit(BitmapIndexedSetNode.this.mutator, writeCapabilityToken)) {
+          // throw new IllegalStateException();
+          // }
+
+          nodes[nodes.length - 1 - index] = item;
+        }
+
+        @Override
+        public void set(int index, AbstractSetNode<K> item,
+            AtomicReference<?> writeCapabilityToken) {
+          if (!isAllowedToEdit(BitmapIndexedSetNode.this.mutator, writeCapabilityToken)) {
+            throw new IllegalStateException();
+          }
+
+          nodes[nodes.length - 1 - index] = item;
+        }
+      };
+    }
+
+    @Override
+    public K getKey(final int index) {
       return (K) nodes[TUPLE_LENGTH * index];
     }
 
     @Override
-    int getKeyHash(int index) {
+    public int getKeyHash(int index) {
       return keyHashes[index];
     }
 
@@ -1220,12 +1444,12 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     }
 
     @Override
-    boolean hasPayload() {
+    public boolean hasPayload() {
       return dataMap() != 0;
     }
 
     @Override
-    int payloadArity() {
+    public int payloadArity() {
       return Integer.bitCount(dataMap());
     }
 
@@ -1252,6 +1476,13 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     @Override
     int slotArity() {
       return nodes.length;
+    }
+
+    @Override
+    int localPayloadHashCode() {
+      final Stream<K> keyStream =
+          StreamSupport.stream(this.<K>dataArray(0, 0).spliterator(), false);
+      return keyStream.mapToInt(Object::hashCode).sum();
     }
 
     @Override
@@ -1297,7 +1528,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     }
 
     @Override
-    byte sizePredicate() {
+    public byte sizePredicate() {
       if (this.nodeArity() == 0) {
         switch (this.payloadArity()) {
           case 0:
@@ -1311,6 +1542,24 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
         return SIZE_MORE_THAN_ONE;
       }
     }
+
+//    @Override
+//    public final int size() {
+//      if (TRUST_NODE_SIZE_AND_HASHCODE) {
+//        return cachedSize;
+//      } else {
+//        return super.size();
+//      }
+//    }
+//
+//    @Override
+//    public int recursivePayloadHashCode() {
+//      if (TRUST_NODE_SIZE_AND_HASHCODE) {
+//        return cachedHashCode;
+//      } else {
+//        return super.recursivePayloadHashCode();
+//      }
+//    }
 
     @Override
     CompactSetNode<K> copyAndSetNode(final AtomicReference<Thread> mutator, final int bitpos,
@@ -1443,6 +1692,360 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       return dst;
     }
 
+    private final static int PATTERN_EMPTY_AND_NODE  = 0b0001;
+    private final static int PATTERN_NODE_AND_EMPTY  = 0b0100;
+
+    private final static int PATTERN_EMPTY_AND_DATA  = 0b0010;
+    private final static int PATTERN_DATA_AND_EMPTY  = 0b1000;
+
+    private final static int PATTERN_DATA_AND_NODE   = 0b1001;
+    private final static int PATTERN_NODE_AND_DATA   = 0b0110;
+
+    private final static int PATTERN_EMPTY_AND_EMPTY = 0b0000;
+    private final static int PATTERN_DATA_AND_DATA   = 0b1010;
+    private final static int PATTERN_NODE_AND_NODE   = 0b0101;
+    // @formatter:on
+
+//    /*
+//     * TODO: for incrementality: only consider duplicate elements
+//     */
+//    @Override
+//    public final AbstractSetNode<K> union(AtomicReference<Thread> mutator,
+//        AbstractSetNode<K> that, int shift, IntersectionResult details,
+//        Comparator<Object> cmp, Preference directionPreference) {
+//
+//      final CompactSetNode<K> node0 = this;
+//      final CompactSetNode<K> node1 = (CompactSetNode<K>) that;
+//
+//      if (node0 == node1) {
+//        // TODO: direction preference?
+//        if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+//          final int remainingSize = node0.size();
+//          final int remainingHashCode = node0.recursivePayloadHashCode();
+//
+//          // delta @ collection
+//          details.addSize(remainingSize);
+//          details.addHashCode(remainingHashCode);
+//        }
+//
+//        return node0;
+//      }
+//
+//      final int dataMap0 = node0.dataMap();
+//      final int nodeMap0 = node0.nodeMap();
+//      final int dataMap1 = node1.dataMap();
+//      final int nodeMap1 = node1.nodeMap();
+//
+//      int unionedBitmap = dataMap0 | nodeMap0 | dataMap1 | nodeMap1;
+//
+//      final Prototype<K, AbstractSetNode<K>> prototype = new Prototype<>();
+//      int deltaSize = 0;
+//      int deltaHashCode = 0;
+//
+//      boolean leftSubTreesUnmodified = true;
+//
+//      int bitsToSkip = Integer.numberOfTrailingZeros(unionedBitmap);
+//
+//      while (bitsToSkip < 32) {
+//        final int bitpos = bitpos(bitsToSkip);
+//
+//        final int bitPattern0 = bitPattern(dataMap0, nodeMap0, bitpos);
+//        final int bitPattern1 = bitPattern(dataMap1, nodeMap1, bitpos);
+//
+//        final int bitPattern = (bitPattern0 << 2) | bitPattern1;
+//
+//        switch (bitPattern) {
+//          case PATTERN_DATA_AND_DATA: {
+//            // case singleton x singleton
+//            final int dataIndex0 = index(dataMap0, bitpos);
+//            final int dataIndex1 = index(dataMap1, bitpos);
+//
+//            final K key0 = node0.getKey(dataIndex0);
+//            final K key1 = node1.getKey(dataIndex1);
+//
+//            // TODO: consider fast-fail if hashes are available for free
+//            // TODO: consider comparator
+//            if (Objects.equals(key0, key1)) {
+////            if (keyHash0 == keyHash1 && cmp.compare(key0, key1) == 0) {
+////            if (keyHash0 == keyHash1 && Objects.equals(key0, key1)) {
+//              // singleton -> singleton
+//              prototype.add(bitpos, key0);
+//
+//              if (MEMOIZE_HASH_CODE_OF_ELEMENT) {
+//                prototype.addHash(node0.getKeyHash(dataIndex0));
+//              }
+//            } else {
+//              // singleton -> node (bitmap change)
+//              final int keyHash0 = node0.getKeyHash(dataIndex0);
+//              final int keyHash1 = node1.getKeyHash(dataIndex1);
+//
+//              final AbstractSetNode<K> node =
+//                  mergeTwoKeyValPairs(key0, keyHash0, key1, keyHash1, shift + BIT_PARTITION_SIZE);
+//
+//              prototype.add(bitpos, node);
+//
+//              if (TRACK_DELTA_OF_META_DATA) {
+//                final int addedSize = 1;
+//                final int addedHashCode = keyHash1;
+//
+//                if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+//                  // delta @ node
+//                  deltaSize += addedSize;
+//                  deltaHashCode += addedHashCode;
+//                }
+//
+//                if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+//                  // delta @ collection
+//                  details.addSize(addedSize);
+//                  details.addHashCode(addedHashCode);
+//                }
+//              }
+//            }
+//            break;
+//          }
+//
+//          case PATTERN_NODE_AND_DATA: {
+//            // case node x singleton
+//            final int nodeIndex0 = index(nodeMap0, bitpos);
+//            final int dataIndex1 = index(dataMap1, bitpos);
+//
+//            final AbstractSetNode<K> node = node0.getNode(nodeIndex0);
+//
+//            final K key = node1.getKey(dataIndex1);
+//            final int keyHash = node1.getKeyHash(dataIndex1);
+//
+//            final SetResult<K> updateDetails = SetResult.unchanged();
+//            final AbstractSetNode<K> newNode = node
+//                .updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, updateDetails, cmp);
+//
+//            // node -> node
+//            prototype.add(bitpos, newNode);
+//
+//            if (updateDetails.isModified()) {
+//              leftSubTreesUnmodified = false;
+//
+//              if (TRACK_DELTA_OF_META_DATA) {
+//                final int addedSize = 1;
+//                final int addedHashCode = keyHash;
+//
+//                if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+//                  // delta @ node
+//                  deltaSize += addedSize;
+//                  deltaHashCode += addedHashCode;
+//                }
+//
+//                if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+//                  // delta @ collection
+//                  details.addSize(addedSize);
+//                  details.addHashCode(addedHashCode);
+//                }
+//              }
+//            }
+//            break;
+//          }
+//
+//          case PATTERN_DATA_AND_NODE: {
+//            // case singleton x node
+//            final int dataIndex0 = index(dataMap0, bitpos);
+//            final int nodeIndex1 = index(nodeMap1, bitpos);
+//
+//            final K key = node0.getKey(dataIndex0);
+//            final int keyHash = node0.getKeyHash(dataIndex0);
+//
+//            final AbstractSetNode<K> node = node1.getNode(nodeIndex1);
+//
+//            final SetResult<K> updateDetails = SetResult.unchanged();
+//            final AbstractSetNode<K> newNode = node
+//                .updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, updateDetails, cmp);
+//
+//            // singleton -> node
+//            prototype.add(bitpos, newNode);
+//
+//            if (TRACK_DELTA_OF_META_DATA) {
+//              final int addedSize;
+//              final int addedHashCode;
+//
+//              if (updateDetails.isModified()) {
+//                addedSize = node.size();
+//                addedHashCode = node.recursivePayloadHashCode();
+//              } else {
+//                addedSize = node.size() - 1;
+//                addedHashCode = node.recursivePayloadHashCode() - keyHash;
+//              }
+//
+//              if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+//                // delta @ node
+//                deltaSize += addedSize;
+//                deltaHashCode += addedHashCode;
+//              }
+//
+//              if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+//                // delta @ collection
+//                details.addSize(addedSize);
+//                details.addHashCode(addedHashCode);
+//              }
+//            }
+//            break;
+//          }
+//
+//          case PATTERN_NODE_AND_NODE: {
+//            // case node x node
+//            final int nodeIndex0 = index(nodeMap0, bitpos);
+//            final int nodeIndex1 = index(nodeMap1, bitpos);
+//
+//            final AbstractSetNode<K> subNode0 = node0.getNode(nodeIndex0);
+//            final AbstractSetNode<K> subNode1 = node1.getNode(nodeIndex1);
+//
+//            final AbstractSetNode<K> newNode = subNode0.union(mutator, subNode1,
+//                shift + BIT_PARTITION_SIZE, details, cmp, directionPreference);
+//
+//            // node -> node
+//            prototype.add(bitpos, newNode);
+//
+//            if (newNode != subNode0) {
+//              leftSubTreesUnmodified = false;
+//
+//              if (TRACK_DELTA_OF_META_DATA) {
+//                // TODO: consider incremental recursive collection
+//                final int addedSize = newNode.size() - subNode0.size();
+//                final int addedHashCode =
+//                    newNode.recursivePayloadHashCode() - subNode0.recursivePayloadHashCode();
+//
+//                // TODO: handle similar to copyAndSetNode -> pass remainder trough result???
+//                // remainder -> subTreeDeltaSize ... subTreeDeltaHashCode
+//                if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+//                  // delta @ node
+//                  deltaSize += addedSize;
+//                  deltaHashCode += addedHashCode;
+//                }
+//
+//                // global modification where already tracked ...
+////                if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+////                  // delta @ collection
+////                  details.addSize(addedSize);
+////                  details.addHashCode(addedHashCode);
+////                }
+//              }
+//            }
+//            break;
+//          }
+//
+//          case PATTERN_DATA_AND_EMPTY: {
+//            // case singleton x empty
+//            final int dataIndex0 = index(dataMap0, bitpos);
+//            final K key0 = node0.getKey(dataIndex0);
+//
+//            prototype.add(bitpos, key0);
+//
+//            if (MEMOIZE_HASH_CODE_OF_ELEMENT) {
+//              prototype.addHash(node1.getKeyHash(dataIndex0));
+//            }
+//            break;
+//          }
+//
+//          case PATTERN_EMPTY_AND_DATA: {
+//            // case empty x singleton
+//            final int dataIndex1 = index(dataMap1, bitpos);
+//            final K key1 = node1.getKey(dataIndex1);
+//
+//            prototype.add(bitpos, key1);
+//
+//            if (MEMOIZE_HASH_CODE_OF_ELEMENT) {
+//              prototype.addHash(node1.getKeyHash(dataIndex1));
+//            }
+//
+//            if (TRACK_DELTA_OF_META_DATA) {
+//              final int addedSize = 1;
+//              final int addedHashCode = node1.getKeyHash(dataIndex1);
+//
+//              if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+//                // delta @ node
+//                deltaSize += addedSize;
+//                deltaHashCode += addedHashCode;
+//              }
+//
+//              if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+//                // delta @ collection
+//                details.addSize(addedSize);
+//                details.addHashCode(addedHashCode);
+//              }
+//            }
+//            break;
+//          }
+//
+//          case PATTERN_NODE_AND_EMPTY: {
+//            // case node x empty
+//            final int nodeIndex0 = index(nodeMap0, bitpos);
+//            final AbstractSetNode<K> subNode0 = node0.getNode(nodeIndex0);
+//
+//            prototype.add(bitpos, subNode0);
+//            break;
+//          }
+//
+//          case PATTERN_EMPTY_AND_NODE: {
+//            // case empty x node
+//            final int nodeIndex1 = index(nodeMap1, bitpos);
+//            final AbstractSetNode<K> subNode1 = node1.getNode(nodeIndex1);
+//
+//            prototype.add(bitpos, subNode1);
+//
+//            if (TRACK_DELTA_OF_META_DATA) {
+//              final int addedSize = subNode1.size();
+//              final int addedHashCode = subNode1.recursivePayloadHashCode();
+//
+//              if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+//                // delta @ node
+//                deltaSize += addedSize;
+//                deltaHashCode += addedHashCode;
+//              }
+//
+//              if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+//                // delta @ collection
+//                details.addSize(addedSize);
+//                details.addHashCode(addedHashCode);
+//              }
+//            }
+//            break;
+//          }
+//        }
+//
+//        int trailingZeroCount = Integer
+//            .numberOfTrailingZeros(unionedBitmap >> (bitsToSkip + 1));
+//        bitsToSkip = bitsToSkip + 1 + trailingZeroCount;
+//      }
+//
+////      if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+////        // delta @ collection
+////        details.addSize(deltaSize);
+////        details.addHashCode(deltaHashCode);
+////      }
+//
+//      final BiFunction<Integer, Integer, CompactSetNode<K>> toNode;
+//
+//      if (TRUST_NODE_SIZE_AND_HASHCODE) {
+//        toNode = (newHashCode, newSize) -> new BitmapIndexedSetNode<K>(mutator,
+//            prototype.nodeMap(), prototype.dataMap(), prototype.compactBuffer(),
+//            node0.recursivePayloadHashCode() + newHashCode, node0.size() + newSize);
+//      } else {
+//        toNode = (newHashCode, newSize) -> new BitmapIndexedSetNode<K>(mutator,
+//            prototype.nodeMap(), prototype.dataMap(), prototype.compactBuffer(), 0, 0);
+//      }
+//
+//      boolean leftNodeUnmodified = leftSubTreesUnmodified
+//          && prototype.dataMap() == dataMap0
+//          && prototype.nodeMap() == nodeMap0;
+//
+//      if (leftNodeUnmodified) {
+//        assert node0.equals(toNode.apply(deltaHashCode, deltaSize));
+//        return node0;
+//      }
+//
+//      final CompactSetNode<K> newNode = toNode.apply(deltaHashCode, deltaSize);
+//      assert !node0.equals(newNode);
+//      assert !node1.equals(newNode);
+//      return newNode;
+//    }
+
   }
 
   private static final class HashCollisionSetNode<K> extends CompactSetNode<K> {
@@ -1457,6 +2060,11 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       this.hash = hash;
 
       assert payloadArity() >= 2;
+    }
+
+    @Override
+    public ArrayView<AbstractSetNode<K>> nodeArray() {
+      return ArrayView.empty();
     }
 
     @Override
@@ -1622,12 +2230,12 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     }
 
     @Override
-    boolean hasPayload() {
+    public boolean hasPayload() {
       return true;
     }
 
     @Override
-    int payloadArity() {
+    public int payloadArity() {
       return keys.length;
     }
 
@@ -1647,17 +2255,17 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     }
 
     @Override
-    byte sizePredicate() {
+    public byte sizePredicate() {
       return SIZE_MORE_THAN_ONE;
     }
 
     @Override
-    K getKey(final int index) {
+    public K getKey(final int index) {
       return keys[index];
     }
 
     @Override
-    int getKeyHash(int index) {
+    public int getKeyHash(int index) {
       return hash;
     }
 
@@ -1679,6 +2287,11 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     @Override
     int slotArity() {
       throw new UnsupportedOperationException();
+    }
+
+    @Override
+    int localPayloadHashCode() {
+      return hash * keys.length;
     }
 
     @Override
