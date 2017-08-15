@@ -32,6 +32,10 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
 
   int getKeyHash(final int index);
 
+  default ImmutablePayloadTuple<K> getPayload(final int index) {
+    return ImmutablePayloadTuple.of(getKeyHash(index), getKey(index));
+  }
+
   int size();
 
   int recursivePayloadHashCode();

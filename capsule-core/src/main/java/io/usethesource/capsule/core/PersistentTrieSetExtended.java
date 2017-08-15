@@ -1110,7 +1110,8 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
       return getPayload(index).keyHash();
     }
 
-    ImmutablePayloadTuple<K> getPayload(final int index) {
+    @Override
+    public ImmutablePayloadTuple<K> getPayload(final int index) {
       return (ImmutablePayloadTuple<K>) nodes[TUPLE_LENGTH * index];
     }
 
