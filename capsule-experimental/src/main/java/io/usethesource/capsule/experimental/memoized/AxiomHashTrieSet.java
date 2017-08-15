@@ -7,19 +7,13 @@
  */
 package io.usethesource.capsule.experimental.memoized;
 
-import static io.usethesource.capsule.core.trie.SetNode.MEMOIZE_HASH_CODE_OF_ELEMENT;
 import static io.usethesource.capsule.core.trie.SetNode.Preference.INDIFFERENT;
-import static io.usethesource.capsule.core.trie.SetNode.TRACK_DELTA_OF_META_DATA;
 import static io.usethesource.capsule.core.trie.SetNode.TRACK_DELTA_OF_META_DATA_PER_COLLECTION;
-import static io.usethesource.capsule.core.trie.SetNode.TRACK_DELTA_OF_META_DATA_PER_NODE;
-import static io.usethesource.capsule.core.trie.SetNode.TRUST_NODE_SIZE_AND_HASHCODE;
+import static io.usethesource.capsule.util.BitmapUtils.isBitInBitmap;
 
 import io.usethesource.capsule.Set;
 import io.usethesource.capsule.core.trie.ArrayView;
 import io.usethesource.capsule.core.trie.SetNode;
-import io.usethesource.capsule.core.trie.SetNode.IntersectionResult;
-import io.usethesource.capsule.core.trie.SetNode.Preference;
-import io.usethesource.capsule.core.trie.SetNode.Prototype;
 import io.usethesource.capsule.util.ArrayUtils;
 import io.usethesource.capsule.util.ArrayUtilsInt;
 import io.usethesource.capsule.util.EqualityComparator;
@@ -95,6 +89,26 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     }
 
     return result;
+  }
+
+  private static <K> int hashCode(AbstractSetNode<K> rootNode) {
+    int hash = 0;
+
+    for (Iterator<K> it = new SetKeyIterator<>(rootNode); it.hasNext(); ) {
+      hash += it.next().hashCode();
+    }
+
+    return hash;
+  }
+
+  private static <K> int size(AbstractSetNode<K> rootNode) {
+    int size = 0;
+
+    for (Iterator<K> it = new SetKeyIterator<>(rootNode); it.hasNext(); it.next()) {
+      size += 1;
+    }
+
+    return size;
   }
 
   private boolean checkHashCodeAndSize(final int targetHash, final int targetSize) {
@@ -275,73 +289,73 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     return tmpTransient.freeze();
   }
 
-//  @Override
-//  public Set.Immutable<K> union(final Set.Immutable<K> other) {
-//
-//    if (this == other) {
-//      return this;
-//    }
-//
-//    if (other == null) {
-//      return this;
-//    }
-//
-//    if (this == EMPTY_SET || this.isEmpty()) {
-//      return other;
-//    }
-//
-//    if (other == EMPTY_SET || other.isEmpty()) {
-//      return this;
-//    }
-//
-//    if (!(other instanceof AxiomHashTrieSet)) {
-//      return Set.Immutable.union(this, other);
-//    }
-//
-//    final AxiomHashTrieSet<K> set1 = this;
-//    final AxiomHashTrieSet<K> set2 = (AxiomHashTrieSet<K>) other;
-//
-//    final AxiomHashTrieSet<K> smaller;
-//    final AxiomHashTrieSet<K> bigger;
-//
-//    final AxiomHashTrieSet<K> unmodified;
-//
-//    if (set2.size() >= set1.size()) {
-//      unmodified = set2;
-//      smaller = set1;
-//      bigger = set2;
-//    } else {
-//      unmodified = set1;
-//      smaller = set2;
-//      bigger = set1;
-//    }
-//
-//    final SetNode.IntersectionResult details = new SetNode.IntersectionResult();
-//
-//    final AbstractSetNode<K> newRootNode = bigger.rootNode.union(null, smaller.rootNode, 0,
-//        details, EqualityComparator.EQUALS.toComparator(), INDIFFERENT);
-//
-////    assert unmodified.cachedHashCode != details.getAccumulatedHashCode()
-////        || unmodified.rootNode == newRootNode || null == newRootNode;
-//
-//    if (newRootNode == unmodified.rootNode || newRootNode == null) {
-//      return unmodified;
-//    }
-//
-//    if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+  @Override
+  public Set.Immutable<K> union(final Set.Immutable<K> other) {
+
+    if (this == other) {
+      return this;
+    }
+
+    if (other == null) {
+      return this;
+    }
+
+    if (this == EMPTY_SET || this.isEmpty()) {
+      return other;
+    }
+
+    if (other == EMPTY_SET || other.isEmpty()) {
+      return this;
+    }
+
+    if (!(other instanceof AxiomHashTrieSet)) {
+      return Set.Immutable.union(this, other);
+    }
+
+    final AxiomHashTrieSet<K> set1 = this;
+    final AxiomHashTrieSet<K> set2 = (AxiomHashTrieSet<K>) other;
+
+    final AxiomHashTrieSet<K> smaller;
+    final AxiomHashTrieSet<K> bigger;
+
+    final AxiomHashTrieSet<K> unmodified;
+
+    if (set2.size() >= set1.size()) {
+      unmodified = set2;
+      smaller = set1;
+      bigger = set2;
+    } else {
+      unmodified = set1;
+      smaller = set2;
+      bigger = set1;
+    }
+
+    final SetNode.IntersectionResult details = new SetNode.IntersectionResult();
+
+    final AbstractSetNode<K> newRootNode = bigger.rootNode.union(null, smaller.rootNode, 0,
+        details, EqualityComparator.EQUALS.toComparator(), INDIFFERENT);
+
+//    assert unmodified.cachedHashCode != details.getAccumulatedHashCode()
+//        || unmodified.rootNode == newRootNode || null == newRootNode;
+
+    if (newRootNode == unmodified.rootNode || newRootNode == null) {
+      return unmodified;
+    }
+
+    if (false && TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
 //      assert unmodified.cachedSize + details.getAccumulatedSize() == size(newRootNode);
 //      assert unmodified.cachedHashCode + details.getAccumulatedHashCode() == hashCode(newRootNode);
 //      return new AxiomHashTrieSet(newRootNode,
 //          unmodified.cachedHashCode + details.getAccumulatedHashCode(),
 //          unmodified.cachedSize + details.getAccumulatedSize());
-//    } else {
-//      assert newRootNode.size() == size(newRootNode);
-//      assert newRootNode.recursivePayloadHashCode() == hashCode(newRootNode);
-//      return new AxiomHashTrieSet(newRootNode,
-//          newRootNode.recursivePayloadHashCode(),
-//          newRootNode.size());
-//    }
-//  }
+      throw new IllegalStateException("Not supported.");
+    } else {
+      assert newRootNode.size() == size(newRootNode);
+      assert newRootNode.recursivePayloadHashCode() == hashCode(newRootNode);
+      // return new AxiomHashTrieSet(newRootNode, newRootNode.recursivePayloadHashCode(), newRootNode.size());
+      return new AxiomHashTrieSet(newRootNode, newRootNode.size());
+    }
+  }
 
   @Override
   public boolean add(final K key) {
@@ -594,11 +608,34 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     }
   }
 
-  static final class SetResult<K> {
+  /*
+   * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
+   * `protected` when experiments are finished.
+   */
+  public static final class SetResult<K> {
 
     private K replacedValue;
     private boolean isModified;
     private boolean isReplaced;
+
+    private int deltaSize;
+    private int deltaHashCode;
+
+    public int getDeltaSize() {
+      return deltaSize;
+    }
+
+    public void updateDeltaSize(int deltaSize) {
+      this.deltaSize += deltaSize;
+    }
+
+    public int getDeltaHashCode() {
+      return deltaHashCode;
+    }
+
+    public void updateDeltaHashCode(int deltaHashCode) {
+      this.deltaHashCode += deltaHashCode;
+    }
 
     // update: inserted/removed single element, element count changed
     public void modified() {
@@ -778,17 +815,18 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       return payloadArity() + nodeArity();
     }
 
-    public int size() {
-      final Iterator<K> it = new SetKeyIterator<>(this);
-
-      int size = 0;
-      while (it.hasNext()) {
-        size += 1;
-        it.next();
-      }
-
-      return size;
-    }
+//    @Override
+//    public int size() {
+//      final Iterator<K> it = new SetKeyIterator<>(this);
+//
+//      int size = 0;
+//      while (it.hasNext()) {
+//        size += 1;
+//        it.next();
+//      }
+//
+//      return size;
+//    }
 
     abstract int localPayloadHashCode();
 
@@ -895,7 +933,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
         final int bitpos);
 
     abstract CompactSetNode<K> copyAndSetNode(final AtomicReference<Thread> mutator,
-        final int bitpos, final CompactSetNode<K> node);
+        final int bitpos, final CompactSetNode<K> node, final SetResult<K> details);
 
     abstract CompactSetNode<K> copyAndMigrateFromInlineToNode(final AtomicReference<Thread> mutator,
         final int bitpos, final CompactSetNode<K> node);
@@ -922,10 +960,10 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 
         if (mask0 < mask1) {
           return nodeOf(null, (0), dataMap, new Object[]{key0, key1},
-              new int[]{keyHash0, keyHash1});
+              new int[]{keyHash0, keyHash1}, 2);
         } else {
           return nodeOf(null, (0), dataMap, new Object[]{key1, key0},
-              new int[]{keyHash1, keyHash0});
+              new int[]{keyHash1, keyHash0}, 2);
         }
       } else {
         final CompactSetNode<K> node =
@@ -933,21 +971,21 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
         // values fit on next level
 
         final int nodeMap = bitpos(mask0);
-        return nodeOf(null, nodeMap, (0), new Object[]{node}, new int[]{});
+        return nodeOf(null, nodeMap, (0), new Object[]{node}, new int[]{}, 2);
       }
     }
 
     static final CompactSetNode EMPTY_NODE;
 
     static {
-      EMPTY_NODE = new BitmapIndexedSetNode<>(null, (0), (0), new Object[]{}, new int[]{});
+      EMPTY_NODE = new BitmapIndexedSetNode<>(null, (0), (0), new Object[]{}, new int[]{}, 0);
     }
 
     ;
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
-        final int nodeMap, final int dataMap, final Object[] nodes, final int[] keyHashes) {
-      return new BitmapIndexedSetNode<>(mutator, nodeMap, dataMap, nodes, keyHashes);
+        final int nodeMap, final int dataMap, final Object[] nodes, final int[] keyHashes, final int cachedSize) {
+      return new BitmapIndexedSetNode<>(mutator, nodeMap, dataMap, nodes, keyHashes, cachedSize);
     }
 
     static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator) {
@@ -1089,6 +1127,8 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
               keyHash, shift + BIT_PARTITION_SIZE);
 
           details.modified();
+          details.updateDeltaSize(1);
+          details.updateDeltaHashCode(keyHash);
           return copyAndMigrateFromInlineToNode(mutator, bitpos, subNodeNew);
         }
       } else if ((nodeMap() & bitpos) != 0) { // node (not value)
@@ -1097,7 +1137,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
             subNode.updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, details);
 
         if (details.isModified()) {
-          return copyAndSetNode(mutator, bitpos, subNodeNew);
+          return copyAndSetNode(mutator, bitpos, subNodeNew, details);
         } else {
           return this;
         }
@@ -1127,6 +1167,8 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
               keyHash, shift + BIT_PARTITION_SIZE);
 
           details.modified();
+          details.updateDeltaSize(1);
+          details.updateDeltaHashCode(keyHash);
           return copyAndMigrateFromInlineToNode(mutator, bitpos, subNodeNew);
         }
       } else if ((nodeMap() & bitpos) != 0) { // node (not value)
@@ -1135,7 +1177,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
             subNode.updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, details, cmp);
 
         if (details.isModified()) {
-          return copyAndSetNode(mutator, bitpos, subNodeNew);
+          return copyAndSetNode(mutator, bitpos, subNodeNew, details);
         } else {
           return this;
         }
@@ -1159,6 +1201,8 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 
         if (currentKeyHash == keyHash && getKey(dataIndex).equals(key)) {
           details.modified();
+          details.updateDeltaSize(-1);
+          details.updateDeltaHashCode(-keyHash);
 
           if (this.payloadArity() == 2 && this.nodeArity() == 0) {
             /*
@@ -1170,10 +1214,10 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 
             if (dataIndex == 0) {
               return CompactSetNode.nodeOf(mutator, (0), newDataMap, new Object[]{getKey(1)},
-                  new int[]{getKeyHash(1)});
+                  new int[]{getKeyHash(1)}, 1);
             } else {
               return CompactSetNode.nodeOf(mutator, (0), newDataMap, new Object[]{getKey(0)},
-                  new int[]{getKeyHash(0)});
+                  new int[]{getKeyHash(0)}, 1);
             }
           } else {
             return copyAndRemoveValue(mutator, bitpos);
@@ -1205,7 +1249,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
           }
           default: {
             // modify current node (set replacement node)
-            return copyAndSetNode(mutator, bitpos, subNodeNew);
+            return copyAndSetNode(mutator, bitpos, subNodeNew, details);
           }
         }
       }
@@ -1226,6 +1270,8 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 
         if (currentKeyHash == keyHash && cmp.compare(getKey(dataIndex), key) == 0) {
           details.modified();
+          details.updateDeltaSize(-1);
+          details.updateDeltaHashCode(-keyHash);
 
           if (this.payloadArity() == 2 && this.nodeArity() == 0) {
             /*
@@ -1237,10 +1283,10 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 
             if (dataIndex == 0) {
               return CompactSetNode.nodeOf(mutator, (0), newDataMap, new Object[]{getKey(1)},
-                  new int[]{getKeyHash(1)});
+                  new int[]{getKeyHash(1)}, 1);
             } else {
               return CompactSetNode.nodeOf(mutator, (0), newDataMap, new Object[]{getKey(0)},
-                  new int[]{getKeyHash(0)});
+                  new int[]{getKeyHash(0)}, 1);
             }
           } else {
             return copyAndRemoveValue(mutator, bitpos);
@@ -1272,7 +1318,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
           }
           default: {
             // modify current node (set replacement node)
-            return copyAndSetNode(mutator, bitpos, subNodeNew);
+            return copyAndSetNode(mutator, bitpos, subNodeNew, details);
           }
         }
       }
@@ -1362,19 +1408,26 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 
   }
 
+  /*
+   * TODO add cachedSize property.
+   */
   private static final class BitmapIndexedSetNode<K> extends CompactMixedSetNode<K> {
 
     final AtomicReference<Thread> mutator;
     final Object[] nodes;
     final int[] keyHashes;
 
+    int cachedSize;
+
     private BitmapIndexedSetNode(final AtomicReference<Thread> mutator, final int nodeMap,
-        final int dataMap, final Object[] nodes, final int[] keyHashes) {
+        final int dataMap, final Object[] nodes, final int[] keyHashes, final int cachedSize) {
       super(mutator, nodeMap, dataMap);
 
       this.mutator = mutator;
       this.nodes = nodes;
       this.keyHashes = keyHashes;
+
+      this.cachedSize = cachedSize;
 
       if (DEBUG) {
         assert (TUPLE_LENGTH * Integer.bitCount(dataMap)
@@ -1543,15 +1596,11 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       }
     }
 
-//    @Override
-//    public final int size() {
-//      if (TRUST_NODE_SIZE_AND_HASHCODE) {
-//        return cachedSize;
-//      } else {
-//        return super.size();
-//      }
-//    }
-//
+    @Override
+    public final int size() {
+        return cachedSize;
+    }
+
 //    @Override
 //    public int recursivePayloadHashCode() {
 //      if (TRUST_NODE_SIZE_AND_HASHCODE) {
@@ -1561,15 +1610,19 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 //      }
 //    }
 
-    @Override
     CompactSetNode<K> copyAndSetNode(final AtomicReference<Thread> mutator, final int bitpos,
-        final CompactSetNode<K> node) {
+        final CompactSetNode<K> node,
+        SetResult<K> details) {
 
       final int idx = this.nodes.length - 1 - nodeIndex(bitpos);
+
+      // final int newCachedHashCode = cachedHashCode + details.getDeltaHashCode();
+      final int newCachedSize = details.getDeltaSize();
 
       if (isAllowedToEdit(this.mutator, mutator)) {
         // no copying if already editable
         this.nodes[idx] = node;
+        this.cachedSize = newCachedSize;
         return this;
       } else {
         final Object[] src = this.nodes;
@@ -1579,7 +1632,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
         System.arraycopy(src, 0, dst, 0, src.length);
         dst[idx + 0] = node;
 
-        return nodeOf(mutator, nodeMap(), dataMap(), dst, keyHashes);
+        return nodeOf(mutator, nodeMap(), dataMap(), dst, keyHashes, newCachedSize);
       }
     }
 
@@ -1594,7 +1647,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       final int[] srcKeyHashes = this.keyHashes;
       final int[] dstKeyHashes = ArrayUtilsInt.arraycopyAndInsertInt(srcKeyHashes, idx, keyHash);
 
-      return nodeOf(mutator, nodeMap(), dataMap() | bitpos, dst, dstKeyHashes);
+      return nodeOf(mutator, nodeMap(), dataMap() | bitpos, dst, dstKeyHashes, cachedSize + 1);
     }
 
     private Object[] arraycopyAndInsertValue(final Object[] src, final int idx, final K key) {
@@ -1617,7 +1670,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       final int[] srcKeyHashes = this.keyHashes;
       final int[] dstKeyHashes = ArrayUtilsInt.arraycopyAndRemoveInt(srcKeyHashes, idx);
 
-      return nodeOf(mutator, nodeMap(), dataMap() ^ bitpos, dst, dstKeyHashes);
+      return nodeOf(mutator, nodeMap(), dataMap() ^ bitpos, dst, dstKeyHashes, cachedSize - 1);
     }
 
     private Object[] arraycopyAndRemoveValue(final Object[] src, final int idx) {
@@ -1643,7 +1696,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       final int[] srcKeyHashes = this.keyHashes;
       final int[] dstKeyHashes = ArrayUtilsInt.arraycopyAndRemoveInt(srcKeyHashes, idx);
 
-      return nodeOf(mutator, nodeMap() | bitpos, dataMap() ^ bitpos, dst, dstKeyHashes);
+      return nodeOf(mutator, nodeMap() | bitpos, dataMap() ^ bitpos, dst, dstKeyHashes, cachedSize + 1);
     }
 
     private Object[] arraycopyAndMigrateFromInlineToNode(final Object[] src, final int idxOld,
@@ -1675,7 +1728,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       final int[] dstKeyHashes =
           ArrayUtilsInt.arraycopyAndInsertInt(srcKeyHashes, idx, node.getKeyHash(0));
 
-      return nodeOf(mutator, nodeMap() ^ bitpos, dataMap() | bitpos, dst, dstKeyHashes);
+      return nodeOf(mutator, nodeMap() ^ bitpos, dataMap() | bitpos, dst, dstKeyHashes, cachedSize - 1);
     }
 
     private Object[] arraycopyAndMigrateFromNodeToInline(final Object[] src, final int idxOld,
@@ -1692,6 +1745,23 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       return dst;
     }
 
+    private final int bitPattern(int dataMap, int nodeMap, int bitpos) {
+      boolean isInDataMap = isBitInBitmap(dataMap, bitpos);
+      boolean isInNodeMap = isBitInBitmap(nodeMap, bitpos);
+
+      int bitPattern = 0;
+
+      if (isInDataMap) {
+        bitPattern = bitPattern + 2;
+      }
+
+      if (isInNodeMap) {
+        bitPattern = bitPattern + 1;
+      }
+
+      return bitPattern;
+    }
+
     private final static int PATTERN_EMPTY_AND_NODE  = 0b0001;
     private final static int PATTERN_NODE_AND_EMPTY  = 0b0100;
 
@@ -1706,322 +1776,328 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     private final static int PATTERN_NODE_AND_NODE   = 0b0101;
     // @formatter:on
 
-//    /*
-//     * TODO: for incrementality: only consider duplicate elements
-//     */
-//    @Override
-//    public final AbstractSetNode<K> union(AtomicReference<Thread> mutator,
-//        AbstractSetNode<K> that, int shift, IntersectionResult details,
-//        Comparator<Object> cmp, Preference directionPreference) {
-//
-//      final CompactSetNode<K> node0 = this;
-//      final CompactSetNode<K> node1 = (CompactSetNode<K>) that;
-//
-//      if (node0 == node1) {
-//        // TODO: direction preference?
-//        if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
-//          final int remainingSize = node0.size();
-//          final int remainingHashCode = node0.recursivePayloadHashCode();
-//
-//          // delta @ collection
-//          details.addSize(remainingSize);
-//          details.addHashCode(remainingHashCode);
-//        }
-//
-//        return node0;
-//      }
-//
-//      final int dataMap0 = node0.dataMap();
-//      final int nodeMap0 = node0.nodeMap();
-//      final int dataMap1 = node1.dataMap();
-//      final int nodeMap1 = node1.nodeMap();
-//
-//      int unionedBitmap = dataMap0 | nodeMap0 | dataMap1 | nodeMap1;
-//
-//      final Prototype<K, AbstractSetNode<K>> prototype = new Prototype<>();
-//      int deltaSize = 0;
-//      int deltaHashCode = 0;
-//
-//      boolean leftSubTreesUnmodified = true;
-//
-//      int bitsToSkip = Integer.numberOfTrailingZeros(unionedBitmap);
-//
-//      while (bitsToSkip < 32) {
-//        final int bitpos = bitpos(bitsToSkip);
-//
-//        final int bitPattern0 = bitPattern(dataMap0, nodeMap0, bitpos);
-//        final int bitPattern1 = bitPattern(dataMap1, nodeMap1, bitpos);
-//
-//        final int bitPattern = (bitPattern0 << 2) | bitPattern1;
-//
-//        switch (bitPattern) {
-//          case PATTERN_DATA_AND_DATA: {
-//            // case singleton x singleton
-//            final int dataIndex0 = index(dataMap0, bitpos);
-//            final int dataIndex1 = index(dataMap1, bitpos);
-//
-//            final K key0 = node0.getKey(dataIndex0);
-//            final K key1 = node1.getKey(dataIndex1);
-//
-//            // TODO: consider fast-fail if hashes are available for free
-//            // TODO: consider comparator
-//            if (Objects.equals(key0, key1)) {
-////            if (keyHash0 == keyHash1 && cmp.compare(key0, key1) == 0) {
-////            if (keyHash0 == keyHash1 && Objects.equals(key0, key1)) {
-//              // singleton -> singleton
-//              prototype.add(bitpos, key0);
-//
-//              if (MEMOIZE_HASH_CODE_OF_ELEMENT) {
-//                prototype.addHash(node0.getKeyHash(dataIndex0));
-//              }
-//            } else {
-//              // singleton -> node (bitmap change)
+    /*
+     * TODO: for incrementality: only consider duplicate elements
+     */
+    @Override
+    public final AbstractSetNode<K> union(AtomicReference<Thread> mutator,
+        AbstractSetNode<K> that, int shift, IntersectionResult details,
+        Comparator<Object> cmp, Preference directionPreference) {
+
+      final CompactSetNode<K> node0 = this;
+      final CompactSetNode<K> node1 = (CompactSetNode<K>) that;
+
+      if (node0 == node1) {
+        // TODO: direction preference?
+        if (false && TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+          final int remainingSize = node0.size();
+          final int remainingHashCode = node0.recursivePayloadHashCode();
+
+          // delta @ collection
+          details.addSize(remainingSize);
+          details.addHashCode(remainingHashCode);
+        }
+
+        return node0;
+      }
+
+      final int dataMap0 = node0.dataMap();
+      final int nodeMap0 = node0.nodeMap();
+      final int dataMap1 = node1.dataMap();
+      final int nodeMap1 = node1.nodeMap();
+
+      int unionedBitmap = dataMap0 | nodeMap0 | dataMap1 | nodeMap1;
+
+      final Prototype<K, AbstractSetNode<K>> prototype = new Prototype<>();
+      int deltaSize = 0;
+      int deltaHashCode = 0;
+
+      boolean leftSubTreesUnmodified = true;
+
+      int bitsToSkip = Integer.numberOfTrailingZeros(unionedBitmap);
+
+      while (bitsToSkip < 32) {
+        final int bitpos = bitpos(bitsToSkip);
+
+        final int bitPattern0 = bitPattern(dataMap0, nodeMap0, bitpos);
+        final int bitPattern1 = bitPattern(dataMap1, nodeMap1, bitpos);
+
+        final int bitPattern = (bitPattern0 << 2) | bitPattern1;
+
+        switch (bitPattern) {
+          case PATTERN_DATA_AND_DATA: {
+            // case singleton x singleton
+            final int dataIndex0 = index(dataMap0, bitpos);
+            final int dataIndex1 = index(dataMap1, bitpos);
+
+            final int keyHash0 = node0.getKeyHash(dataIndex0);
+            final int keyHash1 = node1.getKeyHash(dataIndex1);
+
+            final K key0 = node0.getKey(dataIndex0);
+            final K key1 = node1.getKey(dataIndex1);
+
+            // TODO: consider fast-fail if hashes are available for free
+            // TODO: consider comparator
+            if (keyHash0 == keyHash1 && Objects.equals(key0, key1)) {
+//            if (keyHash0 == keyHash1 && cmp.compare(key0, key1) == 0) {
+//            if (keyHash0 == keyHash1 && Objects.equals(key0, key1)) {
+              // singleton -> singleton
+              prototype.add(bitpos, key0);
+
+              if (true || MEMOIZE_HASH_CODE_OF_ELEMENT) {
+                prototype.addHash(node0.getKeyHash(dataIndex0));
+              }
+            } else {
+              // singleton -> node (bitmap change)
 //              final int keyHash0 = node0.getKeyHash(dataIndex0);
 //              final int keyHash1 = node1.getKeyHash(dataIndex1);
-//
-//              final AbstractSetNode<K> node =
-//                  mergeTwoKeyValPairs(key0, keyHash0, key1, keyHash1, shift + BIT_PARTITION_SIZE);
-//
-//              prototype.add(bitpos, node);
-//
-//              if (TRACK_DELTA_OF_META_DATA) {
-//                final int addedSize = 1;
-//                final int addedHashCode = keyHash1;
-//
-//                if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
-//                  // delta @ node
-//                  deltaSize += addedSize;
-//                  deltaHashCode += addedHashCode;
-//                }
-//
-//                if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+
+              final AbstractSetNode<K> node =
+                  mergeTwoKeyValPairs(key0, keyHash0, key1, keyHash1, shift + BIT_PARTITION_SIZE);
+
+              prototype.add(bitpos, node);
+
+              if (TRACK_DELTA_OF_META_DATA) {
+                final int addedSize = 1;
+                final int addedHashCode = keyHash1;
+
+                if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+                  // delta @ node
+                  deltaSize += addedSize;
+                  deltaHashCode += addedHashCode;
+                }
+
+                if (false && TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+                  // delta @ collection
+                  details.addSize(addedSize);
+                  details.addHashCode(addedHashCode);
+                }
+              }
+            }
+            break;
+          }
+
+          case PATTERN_NODE_AND_DATA: {
+            // case node x singleton
+            final int nodeIndex0 = index(nodeMap0, bitpos);
+            final int dataIndex1 = index(dataMap1, bitpos);
+
+            final AbstractSetNode<K> node = node0.getNode(nodeIndex0);
+
+            final K key = node1.getKey(dataIndex1);
+            final int keyHash = node1.getKeyHash(dataIndex1);
+
+            final SetResult<K> updateDetails = SetResult.unchanged();
+            final AbstractSetNode<K> newNode = node
+                .updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, updateDetails, cmp);
+
+            // node -> node
+            prototype.add(bitpos, newNode);
+
+            if (updateDetails.isModified()) {
+              leftSubTreesUnmodified = false;
+
+              if (TRACK_DELTA_OF_META_DATA) {
+                final int addedSize = 1;
+                final int addedHashCode = keyHash;
+
+                if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+                  // delta @ node
+                  deltaSize += addedSize;
+                  deltaHashCode += addedHashCode;
+                }
+
+                if (false && TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+                  // delta @ collection
+                  details.addSize(addedSize);
+                  details.addHashCode(addedHashCode);
+                }
+              }
+            }
+            break;
+          }
+
+          case PATTERN_DATA_AND_NODE: {
+            // case singleton x node
+            final int dataIndex0 = index(dataMap0, bitpos);
+            final int nodeIndex1 = index(nodeMap1, bitpos);
+
+            final K key = node0.getKey(dataIndex0);
+            final int keyHash = node0.getKeyHash(dataIndex0);
+
+            final AbstractSetNode<K> node = node1.getNode(nodeIndex1);
+
+            final SetResult<K> updateDetails = SetResult.unchanged();
+            final AbstractSetNode<K> newNode = node
+                .updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, updateDetails, cmp);
+
+            // singleton -> node
+            prototype.add(bitpos, newNode);
+
+            if (TRACK_DELTA_OF_META_DATA) {
+              final int addedSize;
+              final int addedHashCode;
+
+              if (updateDetails.isModified()) {
+                addedSize = node.size();
+                addedHashCode = node.recursivePayloadHashCode();
+              } else {
+                addedSize = node.size() - 1;
+                addedHashCode = node.recursivePayloadHashCode() - keyHash;
+              }
+
+              if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+                // delta @ node
+                deltaSize += addedSize;
+                deltaHashCode += addedHashCode;
+              }
+
+              if (false && TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+                // delta @ collection
+                details.addSize(addedSize);
+                details.addHashCode(addedHashCode);
+              }
+            }
+            break;
+          }
+
+          case PATTERN_NODE_AND_NODE: {
+            // case node x node
+            final int nodeIndex0 = index(nodeMap0, bitpos);
+            final int nodeIndex1 = index(nodeMap1, bitpos);
+
+            final AbstractSetNode<K> subNode0 = node0.getNode(nodeIndex0);
+            final AbstractSetNode<K> subNode1 = node1.getNode(nodeIndex1);
+
+            final AbstractSetNode<K> newNode = subNode0.union(mutator, subNode1,
+                shift + BIT_PARTITION_SIZE, details, cmp, directionPreference);
+
+            // node -> node
+            prototype.add(bitpos, newNode);
+
+            if (newNode != subNode0) {
+              leftSubTreesUnmodified = false;
+
+              if (TRACK_DELTA_OF_META_DATA) {
+                // TODO: consider incremental recursive collection
+                final int addedSize = newNode.size() - subNode0.size();
+                final int addedHashCode =
+                    newNode.recursivePayloadHashCode() - subNode0.recursivePayloadHashCode();
+
+                // TODO: handle similar to copyAndSetNode -> pass remainder trough result???
+                // remainder -> subTreeDeltaSize ... subTreeDeltaHashCode
+                if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+                  // delta @ node
+                  deltaSize += addedSize;
+                  deltaHashCode += addedHashCode;
+                }
+
+                // global modification where already tracked ...
+//                if (false && TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
 //                  // delta @ collection
 //                  details.addSize(addedSize);
 //                  details.addHashCode(addedHashCode);
 //                }
-//              }
-//            }
-//            break;
-//          }
-//
-//          case PATTERN_NODE_AND_DATA: {
-//            // case node x singleton
-//            final int nodeIndex0 = index(nodeMap0, bitpos);
-//            final int dataIndex1 = index(dataMap1, bitpos);
-//
-//            final AbstractSetNode<K> node = node0.getNode(nodeIndex0);
-//
-//            final K key = node1.getKey(dataIndex1);
-//            final int keyHash = node1.getKeyHash(dataIndex1);
-//
-//            final SetResult<K> updateDetails = SetResult.unchanged();
-//            final AbstractSetNode<K> newNode = node
-//                .updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, updateDetails, cmp);
-//
-//            // node -> node
-//            prototype.add(bitpos, newNode);
-//
-//            if (updateDetails.isModified()) {
-//              leftSubTreesUnmodified = false;
-//
-//              if (TRACK_DELTA_OF_META_DATA) {
-//                final int addedSize = 1;
-//                final int addedHashCode = keyHash;
-//
-//                if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
-//                  // delta @ node
-//                  deltaSize += addedSize;
-//                  deltaHashCode += addedHashCode;
-//                }
-//
-//                if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
-//                  // delta @ collection
-//                  details.addSize(addedSize);
-//                  details.addHashCode(addedHashCode);
-//                }
-//              }
-//            }
-//            break;
-//          }
-//
-//          case PATTERN_DATA_AND_NODE: {
-//            // case singleton x node
-//            final int dataIndex0 = index(dataMap0, bitpos);
-//            final int nodeIndex1 = index(nodeMap1, bitpos);
-//
-//            final K key = node0.getKey(dataIndex0);
-//            final int keyHash = node0.getKeyHash(dataIndex0);
-//
-//            final AbstractSetNode<K> node = node1.getNode(nodeIndex1);
-//
-//            final SetResult<K> updateDetails = SetResult.unchanged();
-//            final AbstractSetNode<K> newNode = node
-//                .updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, updateDetails, cmp);
-//
-//            // singleton -> node
-//            prototype.add(bitpos, newNode);
-//
-//            if (TRACK_DELTA_OF_META_DATA) {
-//              final int addedSize;
-//              final int addedHashCode;
-//
-//              if (updateDetails.isModified()) {
-//                addedSize = node.size();
-//                addedHashCode = node.recursivePayloadHashCode();
-//              } else {
-//                addedSize = node.size() - 1;
-//                addedHashCode = node.recursivePayloadHashCode() - keyHash;
-//              }
-//
-//              if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
-//                // delta @ node
-//                deltaSize += addedSize;
-//                deltaHashCode += addedHashCode;
-//              }
-//
-//              if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
-//                // delta @ collection
-//                details.addSize(addedSize);
-//                details.addHashCode(addedHashCode);
-//              }
-//            }
-//            break;
-//          }
-//
-//          case PATTERN_NODE_AND_NODE: {
-//            // case node x node
-//            final int nodeIndex0 = index(nodeMap0, bitpos);
-//            final int nodeIndex1 = index(nodeMap1, bitpos);
-//
-//            final AbstractSetNode<K> subNode0 = node0.getNode(nodeIndex0);
-//            final AbstractSetNode<K> subNode1 = node1.getNode(nodeIndex1);
-//
-//            final AbstractSetNode<K> newNode = subNode0.union(mutator, subNode1,
-//                shift + BIT_PARTITION_SIZE, details, cmp, directionPreference);
-//
-//            // node -> node
-//            prototype.add(bitpos, newNode);
-//
-//            if (newNode != subNode0) {
-//              leftSubTreesUnmodified = false;
-//
-//              if (TRACK_DELTA_OF_META_DATA) {
-//                // TODO: consider incremental recursive collection
-//                final int addedSize = newNode.size() - subNode0.size();
-//                final int addedHashCode =
-//                    newNode.recursivePayloadHashCode() - subNode0.recursivePayloadHashCode();
-//
-//                // TODO: handle similar to copyAndSetNode -> pass remainder trough result???
-//                // remainder -> subTreeDeltaSize ... subTreeDeltaHashCode
-//                if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
-//                  // delta @ node
-//                  deltaSize += addedSize;
-//                  deltaHashCode += addedHashCode;
-//                }
-//
-//                // global modification where already tracked ...
-////                if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
-////                  // delta @ collection
-////                  details.addSize(addedSize);
-////                  details.addHashCode(addedHashCode);
-////                }
-//              }
-//            }
-//            break;
-//          }
-//
-//          case PATTERN_DATA_AND_EMPTY: {
-//            // case singleton x empty
-//            final int dataIndex0 = index(dataMap0, bitpos);
-//            final K key0 = node0.getKey(dataIndex0);
-//
-//            prototype.add(bitpos, key0);
-//
-//            if (MEMOIZE_HASH_CODE_OF_ELEMENT) {
-//              prototype.addHash(node1.getKeyHash(dataIndex0));
-//            }
-//            break;
-//          }
-//
-//          case PATTERN_EMPTY_AND_DATA: {
-//            // case empty x singleton
-//            final int dataIndex1 = index(dataMap1, bitpos);
-//            final K key1 = node1.getKey(dataIndex1);
-//
-//            prototype.add(bitpos, key1);
-//
-//            if (MEMOIZE_HASH_CODE_OF_ELEMENT) {
-//              prototype.addHash(node1.getKeyHash(dataIndex1));
-//            }
-//
-//            if (TRACK_DELTA_OF_META_DATA) {
-//              final int addedSize = 1;
-//              final int addedHashCode = node1.getKeyHash(dataIndex1);
-//
-//              if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
-//                // delta @ node
-//                deltaSize += addedSize;
-//                deltaHashCode += addedHashCode;
-//              }
-//
-//              if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
-//                // delta @ collection
-//                details.addSize(addedSize);
-//                details.addHashCode(addedHashCode);
-//              }
-//            }
-//            break;
-//          }
-//
-//          case PATTERN_NODE_AND_EMPTY: {
-//            // case node x empty
-//            final int nodeIndex0 = index(nodeMap0, bitpos);
-//            final AbstractSetNode<K> subNode0 = node0.getNode(nodeIndex0);
-//
-//            prototype.add(bitpos, subNode0);
-//            break;
-//          }
-//
-//          case PATTERN_EMPTY_AND_NODE: {
-//            // case empty x node
-//            final int nodeIndex1 = index(nodeMap1, bitpos);
-//            final AbstractSetNode<K> subNode1 = node1.getNode(nodeIndex1);
-//
-//            prototype.add(bitpos, subNode1);
-//
-//            if (TRACK_DELTA_OF_META_DATA) {
-//              final int addedSize = subNode1.size();
-//              final int addedHashCode = subNode1.recursivePayloadHashCode();
-//
-//              if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
-//                // delta @ node
-//                deltaSize += addedSize;
-//                deltaHashCode += addedHashCode;
-//              }
-//
-//              if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
-//                // delta @ collection
-//                details.addSize(addedSize);
-//                details.addHashCode(addedHashCode);
-//              }
-//            }
-//            break;
-//          }
-//        }
-//
-//        int trailingZeroCount = Integer
-//            .numberOfTrailingZeros(unionedBitmap >> (bitsToSkip + 1));
-//        bitsToSkip = bitsToSkip + 1 + trailingZeroCount;
+              }
+            }
+            break;
+          }
+
+          case PATTERN_DATA_AND_EMPTY: {
+            // case singleton x empty
+            final int dataIndex0 = index(dataMap0, bitpos);
+            final K key0 = node0.getKey(dataIndex0);
+
+            prototype.add(bitpos, key0);
+
+            if (MEMOIZE_HASH_CODE_OF_ELEMENT) {
+              prototype.addHash(node1.getKeyHash(dataIndex0));
+            }
+            break;
+          }
+
+          case PATTERN_EMPTY_AND_DATA: {
+            // case empty x singleton
+            final int dataIndex1 = index(dataMap1, bitpos);
+            final K key1 = node1.getKey(dataIndex1);
+
+            prototype.add(bitpos, key1);
+
+            if (MEMOIZE_HASH_CODE_OF_ELEMENT) {
+              prototype.addHash(node1.getKeyHash(dataIndex1));
+            }
+
+            if (TRACK_DELTA_OF_META_DATA) {
+              final int addedSize = 1;
+              final int addedHashCode = node1.getKeyHash(dataIndex1);
+
+              if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+                // delta @ node
+                deltaSize += addedSize;
+                deltaHashCode += addedHashCode;
+              }
+
+              if (false && TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+                // delta @ collection
+                details.addSize(addedSize);
+                details.addHashCode(addedHashCode);
+              }
+            }
+            break;
+          }
+
+          case PATTERN_NODE_AND_EMPTY: {
+            // case node x empty
+            final int nodeIndex0 = index(nodeMap0, bitpos);
+            final AbstractSetNode<K> subNode0 = node0.getNode(nodeIndex0);
+
+            prototype.add(bitpos, subNode0);
+            break;
+          }
+
+          case PATTERN_EMPTY_AND_NODE: {
+            // case empty x node
+            final int nodeIndex1 = index(nodeMap1, bitpos);
+            final AbstractSetNode<K> subNode1 = node1.getNode(nodeIndex1);
+
+            prototype.add(bitpos, subNode1);
+
+            if (TRACK_DELTA_OF_META_DATA) {
+              final int addedSize = subNode1.size();
+              final int addedHashCode = subNode1.recursivePayloadHashCode();
+
+              if (TRACK_DELTA_OF_META_DATA_PER_NODE) {
+                // delta @ node
+                deltaSize += addedSize;
+                deltaHashCode += addedHashCode;
+              }
+
+              if (false && TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+                // delta @ collection
+                details.addSize(addedSize);
+                details.addHashCode(addedHashCode);
+              }
+            }
+            break;
+          }
+        }
+
+        int trailingZeroCount = Integer
+            .numberOfTrailingZeros(unionedBitmap >> (bitsToSkip + 1));
+        bitsToSkip = bitsToSkip + 1 + trailingZeroCount;
+      }
+
+//      if (false && TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
+//        // delta @ collection
+//        details.addSize(deltaSize);
+//        details.addHashCode(deltaHashCode);
 //      }
-//
-////      if (TRACK_DELTA_OF_META_DATA_PER_COLLECTION) {
-////        // delta @ collection
-////        details.addSize(deltaSize);
-////        details.addHashCode(deltaHashCode);
-////      }
-//
-//      final BiFunction<Integer, Integer, CompactSetNode<K>> toNode;
-//
+
+      final BiFunction<Integer, Integer, CompactSetNode<K>> toNode =
+          (newHashCode, newSize) -> new BitmapIndexedSetNode<K>(mutator,
+              prototype.nodeMap(), prototype.dataMap(), prototype.compactBuffer(), prototype.compactHashes(), node0.size() + newSize);
+      // node0.recursivePayloadHashCode() + newHashCode, node0.size() + newSize
+
 //      if (TRUST_NODE_SIZE_AND_HASHCODE) {
 //        toNode = (newHashCode, newSize) -> new BitmapIndexedSetNode<K>(mutator,
 //            prototype.nodeMap(), prototype.dataMap(), prototype.compactBuffer(),
@@ -2030,21 +2106,21 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 //        toNode = (newHashCode, newSize) -> new BitmapIndexedSetNode<K>(mutator,
 //            prototype.nodeMap(), prototype.dataMap(), prototype.compactBuffer(), 0, 0);
 //      }
-//
-//      boolean leftNodeUnmodified = leftSubTreesUnmodified
-//          && prototype.dataMap() == dataMap0
-//          && prototype.nodeMap() == nodeMap0;
-//
-//      if (leftNodeUnmodified) {
-//        assert node0.equals(toNode.apply(deltaHashCode, deltaSize));
-//        return node0;
-//      }
-//
-//      final CompactSetNode<K> newNode = toNode.apply(deltaHashCode, deltaSize);
-//      assert !node0.equals(newNode);
-//      assert !node1.equals(newNode);
-//      return newNode;
-//    }
+
+      boolean leftNodeUnmodified = leftSubTreesUnmodified
+          && prototype.dataMap() == dataMap0
+          && prototype.nodeMap() == nodeMap0;
+
+      if (leftNodeUnmodified) {
+        assert node0.equals(toNode.apply(deltaHashCode, deltaSize));
+        return node0;
+      }
+
+      final CompactSetNode<K> newNode = toNode.apply(deltaHashCode, deltaSize);
+      assert !node0.equals(newNode);
+      assert !node1.equals(newNode);
+      return newNode;
+    }
 
   }
 
@@ -2136,6 +2212,8 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
           this.keys.length - keys.length);
 
       details.modified();
+      details.updateDeltaSize(1);
+      details.updateDeltaHashCode(keyHash);
       return new HashCollisionSetNode<>(keyHash, keysNew);
     }
 
@@ -2160,6 +2238,8 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
           this.keys.length - keys.length);
 
       details.modified();
+      details.updateDeltaSize(1);
+      details.updateDeltaHashCode(keyHash);
       return new HashCollisionSetNode<>(keyHash, keysNew);
     }
 
@@ -2169,6 +2249,8 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       for (int idx = 0; idx < keys.length; idx++) {
         if (keys[idx].equals(key)) {
           details.modified();
+          details.updateDeltaSize(-1);
+          details.updateDeltaHashCode(-keyHash);
 
           if (this.arity() == 1) {
             return nodeOf(mutator);
@@ -2202,6 +2284,8 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       for (int idx = 0; idx < keys.length; idx++) {
         if (cmp.compare(keys[idx], key) == 0) {
           details.modified();
+          details.updateDeltaSize(-1);
+          details.updateDeltaHashCode(-keyHash);
 
           if (this.arity() == 1) {
             return nodeOf(mutator);
@@ -2257,6 +2341,11 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     @Override
     public byte sizePredicate() {
       return SIZE_MORE_THAN_ONE;
+    }
+
+    @Override
+    public final int size() {
+      return keys.length;
     }
 
     @Override
@@ -2359,7 +2448,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 
     @Override
     CompactSetNode<K> copyAndSetNode(final AtomicReference<Thread> mutator, final int bitpos,
-        final CompactSetNode<K> node) {
+        final CompactSetNode<K> node, final SetResult<K> details) {
       throw new UnsupportedOperationException();
     }
 

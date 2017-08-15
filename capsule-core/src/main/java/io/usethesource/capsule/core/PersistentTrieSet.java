@@ -3261,6 +3261,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
           this.keys.length - keys.length);
 
       details.modified();
+      details.updateDeltaSize(1);
+      details.updateDeltaHashCode(keyHash);
       return new HashCollisionSetNode<>(keyHash, keysNew);
     }
 
@@ -3286,6 +3288,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
           this.keys.length - keys.length);
 
       details.modified();
+      details.updateDeltaSize(1);
+      details.updateDeltaHashCode(keyHash);
       return new HashCollisionSetNode<>(keyHash, keysNew);
     }
 
