@@ -929,6 +929,14 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     abstract CompactSetNode<K> copyAndMigrateFromNodeToInline(final AtomicReference<Thread> mutator,
         final int bitpos, final CompactSetNode<K> node);
 
+    static final <K> CompactSetNode<K> mergeTwoKeyValPairs(
+        final ImmutablePayloadTuple<K> payload0,
+        final ImmutablePayloadTuple<K> payload1,
+        final int shift) {
+      return mergeTwoKeyValPairs(payload0.get(), payload0.keyHash(), payload1.get(),
+          payload1.keyHash(), shift);
+    }
+
     static final <K> CompactSetNode<K> mergeTwoKeyValPairs(final K key0, final int keyHash0,
         final K key1, final int keyHash1, final int shift) {
       // assert !(key0.equals(key1));
@@ -972,7 +980,8 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     ;
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
-        final int nodeMap, final int dataMap, final Object[] nodes, final int[] keyHashes, final int cachedSize) {
+        final int nodeMap, final int dataMap, final Object[] nodes, final int[] keyHashes,
+        final int cachedSize) {
       return new BitmapIndexedSetNode<>(mutator, nodeMap, dataMap, nodes, keyHashes, cachedSize);
     }
 
@@ -1595,7 +1604,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 
     @Override
     public final int size() {
-        return cachedSize;
+      return cachedSize;
     }
 
 //    @Override
@@ -1693,7 +1702,8 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       final int[] srcKeyHashes = this.keyHashes;
       final int[] dstKeyHashes = ArrayUtilsInt.arraycopyAndRemoveInt(srcKeyHashes, idx);
 
-      return nodeOf(mutator, nodeMap() | bitpos, dataMap() ^ bitpos, dst, dstKeyHashes, cachedSize + 1);
+      return nodeOf(mutator, nodeMap() | bitpos, dataMap() ^ bitpos, dst, dstKeyHashes,
+          cachedSize + 1);
     }
 
     private Object[] arraycopyAndMigrateFromInlineToNode(final Object[] src, final int idxOld,
@@ -1725,7 +1735,8 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       final int[] dstKeyHashes =
           ArrayUtilsInt.arraycopyAndInsertInt(srcKeyHashes, idx, node.getKeyHash(0));
 
-      return nodeOf(mutator, nodeMap() ^ bitpos, dataMap() | bitpos, dst, dstKeyHashes, cachedSize - 1);
+      return nodeOf(mutator, nodeMap() ^ bitpos, dataMap() | bitpos, dst, dstKeyHashes,
+          cachedSize - 1);
     }
 
     private Object[] arraycopyAndMigrateFromNodeToInline(final Object[] src, final int idxOld,
@@ -1759,18 +1770,18 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       return bitPattern;
     }
 
-    private final static int PATTERN_EMPTY_AND_NODE  = 0b0001;
-    private final static int PATTERN_NODE_AND_EMPTY  = 0b0100;
+    private final static int PATTERN_EMPTY_AND_NODE = 0b0001;
+    private final static int PATTERN_NODE_AND_EMPTY = 0b0100;
 
-    private final static int PATTERN_EMPTY_AND_DATA  = 0b0010;
-    private final static int PATTERN_DATA_AND_EMPTY  = 0b1000;
+    private final static int PATTERN_EMPTY_AND_DATA = 0b0010;
+    private final static int PATTERN_DATA_AND_EMPTY = 0b1000;
 
-    private final static int PATTERN_DATA_AND_NODE   = 0b1001;
-    private final static int PATTERN_NODE_AND_DATA   = 0b0110;
+    private final static int PATTERN_DATA_AND_NODE = 0b1001;
+    private final static int PATTERN_NODE_AND_DATA = 0b0110;
 
     private final static int PATTERN_EMPTY_AND_EMPTY = 0b0000;
-    private final static int PATTERN_DATA_AND_DATA   = 0b1010;
-    private final static int PATTERN_NODE_AND_NODE   = 0b0101;
+    private final static int PATTERN_DATA_AND_DATA = 0b1010;
+    private final static int PATTERN_NODE_AND_NODE = 0b0101;
     // @formatter:on
 
     @FunctionalInterface
@@ -1851,12 +1862,10 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 
             // TODO: consider comparator
             if (Objects.equals(payload0, payload1)) {
-                prototype.add(bitpos, payload0);
+              prototype.add(bitpos, payload0);
             } else {
-              // TODO: mergeTwoPayloadTuples
               final AbstractSetNode<K> node =
-                  mergeTwoKeyValPairs(payload0.get(), payload0.keyHash(), payload1.get(),
-                      payload1.keyHash(), shift + BIT_PARTITION_SIZE);
+                  mergeTwoKeyValPairs(payload0, payload1, shift + BIT_PARTITION_SIZE);
 
               prototype.add(bitpos, node);
             }
@@ -1871,7 +1880,8 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
             final AbstractSetNode<K> node = two.getNode(nodeIndex);
 
             final AbstractSetNode<K> newNode = node.updated(
-                mutator, payload.get(), payload.keyHash(), shift + BIT_PARTITION_SIZE, SetResult.unchanged(), cmp);
+                mutator, payload.get(), payload.keyHash(), shift + BIT_PARTITION_SIZE,
+                SetResult.unchanged(), cmp);
 
             prototype.add(bitpos, newNode);
           };
@@ -2623,7 +2633,8 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     }
 
     @Override
-    public boolean __insertAllEquivalent(final java.util.Set<? extends K> set, final Comparator<Object> cmp) {
+    public boolean __insertAllEquivalent(final java.util.Set<? extends K> set,
+        final Comparator<Object> cmp) {
       boolean modified = false;
 
       for (final K key : set) {
@@ -2689,7 +2700,8 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     }
 
     @Override
-    public boolean __removeAllEquivalent(final java.util.Set<? extends K> set, final Comparator<Object> cmp) {
+    public boolean __removeAllEquivalent(final java.util.Set<? extends K> set,
+        final Comparator<Object> cmp) {
       boolean modified = false;
 
       for (final K key : set) {
