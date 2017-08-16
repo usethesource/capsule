@@ -1770,6 +1770,8 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       return bitPattern;
     }
 
+    // private final static int PATTERN_EMPTY_AND_EMPTY = 0b0000;
+
     private final static int PATTERN_EMPTY_AND_NODE = 0b0001;
     private final static int PATTERN_NODE_AND_EMPTY = 0b0100;
 
@@ -1779,7 +1781,6 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     private final static int PATTERN_DATA_AND_NODE = 0b1001;
     private final static int PATTERN_NODE_AND_DATA = 0b0110;
 
-    private final static int PATTERN_EMPTY_AND_EMPTY = 0b0000;
     private final static int PATTERN_DATA_AND_DATA = 0b1010;
     private final static int PATTERN_NODE_AND_NODE = 0b0101;
     // @formatter:on
