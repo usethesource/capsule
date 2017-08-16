@@ -915,6 +915,10 @@ public class PersistentTrieSetExtended<K> implements Set.Immutable<K>, java.io.S
       return hashMap;
     }
 
+    final int bitMap() {
+      return dataMap | nodeMap | hashMap;
+    }
+
     static final int mask(final int keyHash, final int shift) {
       return (keyHash >>> shift) & BIT_PARTITION_MASK;
     }
