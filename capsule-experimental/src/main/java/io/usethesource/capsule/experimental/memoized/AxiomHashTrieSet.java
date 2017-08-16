@@ -1860,8 +1860,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
             final ImmutablePayloadTuple<K> payload0 = one.getPayload(dataIndex0);
             final ImmutablePayloadTuple<K> payload1 = two.getPayload(dataIndex1);
 
-            // TODO: consider comparator
-            if (Objects.equals(payload0, payload1)) {
+            if (cmp.compare(payload0, payload1) == 0) {
               prototype.add(bitpos, payload0);
             } else {
               final AbstractSetNode<K> node =
