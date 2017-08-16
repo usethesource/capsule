@@ -886,6 +886,8 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 
     abstract int dataMap();
 
+    abstract int bitMap();
+
     static final byte SIZE_EMPTY = 0b00;
     static final byte SIZE_ONE = 0b01;
     static final byte SIZE_MORE_THAN_ONE = 0b10;
@@ -1407,6 +1409,11 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       return dataMap;
     }
 
+    @Override
+    public int bitMap() {
+      return dataMap | nodeMap;
+    }
+
   }
 
   /*
@@ -1810,10 +1817,6 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
       void accept(T t, U u, int v);
     }
 
-    /*
-     * TODO: for incrementality: only consider duplicate elements
-     * TODO: use comparator instead of Objects.equals
-     */
     @Override
     public final AbstractSetNode<K> union(AtomicReference<Thread> mutator,
         AbstractSetNode<K> that, int shift, IntersectionResult details,
@@ -1826,16 +1829,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
         return node0;
       }
 
-      final int dataMap0 = node0.dataMap();
-      final int nodeMap0 = node0.nodeMap();
-      final int dataMap1 = node1.dataMap();
-      final int nodeMap1 = node1.nodeMap();
-
-      int unionedBitmap = dataMap0 | nodeMap0 | dataMap1 | nodeMap1;
-
       final Prototype<K, AbstractSetNode<K>> prototype = new Prototype<>(true);
-
-      int bitsToSkip = Integer.numberOfTrailingZeros(unionedBitmap);
 
       final ObjectIntConsumer<CompactSetNode<K>> unionData =
           (one, bitpos) -> {
@@ -1900,11 +1894,14 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
             prototype.add(bitpos, newNode);
           };
 
+      int bitmap = node0.bitMap() | node1.bitMap();
+      int bitsToSkip = Integer.numberOfTrailingZeros(bitmap);
+
       while (bitsToSkip < 32) {
         final int bitpos = bitpos(bitsToSkip);
 
-        final int bitPattern0 = bitPattern(dataMap0, nodeMap0, bitpos);
-        final int bitPattern1 = bitPattern(dataMap1, nodeMap1, bitpos);
+        final int bitPattern0 = bitPattern(node0.dataMap(), node0.nodeMap(), bitpos);
+        final int bitPattern1 = bitPattern(node1.dataMap(), node1.nodeMap(), bitpos);
 
         final int bitPattern = (bitPattern0 << 2) | bitPattern1;
 
@@ -1942,8 +1939,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
             break;
         }
 
-        int trailingZeroCount = Integer
-            .numberOfTrailingZeros(unionedBitmap >> (bitsToSkip + 1));
+        int trailingZeroCount = Integer.numberOfTrailingZeros(bitmap >> (bitsToSkip + 1));
         bitsToSkip = bitsToSkip + 1 + trailingZeroCount;
       }
 
@@ -2303,6 +2299,11 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
 
     @Override
     int dataMap() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    int bitMap() {
       throw new UnsupportedOperationException();
     }
 
