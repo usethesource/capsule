@@ -84,11 +84,13 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
   final class Prototype<K, R extends SetNode<K, R>> {
 
     final boolean trackSize;
+    final boolean trackHashCode;
 
     private int dataMap = 0;
     private int nodeMap = 0;
 
     private int cachedSize = 0;
+    private int cachedHashCode = 0;
 
     private final Object[] buffer = new Object[32];
     private int dataIndex = 0;
@@ -97,8 +99,9 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
     private final int[] hashes = new int[32];
     private int hashIndex = 0;
 
-    public Prototype(boolean trackSize) {
+    public Prototype(boolean trackSize, boolean trackHashCode) {
       this.trackSize = trackSize;
+      this.trackHashCode = trackHashCode;
     }
 
     public final int dataMap() {
@@ -117,9 +120,9 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
       return dataMap == 0 && nodeMap == 0;
     }
 
-    public final void add(int bitpos, ImmutablePayloadTuple<K> key) {
+    public final void add(int bitpos, ImmutablePayloadTuple<K> payload) {
       // add element
-      buffer[dataIndex] = key;
+      buffer[dataIndex] = payload;
       dataMap |= bitpos;
 
       // advance cursor
@@ -128,6 +131,9 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
       // increase cached properties
       if (trackSize) {
         cachedSize += 1;
+      }
+      if (trackHashCode) {
+        cachedHashCode += payload.keyHash();
       }
     }
 
@@ -156,6 +162,11 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
 
       // advance cursor
       hashIndex = hashIndex + 1;
+
+      // increase cached properties
+      if (trackHashCode) {
+        cachedHashCode += hash;
+      }
     }
 
     public final void add(int bitpos, R node) {
@@ -169,6 +180,9 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
       // increase cached properties
       if (trackSize) {
         cachedSize += node.size();
+      }
+      if (trackHashCode) {
+        cachedHashCode += node.recursivePayloadHashCode();
       }
     }
 
@@ -187,6 +201,10 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
 
     public final int getCachedSize() {
       return cachedSize;
+    }
+
+    public final int getCachedHashCode() {
+      return cachedHashCode;
     }
   }
 

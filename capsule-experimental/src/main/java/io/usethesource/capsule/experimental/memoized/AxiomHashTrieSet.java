@@ -14,6 +14,8 @@ import io.usethesource.capsule.Set;
 import io.usethesource.capsule.core.trie.ArrayView;
 import io.usethesource.capsule.core.trie.ImmutablePayloadTuple;
 import io.usethesource.capsule.core.trie.SetNode;
+import io.usethesource.capsule.core.util.ObjectIntConsumer;
+import io.usethesource.capsule.core.util.ObjectObjectIntConsumer;
 import io.usethesource.capsule.util.ArrayUtils;
 import io.usethesource.capsule.util.ArrayUtilsInt;
 import io.usethesource.capsule.util.EqualityComparator;
@@ -1792,31 +1794,6 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
     private final static int PATTERN_NODE_AND_NODE = 0b0101;
     // @formatter:on
 
-    @FunctionalInterface
-    private interface ObjectIntConsumer<T> {
-
-      /**
-       * Performs this operation on the given arguments.
-       *
-       * @param t the first input argument
-       * @param u the second input argument
-       */
-      void accept(T t, int u);
-    }
-
-    @FunctionalInterface
-    private interface ObjectObjectIntConsumer<T, U> {
-
-      /**
-       * Performs this operation on the given arguments.
-       *
-       * @param t the first input argument
-       * @param u the second input argument
-       * @param v the third input argument
-       */
-      void accept(T t, U u, int v);
-    }
-
     @Override
     public final AbstractSetNode<K> union(AtomicReference<Thread> mutator,
         AbstractSetNode<K> that, int shift, IntersectionResult details,
@@ -1829,7 +1806,7 @@ public class AxiomHashTrieSet<K> implements Set.Immutable<K> {
         return node0;
       }
 
-      final Prototype<K, AbstractSetNode<K>> prototype = new Prototype<>(true);
+      final Prototype<K, AbstractSetNode<K>> prototype = new Prototype<>(true, false);
 
       final ObjectIntConsumer<CompactSetNode<K>> unionData =
           (one, bitpos) -> {
