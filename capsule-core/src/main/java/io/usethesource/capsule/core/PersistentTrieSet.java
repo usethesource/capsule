@@ -43,8 +43,10 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
   private static final long serialVersionUID = 42L;
 
-  private static final PersistentTrieSet EMPTY_SET = new PersistentTrieSet(
-      CompactSetNode.EMPTY_NODE, 0, 0);
+  public /* protected */ static final CompactSetNode EMPTY_NODE = new BitmapIndexedSetNode<>(null, 0, 0,
+      new Object[]{}, 0, 0);
+
+  private static final PersistentTrieSet EMPTY_SET = new PersistentTrieSet(EMPTY_NODE, 0, 0);
 
   private static final boolean DEBUG = false;
 
@@ -1090,7 +1092,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
   }
 
-  protected static abstract class CompactSetNode<K> extends AbstractSetNode<K> {
+  public /* protected */ static abstract class CompactSetNode<K> extends AbstractSetNode<K> {
 
     static final int HASH_CODE_LENGTH = 32;
 
@@ -1171,12 +1173,6 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         final int nodeMap = bitpos(mask0);
         return nodeOf(null, nodeMap, node);
       }
-    }
-
-    static final CompactSetNode EMPTY_NODE;
-
-    static {
-      EMPTY_NODE = new BitmapIndexedSetNode<>(null, 0, 0, new Object[]{}, 0, 0);
     }
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
@@ -3643,7 +3639,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
   /**
    * Iterator skeleton that uses a fixed stack in depth.
    */
-  private static abstract class AbstractSetIterator<K> {
+  public /* protected */ static abstract class AbstractSetIterator<K> {
 
     private static final int MAX_DEPTH = 7;
 
@@ -3656,7 +3652,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     AbstractSetNode<K>[] nodes = new AbstractSetNode[MAX_DEPTH];
 
-    AbstractSetIterator(AbstractSetNode<K> rootNode) {
+    public /* protected */ AbstractSetIterator(AbstractSetNode<K> rootNode) {
       if (rootNode.hasNodes()) {
         currentStackLevel = 0;
 
