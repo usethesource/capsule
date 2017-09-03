@@ -7,6 +7,12 @@
  */
 package io.usethesource.capsule.core;
 
+import static io.usethesource.capsule.core.trie.SetNode.Preference.INDIFFERENT;
+import static io.usethesource.capsule.core.trie.SetNode.Preference.LEFT;
+import static io.usethesource.capsule.core.trie.SetNode.Preference.RIGHT;
+import static io.usethesource.capsule.core.trie.SetNode.TRACK_DELTA_OF_META_DATA_PER_COLLECTION;
+import static io.usethesource.capsule.util.BitmapUtils.isBitInBitmap;
+
 import java.text.DecimalFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -33,18 +39,12 @@ import io.usethesource.capsule.core.trie.SetNode;
 import io.usethesource.capsule.util.ArrayUtils;
 import io.usethesource.capsule.util.EqualityComparator;
 
-import static io.usethesource.capsule.core.trie.SetNode.Preference.INDIFFERENT;
-import static io.usethesource.capsule.core.trie.SetNode.Preference.LEFT;
-import static io.usethesource.capsule.core.trie.SetNode.Preference.RIGHT;
-import static io.usethesource.capsule.core.trie.SetNode.TRACK_DELTA_OF_META_DATA_PER_COLLECTION;
-import static io.usethesource.capsule.util.BitmapUtils.isBitInBitmap;
-
 public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializable {
 
   private static final long serialVersionUID = 42L;
 
-  public /* protected */ static final CompactSetNode EMPTY_NODE = new BitmapIndexedSetNode<>(null, 0, 0,
-      new Object[]{}, 0, 0);
+  public /* protected */ static final CompactSetNode EMPTY_NODE = new BitmapIndexedSetNode<>(null,
+      0, 0, new Object[]{}, 0, 0);
 
   private static final PersistentTrieSet EMPTY_SET = new PersistentTrieSet(EMPTY_NODE, 0, 0);
 
@@ -657,7 +657,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         return false;
       }
 
-      return rootNode.equals(that.rootNode);
+      return rootNode.equivalent(that.rootNode, Object::equals);
     } else if (other instanceof java.util.Set) {
       java.util.Set that = (java.util.Set) other;
 
@@ -713,7 +713,6 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
   /*
    * For analysis purposes only.
    */
-
   protected int getNodeCount() {
     final Iterator<AbstractSetNode<K>> it = nodeIterator();
     int sumNodes = 0;
@@ -1089,6 +1088,9 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     public Stream<K> stream() {
       return StreamSupport.stream(spliterator(), false);
     }
+
+    // TODO: move to SetNode interface
+    public abstract boolean equivalent(final Object other, final EqualityComparator<Object> cmp);
 
   }
 
@@ -1813,6 +1815,11 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     public boolean equals(final Object other) {
+      return equivalent(other, Object::equals);
+    }
+
+    @Override
+    public boolean equivalent(final Object other, EqualityComparator<Object> cmp) {
       if (null == other) {
         return false;
       }
@@ -1829,9 +1836,43 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       if (dataMap() != that.dataMap()) {
         return false;
       }
-      if (!ArrayUtils.equals(nodes, that.nodes)) {
+      if (!deepContentEquality(nodes, that.nodes, payloadArity(), slotArity(), cmp)) {
         return false;
       }
+      return true;
+    }
+
+    private final boolean deepContentEquality(
+        /* @NotNull */ Object[] a1, /* @NotNull */ Object[] a2, int splitAt, int length,
+        EqualityComparator<Object> cmp) {
+
+//      assert a1 != null && a2 != null;
+//      assert a1.length == a2.length;
+
+      if (a1 == a2) {
+        return true;
+      }
+
+      // compare local payload
+      for (int i = 0; i < splitAt; i++) {
+        Object o1 = a1[i];
+        Object o2 = a2[i];
+
+        if (!EqualityComparator.equals(o1, o2, cmp::equals)) {
+          return false;
+        }
+      }
+
+      // recursively compare nested nodes
+      for (int i = splitAt; i < length; i++) {
+        AbstractSetNode o1 = (AbstractSetNode) a1[i];
+        AbstractSetNode o2 = (AbstractSetNode) a2[i];
+
+        if (!EqualityComparator.equals(o1, o2, (a, b) -> a.equivalent(b, cmp))) {
+          return false;
+        }
+      }
+
       return true;
     }
 
@@ -3444,7 +3485,12 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(final Object other) {
+      return equivalent(other, Object::equals);
+    }
+
+    @Override
+    public boolean equivalent(Object other, EqualityComparator<Object> cmp) {
       if (null == other) {
         return false;
       }
@@ -3475,7 +3521,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         for (int j = 0; j < keys.length; j++) {
           final K key = keys[j];
 
-          if (key.equals(otherKey)) {
+          if (cmp.equals(key, otherKey)) {
             continue outerLoop;
           }
         }
@@ -4207,7 +4253,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
           return false;
         }
 
-        return rootNode.equals(that.rootNode);
+        return rootNode.equivalent(that.rootNode, Object::equals);
       } else if (other instanceof java.util.Set) {
         java.util.Set that = (java.util.Set) other;
 
