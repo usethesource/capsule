@@ -7,11 +7,11 @@
  */
 package io.usethesource.capsule;
 
+import static io.usethesource.capsule.factory.DefaultSetFactory.FACTORY;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
-
-import io.usethesource.capsule.factory.DefaultSetFactory;
 
 public interface Set<K> extends java.util.Set<K>, SetEq<K> {
 
@@ -291,7 +291,5 @@ public interface Set<K> extends java.util.Set<K>, SetEq<K> {
     }
 
   }
-
-  DefaultSetFactory FACTORY = new DefaultSetFactory();
 
 }
