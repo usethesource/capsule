@@ -126,7 +126,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
   public boolean containsKey(final Object o) {
     try {
       final K key = (K) o;
-      return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0);
+      return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0, Object::equals);
     } catch (ClassCastException unused) {
       return false;
     }
@@ -167,7 +167,8 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
   public V get(final Object o) {
     try {
       final K key = (K) o;
-      final Optional<V> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
+      final Optional<V> result = rootNode
+          .findByKey(key, transformHashCode(key.hashCode()), 0, Object::equals);
 
       if (result.isPresent()) {
         return result.get();
@@ -202,7 +203,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     final MapNodeResult<K, V> details = MapNodeResult.unchanged();
 
     final AbstractMapNode<K, V> newRootNode =
-        rootNode.updated(null, key, val, transformHashCode(keyHash), 0, details);
+        rootNode.updated(null, key, val, transformHashCode(keyHash), 0, details, Object::equals);
 
     if (details.isModified()) {
       if (details.hasReplacedValue()) {
@@ -270,7 +271,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     final MapNodeResult<K, V> details = MapNodeResult.unchanged();
 
     final AbstractMapNode<K, V> newRootNode =
-        rootNode.removed(null, key, transformHashCode(keyHash), 0, details);
+        rootNode.removed(null, key, transformHashCode(keyHash), 0, details, Object::equals);
 
     if (details.isModified()) {
       assert details.hasReplacedValue();
@@ -505,7 +506,8 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
         try {
           final K key = (K) entry.getKey();
-          final Optional<V> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
+          final Optional<V> result = rootNode
+              .findByKey(key, transformHashCode(key.hashCode()), 0, Object::equals);
 
           if (!result.isPresent()) {
             return false;
@@ -2038,7 +2040,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     public boolean containsKey(final Object o) {
       try {
         final K key = (K) o;
-        return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0);
+        return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0, Object::equals);
       } catch (ClassCastException unused) {
         return false;
       }
@@ -2079,7 +2081,8 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     public V get(final Object o) {
       try {
         final K key = (K) o;
-        final Optional<V> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
+        final Optional<V> result = rootNode
+            .findByKey(key, transformHashCode(key.hashCode()), 0, Object::equals);
 
         if (result.isPresent()) {
           return result.get();
@@ -2119,7 +2122,8 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
       final MapNodeResult<K, V> details = MapNodeResult.unchanged();
 
       final AbstractMapNode<K, V> newRootNode =
-          rootNode.updated(mutator, key, val, transformHashCode(keyHash), 0, details);
+          rootNode
+              .updated(mutator, key, val, transformHashCode(keyHash), 0, details, Object::equals);
 
       if (details.isModified()) {
         if (details.hasReplacedValue()) {
@@ -2243,7 +2247,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
       final MapNodeResult<K, V> details = MapNodeResult.unchanged();
 
       final AbstractMapNode<K, V> newRootNode =
-          rootNode.removed(mutator, key, transformHashCode(keyHash), 0, details);
+          rootNode.removed(mutator, key, transformHashCode(keyHash), 0, details, Object::equals);
 
       if (details.isModified()) {
         assert details.hasReplacedValue();
@@ -2546,7 +2550,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
           try {
             final K key = (K) entry.getKey();
             final Optional<V> result =
-                rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
+                rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, Object::equals);
 
             if (!result.isPresent()) {
               return false;
