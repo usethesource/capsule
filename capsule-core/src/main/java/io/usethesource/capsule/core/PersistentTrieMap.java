@@ -27,6 +27,7 @@ import java.util.function.BiFunction;
 
 import io.usethesource.capsule.core.trie.ArrayView;
 import io.usethesource.capsule.core.trie.MapNode;
+import io.usethesource.capsule.core.trie.MapNodeResult;
 import io.usethesource.capsule.util.EqualityComparator;
 
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
@@ -198,7 +199,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
   @Override
   public io.usethesource.capsule.Map.Immutable<K, V> __put(final K key, final V val) {
     final int keyHash = key.hashCode();
-    final MapResult<K, V> details = MapResult.unchanged();
+    final MapNodeResult<K, V> details = MapNodeResult.unchanged();
 
     final AbstractMapNode<K, V> newRootNode =
         rootNode.updated(null, key, val, transformHashCode(keyHash), 0, details);
@@ -224,7 +225,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
   public io.usethesource.capsule.Map.Immutable<K, V> __putEquivalent(final K key, final V val,
       final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
-    final MapResult<K, V> details = MapResult.unchanged();
+    final MapNodeResult<K, V> details = MapNodeResult.unchanged();
 
     final AbstractMapNode<K, V> newRootNode = rootNode.updated(null, key, val,
         transformHashCode(keyHash), 0, details, EqualityComparator.fromComparator(cmp));
@@ -266,7 +267,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
   @Override
   public io.usethesource.capsule.Map.Immutable<K, V> __remove(final K key) {
     final int keyHash = key.hashCode();
-    final MapResult<K, V> details = MapResult.unchanged();
+    final MapNodeResult<K, V> details = MapNodeResult.unchanged();
 
     final AbstractMapNode<K, V> newRootNode =
         rootNode.removed(null, key, transformHashCode(keyHash), 0, details);
@@ -285,7 +286,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
   public io.usethesource.capsule.Map.Immutable<K, V> __removeEquivalent(final K key,
       final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
-    final MapResult<K, V> details = MapResult.unchanged();
+    final MapNodeResult<K, V> details = MapNodeResult.unchanged();
 
     final AbstractMapNode<K, V> newRootNode = rootNode.removed(null, key,
         transformHashCode(keyHash), 0, details, EqualityComparator.fromComparator(cmp));
@@ -653,44 +654,6 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
   }
 
-  static final class MapResult<K, V> {
-
-    private V replacedValue;
-    private boolean isModified;
-    private boolean isReplaced;
-
-    // update: inserted/removed single element, element count changed
-    public void modified() {
-      this.isModified = true;
-    }
-
-    public void updated(V replacedValue) {
-      this.replacedValue = replacedValue;
-      this.isModified = true;
-      this.isReplaced = true;
-    }
-
-    // update: neither element, nor element count changed
-    public static <K, V> MapResult<K, V> unchanged() {
-      return new MapResult<>();
-    }
-
-    private MapResult() {
-    }
-
-    public boolean isModified() {
-      return isModified;
-    }
-
-    public boolean hasReplacedValue() {
-      return isReplaced;
-    }
-
-    public V getReplacedValue() {
-      return replacedValue;
-    }
-  }
-
   // TODO: support {@code Iterable} interface like AbstractSetNode
   protected static abstract class AbstractMapNode<K, V> implements
       MapNode<K, V, AbstractMapNode<K, V>>,
@@ -699,30 +662,6 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     private static final long serialVersionUID = 42L;
 
     static final int TUPLE_LENGTH = 2;
-
-    abstract boolean containsKey(final K key, final int keyHash, final int shift);
-
-    abstract boolean containsKey(final K key, final int keyHash, final int shift,
-        final EqualityComparator<Object> cmp);
-
-    abstract Optional<V> findByKey(final K key, final int keyHash, final int shift);
-
-    abstract Optional<V> findByKey(final K key, final int keyHash, final int shift,
-        final EqualityComparator<Object> cmp);
-
-    abstract AbstractMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key,
-        final V val, final int keyHash, final int shift, final MapResult<K, V> details);
-
-    abstract AbstractMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key,
-        final V val, final int keyHash, final int shift, final MapResult<K, V> details,
-        final EqualityComparator<Object> cmp);
-
-    abstract AbstractMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
-        final int keyHash, final int shift, final MapResult<K, V> details);
-
-    abstract AbstractMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
-        final int keyHash, final int shift, final MapResult<K, V> details,
-        final EqualityComparator<Object> cmp);
 
     static final <T> boolean isAllowedToEdit(AtomicReference<?> x, AtomicReference<?> y) {
       return x != null && y != null && (x == y || x.get() == y.get());
@@ -967,7 +906,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    boolean containsKey(final K key, final int keyHash, final int shift) {
+    public boolean containsKey(final K key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -987,7 +926,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    boolean containsKey(final K key, final int keyHash, final int shift,
+    public boolean containsKey(final K key, final int keyHash, final int shift,
         final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -1008,7 +947,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    Optional<V> findByKey(final K key, final int keyHash, final int shift) {
+    public Optional<V> findByKey(final K key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1033,7 +972,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    Optional<V> findByKey(final K key, final int keyHash, final int shift,
+    public Optional<V> findByKey(final K key, final int keyHash, final int shift,
         final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -1059,8 +998,8 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    AbstractMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
-        final int keyHash, final int shift, final MapResult<K, V> details) {
+    public AbstractMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
+        final int keyHash, final int shift, final MapNodeResult<K, V> details) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1101,8 +1040,8 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    AbstractMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
-        final int keyHash, final int shift, final MapResult<K, V> details,
+    public AbstractMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
+        final int keyHash, final int shift, final MapNodeResult<K, V> details,
         final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -1144,8 +1083,8 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    AbstractMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
-        final int keyHash, final int shift, final MapResult<K, V> details) {
+    public AbstractMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
+        final int keyHash, final int shift, final MapNodeResult<K, V> details) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1208,8 +1147,8 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    AbstractMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
-        final int keyHash, final int shift, final MapResult<K, V> details,
+    public AbstractMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
+        final int keyHash, final int shift, final MapNodeResult<K, V> details,
         final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -1703,7 +1642,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    boolean containsKey(final K key, final int keyHash, final int shift) {
+    public boolean containsKey(final K key, final int keyHash, final int shift) {
       if (this.hash == keyHash) {
         for (K k : keys) {
           if (k.equals(key)) {
@@ -1715,7 +1654,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    boolean containsKey(final K key, final int keyHash, final int shift,
+    public boolean containsKey(final K key, final int keyHash, final int shift,
         final EqualityComparator<Object> cmp) {
       if (this.hash == keyHash) {
         for (K k : keys) {
@@ -1728,7 +1667,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    Optional<V> findByKey(final K key, final int keyHash, final int shift) {
+    public Optional<V> findByKey(final K key, final int keyHash, final int shift) {
       for (int i = 0; i < keys.length; i++) {
         final K _key = keys[i];
         if (key.equals(_key)) {
@@ -1740,7 +1679,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    Optional<V> findByKey(final K key, final int keyHash, final int shift,
+    public Optional<V> findByKey(final K key, final int keyHash, final int shift,
         final EqualityComparator<Object> cmp) {
       for (int i = 0; i < keys.length; i++) {
         final K _key = keys[i];
@@ -1753,8 +1692,8 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    AbstractMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
-        final int keyHash, final int shift, final MapResult<K, V> details) {
+    public AbstractMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
+        final int keyHash, final int shift, final MapNodeResult<K, V> details) {
       assert this.hash == keyHash;
 
       for (int idx = 0; idx < keys.length; idx++) {
@@ -1804,8 +1743,8 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    AbstractMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
-        final int keyHash, final int shift, final MapResult<K, V> details,
+    public AbstractMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
+        final int keyHash, final int shift, final MapNodeResult<K, V> details,
         final EqualityComparator<Object> cmp) {
       assert this.hash == keyHash;
 
@@ -1856,8 +1795,8 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    AbstractMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
-        final int keyHash, final int shift, final MapResult<K, V> details) {
+    public AbstractMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
+        final int keyHash, final int shift, final MapNodeResult<K, V> details) {
       for (int idx = 0; idx < keys.length; idx++) {
         if (keys[idx].equals(key)) {
           final V currentVal = vals[idx];
@@ -1897,8 +1836,8 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    AbstractMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
-        final int keyHash, final int shift, final MapResult<K, V> details,
+    public AbstractMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
+        final int keyHash, final int shift, final MapNodeResult<K, V> details,
         final EqualityComparator<Object> cmp) {
       for (int idx = 0; idx < keys.length; idx++) {
         if (cmp.equals(keys[idx], key)) {
@@ -2444,7 +2383,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
       }
 
       final int keyHash = key.hashCode();
-      final MapResult<K, V> details = MapResult.unchanged();
+      final MapNodeResult<K, V> details = MapNodeResult.unchanged();
 
       final AbstractMapNode<K, V> newRootNode =
           rootNode.updated(mutator, key, val, transformHashCode(keyHash), 0, details);
@@ -2489,7 +2428,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
       }
 
       final int keyHash = key.hashCode();
-      final MapResult<K, V> details = MapResult.unchanged();
+      final MapNodeResult<K, V> details = MapNodeResult.unchanged();
 
       final AbstractMapNode<K, V> newRootNode =
           rootNode.updated(mutator, key, val, transformHashCode(keyHash), 0, details,
@@ -2568,7 +2507,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
       }
 
       final int keyHash = key.hashCode();
-      final MapResult<K, V> details = MapResult.unchanged();
+      final MapNodeResult<K, V> details = MapNodeResult.unchanged();
 
       final AbstractMapNode<K, V> newRootNode =
           rootNode.removed(mutator, key, transformHashCode(keyHash), 0, details);
@@ -2601,7 +2540,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
       }
 
       final int keyHash = key.hashCode();
-      final MapResult<K, V> details = MapResult.unchanged();
+      final MapNodeResult<K, V> details = MapNodeResult.unchanged();
 
       final AbstractMapNode<K, V> newRootNode = rootNode.removed(mutator, key,
           transformHashCode(keyHash), 0, details, EqualityComparator.fromComparator(cmp));
