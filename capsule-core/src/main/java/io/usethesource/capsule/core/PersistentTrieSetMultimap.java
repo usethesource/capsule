@@ -397,7 +397,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     /***** CONVERISONS *****/
 
-    abstract PersistentTrieSet.AbstractSetNode<K> toSetNode(AtomicReference<Thread> mutator);
+//    abstract PersistentTrieSet.AbstractSetNode<K> toSetNode(AtomicReference<Thread> mutator);
 
 // abstract PersistentTrieSet.AbstractSetNode<K> toSetNode(
     // PersistentTrieSet.AbstractSetNode<K>... newChildren);
@@ -1698,26 +1698,26 @@ public class PersistentTrieSetMultimap<K, V> extends
       return nodes[index];
     }
 
-    @Override
-    PersistentTrieSet.AbstractSetNode<K> toSetNode(final AtomicReference<Thread> mutator) {
-      final int mergedPayloadMap = rawMap2();
-
-      final ArrayView<K> dataArray0 = dataArray(0, 0);
-      final ArrayView<K> dataArray1 = dataArray(1, 0);
-
-      final Iterator<K> iterator = ziperator(arity(mergedPayloadMap), bitmap(0),
-          dataArray0.iterator(), bitmap(1), dataArray1.iterator());
-
-      // allocate an array that can hold the keys + empty placeholder slots for sub-nodes
-      final Object[] content = new Object[arity(mergedPayloadMap) + arity(nodeMap())];
-
-      for (int i = 0; iterator.hasNext(); i++) {
-        content[i] = iterator.next();
-      }
-
-      return PersistentTrieSet.AbstractSetNode.newBitmapIndexedNode(mutator, nodeMap(),
-          mergedPayloadMap, content);
-    }
+//    @Override
+//    PersistentTrieSet.AbstractSetNode<K> toSetNode(final AtomicReference<Thread> mutator) {
+//      final int mergedPayloadMap = rawMap2();
+//
+//      final ArrayView<K> dataArray0 = dataArray(0, 0);
+//      final ArrayView<K> dataArray1 = dataArray(1, 0);
+//
+//      final Iterator<K> iterator = ziperator(arity(mergedPayloadMap), bitmap(0),
+//          dataArray0.iterator(), bitmap(1), dataArray1.iterator());
+//
+//      // allocate an array that can hold the keys + empty placeholder slots for sub-nodes
+//      final Object[] content = new Object[arity(mergedPayloadMap) + arity(nodeMap())];
+//
+//      for (int i = 0; iterator.hasNext(); i++) {
+//        content[i] = iterator.next();
+//      }
+//
+//      return PersistentTrieSet.AbstractSetNode.newBitmapIndexedNode(mutator, nodeMap(),
+//          mergedPayloadMap, content);
+//    }
 
     private <T> Iterator<T> ziperator(final int expectedSize, final int bitmap0,
         final Iterator<T> dataIterator0, final int bitmap1, final Iterator<T> dataIterator1) {
@@ -2301,12 +2301,12 @@ public class PersistentTrieSetMultimap<K, V> extends
     private static final Supplier<RuntimeException> UOE_NOT_YET_IMPLEMENTED_FACTORY =
         () -> new UnsupportedOperationException("Not yet implemented @ HashCollisionNode.");
 
-    @Override
-    PersistentTrieSet.AbstractSetNode<K> toSetNode(AtomicReference<Thread> mutator) {
-      // is leaf; ignore mutator
-      return PersistentTrieSet.AbstractSetNode.newHashCollisonNode(hash,
-          (K[]) collisionContent.stream().map(Map.Entry::getKey).toArray());
-    }
+//    @Override
+//    PersistentTrieSet.AbstractSetNode<K> toSetNode(AtomicReference<Thread> mutator) {
+//      // is leaf; ignore mutator
+//      return PersistentTrieSet.AbstractSetNode.newHashCollisonNode(hash,
+//          (K[]) collisionContent.stream().map(Map.Entry::getKey).toArray());
+//    }
 
     // @Override
     // PersistentTrieSet.AbstractSetNode<K> toSetNode(PersistentTrieSet.AbstractSetNode<K>[] newChildren) {

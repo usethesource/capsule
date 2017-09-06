@@ -34,21 +34,23 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
   private static final long serialVersionUID = 42L;
 
-  private static final PersistentTrieMap EMPTY_MAP = new PersistentTrieMap(
-      CompactMapNode.EMPTY_NODE, 0, 0);
+  private static final CompactMapNode EMPTY_NODE = new BitmapIndexedMapNode<>(null, (0), (0),
+      new Object[]{});
+
+  private static final PersistentTrieMap EMPTY_MAP = new PersistentTrieMap(EMPTY_NODE, 0, 0);
 
   private static final boolean DEBUG = false;
 
   private final AbstractMapNode<K, V> rootNode;
-  private final int hashCode;
+  private final int cachedHashCode;
   private final int cachedSize;
 
-  PersistentTrieMap(AbstractMapNode<K, V> rootNode, int hashCode, int cachedSize) {
+  PersistentTrieMap(AbstractMapNode<K, V> rootNode, int cachedHashCode, int cachedSize) {
     this.rootNode = rootNode;
-    this.hashCode = hashCode;
+    this.cachedHashCode = cachedHashCode;
     this.cachedSize = cachedSize;
     if (DEBUG) {
-      assert checkHashCodeAndSize(hashCode, cachedSize);
+      assert checkHashCodeAndSize(cachedHashCode, cachedSize);
     }
   }
 
@@ -203,11 +205,11 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
         final int valHashNew = val.hashCode();
 
         return new PersistentTrieMap<K, V>(newRootNode,
-            hashCode + ((keyHash ^ valHashNew)) - ((keyHash ^ valHashOld)), cachedSize);
+            cachedHashCode + ((keyHash ^ valHashNew)) - ((keyHash ^ valHashOld)), cachedSize);
       }
 
       final int valHash = val.hashCode();
-      return new PersistentTrieMap<K, V>(newRootNode, hashCode + ((keyHash ^ valHash)),
+      return new PersistentTrieMap<K, V>(newRootNode, cachedHashCode + ((keyHash ^ valHash)),
           cachedSize + 1);
     }
 
@@ -229,11 +231,11 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
         final int valHashNew = val.hashCode();
 
         return new PersistentTrieMap<K, V>(newRootNode,
-            hashCode + ((keyHash ^ valHashNew)) - ((keyHash ^ valHashOld)), cachedSize);
+            cachedHashCode + ((keyHash ^ valHashNew)) - ((keyHash ^ valHashOld)), cachedSize);
       }
 
       final int valHash = val.hashCode();
-      return new PersistentTrieMap<K, V>(newRootNode, hashCode + ((keyHash ^ valHash)),
+      return new PersistentTrieMap<K, V>(newRootNode, cachedHashCode + ((keyHash ^ valHash)),
           cachedSize + 1);
     }
 
@@ -268,7 +270,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     if (details.isModified()) {
       assert details.hasReplacedValue();
       final int valHash = details.getReplacedValue().hashCode();
-      return new PersistentTrieMap<K, V>(newRootNode, hashCode - ((keyHash ^ valHash)),
+      return new PersistentTrieMap<K, V>(newRootNode, cachedHashCode - ((keyHash ^ valHash)),
           cachedSize - 1);
     }
 
@@ -287,7 +289,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     if (details.isModified()) {
       assert details.hasReplacedValue();
       final int valHash = details.getReplacedValue().hashCode();
-      return new PersistentTrieMap<K, V>(newRootNode, hashCode - ((keyHash ^ valHash)),
+      return new PersistentTrieMap<K, V>(newRootNode, cachedHashCode - ((keyHash ^ valHash)),
           cachedSize - 1);
     }
 
@@ -480,7 +482,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
         return false;
       }
 
-      if (this.hashCode != that.hashCode) {
+      if (this.cachedHashCode != that.cachedHashCode) {
         return false;
       }
 
@@ -522,7 +524,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
   @Override
   public int hashCode() {
-    return hashCode;
+    return cachedHashCode;
   }
 
   @Override
@@ -540,7 +542,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
   @Override
   public io.usethesource.capsule.Map.Transient<K, V> asTransient() {
-    return new TransientTrieMap_5Bits<K, V>(this);
+    return new TransientTrieMap<K, V>(this);
   }
 
   /*
@@ -554,7 +556,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
    * For analysis purposes only.
    */
   protected Iterator<AbstractMapNode<K, V>> nodeIterator() {
-    return new TrieMap_5BitsNodeIterator<>(rootNode);
+    return new TrieMapNodeIterator<>(rootNode);
   }
 
   /*
@@ -869,7 +871,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
       if (shift >= HASH_CODE_LENGTH) {
         // throw new
         // IllegalStateException("Hash collision not yet fixed.");
-        return new HashCollisionMapNode_5Bits<>(keyHash0, (K[]) new Object[]{key0, key1},
+        return new HashCollisionMapNode<>(keyHash0, (K[]) new Object[]{key0, key1},
             (V[]) new Object[]{val0, val1});
       }
 
@@ -894,16 +896,6 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
         return nodeOf(null, nodeMap, (0), new Object[]{node});
       }
     }
-
-    static final CompactMapNode EMPTY_NODE;
-
-    static {
-
-      EMPTY_NODE = new BitmapIndexedMapNode<>(null, (0), (0), new Object[]{});
-
-    }
-
-    ;
 
     static final <K, V> CompactMapNode<K, V> nodeOf(final AtomicReference<Thread> mutator,
         final int nodeMap, final int dataMap, final Object[] nodes) {
@@ -1581,13 +1573,13 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
   }
 
-  private static final class HashCollisionMapNode_5Bits<K, V> extends CompactMapNode<K, V> {
+  private static final class HashCollisionMapNode<K, V> extends CompactMapNode<K, V> {
 
     private final K[] keys;
     private final V[] vals;
     private final int hash;
 
-    HashCollisionMapNode_5Bits(final int hash, final K[] keys, final V[] vals) {
+    HashCollisionMapNode(final int hash, final K[] keys, final V[] vals) {
       this.keys = keys;
       this.vals = vals;
       this.hash = hash;
@@ -1666,7 +1658,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
             dst[idx + 0] = val;
 
             final CompactMapNode<K, V> thisNew =
-                new HashCollisionMapNode_5Bits<>(this.hash, this.keys, dst);
+                new HashCollisionMapNode<>(this.hash, this.keys, dst);
 
             details.updated(currentVal);
             return thisNew;
@@ -1693,7 +1685,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
           this.vals.length - vals.length);
 
       details.modified();
-      return new HashCollisionMapNode_5Bits<>(keyHash, keysNew, valsNew);
+      return new HashCollisionMapNode<>(keyHash, keysNew, valsNew);
     }
 
     @Override
@@ -1718,7 +1710,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
             dst[idx + 0] = val;
 
             final CompactMapNode<K, V> thisNew =
-                new HashCollisionMapNode_5Bits<>(this.hash, this.keys, dst);
+                new HashCollisionMapNode<>(this.hash, this.keys, dst);
 
             details.updated(currentVal);
             return thisNew;
@@ -1745,7 +1737,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
           this.vals.length - vals.length);
 
       details.modified();
-      return new HashCollisionMapNode_5Bits<>(keyHash, keysNew, valsNew);
+      return new HashCollisionMapNode<>(keyHash, keysNew, valsNew);
     }
 
     @Override
@@ -1782,7 +1774,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
             System.arraycopy(this.vals, 0, valsNew, 0, idx);
             System.arraycopy(this.vals, idx + 1, valsNew, idx, this.vals.length - idx - 1);
 
-            return new HashCollisionMapNode_5Bits<>(keyHash, keysNew, valsNew);
+            return new HashCollisionMapNode<>(keyHash, keysNew, valsNew);
           }
         }
       }
@@ -1824,7 +1816,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
             System.arraycopy(this.vals, 0, valsNew, 0, idx);
             System.arraycopy(this.vals, idx + 1, valsNew, idx, this.vals.length - idx - 1);
 
-            return new HashCollisionMapNode_5Bits<>(keyHash, keysNew, valsNew);
+            return new HashCollisionMapNode<>(keyHash, keysNew, valsNew);
           }
         }
       }
@@ -1918,7 +1910,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
         return false;
       }
 
-      HashCollisionMapNode_5Bits<?, ?> that = (HashCollisionMapNode_5Bits<?, ?>) other;
+      HashCollisionMapNode<?, ?> that = (HashCollisionMapNode<?, ?>) other;
 
       if (hash != that.hash) {
         return false;
@@ -2145,11 +2137,11 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
   /**
    * Iterator that first iterates over inlined-values and then continues depth first recursively.
    */
-  private static class TrieMap_5BitsNodeIterator<K, V> implements Iterator<AbstractMapNode<K, V>> {
+  private static class TrieMapNodeIterator<K, V> implements Iterator<AbstractMapNode<K, V>> {
 
     final Deque<Iterator<? extends AbstractMapNode<K, V>>> nodeIteratorStack;
 
-    TrieMap_5BitsNodeIterator(AbstractMapNode<K, V> rootNode) {
+    TrieMapNodeIterator(AbstractMapNode<K, V> rootNode) {
       nodeIteratorStack = new ArrayDeque<>();
       nodeIteratorStack.push(Collections.singleton(rootNode).iterator());
     }
@@ -2191,21 +2183,21 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
   }
 
-  static final class TransientTrieMap_5Bits<K, V> implements
+  static final class TransientTrieMap<K, V> implements
       io.usethesource.capsule.Map.Transient<K, V> {
 
     final private AtomicReference<Thread> mutator;
     private AbstractMapNode<K, V> rootNode;
-    private int hashCode;
+    private int cachedHashCode;
     private int cachedSize;
 
-    TransientTrieMap_5Bits(PersistentTrieMap<K, V> trieMap_5Bits) {
+    TransientTrieMap(PersistentTrieMap<K, V> trieMap) {
       this.mutator = new AtomicReference<Thread>(Thread.currentThread());
-      this.rootNode = trieMap_5Bits.rootNode;
-      this.hashCode = trieMap_5Bits.hashCode;
-      this.cachedSize = trieMap_5Bits.cachedSize;
+      this.rootNode = trieMap.rootNode;
+      this.cachedHashCode = trieMap.cachedHashCode;
+      this.cachedSize = trieMap.cachedSize;
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
     }
 
@@ -2343,27 +2335,27 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
           final int valHashNew = val.hashCode();
 
           rootNode = newRootNode;
-          hashCode = hashCode + (keyHash ^ valHashNew) - (keyHash ^ valHashOld);
+          cachedHashCode = cachedHashCode + (keyHash ^ valHashNew) - (keyHash ^ valHashOld);
 
           if (DEBUG) {
-            assert checkHashCodeAndSize(hashCode, cachedSize);
+            assert checkHashCodeAndSize(cachedHashCode, cachedSize);
           }
           return details.getReplacedValue();
         } else {
           final int valHashNew = val.hashCode();
           rootNode = newRootNode;
-          hashCode += (keyHash ^ valHashNew);
+          cachedHashCode += (keyHash ^ valHashNew);
           cachedSize += 1;
 
           if (DEBUG) {
-            assert checkHashCodeAndSize(hashCode, cachedSize);
+            assert checkHashCodeAndSize(cachedHashCode, cachedSize);
           }
           return null;
         }
       }
 
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
       return null;
     }
@@ -2388,27 +2380,27 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
           final int valHashNew = val.hashCode();
 
           rootNode = newRootNode;
-          hashCode = hashCode + (keyHash ^ valHashNew) - (keyHash ^ valHashOld);
+          cachedHashCode = cachedHashCode + (keyHash ^ valHashNew) - (keyHash ^ valHashOld);
 
           if (DEBUG) {
-            assert checkHashCodeAndSize(hashCode, cachedSize);
+            assert checkHashCodeAndSize(cachedHashCode, cachedSize);
           }
           return details.getReplacedValue();
         } else {
           final int valHashNew = val.hashCode();
           rootNode = newRootNode;
-          hashCode += (keyHash ^ valHashNew);
+          cachedHashCode += (keyHash ^ valHashNew);
           cachedSize += 1;
 
           if (DEBUG) {
-            assert checkHashCodeAndSize(hashCode, cachedSize);
+            assert checkHashCodeAndSize(cachedHashCode, cachedSize);
           }
           return null;
         }
       }
 
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
       return null;
     }
@@ -2463,17 +2455,17 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
         final int valHash = details.getReplacedValue().hashCode();
 
         rootNode = newRootNode;
-        hashCode = hashCode - (keyHash ^ valHash);
+        cachedHashCode = cachedHashCode - (keyHash ^ valHash);
         cachedSize = cachedSize - 1;
 
         if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
+          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
         }
         return details.getReplacedValue();
       }
 
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
 
       return null;
@@ -2496,17 +2488,17 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
         final int valHash = details.getReplacedValue().hashCode();
 
         rootNode = newRootNode;
-        hashCode = hashCode - (keyHash ^ valHash);
+        cachedHashCode = cachedHashCode - (keyHash ^ valHash);
         cachedSize = cachedSize - 1;
 
         if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
+          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
         }
         return details.getReplacedValue();
       }
 
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
 
       return null;
@@ -2539,10 +2531,10 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
     public static class TransientMapKeyIterator<K, V> extends MapKeyIterator<K, V> {
 
-      final TransientTrieMap_5Bits<K, V> collection;
+      final TransientTrieMap<K, V> collection;
       K lastKey;
 
-      public TransientMapKeyIterator(final TransientTrieMap_5Bits<K, V> collection) {
+      public TransientMapKeyIterator(final TransientTrieMap<K, V> collection) {
         super(collection.rootNode);
         this.collection = collection;
       }
@@ -2561,9 +2553,9 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
     public static class TransientMapValueIterator<K, V> extends MapValueIterator<K, V> {
 
-      final TransientTrieMap_5Bits<K, V> collection;
+      final TransientTrieMap<K, V> collection;
 
-      public TransientMapValueIterator(final TransientTrieMap_5Bits<K, V> collection) {
+      public TransientMapValueIterator(final TransientTrieMap<K, V> collection) {
         super(collection.rootNode);
         this.collection = collection;
       }
@@ -2581,9 +2573,9 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
     public static class TransientMapEntryIterator<K, V> extends MapEntryIterator<K, V> {
 
-      final TransientTrieMap_5Bits<K, V> collection;
+      final TransientTrieMap<K, V> collection;
 
-      public TransientMapEntryIterator(final TransientTrieMap_5Bits<K, V> collection) {
+      public TransientMapEntryIterator(final TransientTrieMap<K, V> collection) {
         super(collection.rootNode);
         this.collection = collection;
       }
@@ -2607,27 +2599,27 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
         keySet = new AbstractSet<K>() {
           @Override
           public Iterator<K> iterator() {
-            return TransientTrieMap_5Bits.this.keyIterator();
+            return TransientTrieMap.this.keyIterator();
           }
 
           @Override
           public int size() {
-            return TransientTrieMap_5Bits.this.size();
+            return TransientTrieMap.this.size();
           }
 
           @Override
           public boolean isEmpty() {
-            return TransientTrieMap_5Bits.this.isEmpty();
+            return TransientTrieMap.this.isEmpty();
           }
 
           @Override
           public void clear() {
-            TransientTrieMap_5Bits.this.clear();
+            TransientTrieMap.this.clear();
           }
 
           @Override
           public boolean contains(Object k) {
-            return TransientTrieMap_5Bits.this.containsKey(k);
+            return TransientTrieMap.this.containsKey(k);
           }
         };
       }
@@ -2643,27 +2635,27 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
         values = new AbstractCollection<V>() {
           @Override
           public Iterator<V> iterator() {
-            return TransientTrieMap_5Bits.this.valueIterator();
+            return TransientTrieMap.this.valueIterator();
           }
 
           @Override
           public int size() {
-            return TransientTrieMap_5Bits.this.size();
+            return TransientTrieMap.this.size();
           }
 
           @Override
           public boolean isEmpty() {
-            return TransientTrieMap_5Bits.this.isEmpty();
+            return TransientTrieMap.this.isEmpty();
           }
 
           @Override
           public void clear() {
-            TransientTrieMap_5Bits.this.clear();
+            TransientTrieMap.this.clear();
           }
 
           @Override
           public boolean contains(Object v) {
-            return TransientTrieMap_5Bits.this.containsValue(v);
+            return TransientTrieMap.this.containsValue(v);
           }
         };
       }
@@ -2701,22 +2693,22 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
           @Override
           public int size() {
-            return TransientTrieMap_5Bits.this.size();
+            return TransientTrieMap.this.size();
           }
 
           @Override
           public boolean isEmpty() {
-            return TransientTrieMap_5Bits.this.isEmpty();
+            return TransientTrieMap.this.isEmpty();
           }
 
           @Override
           public void clear() {
-            TransientTrieMap_5Bits.this.clear();
+            TransientTrieMap.this.clear();
           }
 
           @Override
           public boolean contains(Object k) {
-            return TransientTrieMap_5Bits.this.containsKey(k);
+            return TransientTrieMap.this.containsKey(k);
           }
         };
       }
@@ -2733,14 +2725,14 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
         return false;
       }
 
-      if (other instanceof TransientTrieMap_5Bits) {
-        TransientTrieMap_5Bits<?, ?> that = (TransientTrieMap_5Bits<?, ?>) other;
+      if (other instanceof PersistentTrieMap.TransientTrieMap) {
+        TransientTrieMap<?, ?> that = (TransientTrieMap<?, ?>) other;
 
         if (this.cachedSize != that.cachedSize) {
           return false;
         }
 
-        if (this.hashCode != that.hashCode) {
+        if (this.cachedHashCode != that.cachedHashCode) {
           return false;
         }
 
@@ -2783,7 +2775,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
     @Override
     public int hashCode() {
-      return hashCode;
+      return cachedHashCode;
     }
 
     @Override
@@ -2793,7 +2785,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
       }
 
       mutator.set(null);
-      return new PersistentTrieMap<K, V>(rootNode, hashCode, cachedSize);
+      return new PersistentTrieMap<K, V>(rootNode, cachedHashCode, cachedSize);
     }
   }
 

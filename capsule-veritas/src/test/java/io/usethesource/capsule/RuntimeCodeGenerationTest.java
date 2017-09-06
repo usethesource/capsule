@@ -7,8 +7,10 @@
  */
 package io.usethesource.capsule;
 
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 
+@Ignore
 @RunWith(RuntimeCodeGenerationTestSuite.class)
 public class RuntimeCodeGenerationTest {
 }

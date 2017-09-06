@@ -119,60 +119,6 @@ public class SetMultimapUtils {
   }
 
   @Deprecated
-  public static final <T> io.usethesource.capsule.Set.Immutable<T> setFromNode(
-      PersistentTrieSet.AbstractSetNode<T> rootNode) {
-    return new PersistentTrieSet<>(rootNode);
-  }
-
-  @Deprecated
-  public static final <T> io.usethesource.capsule.Set.Immutable<T> setFromNode(
-      io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8.AbstractSetNode<T> rootNode) {
-    return new TrieSet_5Bits_Spec0To8<>(rootNode);
-  }
-
-  @Deprecated
-  public static final <T> PersistentTrieSet.AbstractSetNode<T> setNodeOf(
-      T key1) {
-    return ((PersistentTrieSet) PersistentTrieSet.of(key1)).getRootNode();
-  }
-
-  @Deprecated
-  public static final <T> io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8.AbstractSetNode<T> specSetNodeOf(
-      T key1) {
-    return ((TrieSet_5Bits_Spec0To8) TrieSet_5Bits_Spec0To8.of(key1)).getRootNode();
-  }
-
-  @Deprecated
-  public static final <T> io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8.AbstractSetNode<T> specSetNodeOf(
-      T key1, T key2) {
-    return ((TrieSet_5Bits_Spec0To8) TrieSet_5Bits_Spec0To8.of(key1, key2)).getRootNode();
-  }
-
-  @Deprecated
-  public static final <T> PersistentTrieSet.AbstractSetNode<T> setToNode(
-      io.usethesource.capsule.Set.Immutable<T> set) {
-    if (set instanceof AbstractSpecialisedImmutableSet && set.size() == 1) {
-      return setNodeOf(set.findFirst().get());
-    } else {
-      return ((PersistentTrieSet) set).getRootNode();
-    }
-
-  }
-
-  @Deprecated
-  public static final <T> io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8.AbstractSetNode<T> specSetToNode(
-      io.usethesource.capsule.Set.Immutable<T> set) {
-    return ((TrieSet_5Bits_Spec0To8) set).getRootNode();
-  }
-
-
-  @Deprecated
-  public static final <T> PersistentTrieSet.AbstractSetNode<T> setNodeOf(T key1,
-      T key2) {
-    return ((PersistentTrieSet) PersistentTrieSet.of(key1, key2)).getRootNode();
-  }
-
-  @Deprecated
   public static final <T> io.usethesource.capsule.Set.Immutable<T> setOf(T key1) {
     return PersistentTrieSet.of(key1);
   }
@@ -180,28 +126,6 @@ public class SetMultimapUtils {
   @Deprecated
   public static final <T> io.usethesource.capsule.Set.Immutable<T> setOf(T key1, T key2) {
     return PersistentTrieSet.of(key1, key2);
-  }
-
-  @Deprecated
-  public static final <T> io.usethesource.capsule.Set.Immutable<T> specSetOf(T key1) {
-    return TrieSet_5Bits_Spec0To8.of(key1);
-  }
-
-  @Deprecated
-  public static final <T> io.usethesource.capsule.Set.Immutable<T> specSetOf(T key1, T key2) {
-    return TrieSet_5Bits_Spec0To8.of(key1, key2);
-  }
-
-  public static final <T> Set.Immutable<T> setOfNew() {
-    return TrieSet.of();
-  }
-
-  public static final <T> Set.Immutable<T> setOfNew(T key1) {
-    return TrieSet.of(key1);
-  }
-
-  public static final <T> Set.Immutable<T> setOfNew(T key1, T key2) {
-    return TrieSet.of(key1, key2);
   }
 
 }

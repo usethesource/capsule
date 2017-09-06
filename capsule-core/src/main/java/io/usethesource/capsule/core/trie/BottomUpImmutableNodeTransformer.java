@@ -11,8 +11,7 @@ import java.util.ListIterator;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
-
-import io.usethesource.capsule.core.PersistentTrieSet;
+import java.util.function.IntFunction;
 
 /**
  * Bottom Up Trie Transformer, e.g., for combined mapping plus canonicalization of the tree.
@@ -28,11 +27,13 @@ public class BottomUpImmutableNodeTransformer<SN extends Node, DN extends Node> 
   private final AtomicReference<Thread> mutator;
   private final DN dstRootNode;
 
-  static final <SN extends Node, DN extends Node> DN applyNodeTransformation(
-      final SN rootNode, final BiFunction<SN, DN[], DN> nodeMapper) {
+  private final IntFunction<DN[]> arrayConstructor;
+
+  static final <SN extends Node, DN extends Node> DN applyNodeTransformation(final SN rootNode,
+      final BiFunction<SN, DN[], DN> nodeMapper, final IntFunction<DN[]> arrayConstructor) {
 
     BottomUpImmutableNodeTransformer<SN, DN> transformer =
-        new BottomUpImmutableNodeTransformer<>(rootNode, nodeMapper);
+        new BottomUpImmutableNodeTransformer<>(rootNode, nodeMapper, arrayConstructor);
     transformer.processStack();
     return transformer.mappedNodesStack.peek();
   }
@@ -46,9 +47,10 @@ public class BottomUpImmutableNodeTransformer<SN extends Node, DN extends Node> 
   private final DN[] EMPTY_DN_ARRAY = (DN[]) new Object[]{};
 
   public BottomUpImmutableNodeTransformer(final SN srcRootNode,
-      final BiFunction<SN, DN[], DN> nodeMapper) {
+      final BiFunction<SN, DN[], DN> nodeMapper, final IntFunction<DN[]> arrayConstructor) {
     mappedNodesStack.ensureCapacity(128);
     this.nodeMapper = nodeMapper;
+    this.arrayConstructor = arrayConstructor;
     this.mutator = new AtomicReference<>(Thread.currentThread());
     this.dstRootNode = null; // nodeMapper.apply(srcRootNode, mutator);
 
@@ -131,7 +133,7 @@ public class BottomUpImmutableNodeTransformer<SN extends Node, DN extends Node> 
         } else {
           // pop all children
           assert childNodeLength != 0;
-          DN[] newChildren = (DN[]) new PersistentTrieSet.AbstractSetNode[childNodeLength];
+          DN[] newChildren = arrayConstructor.apply(childNodeLength);
           for (int i = childNodeLength - 1; i >= 0; i--) {
             newChildren[i] = mappedNodesStack.pop();
           }

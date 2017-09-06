@@ -7,6 +7,18 @@
  */
 package io.usethesource.capsule.experimental.multimap;
 
+import static io.usethesource.capsule.core.trie.EitherSingletonOrCollection.Type.COLLECTION;
+import static io.usethesource.capsule.core.trie.EitherSingletonOrCollection.Type.SINGLETON;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_COLLECTION;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_SINGLETON;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_EMPTY;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_NODE;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setBitPattern;
+import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setOf;
+import static io.usethesource.capsule.util.BitmapUtils.filter;
+import static io.usethesource.capsule.util.BitmapUtils.index;
+import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
+
 import java.util.AbstractCollection;
 import java.util.AbstractSet;
 import java.util.ArrayDeque;
@@ -36,18 +48,6 @@ import io.usethesource.capsule.core.trie.EitherSingletonOrCollection;
 import io.usethesource.capsule.core.trie.EitherSingletonOrCollection.Type;
 import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
-
-import static io.usethesource.capsule.core.trie.EitherSingletonOrCollection.Type.COLLECTION;
-import static io.usethesource.capsule.core.trie.EitherSingletonOrCollection.Type.SINGLETON;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_COLLECTION;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_DATA_SINGLETON;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_EMPTY;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.PATTERN_NODE;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setBitPattern;
-import static io.usethesource.capsule.experimental.multimap.SetMultimapUtils.setOf;
-import static io.usethesource.capsule.util.BitmapUtils.filter;
-import static io.usethesource.capsule.util.BitmapUtils.index;
-import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
 public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> {
 

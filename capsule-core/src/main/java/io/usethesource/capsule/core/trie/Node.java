@@ -32,6 +32,8 @@ public interface Node {
    */
   <T> ArrayView<T> dataArray(int category, int component);
 
+  // ArrayView<Integer> hashArray(int category, int component);
+
   ArrayView<? extends Node> nodeArray();
 
 }

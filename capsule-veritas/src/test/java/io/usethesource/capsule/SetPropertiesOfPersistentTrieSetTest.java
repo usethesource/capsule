@@ -8,15 +8,14 @@
 package io.usethesource.capsule;
 
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Interlinked;
+import io.usethesource.capsule.core.PersistentTrieSet;
 import org.junit.runner.RunWith;
 
 @RunWith(JUnitQuickcheck.class)
-public class SetMultimapPropertiesOfHhamtInterlinkedTest extends
-    AbstractSetMultimapProperties<Integer, Integer, TrieSetMultimap_HHAMT_Interlinked<Integer, Integer>> {
+public class SetPropertiesOfPersistentTrieSetTest
+    extends AbstractSetProperties<String, PersistentTrieSet<String>> {
 
-  public SetMultimapPropertiesOfHhamtInterlinkedTest() {
-    super(TrieSetMultimap_HHAMT_Interlinked.class);
+  public SetPropertiesOfPersistentTrieSetTest() {
+    super(PersistentTrieSet.class);
   }
-
 }

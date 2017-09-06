@@ -7,6 +7,8 @@
  */
 package io.usethesource.capsule.core;
 
+import static io.usethesource.capsule.util.BitmapUtils.isBitInBitmap;
+
 import java.text.DecimalFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -28,43 +30,31 @@ import java.util.stream.StreamSupport;
 
 import io.usethesource.capsule.Set;
 import io.usethesource.capsule.core.trie.ArrayView;
-import io.usethesource.capsule.core.trie.Node;
-import io.usethesource.capsule.util.ArrayUtils;
+import io.usethesource.capsule.core.trie.SetNode;
+import io.usethesource.capsule.core.trie.SetNodeResult;
+import io.usethesource.capsule.util.EqualityComparator;
 
 public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializable {
 
   private static final long serialVersionUID = 42L;
 
-  private static final PersistentTrieSet EMPTY_SET = new PersistentTrieSet(
-      CompactSetNode.EMPTY_NODE, 0, 0);
+  private static final CompactSetNode EMPTY_NODE = new BitmapIndexedSetNode<>(null,
+      0, 0, new Object[]{});
+
+  private static final PersistentTrieSet EMPTY_SET = new PersistentTrieSet(EMPTY_NODE, 0, 0);
 
   private static final boolean DEBUG = false;
 
   private final AbstractSetNode<K> rootNode;
-  private final int hashCode;
+  private final int cachedHashCode;
   private final int cachedSize;
 
-  /*
-   * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-   * `protected` when experiments are finished.
-   */
-  public /* protected */ PersistentTrieSet(AbstractSetNode<K> rootNode) {
+  PersistentTrieSet(AbstractSetNode<K> rootNode, int cachedHashCode, int cachedSize) {
     this.rootNode = rootNode;
-    this.hashCode = hashCode(rootNode);
-    this.cachedSize = size(rootNode);
-  }
-
-  /*
-   * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-   * `protected` when experiments are finished.
-   */
-  public /* protected */ PersistentTrieSet(AbstractSetNode<K> rootNode, int hashCode,
-      int cachedSize) {
-    this.rootNode = rootNode;
-    this.hashCode = hashCode;
+    this.cachedHashCode = cachedHashCode;
     this.cachedSize = cachedSize;
     if (DEBUG) {
-      assert checkHashCodeAndSize(hashCode, cachedSize);
+      assert checkHashCodeAndSize(cachedHashCode, cachedSize);
     }
   }
 
@@ -75,10 +65,9 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
   public static final <K> Set.Immutable<K> of(K key0) {
     final int keyHash0 = key0.hashCode();
 
-    final int nodeMap = 0;
     final int dataMap = CompactSetNode.bitpos(CompactSetNode.mask(keyHash0, 0));
 
-    CompactSetNode<K> newRootNode = CompactSetNode.nodeOf(null, nodeMap, dataMap, key0);
+    final CompactSetNode<K> newRootNode = CompactSetNode.nodeOf(null, dataMap, key0, keyHash0);
 
     return new PersistentTrieSet<K>(newRootNode, keyHash0, 1);
   }
@@ -161,7 +150,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
   public boolean contains(final Object o) {
     try {
       final K key = (K) o;
-      return rootNode.contains(key, transformHashCode(key.hashCode()), 0);
+      return rootNode.contains(key, transformHashCode(key.hashCode()), 0, Object::equals);
     } catch (ClassCastException unused) {
       return false;
     }
@@ -171,7 +160,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
   public boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
       final K key = (K) o;
-      return rootNode.contains(key, transformHashCode(key.hashCode()), 0, cmp);
+      return rootNode.contains(key, transformHashCode(key.hashCode()), 0,
+          EqualityComparator.fromComparator(cmp));
     } catch (ClassCastException unused) {
       return false;
     }
@@ -181,7 +171,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
   public K get(final Object o) {
     try {
       final K key = (K) o;
-      final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
+      final Optional<K> result = rootNode
+          .findByKey(key, transformHashCode(key.hashCode()), 0, Object::equals);
 
       if (result.isPresent()) {
         return result.get();
@@ -197,7 +188,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
   public K getEquivalent(final Object o, final Comparator<Object> cmp) {
     try {
       final K key = (K) o;
-      final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
+      final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0,
+          EqualityComparator.fromComparator(cmp));
 
       if (result.isPresent()) {
         return result.get();
@@ -212,13 +204,13 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
   @Override
   public Set.Immutable<K> __insert(final K key) {
     final int keyHash = key.hashCode();
-    final SetResult<K> details = SetResult.unchanged();
+    final SetNodeResult<K> details = SetNodeResult.unchanged();
 
-    final CompactSetNode<K> newRootNode =
-        rootNode.updated(null, key, transformHashCode(keyHash), 0, details);
+    final AbstractSetNode<K> newRootNode =
+        rootNode.updated(null, key, transformHashCode(keyHash), 0, details, Object::equals);
 
     if (details.isModified()) {
-      return new PersistentTrieSet<K>(newRootNode, hashCode + keyHash, cachedSize + 1);
+      return new PersistentTrieSet<K>(newRootNode, cachedHashCode + keyHash, cachedSize + 1);
     }
 
     return this;
@@ -227,13 +219,13 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
   @Override
   public Set.Immutable<K> __insertEquivalent(final K key, final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
-    final SetResult<K> details = SetResult.unchanged();
+    final SetNodeResult<K> details = SetNodeResult.unchanged();
 
-    final CompactSetNode<K> newRootNode =
-        rootNode.updated(null, key, transformHashCode(keyHash), 0, details, cmp);
+    final AbstractSetNode<K> newRootNode = rootNode.updated(null, key,
+        transformHashCode(keyHash), 0, details, EqualityComparator.fromComparator(cmp));
 
     if (details.isModified()) {
-      return new PersistentTrieSet<K>(newRootNode, hashCode + keyHash, cachedSize + 1);
+      return new PersistentTrieSet<K>(newRootNode, cachedHashCode + keyHash, cachedSize + 1);
     }
 
     return this;
@@ -257,13 +249,13 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
   @Override
   public Set.Immutable<K> __remove(final K key) {
     final int keyHash = key.hashCode();
-    final SetResult<K> details = SetResult.unchanged();
+    final SetNodeResult<K> details = SetNodeResult.unchanged();
 
-    final CompactSetNode<K> newRootNode =
-        rootNode.removed(null, key, transformHashCode(keyHash), 0, details);
+    final AbstractSetNode<K> newRootNode =
+        rootNode.removed(null, key, transformHashCode(keyHash), 0, details, Object::equals);
 
     if (details.isModified()) {
-      return new PersistentTrieSet<K>(newRootNode, hashCode - keyHash, cachedSize - 1);
+      return new PersistentTrieSet<K>(newRootNode, cachedHashCode - keyHash, cachedSize - 1);
     }
 
     return this;
@@ -272,13 +264,13 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
   @Override
   public Set.Immutable<K> __removeEquivalent(final K key, final Comparator<Object> cmp) {
     final int keyHash = key.hashCode();
-    final SetResult<K> details = SetResult.unchanged();
+    final SetNodeResult<K> details = SetNodeResult.unchanged();
 
-    final CompactSetNode<K> newRootNode =
-        rootNode.removed(null, key, transformHashCode(keyHash), 0, details, cmp);
+    final AbstractSetNode<K> newRootNode = rootNode.removed(null, key,
+        transformHashCode(keyHash), 0, details, EqualityComparator.fromComparator(cmp));
 
     if (details.isModified()) {
-      return new PersistentTrieSet<K>(newRootNode, hashCode - keyHash, cachedSize - 1);
+      return new PersistentTrieSet<K>(newRootNode, cachedHashCode - keyHash, cachedSize - 1);
     }
 
     return this;
@@ -423,11 +415,11 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         return false;
       }
 
-      if (this.hashCode != that.hashCode) {
+      if (this.cachedHashCode != that.cachedHashCode) {
         return false;
       }
 
-      return rootNode.equals(that.rootNode);
+      return rootNode.equivalent(that.rootNode, Object::equals);
     } else if (other instanceof java.util.Set) {
       java.util.Set that = (java.util.Set) other;
 
@@ -443,7 +435,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
   @Override
   public int hashCode() {
-    return hashCode;
+    return cachedHashCode;
   }
 
   @Override
@@ -463,13 +455,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     return new TransientTrieSet<K>(this);
   }
 
-  /*
-   * For analysis purposes only.
-   *
-   * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-   * `protected` when experiments are finished.
-   */
-  public /* protected */ AbstractSetNode<K> getRootNode() {
+  protected AbstractSetNode<K> getRootNode() {
     return rootNode;
   }
 
@@ -570,128 +556,16 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
   }
 
-  /*
-   * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-   * `protected` when experiments are finished.
-   */
-  public static final class SetResult<K> {
-
-    private K replacedValue;
-    private boolean isModified;
-    private boolean isReplaced;
-
-    // update: inserted/removed single element, element count changed
-    public void modified() {
-      this.isModified = true;
-    }
-
-    public void updated(K replacedValue) {
-      this.replacedValue = replacedValue;
-      this.isModified = true;
-      this.isReplaced = true;
-    }
-
-    // update: neither element, nor element count changed
-    public static <K> SetResult<K> unchanged() {
-      return new SetResult<>();
-    }
-
-    private SetResult() {
-    }
-
-    public boolean isModified() {
-      return isModified;
-    }
-
-    public boolean hasReplacedValue() {
-      return isReplaced;
-    }
-
-    public K getReplacedValue() {
-      return replacedValue;
-    }
-  }
-
-  /*
-   * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-   * `protected` when experiments are finished.
-   */
-  public /* protected */ static abstract class AbstractSetNode<K> implements Node, Iterable<K>,
+  protected static abstract class AbstractSetNode<K> implements
+      SetNode<K, AbstractSetNode<K>>, Iterable<K>,
       java.io.Serializable {
 
     private static final long serialVersionUID = 42L;
 
     static final int TUPLE_LENGTH = 1;
 
-    // factory method to construct trie from outer classes
-    // TODO: find alternative solution that does not violate information hiding
-    public static <K> AbstractSetNode<K> newHashCollisonNode(final int hash, K... keys) {
-      return new HashCollisionSetNode<>(hash, keys);
-    }
-
-    // factory method to construct trie from outer classes
-    // TODO: find alternative solution that does not violate information hiding
-    public static <K> AbstractSetNode<K> newBitmapIndexedNode(final AtomicReference<Thread> mutator,
-        final int nodeMap, final int dataMap, final Object[] content) {
-      // content is assumed to be effectivle immutable to avoid defensive copying
-      return new BitmapIndexedSetNode<>(mutator, nodeMap, dataMap, content);
-    }
-
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
-    public abstract boolean contains(final K key, final int keyHash, final int shift);
-
-    abstract boolean contains(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp);
-
-    abstract Optional<K> findByKey(final K key, final int keyHash, final int shift);
-
-    abstract Optional<K> findByKey(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp);
-
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
-    public /* protected */ abstract CompactSetNode<K> updated(final AtomicReference<Thread> mutator,
-        final K key, final int keyHash, final int shift, final SetResult<K> details);
-
-    abstract CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key,
-        final int keyHash, final int shift, final SetResult<K> details,
-        final Comparator<Object> cmp);
-
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
-    public /* protected */ abstract CompactSetNode<K> removed(final AtomicReference<Thread> mutator,
-        final K key, final int keyHash, final int shift, final SetResult<K> details);
-
-    abstract CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key,
-        final int keyHash, final int shift, final SetResult<K> details,
-        final Comparator<Object> cmp);
-
-    // static final <T> boolean isAllowedToEdit(AtomicReference<T> x, AtomicReference<T> y) {
-    // return x != null && y != null && (x == y || x.get() == y.get());
-    // }
-
     static final <T> boolean isAllowedToEdit(AtomicReference<?> x, AtomicReference<?> y) {
       return x != null && y != null && (x == y || x.get() == y.get());
-    }
-
-    /*
-     * TODO: in future move to SetNode interface
-     */
-    public Optional<K> findFirst() {
-      final ArrayView<K> elementArray = dataArray(0, 0);
-
-      if (elementArray.isEmpty()) {
-        return Optional.empty();
-      } else {
-        return Optional.of(elementArray.get(0));
-      }
     }
 
     @Override
@@ -726,13 +600,6 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     abstract AbstractSetNode<K> getNode(final int index);
 
-//    /*
-//     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-//     * `protected` when experiments are finished.
-//     */
-//    public /* protected */ abstract void setNode(final AtomicReference<Thread> mutator,
-//        final int index, final AbstractSetNode<K> node);
-
     @Deprecated
     Iterator<? extends AbstractSetNode<K>> nodeIterator() {
       return new Iterator<AbstractSetNode<K>>() {
@@ -760,11 +627,11 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       };
     }
 
-    abstract boolean hasPayload();
-
-    abstract int payloadArity();
-
-    abstract K getKey(final int index);
+//    abstract boolean hasPayload();
+//
+//    abstract int payloadArity();
+//
+//    abstract K getKey(final int index);
 
     @Deprecated
     abstract boolean hasSlots();
@@ -778,25 +645,36 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
      *
      * @return sum of nodes and values stored within
      */
-
     int arity() {
       return payloadArity() + nodeArity();
     }
 
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
-    public /* protected */ int size() {
-      final Iterator<K> it = new SetKeyIterator<>(this);
+    @Override
+    public int size() {
+      final Iterator<? extends AbstractSetNode<K>> it = new TrieSetNodeIterator(this);
 
       int size = 0;
       while (it.hasNext()) {
-        size += 1;
-        it.next();
+        final AbstractSetNode<K> node = it.next();
+        size += node.payloadArity();
       }
 
       return size;
+    }
+
+    abstract int localPayloadHashCode();
+
+    @Override
+    public int recursivePayloadHashCode() {
+      final Iterator<? extends AbstractSetNode<K>> it = new TrieSetNodeIterator(this);
+
+      int hashCode = 0;
+      while (it.hasNext()) {
+        final AbstractSetNode<K> node = it.next();
+        hashCode += node.localPayloadHashCode();
+      }
+
+      return hashCode;
     }
 
     @Override
@@ -857,13 +735,13 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         final int bitpos);
 
     abstract CompactSetNode<K> copyAndSetNode(final AtomicReference<Thread> mutator,
-        final int bitpos, final CompactSetNode<K> node);
+        final int bitpos, final AbstractSetNode<K> node);
 
     abstract CompactSetNode<K> copyAndMigrateFromInlineToNode(final AtomicReference<Thread> mutator,
-        final int bitpos, final CompactSetNode<K> node);
+        final int bitpos, final AbstractSetNode<K> node);
 
     abstract CompactSetNode<K> copyAndMigrateFromNodeToInline(final AtomicReference<Thread> mutator,
-        final int bitpos, final CompactSetNode<K> node);
+        final int bitpos, final AbstractSetNode<K> node);
 
     static final <K> CompactSetNode<K> mergeTwoKeyValPairs(final K key0, final int keyHash0,
         final K key1, final int keyHash1, final int shift) {
@@ -883,9 +761,9 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         final int dataMap = bitpos(mask0) | bitpos(mask1);
 
         if (mask0 < mask1) {
-          return nodeOf(null, (0), dataMap, new Object[]{key0, key1});
+          return nodeOf(null, dataMap, key0, keyHash0, key1, keyHash1);
         } else {
-          return nodeOf(null, (0), dataMap, new Object[]{key1, key0});
+          return nodeOf(null, dataMap, key1, keyHash1, key0, keyHash0);
         }
       } else {
         final CompactSetNode<K> node =
@@ -893,19 +771,9 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         // values fit on next level
 
         final int nodeMap = bitpos(mask0);
-        return nodeOf(null, nodeMap, (0), new Object[]{node});
+        return nodeOf(null, nodeMap, node);
       }
     }
-
-    static final CompactSetNode EMPTY_NODE;
-
-    static {
-
-      EMPTY_NODE = new BitmapIndexedSetNode<>(null, (0), (0), new Object[]{});
-
-    }
-
-    ;
 
     static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
         final int nodeMap, final int dataMap, final Object[] nodes) {
@@ -916,10 +784,19 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       return EMPTY_NODE;
     }
 
-    static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator, final int nodeMap,
-        final int dataMap, final K key) {
-      assert nodeMap == 0;
-      return nodeOf(mutator, (0), dataMap, new Object[]{key});
+    static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator,
+        final int dataMap, final K key, final int keyHash) {
+      return nodeOf(mutator, 0, dataMap, new Object[]{key});
+    }
+
+    static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator, final int dataMap,
+        final K key0, final int keyHash0, final K key1, final int keyHash1) {
+      return nodeOf(mutator, 0, dataMap, new Object[]{key0, key1});
+    }
+
+    static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator,
+        final int nodeMap, final AbstractSetNode<K> node) {
+      return nodeOf(mutator, nodeMap, 0, new Object[]{node});
     }
 
     static final int index(final int bitmap, final int bitpos) {
@@ -942,40 +819,16 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       return getNode(nodeIndex(bitpos));
     }
 
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
     @Override
-    public /* protected */ boolean contains(final K key, final int keyHash, final int shift) {
+    public boolean contains(final K key, final int keyHash, final int shift,
+        final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
       final int dataMap = dataMap();
       if ((dataMap & bitpos) != 0) {
         final int index = index(dataMap, mask, bitpos);
-        return getKey(index).equals(key);
-      }
-
-      final int nodeMap = nodeMap();
-      if ((nodeMap & bitpos) != 0) {
-        final int index = index(nodeMap, mask, bitpos);
-        return getNode(index).contains(key, keyHash, shift + BIT_PARTITION_SIZE);
-      }
-
-      return false;
-    }
-
-    @Override
-    boolean contains(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
-      final int mask = mask(keyHash, shift);
-      final int bitpos = bitpos(mask);
-
-      final int dataMap = dataMap();
-      if ((dataMap & bitpos) != 0) {
-        final int index = index(dataMap, mask, bitpos);
-        return cmp.compare(getKey(index), key) == 0;
+        return cmp.equals(getKey(index), key);
       }
 
       final int nodeMap = nodeMap();
@@ -988,37 +841,14 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    Optional<K> findByKey(final K key, final int keyHash, final int shift) {
+    public Optional<K> findByKey(final K key, final int keyHash, final int shift,
+        final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
       if ((dataMap() & bitpos) != 0) { // inplace value
         final int index = dataIndex(bitpos);
-        if (getKey(index).equals(key)) {
-          return Optional.of(getKey(index));
-        }
-
-        return Optional.empty();
-      }
-
-      if ((nodeMap() & bitpos) != 0) { // node (not value)
-        final AbstractSetNode<K> subNode = nodeAt(bitpos);
-
-        return subNode.findByKey(key, keyHash, shift + BIT_PARTITION_SIZE);
-      }
-
-      return Optional.empty();
-    }
-
-    @Override
-    Optional<K> findByKey(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
-      final int mask = mask(keyHash, shift);
-      final int bitpos = bitpos(mask);
-
-      if ((dataMap() & bitpos) != 0) { // inplace value
-        final int index = dataIndex(bitpos);
-        if (cmp.compare(getKey(index), key) == 0) {
+        if (cmp.equals(getKey(index), key)) {
           return Optional.of(getKey(index));
         }
 
@@ -1034,13 +864,10 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       return Optional.empty();
     }
 
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
     @Override
-    public /* protected */ CompactSetNode<K> updated(final AtomicReference<Thread> mutator,
-        final K key, final int keyHash, final int shift, final SetResult<K> details) {
+    public AbstractSetNode<K> updated(final AtomicReference<Thread> mutator, final K key,
+        final int keyHash, final int shift, final SetNodeResult<K> details,
+        final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1048,57 +875,28 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         final int dataIndex = dataIndex(bitpos);
         final K currentKey = getKey(dataIndex);
 
-        if (currentKey.equals(key)) {
+        if (cmp.equals(currentKey, key)) {
           return this;
         } else {
-          final CompactSetNode<K> subNodeNew = mergeTwoKeyValPairs(currentKey,
+          final AbstractSetNode<K> subNodeNew = mergeTwoKeyValPairs(currentKey,
               transformHashCode(currentKey.hashCode()), key, keyHash, shift + BIT_PARTITION_SIZE);
 
           details.modified();
+          details.updateDeltaSize(1);
+          details.updateDeltaHashCode(keyHash);
           return copyAndMigrateFromInlineToNode(mutator, bitpos, subNodeNew);
         }
       } else if ((nodeMap() & bitpos) != 0) { // node (not value)
-        final CompactSetNode<K> subNode = nodeAt(bitpos);
-        final CompactSetNode<K> subNodeNew =
-            subNode.updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, details);
-
-        if (details.isModified()) {
-          return copyAndSetNode(mutator, bitpos, subNodeNew);
-        } else {
-          return this;
-        }
-      } else {
-        // no value
-        details.modified();
-        return copyAndInsertValue(mutator, bitpos, key);
-      }
-    }
-
-    @Override
-    CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key, final int keyHash,
-        final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
-      final int mask = mask(keyHash, shift);
-      final int bitpos = bitpos(mask);
-
-      if ((dataMap() & bitpos) != 0) { // inplace value
-        final int dataIndex = dataIndex(bitpos);
-        final K currentKey = getKey(dataIndex);
-
-        if (cmp.compare(currentKey, key) == 0) {
-          return this;
-        } else {
-          final CompactSetNode<K> subNodeNew = mergeTwoKeyValPairs(currentKey,
-              transformHashCode(currentKey.hashCode()), key, keyHash, shift + BIT_PARTITION_SIZE);
-
-          details.modified();
-          return copyAndMigrateFromInlineToNode(mutator, bitpos, subNodeNew);
-        }
-      } else if ((nodeMap() & bitpos) != 0) { // node (not value)
-        final CompactSetNode<K> subNode = nodeAt(bitpos);
-        final CompactSetNode<K> subNodeNew =
+        final AbstractSetNode<K> subNode = nodeAt(bitpos);
+        final AbstractSetNode<K> subNodeNew =
             subNode.updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, details, cmp);
 
         if (details.isModified()) {
+          /*
+           * NOTE: subNode and subNodeNew may be referential equal if updated transiently in-place.
+           * Therefore diffing nodes is not an option. Changes to content and meta-data need to be
+           * explicitly tracked and passed when descending from recursion (i.e., {@code details}).
+           */
           return copyAndSetNode(mutator, bitpos, subNodeNew);
         } else {
           return this;
@@ -1106,25 +904,25 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       } else {
         // no value
         details.modified();
+        details.updateDeltaSize(1);
+        details.updateDeltaHashCode(keyHash);
         return copyAndInsertValue(mutator, bitpos, key);
       }
     }
 
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
     @Override
-    public /* protected */ CompactSetNode<K> removed(final AtomicReference<Thread> mutator,
-        final K key, final int keyHash, final int shift, final SetResult<K> details) {
+    public AbstractSetNode<K> removed(final AtomicReference<Thread> mutator, final K key, final int keyHash,
+        final int shift, final SetNodeResult<K> details, final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
       if ((dataMap() & bitpos) != 0) { // inplace value
         final int dataIndex = dataIndex(bitpos);
 
-        if (getKey(dataIndex).equals(key)) {
+        if (cmp.equals(getKey(dataIndex), key)) {
           details.modified();
+          details.updateDeltaSize(-1);
+          details.updateDeltaHashCode(-keyHash);
 
           if (this.payloadArity() == 2 && this.nodeArity() == 0) {
             /*
@@ -1135,9 +933,9 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
                 (shift == 0) ? (int) (dataMap() ^ bitpos) : bitpos(mask(keyHash, 0));
 
             if (dataIndex == 0) {
-              return CompactSetNode.<K>nodeOf(mutator, 0, newDataMap, getKey(1));
+              return CompactSetNode.<K>nodeOf(mutator, newDataMap, getKey(1), getKeyHash(1));
             } else {
-              return CompactSetNode.<K>nodeOf(mutator, 0, newDataMap, getKey(0));
+              return CompactSetNode.<K>nodeOf(mutator, newDataMap, getKey(0), getKeyHash(0));
             }
           } else {
             return copyAndRemoveValue(mutator, bitpos);
@@ -1146,71 +944,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
           return this;
         }
       } else if ((nodeMap() & bitpos) != 0) { // node (not value)
-        final CompactSetNode<K> subNode = nodeAt(bitpos);
-        final CompactSetNode<K> subNodeNew =
-            subNode.removed(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, details);
-
-        if (!details.isModified()) {
-          return this;
-        }
-
-        switch (subNodeNew.sizePredicate()) {
-          case 0: {
-            throw new IllegalStateException("Sub-node must have at least one element.");
-          }
-          case 1: {
-            if (this.payloadArity() == 0 && this.nodeArity() == 1) {
-              // escalate (singleton or empty) result
-              return subNodeNew;
-            } else {
-              // inline value (move to front)
-              return copyAndMigrateFromNodeToInline(mutator, bitpos, subNodeNew);
-            }
-          }
-          default: {
-            // modify current node (set replacement node)
-            return copyAndSetNode(mutator, bitpos, subNodeNew);
-          }
-        }
-      }
-
-      return this;
-    }
-
-    @Override
-    CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key, final int keyHash,
-        final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
-      final int mask = mask(keyHash, shift);
-      final int bitpos = bitpos(mask);
-
-      if ((dataMap() & bitpos) != 0) { // inplace value
-        final int dataIndex = dataIndex(bitpos);
-
-        if (cmp.compare(getKey(dataIndex), key) == 0) {
-          details.modified();
-
-          if (this.payloadArity() == 2 && this.nodeArity() == 0) {
-            /*
-             * Create new node with remaining pair. The new node will a) either become the new root
-             * returned, or b) unwrapped and inlined during returning.
-             */
-            final int newDataMap =
-                (shift == 0) ? (int) (dataMap() ^ bitpos) : bitpos(mask(keyHash, 0));
-
-            if (dataIndex == 0) {
-              return CompactSetNode.<K>nodeOf(mutator, 0, newDataMap, getKey(1));
-            } else {
-              return CompactSetNode.<K>nodeOf(mutator, 0, newDataMap, getKey(0));
-            }
-          } else {
-            return copyAndRemoveValue(mutator, bitpos);
-          }
-        } else {
-          return this;
-        }
-      } else if ((nodeMap() & bitpos) != 0) { // node (not value)
-        final CompactSetNode<K> subNode = nodeAt(bitpos);
-        final CompactSetNode<K> subNodeNew =
+        final AbstractSetNode<K> subNode = nodeAt(bitpos);
+        final AbstractSetNode<K> subNodeNew =
             subNode.removed(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, details, cmp);
 
         if (!details.isModified()) {
@@ -1387,8 +1122,13 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    K getKey(final int index) {
+    public K getKey(final int index) {
       return (K) nodes[TUPLE_LENGTH * index];
+    }
+
+    @Override
+    public int getKeyHash(int index) {
+      return getKey(index).hashCode();
     }
 
     @Override
@@ -1407,12 +1147,12 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 //    }
 
     @Override
-    boolean hasPayload() {
+    public boolean hasPayload() {
       return dataMap() != 0;
     }
 
     @Override
-    int payloadArity() {
+    public int payloadArity() {
       return java.lang.Integer.bitCount(dataMap());
     }
 
@@ -1442,6 +1182,13 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
+    int localPayloadHashCode() {
+      final Stream<K> keyStream =
+          StreamSupport.stream(this.<K>dataArray(0, 0).spliterator(), false);
+      return keyStream.mapToInt(Object::hashCode).sum();
+    }
+
+    @Override
     public int hashCode() {
       final int prime = 31;
       int result = 0;
@@ -1453,6 +1200,11 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     public boolean equals(final Object other) {
+      return equivalent(other, Object::equals);
+    }
+
+    @Override
+    public boolean equivalent(final Object other, EqualityComparator<Object> cmp) {
       if (null == other) {
         return false;
       }
@@ -1469,9 +1221,43 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       if (dataMap() != that.dataMap()) {
         return false;
       }
-      if (!ArrayUtils.equals(nodes, that.nodes)) {
+      if (!deepContentEquality(nodes, that.nodes, payloadArity(), slotArity(), cmp)) {
         return false;
       }
+      return true;
+    }
+
+    private final boolean deepContentEquality(
+        /* @NotNull */ Object[] a1, /* @NotNull */ Object[] a2, int splitAt, int length,
+        EqualityComparator<Object> cmp) {
+
+//      assert a1 != null && a2 != null;
+//      assert a1.length == a2.length;
+
+      if (a1 == a2) {
+        return true;
+      }
+
+      // compare local payload
+      for (int i = 0; i < splitAt; i++) {
+        Object o1 = a1[i];
+        Object o2 = a2[i];
+
+        if (!EqualityComparator.equals(o1, o2, cmp::equals)) {
+          return false;
+        }
+      }
+
+      // recursively compare nested nodes
+      for (int i = splitAt; i < length; i++) {
+        AbstractSetNode o1 = (AbstractSetNode) a1[i];
+        AbstractSetNode o2 = (AbstractSetNode) a2[i];
+
+        if (!EqualityComparator.equals(o1, o2, (a, b) -> a.equivalent(b, cmp))) {
+          return false;
+        }
+      }
+
       return true;
     }
 
@@ -1492,14 +1278,30 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    CompactSetNode<K> copyAndSetNode(final AtomicReference<Thread> mutator, final int bitpos,
-        final CompactSetNode<K> node) {
+    public final int size() {
+      return super.size();
+    }
 
-      final int idx = this.nodes.length - 1 - nodeIndex(bitpos);
+    @Override
+    public int recursivePayloadHashCode() {
+      return super.recursivePayloadHashCode();
+    }
+
+    @Override
+    CompactSetNode<K> copyAndSetNode(final AtomicReference<Thread> mutator, final int bitpos,
+        final AbstractSetNode<K> newNode) {
+
+      final int nodeIndex = nodeIndex(bitpos);
+      final AbstractSetNode<K> node = getNode(nodeIndex);
+
+      final int newCachedHashCode;
+      final int newCachedSize;
+
+      final int idx = this.nodes.length - 1 - nodeIndex;
 
       if (isAllowedToEdit(this.mutator, mutator)) {
         // no copying if already editable
-        this.nodes[idx] = node;
+        this.nodes[idx] = newNode;
         return this;
       } else {
         final Object[] src = this.nodes;
@@ -1507,7 +1309,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
         // copy 'src' and set 1 element(s) at position 'idx'
         System.arraycopy(src, 0, dst, 0, src.length);
-        dst[idx + 0] = node;
+        dst[idx + 0] = newNode;
 
         return nodeOf(mutator, nodeMap(), dataMap(), dst);
       }
@@ -1545,7 +1347,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     CompactSetNode<K> copyAndMigrateFromInlineToNode(final AtomicReference<Thread> mutator,
-        final int bitpos, final CompactSetNode<K> node) {
+        final int bitpos, final AbstractSetNode<K> node) {
 
       final int idxOld = TUPLE_LENGTH * dataIndex(bitpos);
       final int idxNew = this.nodes.length - TUPLE_LENGTH - nodeIndex(bitpos);
@@ -1566,7 +1368,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     CompactSetNode<K> copyAndMigrateFromNodeToInline(final AtomicReference<Thread> mutator,
-        final int bitpos, final CompactSetNode<K> node) {
+        final int bitpos, final AbstractSetNode<K> node) {
 
       final int idxOld = this.nodes.length - 1 - nodeIndex(bitpos);
       final int idxNew = TUPLE_LENGTH * dataIndex(bitpos);
@@ -1606,15 +1408,12 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       return ArrayView.empty();
     }
 
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
     @Override
-    public /* protected */ boolean contains(final K key, final int keyHash, final int shift) {
+    public boolean contains(final K key, final int keyHash, final int shift,
+        final EqualityComparator<Object> cmp) {
       if (this.hash == keyHash) {
         for (K k : keys) {
-          if (k.equals(key)) {
+          if (cmp.equals(k, key)) {
             return true;
           }
         }
@@ -1623,23 +1422,11 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    boolean contains(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
-      if (this.hash == keyHash) {
-        for (K k : keys) {
-          if (cmp.compare(k, key) == 0) {
-            return true;
-          }
-        }
-      }
-      return false;
-    }
-
-    @Override
-    Optional<K> findByKey(final K key, final int keyHash, final int shift) {
+    public Optional<K> findByKey(final K key, final int keyHash, final int shift,
+        final EqualityComparator<Object> cmp) {
       for (int i = 0; i < keys.length; i++) {
         final K _key = keys[i];
-        if (key.equals(_key)) {
+        if (cmp.equals(key, _key)) {
           return Optional.of(_key);
         }
       }
@@ -1647,28 +1434,13 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    Optional<K> findByKey(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
-      for (int i = 0; i < keys.length; i++) {
-        final K _key = keys[i];
-        if (cmp.compare(key, _key) == 0) {
-          return Optional.of(_key);
-        }
-      }
-      return Optional.empty();
-    }
-
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
-    @Override
-    public /* protected */ CompactSetNode<K> updated(final AtomicReference<Thread> mutator,
-        final K key, final int keyHash, final int shift, final SetResult<K> details) {
+    public AbstractSetNode<K> updated(final AtomicReference<Thread> mutator, final K key,
+        final int keyHash, final int shift, final SetNodeResult<K> details,
+        final EqualityComparator<Object> cmp) {
       assert this.hash == keyHash;
 
       for (int idx = 0; idx < keys.length; idx++) {
-        if (keys[idx].equals(key)) {
+        if (cmp.equals(keys[idx], key)) {
           return this;
         }
       }
@@ -1683,43 +1455,20 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
           this.keys.length - keys.length);
 
       details.modified();
+      details.updateDeltaSize(1);
+      details.updateDeltaHashCode(keyHash);
       return new HashCollisionSetNode<>(keyHash, keysNew);
     }
 
     @Override
-    CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key, final int keyHash,
-        final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
-      assert this.hash == keyHash;
-
+    public AbstractSetNode<K> removed(final AtomicReference<Thread> mutator, final K key,
+        final int keyHash, final int shift, final SetNodeResult<K> details,
+        final EqualityComparator<Object> cmp) {
       for (int idx = 0; idx < keys.length; idx++) {
-        if (cmp.compare(keys[idx], key) == 0) {
-          return this;
-        }
-      }
-
-      final K[] keysNew = (K[]) new Object[this.keys.length + 1];
-
-      // copy 'this.keys' and insert 1 element(s) at position
-      // 'keys.length'
-      System.arraycopy(this.keys, 0, keysNew, 0, keys.length);
-      keysNew[keys.length + 0] = key;
-      System.arraycopy(this.keys, keys.length, keysNew, keys.length + 1,
-          this.keys.length - keys.length);
-
-      details.modified();
-      return new HashCollisionSetNode<>(keyHash, keysNew);
-    }
-
-    /*
-     * TODO: visibility is currently public to allow set-multimap experiments. Must be set back to
-     * `protected` when experiments are finished.
-     */
-    @Override
-    public /* protected */ CompactSetNode<K> removed(final AtomicReference<Thread> mutator,
-        final K key, final int keyHash, final int shift, final SetResult<K> details) {
-      for (int idx = 0; idx < keys.length; idx++) {
-        if (keys[idx].equals(key)) {
+        if (cmp.equals(keys[idx], key)) {
           details.modified();
+          details.updateDeltaSize(-1);
+          details.updateDeltaHashCode(-keyHash);
 
           if (this.arity() == 1) {
             return nodeOf(mutator);
@@ -1731,7 +1480,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
             final K theOtherKey = (idx == 0) ? keys[1] : keys[0];
 
             return CompactSetNode.<K>nodeOf(mutator).updated(mutator, theOtherKey, keyHash, 0,
-                details);
+                SetNodeResult.unchanged(), cmp);
           } else {
             final K[] keysNew = (K[]) new Object[this.keys.length - 1];
 
@@ -1748,45 +1497,12 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key, final int keyHash,
-        final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
-      for (int idx = 0; idx < keys.length; idx++) {
-        if (cmp.compare(keys[idx], key) == 0) {
-          details.modified();
-
-          if (this.arity() == 1) {
-            return nodeOf(mutator);
-          } else if (this.arity() == 2) {
-            /*
-             * Create root node with singleton element. This node will be a) either be the new root
-             * returned, or b) unwrapped and inlined.
-             */
-            final K theOtherKey = (idx == 0) ? keys[1] : keys[0];
-
-            return CompactSetNode.<K>nodeOf(mutator).updated(mutator, theOtherKey, keyHash, 0,
-                details, cmp);
-          } else {
-            final K[] keysNew = (K[]) new Object[this.keys.length - 1];
-
-            // copy 'this.keys' and remove 1 element(s) at position
-            // 'idx'
-            System.arraycopy(this.keys, 0, keysNew, 0, idx);
-            System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
-
-            return new HashCollisionSetNode<>(keyHash, keysNew);
-          }
-        }
-      }
-      return this;
-    }
-
-    @Override
-    boolean hasPayload() {
+    public boolean hasPayload() {
       return true;
     }
 
     @Override
-    int payloadArity() {
+    public int payloadArity() {
       return keys.length;
     }
 
@@ -1811,8 +1527,13 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    K getKey(final int index) {
+    public K getKey(final int index) {
       return keys[index];
+    }
+
+    @Override
+    public int getKeyHash(int index) {
+      return getKey(index).hashCode();
     }
 
     @Override
@@ -1841,6 +1562,11 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
+    int localPayloadHashCode() {
+      return hash * keys.length;
+    }
+
+    @Override
     public int hashCode() {
       final int prime = 31;
       int result = 0;
@@ -1850,7 +1576,12 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(final Object other) {
+      return equivalent(other, Object::equals);
+    }
+
+    @Override
+    public boolean equivalent(Object other, EqualityComparator<Object> cmp) {
       if (null == other) {
         return false;
       }
@@ -1881,7 +1612,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         for (int j = 0; j < keys.length; j++) {
           final K key = keys[j];
 
-          if (key.equals(otherKey)) {
+          if (cmp.equals(key, otherKey)) {
             continue outerLoop;
           }
         }
@@ -1899,25 +1630,26 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    CompactSetNode<K> copyAndRemoveValue(final AtomicReference<Thread> mutator, final int bitpos) {
+    CompactSetNode<K> copyAndRemoveValue(final AtomicReference<Thread> mutator,
+        final int bitpos) {
       throw new UnsupportedOperationException();
     }
 
     @Override
     CompactSetNode<K> copyAndSetNode(final AtomicReference<Thread> mutator, final int bitpos,
-        final CompactSetNode<K> node) {
+        final AbstractSetNode<K> node) {
       throw new UnsupportedOperationException();
     }
 
     @Override
     CompactSetNode<K> copyAndMigrateFromInlineToNode(final AtomicReference<Thread> mutator,
-        final int bitpos, final CompactSetNode<K> node) {
+        final int bitpos, final AbstractSetNode<K> node) {
       throw new UnsupportedOperationException();
     }
 
     @Override
     CompactSetNode<K> copyAndMigrateFromNodeToInline(final AtomicReference<Thread> mutator,
-        final int bitpos, final CompactSetNode<K> node) {
+        final int bitpos, final AbstractSetNode<K> node) {
       throw new UnsupportedOperationException();
     }
 
@@ -2092,15 +1824,15 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
   static abstract class AbstractTransientTrieSet<K> implements Set.Transient<K> {
 
     protected AbstractSetNode<K> rootNode;
-    protected int hashCode;
+    protected int cachedHashCode;
     protected int cachedSize;
 
     AbstractTransientTrieSet(PersistentTrieSet<K> trieSet) {
       this.rootNode = trieSet.rootNode;
-      this.hashCode = trieSet.hashCode;
+      this.cachedHashCode = trieSet.cachedHashCode;
       this.cachedSize = trieSet.cachedSize;
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
     }
 
@@ -2152,7 +1884,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     public boolean contains(final Object o) {
       try {
         final K key = (K) o;
-        return rootNode.contains(key, transformHashCode(key.hashCode()), 0);
+        return rootNode.contains(key, transformHashCode(key.hashCode()), 0, Object::equals);
       } catch (ClassCastException unused) {
         return false;
       }
@@ -2162,7 +1894,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     public boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
       try {
         final K key = (K) o;
-        return rootNode.contains(key, transformHashCode(key.hashCode()), 0, cmp);
+        return rootNode.contains(key, transformHashCode(key.hashCode()), 0,
+            EqualityComparator.fromComparator(cmp));
       } catch (ClassCastException unused) {
         return false;
       }
@@ -2172,7 +1905,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     public K get(final Object o) {
       try {
         final K key = (K) o;
-        final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
+        final Optional<K> result = rootNode
+            .findByKey(key, transformHashCode(key.hashCode()), 0, Object::equals);
 
         if (result.isPresent()) {
           return result.get();
@@ -2189,7 +1923,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       try {
         final K key = (K) o;
         final Optional<K> result =
-            rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
+            rootNode.findByKey(key, transformHashCode(key.hashCode()), 0,
+                EqualityComparator.fromComparator(cmp));
 
         if (result.isPresent()) {
           return result.get();
@@ -2207,57 +1942,57 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       }
 
       final int keyHash = key.hashCode();
-      final SetResult<K> details = SetResult.unchanged();
+      final SetNodeResult<K> details = SetNodeResult.unchanged();
 
-      final CompactSetNode<K> newRootNode =
-          rootNode.updated(mutator, key, transformHashCode(keyHash), 0, details);
+      final AbstractSetNode<K> newRootNode =
+          rootNode.updated(mutator, key, transformHashCode(keyHash), 0, details, Object::equals);
 
       if (details.isModified()) {
 
         rootNode = newRootNode;
-        hashCode += keyHash;
+        cachedHashCode += keyHash;
         cachedSize += 1;
 
         if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
+          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
         }
         return true;
 
       }
 
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
       return false;
     }
 
-    protected boolean __insertEquivalentWithCapability(AtomicReference<Thread> mutator, final K key,
-        final Comparator<Object> cmp) {
+    protected boolean __insertEquivalentWithCapability(AtomicReference<Thread> mutator,
+        final K key, final EqualityComparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
 
       final int keyHash = key.hashCode();
-      final SetResult<K> details = SetResult.unchanged();
+      final SetNodeResult<K> details = SetNodeResult.unchanged();
 
-      final CompactSetNode<K> newRootNode =
+      final AbstractSetNode<K> newRootNode =
           rootNode.updated(mutator, key, transformHashCode(keyHash), 0, details, cmp);
 
       if (details.isModified()) {
 
         rootNode = newRootNode;
-        hashCode += keyHash;
+        cachedHashCode += keyHash;
         cachedSize += 1;
 
         if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
+          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
         }
         return true;
 
       }
 
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
       return false;
     }
@@ -2291,54 +2026,54 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       }
 
       final int keyHash = key.hashCode();
-      final SetResult<K> details = SetResult.unchanged();
+      final SetNodeResult<K> details = SetNodeResult.unchanged();
 
-      final CompactSetNode<K> newRootNode =
-          rootNode.removed(mutator, key, transformHashCode(keyHash), 0, details);
+      final AbstractSetNode<K> newRootNode =
+          rootNode.removed(mutator, key, transformHashCode(keyHash), 0, details, Object::equals);
 
       if (details.isModified()) {
         rootNode = newRootNode;
-        hashCode = hashCode - keyHash;
+        cachedHashCode = cachedHashCode - keyHash;
         cachedSize = cachedSize - 1;
 
         if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
+          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
         }
         return true;
       }
 
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
 
       return false;
     }
 
-    protected boolean __removeEquivalentWithCapability(AtomicReference<Thread> mutator, final K key,
-        final Comparator<Object> cmp) {
+    protected boolean __removeEquivalentWithCapability(AtomicReference<Thread> mutator,
+        final K key, final EqualityComparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
 
       final int keyHash = key.hashCode();
-      final SetResult<K> details = SetResult.unchanged();
+      final SetNodeResult<K> details = SetNodeResult.unchanged();
 
-      final CompactSetNode<K> newRootNode =
+      final AbstractSetNode<K> newRootNode =
           rootNode.removed(mutator, key, transformHashCode(keyHash), 0, details, cmp);
 
       if (details.isModified()) {
         rootNode = newRootNode;
-        hashCode = hashCode - keyHash;
+        cachedHashCode = cachedHashCode - keyHash;
         cachedSize = cachedSize - 1;
 
         if (DEBUG) {
-          assert checkHashCodeAndSize(hashCode, cachedSize);
+          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
         }
         return true;
       }
 
       if (DEBUG) {
-        assert checkHashCodeAndSize(hashCode, cachedSize);
+        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
       }
 
       return false;
@@ -2498,11 +2233,11 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
           return false;
         }
 
-        if (this.hashCode != that.hashCode) {
+        if (this.cachedHashCode != that.cachedHashCode) {
           return false;
         }
 
-        return rootNode.equals(that.rootNode);
+        return rootNode.equivalent(that.rootNode, Object::equals);
       } else if (other instanceof java.util.Set) {
         java.util.Set that = (java.util.Set) other;
 
@@ -2518,7 +2253,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     public int hashCode() {
-      return hashCode;
+      return cachedHashCode;
     }
 
   }
@@ -2539,7 +2274,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     public boolean __insertEquivalent(final K key, final Comparator<Object> cmp) {
-      return __insertEquivalentWithCapability(this.mutator, key, cmp);
+      return __insertEquivalentWithCapability(this.mutator, key,
+          EqualityComparator.fromComparator(cmp));
     }
 
     @Override
@@ -2549,7 +2285,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     public boolean __removeEquivalent(final K key, final Comparator<Object> cmp) {
-      return __removeEquivalentWithCapability(this.mutator, key, cmp);
+      return __removeEquivalentWithCapability(this.mutator, key,
+          EqualityComparator.fromComparator(cmp));
     }
 
     @Override
@@ -2559,7 +2296,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       }
 
       mutator.set(null);
-      return new PersistentTrieSet<K>(rootNode, hashCode, cachedSize);
+      return new PersistentTrieSet<K>(rootNode, cachedHashCode, cachedSize);
     }
 
   }
