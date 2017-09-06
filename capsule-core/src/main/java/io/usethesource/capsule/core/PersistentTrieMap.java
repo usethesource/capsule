@@ -124,20 +124,14 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
   @Override
   public boolean containsKey(final Object o) {
-    try {
-      final K key = (K) o;
-      return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0, Object::equals);
-    } catch (ClassCastException unused) {
-      return false;
-    }
+    return containsKeyEquivalent(o, Object::equals);
   }
 
   @Override
   public boolean containsKeyEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     try {
       final K key = (K) o;
-      return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0,
-          cmp);
+      return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0, cmp);
     } catch (ClassCastException unused) {
       return false;
     }
@@ -145,12 +139,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
   @Override
   public boolean containsValue(final Object o) {
-    for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
-      if (iterator.next().equals(o)) {
-        return true;
-      }
-    }
-    return false;
+    return containsValueEquivalent(o, Object::equals);
   }
 
   @Override
@@ -165,27 +154,14 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
   @Override
   public V get(final Object o) {
-    try {
-      final K key = (K) o;
-      final Optional<V> result = rootNode
-          .findByKey(key, transformHashCode(key.hashCode()), 0, Object::equals);
-
-      if (result.isPresent()) {
-        return result.get();
-      } else {
-        return null;
-      }
-    } catch (ClassCastException unused) {
-      return null;
-    }
+    return getEquivalent(o, Object::equals);
   }
 
   @Override
   public V getEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     try {
       final K key = (K) o;
-      final Optional<V> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0,
-          cmp);
+      final Optional<V> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
       if (result.isPresent()) {
         return result.get();
@@ -199,27 +175,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
   @Override
   public io.usethesource.capsule.Map.Immutable<K, V> __put(final K key, final V val) {
-    final int keyHash = key.hashCode();
-    final MapNodeResult<K, V> details = MapNodeResult.unchanged();
-
-    final AbstractMapNode<K, V> newRootNode =
-        rootNode.updated(null, key, val, transformHashCode(keyHash), 0, details, Object::equals);
-
-    if (details.isModified()) {
-      if (details.hasReplacedValue()) {
-        final int valHashOld = details.getReplacedValue().hashCode();
-        final int valHashNew = val.hashCode();
-
-        return new PersistentTrieMap<K, V>(newRootNode,
-            cachedHashCode + ((keyHash ^ valHashNew)) - ((keyHash ^ valHashOld)), cachedSize);
-      }
-
-      final int valHash = val.hashCode();
-      return new PersistentTrieMap<K, V>(newRootNode, cachedHashCode + ((keyHash ^ valHash)),
-          cachedSize + 1);
-    }
-
-    return this;
+    return __putEquivalent(key, val, Object::equals);
   }
 
   @Override
@@ -251,9 +207,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
   @Override
   public io.usethesource.capsule.Map.Immutable<K, V> __putAll(
       final Map<? extends K, ? extends V> map) {
-    final io.usethesource.capsule.Map.Transient<K, V> tmpTransient = this.asTransient();
-    tmpTransient.__putAll(map);
-    return tmpTransient.freeze();
+    return __putAllEquivalent(map, Object::equals);
   }
 
   @Override
@@ -267,20 +221,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
   @Override
   public io.usethesource.capsule.Map.Immutable<K, V> __remove(final K key) {
-    final int keyHash = key.hashCode();
-    final MapNodeResult<K, V> details = MapNodeResult.unchanged();
-
-    final AbstractMapNode<K, V> newRootNode =
-        rootNode.removed(null, key, transformHashCode(keyHash), 0, details, Object::equals);
-
-    if (details.isModified()) {
-      assert details.hasReplacedValue();
-      final int valHash = details.getReplacedValue().hashCode();
-      return new PersistentTrieMap<K, V>(newRootNode, cachedHashCode - ((keyHash ^ valHash)),
-          cachedSize - 1);
-    }
-
-    return this;
+    return __removeEquivalent(key, Object::equals);
   }
 
   @Override
@@ -2038,20 +1979,14 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
     @Override
     public boolean containsKey(final Object o) {
-      try {
-        final K key = (K) o;
-        return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0, Object::equals);
-      } catch (ClassCastException unused) {
-        return false;
-      }
+      return containsKeyEquivalent(o, Object::equals);
     }
 
     @Override
     public boolean containsKeyEquivalent(final Object o, final EqualityComparator<Object> cmp) {
       try {
         final K key = (K) o;
-        return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0,
-            cmp);
+        return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0, cmp);
       } catch (ClassCastException unused) {
         return false;
       }
@@ -2059,12 +1994,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
     @Override
     public boolean containsValue(final Object o) {
-      for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
-        if (iterator.next().equals(o)) {
-          return true;
-        }
-      }
-      return false;
+      return containsValueEquivalent(o, Object::equals);
     }
 
     @Override
@@ -2079,19 +2009,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
     @Override
     public V get(final Object o) {
-      try {
-        final K key = (K) o;
-        final Optional<V> result = rootNode
-            .findByKey(key, transformHashCode(key.hashCode()), 0, Object::equals);
-
-        if (result.isPresent()) {
-          return result.get();
-        } else {
-          return null;
-        }
-      } catch (ClassCastException unused) {
-        return null;
-      }
+      return getEquivalent(o, Object::equals);
     }
 
     @Override
@@ -2099,8 +2017,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
       try {
         final K key = (K) o;
         final Optional<V> result =
-            rootNode.findByKey(key, transformHashCode(key.hashCode()), 0,
-                cmp);
+            rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
         if (result.isPresent()) {
           return result.get();
@@ -2114,48 +2031,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
     @Override
     public V __put(final K key, final V val) {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
-      final int keyHash = key.hashCode();
-      final MapNodeResult<K, V> details = MapNodeResult.unchanged();
-
-      final AbstractMapNode<K, V> newRootNode =
-          rootNode
-              .updated(mutator, key, val, transformHashCode(keyHash), 0, details, Object::equals);
-
-      if (details.isModified()) {
-        if (details.hasReplacedValue()) {
-          final V old = details.getReplacedValue();
-
-          final int valHashOld = old.hashCode();
-          final int valHashNew = val.hashCode();
-
-          rootNode = newRootNode;
-          cachedHashCode = cachedHashCode + (keyHash ^ valHashNew) - (keyHash ^ valHashOld);
-
-          if (DEBUG) {
-            assert checkHashCodeAndSize(cachedHashCode, cachedSize);
-          }
-          return details.getReplacedValue();
-        } else {
-          final int valHashNew = val.hashCode();
-          rootNode = newRootNode;
-          cachedHashCode += (keyHash ^ valHashNew);
-          cachedSize += 1;
-
-          if (DEBUG) {
-            assert checkHashCodeAndSize(cachedHashCode, cachedSize);
-          }
-          return null;
-        }
-      }
-
-      if (DEBUG) {
-        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
-      }
-      return null;
+      return __putEquivalent(key, val, Object::equals);
     }
 
     @Override
@@ -2168,8 +2044,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
       final MapNodeResult<K, V> details = MapNodeResult.unchanged();
 
       final AbstractMapNode<K, V> newRootNode =
-          rootNode.updated(mutator, key, val, transformHashCode(keyHash), 0, details,
-              cmp);
+          rootNode.updated(mutator, key, val, transformHashCode(keyHash), 0, details, cmp);
 
       if (details.isModified()) {
         if (details.hasReplacedValue()) {
@@ -2206,18 +2081,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
     @Override
     public boolean __putAll(final Map<? extends K, ? extends V> map) {
-      boolean modified = false;
-
-      for (Map.Entry<? extends K, ? extends V> entry : map.entrySet()) {
-        final boolean isPresent = this.containsKey(entry.getKey());
-        final V replaced = this.__put(entry.getKey(), entry.getValue());
-
-        if (!isPresent || replaced != null) {
-          modified = true;
-        }
-      }
-
-      return modified;
+      return __putAllEquivalent(map, Object::equals);
     }
 
     @Override
@@ -2239,35 +2103,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
     @Override
     public V __remove(final K key) {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
-      final int keyHash = key.hashCode();
-      final MapNodeResult<K, V> details = MapNodeResult.unchanged();
-
-      final AbstractMapNode<K, V> newRootNode =
-          rootNode.removed(mutator, key, transformHashCode(keyHash), 0, details, Object::equals);
-
-      if (details.isModified()) {
-        assert details.hasReplacedValue();
-        final int valHash = details.getReplacedValue().hashCode();
-
-        rootNode = newRootNode;
-        cachedHashCode = cachedHashCode - (keyHash ^ valHash);
-        cachedSize = cachedSize - 1;
-
-        if (DEBUG) {
-          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
-        }
-        return details.getReplacedValue();
-      }
-
-      if (DEBUG) {
-        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
-      }
-
-      return null;
+      return __removeEquivalent(key, Object::equals);
     }
 
     @Override
