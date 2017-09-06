@@ -2706,7 +2706,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
     boolean containsTuple(K key, V val, int keyHash, int shift, EqualityComparator<Object> cmp) {
       return collisionContent.stream()
           .filter(entry -> cmp.equals(key, entry.getKey())
-              && entry.getValue().containsEquivalent(val, cmp.toComparator()))
+              && entry.getValue().containsEquivalent(val, cmp))
           .findAny().isPresent();
     }
 
@@ -2727,7 +2727,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
 
         io.usethesource.capsule.Set.Immutable<V> values = optionalTuple.get().getValue();
 
-        if (values.containsEquivalent(val, cmp.toComparator())) {
+        if (values.containsEquivalent(val, cmp)) {
           // contains key and value
           details.unchanged();
           return this;
@@ -2739,7 +2739,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
               (kImmutableSetEntry) -> {
                 if (kImmutableSetEntry == optionalTuple.get()) {
                   io.usethesource.capsule.Set.Immutable<V> updatedValues =
-                      values.__insertEquivalent(val, cmp.toComparator());
+                      values.__insertEquivalent(val, cmp);
                   return entryOf(key, updatedValues);
                 } else {
                   return kImmutableSetEntry;
@@ -2754,10 +2754,10 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
           assert updatedCollisionContent.size() == collisionContent.size();
           assert updatedCollisionContent.contains(optionalTuple.get()) == false;
           // assert updatedCollisionContent.contains(entryOf(key, values.__insertEquivalent(val,
-          // cmp.toComparator())));
+          // cmp)));
           assert updatedCollisionContent.stream()
               .filter(entry -> cmp.equals(key, entry.getKey())
-                  && entry.getValue().containsEquivalent(val, cmp.toComparator()))
+                  && entry.getValue().containsEquivalent(val, cmp))
               .findAny().isPresent();
 
           details.modified();
@@ -2802,7 +2802,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
             (kImmutableSetEntry) -> {
               if (kImmutableSetEntry == optionalTuple.get()) {
                 io.usethesource.capsule.Set.Immutable<V> updatedValues = values
-                    .__insertEquivalent(val, cmp.toComparator());
+                    .__insertEquivalent(val, cmp);
                 return entryOf(key, updatedValues);
               } else {
                 return kImmutableSetEntry;
@@ -2847,7 +2847,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
 
         io.usethesource.capsule.Set.Immutable<V> values = optionalTuple.get().getValue();
 
-        if (values.containsEquivalent(val, cmp.toComparator())) {
+        if (values.containsEquivalent(val, cmp)) {
           // contains key and value -> remove mapping
 
           final List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> updatedCollisionContent;
@@ -2861,7 +2861,7 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
                 (kImmutableSetEntry) -> {
                   if (kImmutableSetEntry == optionalTuple.get()) {
                     io.usethesource.capsule.Set.Immutable<V> updatedValues =
-                        values.__removeEquivalent(val, cmp.toComparator());
+                        values.__removeEquivalent(val, cmp);
                     return entryOf(key, updatedValues);
                   } else {
                     return kImmutableSetEntry;

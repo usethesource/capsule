@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.usethesource.capsule.util.ArrayUtils;
+import io.usethesource.capsule.util.EqualityComparator;
 
 public class TrieSet_5Bits_Spec0To8_IntKey implements
     io.usethesource.capsule.Set.Immutable<Integer> {
@@ -104,7 +105,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
   }
 
   @Override
-  public boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
+  public boolean containsEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     try {
       final int key = (int) o;
       return rootNode.contains(key, transformHashCode(key), 0, cmp);
@@ -130,7 +131,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
   }
 
   @Override
-  public java.lang.Integer getEquivalent(final Object o, final Comparator<Object> cmp) {
+  public java.lang.Integer getEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     try {
       final int key = (int) o;
       final Optional<java.lang.Integer> result =
@@ -164,7 +165,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
   @Override
   public io.usethesource.capsule.Set.Immutable<Integer> __insertEquivalent(
       final java.lang.Integer key,
-      final Comparator<Object> cmp) {
+      final EqualityComparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult details = SetResult.unchanged();
 
@@ -188,7 +189,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
 
   @Override
   public io.usethesource.capsule.Set.Immutable<Integer> __insertAllEquivalent(
-      final Set<? extends java.lang.Integer> set, final Comparator<Object> cmp) {
+      final Set<? extends java.lang.Integer> set, final EqualityComparator<Object> cmp) {
     final io.usethesource.capsule.Set.Transient<Integer> tmpTransient = this.asTransient();
     tmpTransient.__insertAllEquivalent(set, cmp);
     return tmpTransient.freeze();
@@ -212,7 +213,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
   @Override
   public io.usethesource.capsule.Set.Immutable<Integer> __removeEquivalent(
       final java.lang.Integer key,
-      final Comparator<Object> cmp) {
+      final EqualityComparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult details = SetResult.unchanged();
 
@@ -236,7 +237,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
 
   @Override
   public io.usethesource.capsule.Set.Immutable<Integer> __removeAllEquivalent(
-      final Set<? extends java.lang.Integer> set, final Comparator<Object> cmp) {
+      final Set<? extends java.lang.Integer> set, final EqualityComparator<Object> cmp) {
     final io.usethesource.capsule.Set.Transient<Integer> tmpTransient = this.asTransient();
     tmpTransient.__removeAllEquivalent(set, cmp);
     return tmpTransient.freeze();
@@ -253,7 +254,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
   @Override
   public io.usethesource.capsule.Set.Immutable<Integer> __retainAllEquivalent(
       final io.usethesource.capsule.Set.Transient<? extends Integer> transientSet,
-      final Comparator<Object> cmp) {
+      final EqualityComparator<Object> cmp) {
     final io.usethesource.capsule.Set.Transient<Integer> tmpTransient = this.asTransient();
     tmpTransient.__retainAllEquivalent(transientSet, cmp);
     return tmpTransient.freeze();
@@ -300,7 +301,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
   }
 
   @Override
-  public boolean containsAllEquivalent(final Collection<?> c, final Comparator<Object> cmp) {
+  public boolean containsAllEquivalent(final Collection<?> c, final EqualityComparator<Object> cmp) {
     for (Object item : c) {
       if (!containsEquivalent(item, cmp)) {
         return false;
@@ -555,25 +556,25 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
     abstract boolean contains(final int key, final int keyHash, final int shift);
 
     abstract boolean contains(final int key, final int keyHash, final int shift,
-        final Comparator<Object> cmp);
+        final EqualityComparator<Object> cmp);
 
     abstract Optional<java.lang.Integer> findByKey(final int key, final int keyHash,
         final int shift);
 
     abstract Optional<java.lang.Integer> findByKey(final int key, final int keyHash,
-        final int shift, final Comparator<Object> cmp);
+        final int shift, final EqualityComparator<Object> cmp);
 
     abstract CompactSetNode updated(final AtomicReference<Thread> mutator, final int key,
         final int keyHash, final int shift, final SetResult details);
 
     abstract CompactSetNode updated(final AtomicReference<Thread> mutator, final int key,
-        final int keyHash, final int shift, final SetResult details, final Comparator<Object> cmp);
+        final int keyHash, final int shift, final SetResult details, final EqualityComparator<Object> cmp);
 
     abstract CompactSetNode removed(final AtomicReference<Thread> mutator, final int key,
         final int keyHash, final int shift, final SetResult details);
 
     abstract CompactSetNode removed(final AtomicReference<Thread> mutator, final int key,
-        final int keyHash, final int shift, final SetResult details, final Comparator<Object> cmp);
+        final int keyHash, final int shift, final SetResult details, final EqualityComparator<Object> cmp);
 
     static final boolean isAllowedToEdit(AtomicReference<Thread> x, AtomicReference<Thread> y) {
       return x != null && y != null && (x == y || x.get() == y.get());
@@ -1204,7 +1205,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
 
     @Override
     boolean contains(final int key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1248,7 +1249,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
 
     @Override
     Optional<java.lang.Integer> findByKey(final int key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1308,7 +1309,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
 
     @Override
     CompactSetNode updated(final AtomicReference<Thread> mutator, final int key, final int keyHash,
-        final int shift, final SetResult details, final Comparator<Object> cmp) {
+        final int shift, final SetResult details, final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1405,7 +1406,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
 
     @Override
     CompactSetNode removed(final AtomicReference<Thread> mutator, final int key, final int keyHash,
-        final int shift, final SetResult details, final Comparator<Object> cmp) {
+        final int shift, final SetResult details, final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -2693,7 +2694,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
 
     @Override
     boolean contains(final int key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       if (this.hash == keyHash) {
         for (int k : keys) {
           if (k == key) {
@@ -2717,7 +2718,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
 
     @Override
     Optional<java.lang.Integer> findByKey(final int key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       for (int i = 0; i < keys.length; i++) {
         final int _key = keys[i];
         if (key == _key) {
@@ -2753,7 +2754,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
 
     @Override
     CompactSetNode updated(final AtomicReference<Thread> mutator, final int key, final int keyHash,
-        final int shift, final SetResult details, final Comparator<Object> cmp) {
+        final int shift, final SetResult details, final EqualityComparator<Object> cmp) {
       assert this.hash == keyHash;
 
       for (int idx = 0; idx < keys.length; idx++) {
@@ -2810,7 +2811,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
 
     @Override
     CompactSetNode removed(final AtomicReference<Thread> mutator, final int key, final int keyHash,
-        final int shift, final SetResult details, final Comparator<Object> cmp) {
+        final int shift, final SetResult details, final EqualityComparator<Object> cmp) {
       for (int idx = 0; idx < keys.length; idx++) {
         if (keys[idx] == key) {
           details.modified();
@@ -3228,7 +3229,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
     }
 
     @Override
-    public boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
+    public boolean containsEquivalent(final Object o, final EqualityComparator<Object> cmp) {
       try {
         final int key = (int) o;
         return rootNode.contains(key, transformHashCode(key), 0, cmp);
@@ -3255,7 +3256,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
     }
 
     @Override
-    public java.lang.Integer getEquivalent(final Object o, final Comparator<Object> cmp) {
+    public java.lang.Integer getEquivalent(final Object o, final EqualityComparator<Object> cmp) {
       try {
         final int key = (int) o;
         final Optional<java.lang.Integer> result =
@@ -3303,7 +3304,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
     }
 
     @Override
-    public boolean __insertEquivalent(final java.lang.Integer key, final Comparator<Object> cmp) {
+    public boolean __insertEquivalent(final java.lang.Integer key, final EqualityComparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -3346,7 +3347,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
 
     @Override
     public boolean __insertAllEquivalent(final Set<? extends java.lang.Integer> set,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       boolean modified = false;
 
       for (final int key : set) {
@@ -3387,7 +3388,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
     }
 
     @Override
-    public boolean __removeEquivalent(final java.lang.Integer key, final Comparator<Object> cmp) {
+    public boolean __removeEquivalent(final java.lang.Integer key, final EqualityComparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -3429,7 +3430,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
 
     @Override
     public boolean __removeAllEquivalent(final Set<? extends java.lang.Integer> set,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       boolean modified = false;
 
       for (final int key : set) {
@@ -3457,7 +3458,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
     @Override
     public boolean __retainAllEquivalent(
         final io.usethesource.capsule.Set.Transient<? extends Integer> transientSet,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       boolean modified = false;
 
       Iterator<java.lang.Integer> thisIterator = iterator();
@@ -3482,7 +3483,7 @@ public class TrieSet_5Bits_Spec0To8_IntKey implements
     }
 
     @Override
-    public boolean containsAllEquivalent(Collection<?> c, Comparator<Object> cmp) {
+    public boolean containsAllEquivalent(Collection<?> c, EqualityComparator<Object> cmp) {
       for (Object item : c) {
         if (!containsEquivalent(item, cmp)) {
           return false;

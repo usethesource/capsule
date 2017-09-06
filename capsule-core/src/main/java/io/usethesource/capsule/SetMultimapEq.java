@@ -9,26 +9,28 @@ package io.usethesource.capsule;
 
 import java.util.Comparator;
 
+import io.usethesource.capsule.util.EqualityComparator;
+
 /**
  * This interface extends multi-maps for usage with custom data element comparators.
  */
 @Deprecated
 public interface SetMultimapEq<K, V> extends SetMultimap<K, V> {
 
-  default boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
+  default boolean containsKeyEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
   }
 
-  default boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
+  default boolean containsValueEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
   }
 
   default boolean containsEntryEquivalent(final Object o0, final Object o1,
-      final Comparator<Object> cmp) {
+      final EqualityComparator<Object> cmp) {
     throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
   }
 
-  default Set.Immutable<V> getEquivalent(final Object o, final Comparator<Object> cmp) {
+  default Set.Immutable<V> getEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
   }
 
@@ -36,47 +38,47 @@ public interface SetMultimapEq<K, V> extends SetMultimap<K, V> {
   interface Immutable<K, V> extends SetMultimapEq<K, V> {
 
     default SetMultimap.Immutable<K, V> __putEquivalent(final K key, final V value,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
     default SetMultimap.Immutable<K, V> __putEquivalent(final K key, final Set.Immutable<V> values,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
     default SetMultimap.Immutable<K, V> __insertEquivalent(final K key, final V value,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
     default SetMultimap.Immutable<K, V> __insertEquivalent(final K key,
-        final Set.Immutable<V> values, final Comparator<Object> cmp) {
+        final Set.Immutable<V> values, final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
     default SetMultimap.Immutable<K, V> __removeEquivalent(final K key,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
     default SetMultimap.Immutable<K, V> __removeEquivalent(final K key, final V val,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
     default SetMultimap.Immutable<K, V> unionEquivalent(
-        final SetMultimap<? extends K, ? extends V> setMultimap, final Comparator<Object> cmp) {
+        final SetMultimap<? extends K, ? extends V> setMultimap, final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
     default SetMultimap.Immutable<K, V> intersectEquivalent(
-        final SetMultimap<? extends K, ? extends V> setMultimap, final Comparator<Object> cmp) {
+        final SetMultimap<? extends K, ? extends V> setMultimap, final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
     default SetMultimap.Immutable<K, V> complementEquivalent(
-        final SetMultimap<? extends K, ? extends V> setMultimap, final Comparator<Object> cmp) {
+        final SetMultimap<? extends K, ? extends V> setMultimap, final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
@@ -85,44 +87,44 @@ public interface SetMultimapEq<K, V> extends SetMultimap<K, V> {
   @Deprecated
   interface Transient<K, V> extends SetMultimapEq<K, V> {
 
-    default boolean __putEquivalent(final K key, final V value, final Comparator<Object> cmp) {
+    default boolean __putEquivalent(final K key, final V value, final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
     default boolean __putEquivalent(final K key, final Set.Immutable<V> values,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
-    default boolean __insertEquivalent(final K key, final V value, final Comparator<Object> cmp) {
+    default boolean __insertEquivalent(final K key, final V value, final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
     default boolean __insertEquivalent(final K key, final Set.Immutable<V> values,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
-    default boolean __removeEquivalent(final K key, final Comparator<Object> cmp) {
+    default boolean __removeEquivalent(final K key, final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
-    default boolean __removeEquivalent(final K key, final V val, final Comparator<Object> cmp) {
+    default boolean __removeEquivalent(final K key, final V val, final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
     default boolean unionEquivalent(final SetMultimap<? extends K, ? extends V> setMultimap,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
     default boolean intersectEquivalent(final SetMultimap<? extends K, ? extends V> setMultimap,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
     default boolean complementEquivalent(final SetMultimap<? extends K, ? extends V> setMultimap,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 

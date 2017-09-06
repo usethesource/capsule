@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Comparator;
 
 import io.usethesource.capsule.Set;
+import io.usethesource.capsule.util.EqualityComparator;
 
 @Deprecated
 public abstract class AbstractImmutableSet<E> extends AbstractSet<E> implements Set.Immutable<E> {
@@ -67,7 +68,7 @@ public abstract class AbstractImmutableSet<E> extends AbstractSet<E> implements 
   }
 
   @Override
-  public boolean containsAllEquivalent(Collection<?> c, Comparator<Object> cmp) {
+  public boolean containsAllEquivalent(Collection<?> c, EqualityComparator<Object> cmp) {
     for (Object item : c) {
       if (!containsEquivalent(item, cmp)) {
         return false;

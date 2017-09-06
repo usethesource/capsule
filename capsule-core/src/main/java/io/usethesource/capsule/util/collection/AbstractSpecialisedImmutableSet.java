@@ -14,6 +14,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 
+import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.iterator.EmptySupplierIterator;
 import io.usethesource.capsule.util.iterator.SupplierIterator;
 
@@ -160,7 +161,7 @@ public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutab
 
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __insertAllEquivalent(Set<? extends K> set,
-      Comparator<Object> cmp) {
+      EqualityComparator<Object> cmp) {
     io.usethesource.capsule.Set.Transient<K> tmp = asTransient();
     if (tmp.__insertAllEquivalent(set, cmp)) {
       return tmp.freeze();
@@ -182,7 +183,7 @@ public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutab
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __retainAllEquivalent(
       io.usethesource.capsule.Set.Transient<? extends K> set,
-      Comparator<Object> cmp) {
+      EqualityComparator<Object> cmp) {
     io.usethesource.capsule.Set.Transient<K> tmp = asTransient();
     if (tmp.__retainAllEquivalent(set, cmp)) {
       return tmp.freeze();
@@ -203,7 +204,7 @@ public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutab
 
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __removeAllEquivalent(Set<? extends K> set,
-      Comparator<Object> cmp) {
+      EqualityComparator<Object> cmp) {
     io.usethesource.capsule.Set.Transient<K> tmp = asTransient();
     if (tmp.__removeAllEquivalent(set, cmp)) {
       return tmp.freeze();
@@ -226,7 +227,7 @@ class Set0<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public boolean containsEquivalent(Object key, Comparator<Object> cmp) {
+  public boolean containsEquivalent(Object key, EqualityComparator<Object> cmp) {
     return false;
   }
 
@@ -236,7 +237,7 @@ class Set0<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public K getEquivalent(Object key, Comparator<Object> cmp) {
+  public K getEquivalent(Object key, EqualityComparator<Object> cmp) {
     return null;
   }
 
@@ -257,7 +258,7 @@ class Set0<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __insertEquivalent(K key,
-      Comparator<Object> cmp) {
+      EqualityComparator<Object> cmp) {
     return setOf(key);
   }
 
@@ -268,7 +269,7 @@ class Set0<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __removeEquivalent(K key,
-      Comparator<Object> cmp) {
+      EqualityComparator<Object> cmp) {
     return this;
   }
 
@@ -308,8 +309,8 @@ class Set1<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public boolean containsEquivalent(Object key, Comparator<Object> cmp) {
-    if (cmp.compare(key, key1) == 0) {
+  public boolean containsEquivalent(Object key, EqualityComparator<Object> cmp) {
+    if (cmp.equals(key, key1)) {
       return true;
     } else {
       return false;
@@ -326,8 +327,8 @@ class Set1<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public K getEquivalent(Object key, Comparator<Object> cmp) {
-    if (cmp.compare(key, key1) == 0) {
+  public K getEquivalent(Object key, EqualityComparator<Object> cmp) {
+    if (cmp.equals(key, key1)) {
       return key1;
     } else {
       return null;
@@ -395,8 +396,8 @@ class Set1<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __insertEquivalent(K key,
-      Comparator<Object> cmp) {
-    if (cmp.compare(key, key1) == 0) {
+      EqualityComparator<Object> cmp) {
+    if (cmp.equals(key, key1)) {
       return setOf(key);
     } else {
       return setOf(key1, key);
@@ -414,8 +415,8 @@ class Set1<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __removeEquivalent(K key,
-      Comparator<Object> cmp) {
-    if (cmp.compare(key, key1) == 0) {
+      EqualityComparator<Object> cmp) {
+    if (cmp.equals(key, key1)) {
       return setOf();
     } else {
       return this;
@@ -467,10 +468,10 @@ class Set2<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public boolean containsEquivalent(Object key, Comparator<Object> cmp) {
-    if (cmp.compare(key, key1) == 0) {
+  public boolean containsEquivalent(Object key, EqualityComparator<Object> cmp) {
+    if (cmp.equals(key, key1)) {
       return true;
-    } else if (cmp.compare(key, key2) == 0) {
+    } else if (cmp.equals(key, key2)) {
       return true;
     } else {
       return false;
@@ -489,10 +490,10 @@ class Set2<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public K getEquivalent(Object key, Comparator<Object> cmp) {
-    if (cmp.compare(key, key1) == 0) {
+  public K getEquivalent(Object key, EqualityComparator<Object> cmp) {
+    if (cmp.equals(key, key1)) {
       return key1;
-    } else if (cmp.compare(key, key2) == 0) {
+    } else if (cmp.equals(key, key2)) {
       return key2;
     } else {
       return null;
@@ -566,10 +567,10 @@ class Set2<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __insertEquivalent(K key,
-      Comparator<Object> cmp) {
-    if (cmp.compare(key, key1) == 0) {
+      EqualityComparator<Object> cmp) {
+    if (cmp.equals(key, key1)) {
       return setOf(key, key2);
-    } else if (cmp.compare(key, key2) == 0) {
+    } else if (cmp.equals(key, key2)) {
       return setOf(key1, key);
     } else {
       return setOf(key1, key2, key);
@@ -589,10 +590,10 @@ class Set2<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __removeEquivalent(K key,
-      Comparator<Object> cmp) {
-    if (cmp.compare(key, key1) == 0) {
+      EqualityComparator<Object> cmp) {
+    if (cmp.equals(key, key1)) {
       return setOf(key2);
-    } else if (cmp.compare(key, key2) == 0) {
+    } else if (cmp.equals(key, key2)) {
       return setOf(key1);
     } else {
       return this;
@@ -649,12 +650,12 @@ class Set3<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public boolean containsEquivalent(Object key, Comparator<Object> cmp) {
-    if (cmp.compare(key, key1) == 0) {
+  public boolean containsEquivalent(Object key, EqualityComparator<Object> cmp) {
+    if (cmp.equals(key, key1)) {
       return true;
-    } else if (cmp.compare(key, key2) == 0) {
+    } else if (cmp.equals(key, key2)) {
       return true;
-    } else if (cmp.compare(key, key3) == 0) {
+    } else if (cmp.equals(key, key3)) {
       return true;
     } else {
       return false;
@@ -675,12 +676,12 @@ class Set3<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public K getEquivalent(Object key, Comparator<Object> cmp) {
-    if (cmp.compare(key, key1) == 0) {
+  public K getEquivalent(Object key, EqualityComparator<Object> cmp) {
+    if (cmp.equals(key, key1)) {
       return key1;
-    } else if (cmp.compare(key, key2) == 0) {
+    } else if (cmp.equals(key, key2)) {
       return key2;
-    } else if (cmp.compare(key, key3) == 0) {
+    } else if (cmp.equals(key, key3)) {
       return key3;
     } else {
       return null;
@@ -760,12 +761,12 @@ class Set3<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __insertEquivalent(K key,
-      Comparator<Object> cmp) {
-    if (cmp.compare(key, key1) == 0) {
+      EqualityComparator<Object> cmp) {
+    if (cmp.equals(key, key1)) {
       return setOf(key, key2, key3);
-    } else if (cmp.compare(key, key2) == 0) {
+    } else if (cmp.equals(key, key2)) {
       return setOf(key1, key, key3);
-    } else if (cmp.compare(key, key3) == 0) {
+    } else if (cmp.equals(key, key3)) {
       return setOf(key1, key2, key);
     } else {
       return setOf(key1, key2, key3, key);
@@ -787,12 +788,12 @@ class Set3<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __removeEquivalent(K key,
-      Comparator<Object> cmp) {
-    if (cmp.compare(key, key1) == 0) {
+      EqualityComparator<Object> cmp) {
+    if (cmp.equals(key, key1)) {
       return setOf(key2, key3);
-    } else if (cmp.compare(key, key2) == 0) {
+    } else if (cmp.equals(key, key2)) {
       return setOf(key1, key3);
-    } else if (cmp.compare(key, key3) == 0) {
+    } else if (cmp.equals(key, key3)) {
       return setOf(key1, key2);
     } else {
       return this;
@@ -855,14 +856,14 @@ class Set4<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public boolean containsEquivalent(Object key, Comparator<Object> cmp) {
-    if (cmp.compare(key, key1) == 0) {
+  public boolean containsEquivalent(Object key, EqualityComparator<Object> cmp) {
+    if (cmp.equals(key, key1)) {
       return true;
-    } else if (cmp.compare(key, key2) == 0) {
+    } else if (cmp.equals(key, key2)) {
       return true;
-    } else if (cmp.compare(key, key3) == 0) {
+    } else if (cmp.equals(key, key3)) {
       return true;
-    } else if (cmp.compare(key, key4) == 0) {
+    } else if (cmp.equals(key, key4)) {
       return true;
     } else {
       return false;
@@ -885,14 +886,14 @@ class Set4<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public K getEquivalent(Object key, Comparator<Object> cmp) {
-    if (cmp.compare(key, key1) == 0) {
+  public K getEquivalent(Object key, EqualityComparator<Object> cmp) {
+    if (cmp.equals(key, key1)) {
       return key1;
-    } else if (cmp.compare(key, key2) == 0) {
+    } else if (cmp.equals(key, key2)) {
       return key2;
-    } else if (cmp.compare(key, key3) == 0) {
+    } else if (cmp.equals(key, key3)) {
       return key3;
-    } else if (cmp.compare(key, key4) == 0) {
+    } else if (cmp.equals(key, key4)) {
       return key4;
     } else {
       return null;
@@ -978,14 +979,14 @@ class Set4<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __insertEquivalent(K key,
-      Comparator<Object> cmp) {
-    if (cmp.compare(key, key1) == 0) {
+      EqualityComparator<Object> cmp) {
+    if (cmp.equals(key, key1)) {
       return setOf(key, key2, key3, key4);
-    } else if (cmp.compare(key, key2) == 0) {
+    } else if (cmp.equals(key, key2)) {
       return setOf(key1, key, key3, key4);
-    } else if (cmp.compare(key, key3) == 0) {
+    } else if (cmp.equals(key, key3)) {
       return setOf(key1, key2, key, key4);
-    } else if (cmp.compare(key, key4) == 0) {
+    } else if (cmp.equals(key, key4)) {
       return setOf(key1, key2, key3, key);
     } else {
       return setOf(key1, key2, key3, key4, key);
@@ -1009,14 +1010,14 @@ class Set4<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __removeEquivalent(K key,
-      Comparator<Object> cmp) {
-    if (cmp.compare(key, key1) == 0) {
+      EqualityComparator<Object> cmp) {
+    if (cmp.equals(key, key1)) {
       return setOf(key2, key3, key4);
-    } else if (cmp.compare(key, key2) == 0) {
+    } else if (cmp.equals(key, key2)) {
       return setOf(key1, key3, key4);
-    } else if (cmp.compare(key, key3) == 0) {
+    } else if (cmp.equals(key, key3)) {
       return setOf(key1, key2, key4);
-    } else if (cmp.compare(key, key4) == 0) {
+    } else if (cmp.equals(key, key4)) {
       return setOf(key1, key2, key3);
     } else {
       return this;
@@ -1086,16 +1087,16 @@ class Set5<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public boolean containsEquivalent(Object key, Comparator<Object> cmp) {
-    if (cmp.compare(key, key1) == 0) {
+  public boolean containsEquivalent(Object key, EqualityComparator<Object> cmp) {
+    if (cmp.equals(key, key1)) {
       return true;
-    } else if (cmp.compare(key, key2) == 0) {
+    } else if (cmp.equals(key, key2)) {
       return true;
-    } else if (cmp.compare(key, key3) == 0) {
+    } else if (cmp.equals(key, key3)) {
       return true;
-    } else if (cmp.compare(key, key4) == 0) {
+    } else if (cmp.equals(key, key4)) {
       return true;
-    } else if (cmp.compare(key, key5) == 0) {
+    } else if (cmp.equals(key, key5)) {
       return true;
     } else {
       return false;
@@ -1120,16 +1121,16 @@ class Set5<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public K getEquivalent(Object key, Comparator<Object> cmp) {
-    if (cmp.compare(key, key1) == 0) {
+  public K getEquivalent(Object key, EqualityComparator<Object> cmp) {
+    if (cmp.equals(key, key1)) {
       return key1;
-    } else if (cmp.compare(key, key2) == 0) {
+    } else if (cmp.equals(key, key2)) {
       return key2;
-    } else if (cmp.compare(key, key3) == 0) {
+    } else if (cmp.equals(key, key3)) {
       return key3;
-    } else if (cmp.compare(key, key4) == 0) {
+    } else if (cmp.equals(key, key4)) {
       return key4;
-    } else if (cmp.compare(key, key5) == 0) {
+    } else if (cmp.equals(key, key5)) {
       return key5;
     } else {
       return null;
@@ -1221,16 +1222,16 @@ class Set5<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __insertEquivalent(K key,
-      Comparator<Object> cmp) {
-    if (cmp.compare(key, key1) == 0) {
+      EqualityComparator<Object> cmp) {
+    if (cmp.equals(key, key1)) {
       return setOf(key, key2, key3, key4, key5);
-    } else if (cmp.compare(key, key2) == 0) {
+    } else if (cmp.equals(key, key2)) {
       return setOf(key1, key, key3, key4, key5);
-    } else if (cmp.compare(key, key3) == 0) {
+    } else if (cmp.equals(key, key3)) {
       return setOf(key1, key2, key, key4, key5);
-    } else if (cmp.compare(key, key4) == 0) {
+    } else if (cmp.equals(key, key4)) {
       return setOf(key1, key2, key3, key, key5);
-    } else if (cmp.compare(key, key5) == 0) {
+    } else if (cmp.equals(key, key5)) {
       return setOf(key1, key2, key3, key4, key);
     } else {
       return setOf(key1, key2, key3, key4, key5, key);
@@ -1256,16 +1257,16 @@ class Set5<K> extends AbstractSpecialisedImmutableSet<K> {
 
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __removeEquivalent(K key,
-      Comparator<Object> cmp) {
-    if (cmp.compare(key, key1) == 0) {
+      EqualityComparator<Object> cmp) {
+    if (cmp.equals(key, key1)) {
       return setOf(key2, key3, key4, key5);
-    } else if (cmp.compare(key, key2) == 0) {
+    } else if (cmp.equals(key, key2)) {
       return setOf(key1, key3, key4, key5);
-    } else if (cmp.compare(key, key3) == 0) {
+    } else if (cmp.equals(key, key3)) {
       return setOf(key1, key2, key4, key5);
-    } else if (cmp.compare(key, key4) == 0) {
+    } else if (cmp.equals(key, key4)) {
       return setOf(key1, key2, key3, key5);
-    } else if (cmp.compare(key, key5) == 0) {
+    } else if (cmp.equals(key, key5)) {
       return setOf(key1, key2, key3, key4);
     } else {
       return this;

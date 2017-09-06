@@ -721,7 +721,7 @@ public class PersistentTrieSetMultimap<K, V> extends
       if (isBitInBitmap(collMap, bitpos)) {
         final int index = index(collMap, mask, bitpos);
         return cmp.equals(getCollectionKey(index), key)
-            && getCollectionValue(index).containsEquivalent(value, cmp.toComparator());
+            && getCollectionValue(index).containsEquivalent(value, cmp);
       }
 
       if (isBitInBitmap(nodeMap, bitpos)) {
@@ -2450,7 +2450,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         EqualityComparator<Object> cmp) {
       return collisionContent.stream()
           .filter(entry -> cmp.equals(key, entry.getKey())
-              && entry.getValue().containsEquivalent(value, cmp.toComparator()))
+              && entry.getValue().containsEquivalent(value, cmp))
           .findAny().isPresent();
     }
 
@@ -2476,7 +2476,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         io.usethesource.capsule.Set.Immutable<V> values =
             optionalTuple.get().getValue();
 
-        if (values.containsEquivalent(value, cmp.toComparator())) {
+        if (values.containsEquivalent(value, cmp)) {
           // contains key and value
           // // details.unchanged();
           return this;
@@ -2488,7 +2488,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               (kImmutableSetEntry) -> {
                 if (kImmutableSetEntry == optionalTuple.get()) {
                   io.usethesource.capsule.Set.Immutable<V> updatedValues =
-                      values.__insertEquivalent(value, cmp.toComparator());
+                      values.__insertEquivalent(value, cmp);
                   return entryOf(key, updatedValues);
                 } else {
                   return kImmutableSetEntry;
@@ -2503,10 +2503,10 @@ public class PersistentTrieSetMultimap<K, V> extends
           assert updatedCollisionContent.size() == collisionContent.size();
           assert updatedCollisionContent.contains(optionalTuple.get()) == false;
           // assert updatedCollisionContent.contains(entryOf(key, values.__insertEquivalent(val,
-          // cmp.toComparator())));
+          // cmp)));
           assert updatedCollisionContent.stream()
               .filter(entry -> cmp.equals(key, entry.getKey())
-                  && entry.getValue().containsEquivalent(value, cmp.toComparator()))
+                  && entry.getValue().containsEquivalent(value, cmp))
               .findAny().isPresent();
 
           details.modified(INSERTED_PAYLOAD, EnumSet.of(INSERTED_VALUE));
@@ -2557,7 +2557,7 @@ public class PersistentTrieSetMultimap<K, V> extends
             (kImmutableSetEntry) -> {
               if (kImmutableSetEntry == optionalTuple.get()) {
                 io.usethesource.capsule.Set.Immutable<V> updatedValues =
-                    values.__insertEquivalent(value, cmp.toComparator());
+                    values.__insertEquivalent(value, cmp);
                 return entryOf(key, updatedValues);
               } else {
                 return kImmutableSetEntry;
@@ -2605,7 +2605,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         io.usethesource.capsule.Set.Immutable<V> values =
             optionalTuple.get().getValue();
 
-        if (values.containsEquivalent(value, cmp.toComparator())) {
+        if (values.containsEquivalent(value, cmp)) {
           // contains key and value -> remove mapping
 
           final List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> updatedCollisionContent;
@@ -2622,7 +2622,7 @@ public class PersistentTrieSetMultimap<K, V> extends
                 (kImmutableSetEntry) -> {
                   if (kImmutableSetEntry == optionalTuple.get()) {
                     io.usethesource.capsule.Set.Immutable<V> updatedValues =
-                        values.__removeEquivalent(value, cmp.toComparator());
+                        values.__removeEquivalent(value, cmp);
                     return entryOf(key, updatedValues);
                   } else {
                     return kImmutableSetEntry;

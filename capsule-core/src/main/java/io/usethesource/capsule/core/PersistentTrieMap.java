@@ -133,11 +133,11 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
   }
 
   @Override
-  public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
+  public boolean containsKeyEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     try {
       final K key = (K) o;
       return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0,
-          EqualityComparator.fromComparator(cmp));
+          cmp);
     } catch (ClassCastException unused) {
       return false;
     }
@@ -154,9 +154,9 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
   }
 
   @Override
-  public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
+  public boolean containsValueEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
-      if (cmp.compare(iterator.next(), o) == 0) {
+      if (cmp.equals(iterator.next(), o) ) {
         return true;
       }
     }
@@ -181,11 +181,11 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
   }
 
   @Override
-  public V getEquivalent(final Object o, final Comparator<Object> cmp) {
+  public V getEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     try {
       final K key = (K) o;
       final Optional<V> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0,
-          EqualityComparator.fromComparator(cmp));
+          cmp);
 
       if (result.isPresent()) {
         return result.get();
@@ -224,12 +224,12 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
   @Override
   public io.usethesource.capsule.Map.Immutable<K, V> __putEquivalent(final K key, final V val,
-      final Comparator<Object> cmp) {
+      final EqualityComparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapNodeResult<K, V> details = MapNodeResult.unchanged();
 
     final AbstractMapNode<K, V> newRootNode = rootNode.updated(null, key, val,
-        transformHashCode(keyHash), 0, details, EqualityComparator.fromComparator(cmp));
+        transformHashCode(keyHash), 0, details, cmp);
 
     if (details.isModified()) {
       if (details.hasReplacedValue()) {
@@ -259,7 +259,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
   @Override
   public io.usethesource.capsule.Map.Immutable<K, V> __putAllEquivalent(
       final Map<? extends K, ? extends V> map,
-      final Comparator<Object> cmp) {
+      final EqualityComparator<Object> cmp) {
     final io.usethesource.capsule.Map.Transient<K, V> tmpTransient = this.asTransient();
     tmpTransient.__putAllEquivalent(map, cmp);
     return tmpTransient.freeze();
@@ -285,12 +285,12 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
   @Override
   public io.usethesource.capsule.Map.Immutable<K, V> __removeEquivalent(final K key,
-      final Comparator<Object> cmp) {
+      final EqualityComparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapNodeResult<K, V> details = MapNodeResult.unchanged();
 
     final AbstractMapNode<K, V> newRootNode = rootNode.removed(null, key,
-        transformHashCode(keyHash), 0, details, EqualityComparator.fromComparator(cmp));
+        transformHashCode(keyHash), 0, details, cmp);
 
     if (details.isModified()) {
       assert details.hasReplacedValue();
@@ -2047,11 +2047,11 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
+    public boolean containsKeyEquivalent(final Object o, final EqualityComparator<Object> cmp) {
       try {
         final K key = (K) o;
         return rootNode.containsKey(key, transformHashCode(key.hashCode()), 0,
-            EqualityComparator.fromComparator(cmp));
+            cmp);
       } catch (ClassCastException unused) {
         return false;
       }
@@ -2068,9 +2068,9 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
+    public boolean containsValueEquivalent(final Object o, final EqualityComparator<Object> cmp) {
       for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
-        if (cmp.compare(iterator.next(), o) == 0) {
+        if (cmp.equals(iterator.next(), o) ) {
           return true;
         }
       }
@@ -2095,12 +2095,12 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    public V getEquivalent(final Object o, final Comparator<Object> cmp) {
+    public V getEquivalent(final Object o, final EqualityComparator<Object> cmp) {
       try {
         final K key = (K) o;
         final Optional<V> result =
             rootNode.findByKey(key, transformHashCode(key.hashCode()), 0,
-                EqualityComparator.fromComparator(cmp));
+                cmp);
 
         if (result.isPresent()) {
           return result.get();
@@ -2159,7 +2159,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    public V __putEquivalent(final K key, final V val, final Comparator<Object> cmp) {
+    public V __putEquivalent(final K key, final V val, final EqualityComparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -2169,7 +2169,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
       final AbstractMapNode<K, V> newRootNode =
           rootNode.updated(mutator, key, val, transformHashCode(keyHash), 0, details,
-              EqualityComparator.fromComparator(cmp));
+              cmp);
 
       if (details.isModified()) {
         if (details.hasReplacedValue()) {
@@ -2222,7 +2222,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
     @Override
     public boolean __putAllEquivalent(final Map<? extends K, ? extends V> map,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       boolean modified = false;
 
       for (Map.Entry<? extends K, ? extends V> entry : map.entrySet()) {
@@ -2271,7 +2271,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    public V __removeEquivalent(final K key, final Comparator<Object> cmp) {
+    public V __removeEquivalent(final K key, final EqualityComparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -2280,7 +2280,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
       final MapNodeResult<K, V> details = MapNodeResult.unchanged();
 
       final AbstractMapNode<K, V> newRootNode = rootNode.removed(mutator, key,
-          transformHashCode(keyHash), 0, details, EqualityComparator.fromComparator(cmp));
+          transformHashCode(keyHash), 0, details, cmp);
 
       if (details.isModified()) {
         assert details.hasReplacedValue();

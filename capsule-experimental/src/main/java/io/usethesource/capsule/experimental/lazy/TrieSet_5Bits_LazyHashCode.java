@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.usethesource.capsule.util.ArrayUtils;
+import io.usethesource.capsule.util.EqualityComparator;
 
 public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Set.Immutable<K> {
 
@@ -80,7 +81,7 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
   }
 
   @Override
-  public boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
+  public boolean containsEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     try {
       final K key = (K) o;
       return rootNode.contains(key, key.hashCode(), 0, cmp);
@@ -106,7 +107,7 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
   }
 
   @Override
-  public K getEquivalent(final Object o, final Comparator<Object> cmp) {
+  public K getEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     try {
       final K key = (K) o;
       final Optional<K> result = rootNode.findByKey(key, key.hashCode(), 0, cmp);
@@ -137,7 +138,7 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
 
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __insertEquivalent(final K key,
-      final Comparator<Object> cmp) {
+      final EqualityComparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -159,7 +160,7 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
 
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __insertAllEquivalent(final Set<? extends K> set,
-      final Comparator<Object> cmp) {
+      final EqualityComparator<Object> cmp) {
     final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__insertAllEquivalent(set, cmp);
     return tmpTransient.freeze();
@@ -181,7 +182,7 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
 
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __removeEquivalent(final K key,
-      final Comparator<Object> cmp) {
+      final EqualityComparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final SetResult<K> details = SetResult.unchanged();
 
@@ -203,7 +204,7 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
 
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __removeAllEquivalent(final Set<? extends K> set,
-      final Comparator<Object> cmp) {
+      final EqualityComparator<Object> cmp) {
     final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__removeAllEquivalent(set, cmp);
     return tmpTransient.freeze();
@@ -219,7 +220,7 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
   @Override
   public io.usethesource.capsule.Set.Immutable<K> __retainAllEquivalent(
       final io.usethesource.capsule.Set.Transient<? extends K> transientSet,
-      final Comparator<Object> cmp) {
+      final EqualityComparator<Object> cmp) {
     final io.usethesource.capsule.Set.Transient<K> tmpTransient = this.asTransient();
     tmpTransient.__retainAllEquivalent(transientSet, cmp);
     return tmpTransient.freeze();
@@ -266,7 +267,7 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
   }
 
   @Override
-  public boolean containsAllEquivalent(final Collection<?> c, final Comparator<Object> cmp) {
+  public boolean containsAllEquivalent(final Collection<?> c, final EqualityComparator<Object> cmp) {
     for (Object item : c) {
       if (!containsEquivalent(item, cmp)) {
         return false;
@@ -529,26 +530,26 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
     abstract boolean contains(final K key, final int keyHash, final int shift);
 
     abstract boolean contains(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp);
+        final EqualityComparator<Object> cmp);
 
     abstract Optional<K> findByKey(final K key, final int keyHash, final int shift);
 
     abstract Optional<K> findByKey(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp);
+        final EqualityComparator<Object> cmp);
 
     abstract CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final SetResult<K> details);
 
     abstract CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final SetResult<K> details,
-        final Comparator<Object> cmp);
+        final EqualityComparator<Object> cmp);
 
     abstract CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final SetResult<K> details);
 
     abstract CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final SetResult<K> details,
-        final Comparator<Object> cmp);
+        final EqualityComparator<Object> cmp);
 
     static final boolean isAllowedToEdit(AtomicReference<Thread> x, AtomicReference<Thread> y) {
       return x != null && y != null && (x == y || x.get() == y.get());
@@ -784,14 +785,14 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
 
     @Override
     boolean contains(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
       final int dataMap = dataMap();
       if ((dataMap & bitpos) != 0) {
         final int index = index(dataMap, mask, bitpos);
-        return cmp.compare(getKey(index), key) == 0;
+        return cmp.equals(getKey(index), key);
       }
 
       final int nodeMap = nodeMap();
@@ -828,13 +829,13 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
 
     @Override
     Optional<K> findByKey(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
       if ((dataMap() & bitpos) != 0) { // inplace value
         final int index = dataIndex(bitpos);
-        if (cmp.compare(getKey(index), key) == 0) {
+        if (cmp.equals(getKey(index), key)) {
           return Optional.of(getKey(index));
         }
 
@@ -888,7 +889,7 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
 
     @Override
     CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key, final int keyHash,
-        final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
+        final int shift, final SetResult<K> details, final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -896,7 +897,7 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
         final int dataIndex = dataIndex(bitpos);
         final K currentKey = getKey(dataIndex);
 
-        if (cmp.compare(currentKey, key) == 0) {
+        if (cmp.equals(currentKey, key)) {
           return this;
         } else {
           final CompactSetNode<K> subNodeNew = mergeTwoKeyValPairs(currentKey,
@@ -987,14 +988,14 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
 
     @Override
     CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key, final int keyHash,
-        final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
+        final int shift, final SetResult<K> details, final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
       if ((dataMap() & bitpos) != 0) { // inplace value
         final int dataIndex = dataIndex(bitpos);
 
-        if (cmp.compare(getKey(dataIndex), key) == 0) {
+        if (cmp.equals(getKey(dataIndex), key)) {
           details.modified();
 
           if (this.payloadArity() == 2 && this.nodeArity() == 0) {
@@ -1377,10 +1378,10 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
 
     @Override
     boolean contains(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       if (this.hash == keyHash) {
         for (K k : keys) {
-          if (cmp.compare(k, key) == 0) {
+          if (cmp.equals(k, key)) {
             return true;
           }
         }
@@ -1401,10 +1402,10 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
 
     @Override
     Optional<K> findByKey(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       for (int i = 0; i < keys.length; i++) {
         final K _key = keys[i];
-        if (cmp.compare(key, _key) == 0) {
+        if (cmp.equals(key, _key)) {
           return Optional.of(_key);
         }
       }
@@ -1437,11 +1438,11 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
 
     @Override
     CompactSetNode<K> updated(final AtomicReference<Thread> mutator, final K key, final int keyHash,
-        final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
+        final int shift, final SetResult<K> details, final EqualityComparator<Object> cmp) {
       assert this.hash == keyHash;
 
       for (int idx = 0; idx < keys.length; idx++) {
-        if (cmp.compare(keys[idx], key) == 0) {
+        if (cmp.equals(keys[idx], key)) {
           return this;
         }
       }
@@ -1493,9 +1494,9 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
 
     @Override
     CompactSetNode<K> removed(final AtomicReference<Thread> mutator, final K key, final int keyHash,
-        final int shift, final SetResult<K> details, final Comparator<Object> cmp) {
+        final int shift, final SetResult<K> details, final EqualityComparator<Object> cmp) {
       for (int idx = 0; idx < keys.length; idx++) {
-        if (cmp.compare(keys[idx], key) == 0) {
+        if (cmp.equals(keys[idx], key)) {
 
           if (this.arity() == 1) {
             return nodeOf(mutator);
@@ -1880,7 +1881,7 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
     }
 
     @Override
-    public boolean containsEquivalent(final Object o, final Comparator<Object> cmp) {
+    public boolean containsEquivalent(final Object o, final EqualityComparator<Object> cmp) {
       try {
         final K key = (K) o;
         return rootNode.contains(key, key.hashCode(), 0, cmp);
@@ -1906,7 +1907,7 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
     }
 
     @Override
-    public K getEquivalent(Object o, Comparator<Object> cmp) {
+    public K getEquivalent(Object o, EqualityComparator<Object> cmp) {
       try {
         final K key = (K) o;
         final Optional<K> result = rootNode.findByKey(key, key.hashCode(), 0, cmp);
@@ -1945,7 +1946,7 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
     }
 
     @Override
-    public boolean __insertEquivalent(final K key, final Comparator<Object> cmp) {
+    public boolean __insertEquivalent(final K key, final EqualityComparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -1980,7 +1981,7 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
     }
 
     @Override
-    public boolean __insertAllEquivalent(final Set<? extends K> set, final Comparator<Object> cmp) {
+    public boolean __insertAllEquivalent(final Set<? extends K> set, final EqualityComparator<Object> cmp) {
       boolean modified = false;
 
       for (final K key : set) {
@@ -2012,7 +2013,7 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
     }
 
     @Override
-    public boolean __removeEquivalent(final K key, final Comparator<Object> cmp) {
+    public boolean __removeEquivalent(final K key, final EqualityComparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -2045,7 +2046,7 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
     }
 
     @Override
-    public boolean __removeAllEquivalent(final Set<? extends K> set, final Comparator<Object> cmp) {
+    public boolean __removeAllEquivalent(final Set<? extends K> set, final EqualityComparator<Object> cmp) {
       boolean modified = false;
 
       for (final K key : set) {
@@ -2073,7 +2074,7 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
     @Override
     public boolean __retainAllEquivalent(
         final io.usethesource.capsule.Set.Transient<? extends K> transientSet,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       boolean modified = false;
 
       Iterator<K> thisIterator = iterator();
@@ -2098,7 +2099,7 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
     }
 
     @Override
-    public boolean containsAllEquivalent(Collection<?> c, Comparator<Object> cmp) {
+    public boolean containsAllEquivalent(Collection<?> c, EqualityComparator<Object> cmp) {
       for (Object item : c) {
         if (!containsEquivalent(item, cmp)) {
           return false;

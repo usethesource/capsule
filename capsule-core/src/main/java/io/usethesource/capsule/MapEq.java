@@ -9,21 +9,23 @@ package io.usethesource.capsule;
 
 import java.util.Comparator;
 
+import io.usethesource.capsule.util.EqualityComparator;
+
 /**
  * Map extension providing methods that take a comparator. Closes over base (and not extended) map.
  */
 @Deprecated
 public interface MapEq<K, V> extends java.util.Map<K, V> {
 
-  default boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
+  default boolean containsKeyEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     throw new UnsupportedOperationException("Not yet implemented @ Map.");
   }
 
-  default boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
+  default boolean containsValueEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     throw new UnsupportedOperationException("Not yet implemented @ Map.");
   }
 
-  default V getEquivalent(final Object o, final Comparator<Object> cmp) {
+  default V getEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     throw new UnsupportedOperationException("Not yet implemented @ Map.");
   }
 
@@ -31,16 +33,16 @@ public interface MapEq<K, V> extends java.util.Map<K, V> {
   interface Immutable<K, V> extends MapEq<K, V> {
 
     default Map.Immutable<K, V> __putEquivalent(final K key, final V val,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Map.");
     }
 
-    default Map.Immutable<K, V> __removeEquivalent(final K key, final Comparator<Object> cmp) {
+    default Map.Immutable<K, V> __removeEquivalent(final K key, final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Map.");
     }
 
     default Map.Immutable<K, V> __putAllEquivalent(
-        final java.util.Map<? extends K, ? extends V> map, final Comparator<Object> cmp) {
+        final java.util.Map<? extends K, ? extends V> map, final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Map.");
     }
 
@@ -49,16 +51,16 @@ public interface MapEq<K, V> extends java.util.Map<K, V> {
   @Deprecated
   interface Transient<K, V> extends MapEq<K, V> {
 
-    default V __putEquivalent(final K key, final V val, final Comparator<Object> cmp) {
+    default V __putEquivalent(final K key, final V val, final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Map.");
     }
 
-    default V __removeEquivalent(final K key, final Comparator<Object> cmp) {
+    default V __removeEquivalent(final K key, final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Map.");
     }
 
     default boolean __putAllEquivalent(final java.util.Map<? extends K, ? extends V> map,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Map.");
     }
 

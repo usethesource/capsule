@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.usethesource.capsule.util.ArrayUtils;
+import io.usethesource.capsule.util.EqualityComparator;
 
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
@@ -127,7 +128,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
   }
 
   @Override
-  public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
+  public boolean containsKeyEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     try {
       final int key = (int) o;
       return rootNode.containsKey(key, transformHashCode(key), 0, cmp);
@@ -147,9 +148,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
   }
 
   @Override
-  public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
+  public boolean containsValueEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     for (Iterator<java.lang.Integer> iterator = valueIterator(); iterator.hasNext(); ) {
-      if (cmp.compare(iterator.next(), o) == 0) {
+      if (cmp.equals(iterator.next(), o)) {
         return true;
       }
     }
@@ -173,7 +174,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
   }
 
   @Override
-  public java.lang.Integer getEquivalent(final Object o, final Comparator<Object> cmp) {
+  public java.lang.Integer getEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     try {
       final int key = (int) o;
       final Optional<java.lang.Integer> result =
@@ -217,7 +218,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
 
   @Override
   public io.usethesource.capsule.Map.Immutable<Integer, Integer> __putEquivalent(
-      final java.lang.Integer key, final java.lang.Integer val, final Comparator<Object> cmp) {
+      final java.lang.Integer key, final java.lang.Integer val, final EqualityComparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult details = MapResult.unchanged();
 
@@ -252,7 +253,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
   @Override
   public io.usethesource.capsule.Map.Immutable<Integer, Integer> __putAllEquivalent(
       final Map<? extends java.lang.Integer, ? extends java.lang.Integer> map,
-      final Comparator<Object> cmp) {
+      final EqualityComparator<Object> cmp) {
     final io.usethesource.capsule.Map.Transient<Integer, Integer> tmpTransient = this.asTransient();
     tmpTransient.__putAllEquivalent(map, cmp);
     return tmpTransient.freeze();
@@ -279,7 +280,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
 
   @Override
   public io.usethesource.capsule.Map.Immutable<Integer, Integer> __removeEquivalent(
-      final java.lang.Integer key, final Comparator<Object> cmp) {
+      final java.lang.Integer key, final EqualityComparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult details = MapResult.unchanged();
 
@@ -693,26 +694,26 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     abstract boolean containsKey(final int key, final int keyHash, final int shift);
 
     abstract boolean containsKey(final int key, final int keyHash, final int shift,
-        final Comparator<Object> cmp);
+        final EqualityComparator<Object> cmp);
 
     abstract Optional<java.lang.Integer> findByKey(final int key, final int keyHash,
         final int shift);
 
     abstract Optional<java.lang.Integer> findByKey(final int key, final int keyHash,
-        final int shift, final Comparator<Object> cmp);
+        final int shift, final EqualityComparator<Object> cmp);
 
     abstract CompactMapNode updated(final AtomicReference<Thread> mutator, final int key,
         final int val, final int keyHash, final int shift, final MapResult details);
 
     abstract CompactMapNode updated(final AtomicReference<Thread> mutator, final int key,
         final int val, final int keyHash, final int shift, final MapResult details,
-        final Comparator<Object> cmp);
+        final EqualityComparator<Object> cmp);
 
     abstract CompactMapNode removed(final AtomicReference<Thread> mutator, final int key,
         final int keyHash, final int shift, final MapResult details);
 
     abstract CompactMapNode removed(final AtomicReference<Thread> mutator, final int key,
-        final int keyHash, final int shift, final MapResult details, final Comparator<Object> cmp);
+        final int keyHash, final int shift, final MapResult details, final EqualityComparator<Object> cmp);
 
     static final boolean isAllowedToEdit(AtomicReference<Thread> x, AtomicReference<Thread> y) {
       return x != null && y != null && (x == y || x.get() == y.get());
@@ -1390,7 +1391,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
 
     @Override
     boolean containsKey(final int key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1436,7 +1437,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
 
     @Override
     Optional<java.lang.Integer> findByKey(final int key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1507,7 +1508,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
 
     @Override
     CompactMapNode updated(final AtomicReference<Thread> mutator, final int key, final int val,
-        final int keyHash, final int shift, final MapResult details, final Comparator<Object> cmp) {
+        final int keyHash, final int shift, final MapResult details, final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1614,7 +1615,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
 
     @Override
     CompactMapNode removed(final AtomicReference<Thread> mutator, final int key, final int keyHash,
-        final int shift, final MapResult details, final Comparator<Object> cmp) {
+        final int shift, final MapResult details, final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -2977,7 +2978,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
 
     @Override
     boolean containsKey(final int key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       if (this.hash == keyHash) {
         for (int k : keys) {
           if (k == key) {
@@ -3002,7 +3003,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
 
     @Override
     Optional<java.lang.Integer> findByKey(final int key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       for (int i = 0; i < keys.length; i++) {
         final int _key = keys[i];
         if (key == _key) {
@@ -3066,7 +3067,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
 
     @Override
     CompactMapNode updated(final AtomicReference<Thread> mutator, final int key, final int val,
-        final int keyHash, final int shift, final MapResult details, final Comparator<Object> cmp) {
+        final int keyHash, final int shift, final MapResult details, final EqualityComparator<Object> cmp) {
       assert this.hash == keyHash;
 
       for (int idx = 0; idx < keys.length; idx++) {
@@ -3159,7 +3160,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
 
     @Override
     CompactMapNode removed(final AtomicReference<Thread> mutator, final int key, final int keyHash,
-        final int shift, final MapResult details, final Comparator<Object> cmp) {
+        final int shift, final MapResult details, final EqualityComparator<Object> cmp) {
       for (int idx = 0; idx < keys.length; idx++) {
         if (keys[idx] == key) {
           final int currentVal = vals[idx];
@@ -3633,7 +3634,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     }
 
     @Override
-    public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
+    public boolean containsKeyEquivalent(final Object o, final EqualityComparator<Object> cmp) {
       try {
         final int key = (int) o;
         return rootNode.containsKey(key, transformHashCode(key), 0, cmp);
@@ -3653,9 +3654,9 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     }
 
     @Override
-    public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
+    public boolean containsValueEquivalent(final Object o, final EqualityComparator<Object> cmp) {
       for (Iterator<java.lang.Integer> iterator = valueIterator(); iterator.hasNext(); ) {
-        if (cmp.compare(iterator.next(), o) == 0) {
+        if (cmp.equals(iterator.next(), o)) {
           return true;
         }
       }
@@ -3680,7 +3681,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     }
 
     @Override
-    public java.lang.Integer getEquivalent(final Object o, final Comparator<Object> cmp) {
+    public java.lang.Integer getEquivalent(final Object o, final EqualityComparator<Object> cmp) {
       try {
         final int key = (int) o;
         final Optional<java.lang.Integer> result =
@@ -3743,7 +3744,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
 
     @Override
     public java.lang.Integer __putEquivalent(final java.lang.Integer key,
-        final java.lang.Integer val, final Comparator<Object> cmp) {
+        final java.lang.Integer val, final EqualityComparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -3808,7 +3809,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
     @Override
     public boolean __putAllEquivalent(
         final Map<? extends java.lang.Integer, ? extends java.lang.Integer> map,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       boolean modified = false;
 
       for (Map.Entry<? extends java.lang.Integer, ? extends java.lang.Integer> entry : map
@@ -3860,7 +3861,7 @@ public class TrieMap_5Bits_Spec0To8_IntKey_IntValue
 
     @Override
     public java.lang.Integer __removeEquivalent(final java.lang.Integer key,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }

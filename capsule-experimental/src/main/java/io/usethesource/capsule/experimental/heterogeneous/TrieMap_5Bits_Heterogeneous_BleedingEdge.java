@@ -34,6 +34,7 @@ import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heteroge
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge_IntIntSpecializations.Map1To0Node_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge_IntIntSpecializations.Map1To2Node_5Bits_Heterogeneous_BleedingEdge;
 import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge_IntIntSpecializations.Map2To0Node_5Bits_Heterogeneous_BleedingEdge;
+import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.RangecopyUtils.AbstractArrayView;
 import io.usethesource.capsule.util.RangecopyUtils.Companion;
 import io.usethesource.capsule.util.RangecopyUtils.EitherIntOrObject;
@@ -144,7 +145,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
     return rootNode.containsKey(key, transformHashCode(key), 0);
   }
 
-  public boolean containsKeyEquivalent(final int key, final Comparator<Object> cmp) {
+  public boolean containsKeyEquivalent(final int key, final EqualityComparator<Object> cmp) {
     return rootNode.containsKeyEquivalent(key, transformHashCode(key), 0, cmp);
   }
 
@@ -159,7 +160,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
   }
 
   @Override
-  public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
+  public boolean containsKeyEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     try {
       final Object key = (Object) o;
       return rootNode.containsKeyEquivalent(key, transformHashCode(key.hashCode()), 0, cmp);
@@ -179,9 +180,9 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
   }
 
   @Override
-  public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
+  public boolean containsValueEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     for (Iterator<Object> iterator = valueIterator(); iterator.hasNext(); ) {
-      if (cmp.compare(iterator.next(), o) == 0) {
+      if (cmp.equals(iterator.next(), o)) {
         return true;
       }
     }
@@ -205,7 +206,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
   }
 
   @Override
-  public Object getEquivalent(final Object o, final Comparator<Object> cmp) {
+  public Object getEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     try {
       final int key = (int) o;
       final Optional<Object> result = rootNode.findByKey(key, transformHashCode(key), 0, cmp);
@@ -249,7 +250,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
 
   public io.usethesource.capsule.Map.Immutable<Object, Object> __putEquivalent(final int key,
       final int val,
-      final Comparator<Object> cmp) {
+      final EqualityComparator<Object> cmp) {
     final int keyHash = (int) key;
     final MapResult details = MapResult.unchanged();
 
@@ -304,7 +305,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
   @Override
   public io.usethesource.capsule.Map.Immutable<Object, Object> __putEquivalent(final Object key,
       final Object val,
-      final Comparator<Object> cmp) {
+      final EqualityComparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult details = MapResult.unchanged();
 
@@ -340,7 +341,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
 
   @Override
   public io.usethesource.capsule.Map.Immutable<Object, Object> __putAllEquivalent(
-      final Map<? extends Object, ? extends Object> map, final Comparator<Object> cmp) {
+      final Map<? extends Object, ? extends Object> map, final EqualityComparator<Object> cmp) {
     final io.usethesource.capsule.Map.Transient<Object, Object> tmpTransient = this
         .asTransient();
     tmpTransient.__putAllEquivalent(map, cmp);
@@ -365,7 +366,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
   }
 
   public io.usethesource.capsule.Map.Immutable<Object, Object> __removeEquivalent(final int key,
-      final Comparator<Object> cmp) {
+      final EqualityComparator<Object> cmp) {
     final int keyHash = (int) key;
     final MapResult details = MapResult.unchanged();
 
@@ -403,7 +404,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
   @Override
   public io.usethesource.capsule.Map.Immutable<Object, Object> __removeEquivalent(
       final Object key,
-      final Comparator<Object> cmp) {
+      final EqualityComparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult details = MapResult.unchanged();
 
@@ -833,48 +834,48 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
     abstract boolean containsKey(final int key, final int keyHash, final int shift);
 
     abstract boolean containsKeyEquivalent(final int key, final int keyHash, final int shift,
-        final Comparator<Object> cmp);
+        final EqualityComparator<Object> cmp);
 
     abstract boolean containsKey(final Object key, final int keyHash, final int shift);
 
     abstract boolean containsKeyEquivalent(final Object key, final int keyHash, final int shift,
-        final Comparator<Object> cmp);
+        final EqualityComparator<Object> cmp);
 
     abstract Optional<Object> findByKey(final int key, final int keyHash, final int shift);
 
     abstract Optional<Object> findByKey(final int key, final int keyHash, final int shift,
-        final Comparator<Object> cmp);
+        final EqualityComparator<Object> cmp);
 
     abstract Optional<Object> findByKey(final Object key, final int keyHash, final int shift);
 
     abstract Optional<Object> findByKey(final Object key, final int keyHash, final int shift,
-        final Comparator<Object> cmp);
+        final EqualityComparator<Object> cmp);
 
     abstract AbstractMapNode updated(final AtomicReference<Thread> mutator, final int key,
         final int val, final int keyHash, final int shift, final MapResult details);
 
     abstract AbstractMapNode updated(final AtomicReference<Thread> mutator, final int key,
         final int val, final int keyHash, final int shift, final MapResult details,
-        final Comparator<Object> cmp);
+        final EqualityComparator<Object> cmp);
 
     abstract AbstractMapNode updated(final AtomicReference<Thread> mutator, final Object key,
         final Object val, final int keyHash, final int shift, final MapResult details);
 
     abstract AbstractMapNode updated(final AtomicReference<Thread> mutator, final Object key,
         final Object val, final int keyHash, final int shift, final MapResult details,
-        final Comparator<Object> cmp);
+        final EqualityComparator<Object> cmp);
 
     abstract public AbstractMapNode removed(final AtomicReference<Thread> mutator, final int key,
         final int keyHash, final int shift, final MapResult details);
 
     abstract public AbstractMapNode removed(final AtomicReference<Thread> mutator, final int key,
-        final int keyHash, final int shift, final MapResult details, final Comparator<Object> cmp);
+        final int keyHash, final int shift, final MapResult details, final EqualityComparator<Object> cmp);
 
     abstract public AbstractMapNode removed(final AtomicReference<Thread> mutator, final Object key,
         final int keyHash, final int shift, final MapResult details);
 
     abstract public AbstractMapNode removed(final AtomicReference<Thread> mutator, final Object key,
-        final int keyHash, final int shift, final MapResult details, final Comparator<Object> cmp);
+        final int keyHash, final int shift, final MapResult details, final EqualityComparator<Object> cmp);
 
     abstract boolean hasNodes();
 
@@ -2251,7 +2252,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
 
     @Override
     boolean containsKeyEquivalent(final int key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       CompactMapNode instance = this;
       Class<? extends CompactMapNode> clazz = instance.getClass();
 
@@ -2287,7 +2288,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
 
     @Override
     AbstractMapNode updated(final AtomicReference<Thread> mutator, final int key, final int val,
-        final int keyHash, final int shift, final MapResult details, final Comparator<Object> cmp) {
+        final int keyHash, final int shift, final MapResult details, final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -2439,7 +2440,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
     @Override
     AbstractMapNode updated(final AtomicReference<Thread> mutator, final Object key,
         final Object val, final int keyHash, final int shift, final MapResult details,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -2469,7 +2470,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
           final int rareIndex = index(rareMap, mask, bitpos);
           final Object currentKey = getRareKey(rareIndex);
 
-          if (cmp.compare(currentKey, key) == 0) {
+          if (cmp.equals(currentKey, key)) {
             final Object currentVal = getRareVal(rareIndex);
 
             // update mapping
@@ -2587,7 +2588,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
 
     @Override
     Optional<Object> findByKey(final int key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -2625,7 +2626,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
 
     @Override
     boolean containsKeyEquivalent(final Object key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       CompactMapNode instance = this;
       Class<? extends CompactMapNode> clazz = instance.getClass();
 
@@ -2651,7 +2652,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
           // final int rareMap = unsafe.getInt(instance, globalRawMap2Offset);
           if (isBitInBitmap(rareMap, bitpos)) {
             final int index = index(rareMap, mask, bitpos);
-            return cmp.compare(getRareKey(clazz, instance, index), key) == 0;
+            return cmp.equals(getRareKey(clazz, instance, index), key);
           } else {
             return false;
           }
@@ -2701,7 +2702,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
 
     @Override
     Optional<Object> findByKey(final Object key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -2709,7 +2710,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
       if (isBitInBitmap(rareMap, bitpos)) { // inplace value
         final int index = index(rareMap, mask, bitpos);
 
-        if (cmp.compare(getRareKey(index), key) == 0) {
+        if (cmp.equals(getRareKey(index), key)) {
           final Object result = getRareVal(index);
 
           return Optional.of(result);
@@ -2813,7 +2814,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
 
     @Override
     public AbstractMapNode removed(final AtomicReference<Thread> mutator, final int key,
-        final int keyHash, final int shift, final MapResult details, final Comparator<Object> cmp) {
+        final int keyHash, final int shift, final MapResult details, final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -2932,7 +2933,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
 
     @Override
     public AbstractMapNode removed(final AtomicReference<Thread> mutator, final Object key,
-        final int keyHash, final int shift, final MapResult details, final Comparator<Object> cmp) {
+        final int keyHash, final int shift, final MapResult details, final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -2943,7 +2944,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
         final int rareIndex = index(rareMap, mask, bitpos);
         final Object currentKey = getRareKey(rareIndex);
 
-        if (cmp.compare(currentKey, key) == 0) {
+        if (cmp.equals(currentKey, key)) {
           final Object currentVal = getRareVal(rareIndex);
           details.updated(EitherIntOrObject.ofObject(currentVal));
 
@@ -3208,14 +3209,14 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
 
     @Override
     AbstractMapNode updated(final AtomicReference<Thread> mutator, final int key, final int val,
-        final int keyHash, final int shift, final MapResult details, final Comparator<Object> cmp) {
+        final int keyHash, final int shift, final MapResult details, final EqualityComparator<Object> cmp) {
       assert this.hash == keyHash;
 
       for (int idx = 0; idx < keys.length; idx++) {
-        if (cmp.compare(keys[idx], key) == 0) {
+        if (cmp.equals(keys[idx], key)) {
           final Object currentVal = vals[idx];
 
-          if (cmp.compare(currentVal, val) == 0) {
+          if (cmp.equals(currentVal, val)) {
             return this;
           } else {
             // add new mapping
@@ -3314,14 +3315,14 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
     @Override
     AbstractMapNode updated(final AtomicReference<Thread> mutator, final Object key,
         final Object val, final int keyHash, final int shift, final MapResult details,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       assert this.hash == keyHash;
 
       for (int idx = 0; idx < keys.length; idx++) {
-        if (cmp.compare(keys[idx], key) == 0) {
+        if (cmp.equals(keys[idx], key)) {
           final Object currentVal = vals[idx];
 
-          if (cmp.compare(currentVal, val) == 0) {
+          if (cmp.equals(currentVal, val)) {
             return this;
           } else {
             // add new mapping
@@ -3414,10 +3415,10 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
 
     @Override
     Optional<Object> findByKey(final int key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       for (int i = 0; i < keys.length; i++) {
         final Object _key = keys[i];
-        if (cmp.compare(_key, key) == 0) {
+        if (cmp.equals(_key, key)) {
           final Object val = vals[i];
           return Optional.of(val);
         }
@@ -3442,10 +3443,10 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
 
     @Override
     boolean containsKeyEquivalent(final Object key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       if (this.hash == keyHash) {
         for (Object k : keys) {
-          if (cmp.compare(k, key) == 0) {
+          if (cmp.equals(k, key)) {
             return true;
           }
         }
@@ -3472,10 +3473,10 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
 
     @Override
     Optional<Object> findByKey(final Object key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       for (int i = 0; i < keys.length; i++) {
         final Object _key = keys[i];
-        if (cmp.compare(_key, key) == 0) {
+        if (cmp.equals(_key, key)) {
           final Object val = vals[i];
           return Optional.of(val);
         }
@@ -3512,9 +3513,9 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
 
     @Override
     public AbstractMapNode removed(final AtomicReference<Thread> mutator, final int key,
-        final int keyHash, final int shift, final MapResult details, final Comparator<Object> cmp) {
+        final int keyHash, final int shift, final MapResult details, final EqualityComparator<Object> cmp) {
       for (int idx = 0; idx < keys.length; idx++) {
-        if (cmp.compare(keys[idx], key) == 0) {
+        if (cmp.equals(keys[idx], key)) {
           final Object currentVal = vals[idx];
           details.updated(EitherIntOrObject.ofObject(currentVal));
 
@@ -3563,9 +3564,9 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
 
     @Override
     public AbstractMapNode removed(final AtomicReference<Thread> mutator, final Object key,
-        final int keyHash, final int shift, final MapResult details, final Comparator<Object> cmp) {
+        final int keyHash, final int shift, final MapResult details, final EqualityComparator<Object> cmp) {
       for (int idx = 0; idx < keys.length; idx++) {
-        if (cmp.compare(keys[idx], key) == 0) {
+        if (cmp.equals(keys[idx], key)) {
           final Object currentVal = vals[idx];
           details.updated(EitherIntOrObject.ofObject(currentVal));
 
@@ -3740,10 +3741,10 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
 
     @Override
     boolean containsKeyEquivalent(final int key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       if (this.hash == keyHash) {
         for (Object k : keys) {
-          if (cmp.compare(k, key) == 0) {
+          if (cmp.equals(k, key)) {
             return true;
           }
         }
@@ -4045,7 +4046,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
       return rootNode.containsKey(key, transformHashCode(key), 0);
     }
 
-    public boolean containsKeyEquivalent(final int key, final Comparator<Object> cmp) {
+    public boolean containsKeyEquivalent(final int key, final EqualityComparator<Object> cmp) {
       return rootNode.containsKeyEquivalent(key, transformHashCode(key), 0, cmp);
     }
 
@@ -4060,7 +4061,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
     }
 
     @Override
-    public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
+    public boolean containsKeyEquivalent(final Object o, final EqualityComparator<Object> cmp) {
       try {
         final Object key = (Object) o;
         return rootNode.containsKeyEquivalent(key, transformHashCode(key.hashCode()), 0, cmp);
@@ -4080,9 +4081,9 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
     }
 
     @Override
-    public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
+    public boolean containsValueEquivalent(final Object o, final EqualityComparator<Object> cmp) {
       for (Iterator<Object> iterator = valueIterator(); iterator.hasNext(); ) {
-        if (cmp.compare(iterator.next(), o) == 0) {
+        if (cmp.equals(iterator.next(), o)) {
           return true;
         }
       }
@@ -4106,7 +4107,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
     }
 
     @Override
-    public Object getEquivalent(final Object o, final Comparator<Object> cmp) {
+    public Object getEquivalent(final Object o, final EqualityComparator<Object> cmp) {
       try {
         final int key = (int) o;
         final Optional<Object> result = rootNode.findByKey(key, transformHashCode(key), 0, cmp);
@@ -4165,7 +4166,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
       return null;
     }
 
-    public Object __putEquivalent(final int key, final int val, final Comparator<Object> cmp) {
+    public Object __putEquivalent(final int key, final int val, final EqualityComparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -4256,7 +4257,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
 
     @Override
     public Object __putEquivalent(final Object key, final Object val,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -4318,7 +4319,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
 
     @Override
     public boolean __putAllEquivalent(final Map<? extends Object, ? extends Object> map,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       boolean modified = false;
 
       for (Map.Entry<? extends Object, ? extends Object> entry : map.entrySet()) {
@@ -4365,7 +4366,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
       return null;
     }
 
-    public Object __removeEquivalent(final int key, final Comparator<Object> cmp) {
+    public Object __removeEquivalent(final int key, final EqualityComparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -4431,7 +4432,7 @@ public class TrieMap_5Bits_Heterogeneous_BleedingEdge implements
     }
 
     @Override
-    public Object __removeEquivalent(final Object key, final Comparator<Object> cmp) {
+    public Object __removeEquivalent(final Object key, final EqualityComparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }

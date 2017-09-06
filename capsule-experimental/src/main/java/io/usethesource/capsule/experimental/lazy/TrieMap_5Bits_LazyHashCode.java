@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.usethesource.capsule.util.ArrayUtils;
+import io.usethesource.capsule.util.EqualityComparator;
 
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
@@ -119,7 +120,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
   }
 
   @Override
-  public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
+  public boolean containsKeyEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     try {
       final K key = (K) o;
       return rootNode.containsKey(key, key.hashCode(), 0, cmp);
@@ -139,9 +140,9 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
   }
 
   @Override
-  public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
+  public boolean containsValueEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
-      if (cmp.compare(iterator.next(), o) == 0) {
+      if (cmp.equals(iterator.next(), o)) {
         return true;
       }
     }
@@ -165,7 +166,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
   }
 
   @Override
-  public V getEquivalent(final Object o, final Comparator<Object> cmp) {
+  public V getEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     try {
       final K key = (K) o;
       final Optional<V> result = rootNode.findByKey(key, key.hashCode(), 0, cmp);
@@ -200,7 +201,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
 
   @Override
   public io.usethesource.capsule.Map.Immutable<K, V> __putEquivalent(final K key, final V val,
-      final Comparator<Object> cmp) {
+      final EqualityComparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -229,7 +230,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
   @Override
   public io.usethesource.capsule.Map.Immutable<K, V> __putAllEquivalent(
       final Map<? extends K, ? extends V> map,
-      final Comparator<Object> cmp) {
+      final EqualityComparator<Object> cmp) {
     final io.usethesource.capsule.Map.Transient<K, V> tmpTransient = this.asTransient();
     tmpTransient.__putAllEquivalent(map, cmp);
     return tmpTransient.freeze();
@@ -252,7 +253,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
 
   @Override
   public io.usethesource.capsule.Map.Immutable<K, V> __removeEquivalent(final K key,
-      final Comparator<Object> cmp) {
+      final EqualityComparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MapResult<K, V> details = MapResult.unchanged();
 
@@ -672,26 +673,26 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
     abstract boolean containsKey(final K key, final int keyHash, final int shift);
 
     abstract boolean containsKey(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp);
+        final EqualityComparator<Object> cmp);
 
     abstract Optional<V> findByKey(final K key, final int keyHash, final int shift);
 
     abstract Optional<V> findByKey(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp);
+        final EqualityComparator<Object> cmp);
 
     abstract CompactMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key,
         final V val, final int keyHash, final int shift, final MapResult<K, V> details);
 
     abstract CompactMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key,
         final V val, final int keyHash, final int shift, final MapResult<K, V> details,
-        final Comparator<Object> cmp);
+        final EqualityComparator<Object> cmp);
 
     abstract CompactMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final MapResult<K, V> details);
 
     abstract CompactMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final MapResult<K, V> details,
-        final Comparator<Object> cmp);
+        final EqualityComparator<Object> cmp);
 
     static final boolean isAllowedToEdit(AtomicReference<Thread> x, AtomicReference<Thread> y) {
       return x != null && y != null && (x == y || x.get() == y.get());
@@ -935,14 +936,14 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
 
     @Override
     boolean containsKey(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
       final int dataMap = dataMap();
       if ((dataMap & bitpos) != 0) {
         final int index = index(dataMap, mask, bitpos);
-        return cmp.compare(getKey(index), key) == 0;
+        return cmp.equals(getKey(index), key);
       }
 
       final int nodeMap = nodeMap();
@@ -981,13 +982,13 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
 
     @Override
     Optional<V> findByKey(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
       if ((dataMap() & bitpos) != 0) { // inplace value
         final int index = dataIndex(bitpos);
-        if (cmp.compare(getKey(index), key) == 0) {
+        if (cmp.equals(getKey(index), key)) {
           final V result = getValue(index);
 
           return Optional.of(result);
@@ -1049,7 +1050,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
     @Override
     CompactMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
         final int keyHash, final int shift, final MapResult<K, V> details,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1057,7 +1058,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
         final int dataIndex = dataIndex(bitpos);
         final K currentKey = getKey(dataIndex);
 
-        if (cmp.compare(currentKey, key) == 0) {
+        if (cmp.equals(currentKey, key)) {
           final V currentVal = getValue(dataIndex);
 
           // update mapping
@@ -1155,14 +1156,14 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
     @Override
     CompactMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final MapResult<K, V> details,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
       if ((dataMap() & bitpos) != 0) { // inplace value
         final int dataIndex = dataIndex(bitpos);
 
-        if (cmp.compare(getKey(dataIndex), key) == 0) {
+        if (cmp.equals(getKey(dataIndex), key)) {
           final V currentVal = getValue(dataIndex);
           details.updated(currentVal);
 
@@ -1580,10 +1581,10 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
 
     @Override
     boolean containsKey(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       if (this.hash == keyHash) {
         for (K k : keys) {
-          if (cmp.compare(k, key) == 0) {
+          if (cmp.equals(k, key)) {
             return true;
           }
         }
@@ -1605,10 +1606,10 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
 
     @Override
     Optional<V> findByKey(final K key, final int keyHash, final int shift,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       for (int i = 0; i < keys.length; i++) {
         final K _key = keys[i];
-        if (cmp.compare(key, _key) == 0) {
+        if (cmp.equals(key, _key)) {
           final V val = vals[i];
           return Optional.of(val);
         }
@@ -1670,14 +1671,14 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
     @Override
     CompactMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
         final int keyHash, final int shift, final MapResult<K, V> details,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       assert this.hash == keyHash;
 
       for (int idx = 0; idx < keys.length; idx++) {
-        if (cmp.compare(keys[idx], key) == 0) {
+        if (cmp.equals(keys[idx], key)) {
           final V currentVal = vals[idx];
 
-          if (cmp.compare(currentVal, val) == 0) {
+          if (cmp.equals(currentVal, val)) {
             return this;
           } else {
             // add new mapping
@@ -1763,9 +1764,9 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
     @Override
     CompactMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
         final int keyHash, final int shift, final MapResult<K, V> details,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       for (int idx = 0; idx < keys.length; idx++) {
-        if (cmp.compare(keys[idx], key) == 0) {
+        if (cmp.equals(keys[idx], key)) {
           final V currentVal = vals[idx];
           details.updated(currentVal);
 
@@ -2206,7 +2207,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
     }
 
     @Override
-    public boolean containsKeyEquivalent(final Object o, final Comparator<Object> cmp) {
+    public boolean containsKeyEquivalent(final Object o, final EqualityComparator<Object> cmp) {
       try {
         final K key = (K) o;
         return rootNode.containsKey(key, key.hashCode(), 0, cmp);
@@ -2226,9 +2227,9 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
     }
 
     @Override
-    public boolean containsValueEquivalent(final Object o, final Comparator<Object> cmp) {
+    public boolean containsValueEquivalent(final Object o, final EqualityComparator<Object> cmp) {
       for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
-        if (cmp.compare(iterator.next(), o) == 0) {
+        if (cmp.equals(iterator.next(), o)) {
           return true;
         }
       }
@@ -2252,7 +2253,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
     }
 
     @Override
-    public V getEquivalent(Object o, Comparator<Object> cmp) {
+    public V getEquivalent(Object o, EqualityComparator<Object> cmp) {
       try {
         final K key = (K) o;
         final Optional<V> result = rootNode.findByKey(key, key.hashCode(), 0, cmp);
@@ -2296,7 +2297,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
     }
 
     @Override
-    public V __putEquivalent(final K key, final V val, final Comparator<Object> cmp) {
+    public V __putEquivalent(final K key, final V val, final EqualityComparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -2341,7 +2342,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
 
     @Override
     public boolean __putAllEquivalent(final Map<? extends K, ? extends V> map,
-        final Comparator<Object> cmp) {
+        final EqualityComparator<Object> cmp) {
       boolean modified = false;
 
       for (Map.Entry<? extends K, ? extends V> entry : map.entrySet()) {
@@ -2380,7 +2381,7 @@ public class TrieMap_5Bits_LazyHashCode<K, V> implements
     }
 
     @Override
-    public V __removeEquivalent(final K key, final Comparator<Object> cmp) {
+    public V __removeEquivalent(final K key, final EqualityComparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
