@@ -51,6 +51,7 @@ public interface SetEq<K> extends java.util.Set<K> {
       throw new UnsupportedOperationException("Not yet implemented @ Set.");
     }
 
+    // TODO: unify API with insert and remove
     default Set.Immutable<K> __retainAllEquivalent(final Set.Transient<? extends K> transientSet,
         final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Set.");
@@ -79,6 +80,7 @@ public interface SetEq<K> extends java.util.Set<K> {
       throw new UnsupportedOperationException("Not yet implemented @ Set.");
     }
 
+    // TODO: unify API with insert and remove
     default boolean __retainAllEquivalent(final Set.Transient<? extends K> transientSet,
         final EqualityComparator<Object> cmp) {
       throw new UnsupportedOperationException("Not yet implemented @ Set.");

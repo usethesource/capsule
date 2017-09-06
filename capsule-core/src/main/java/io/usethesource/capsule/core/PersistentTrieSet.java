@@ -7,15 +7,12 @@
  */
 package io.usethesource.capsule.core;
 
-import static io.usethesource.capsule.util.BitmapUtils.isBitInBitmap;
-
 import java.text.DecimalFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
@@ -148,20 +145,14 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
   @Override
   public boolean contains(final Object o) {
-    try {
-      final K key = (K) o;
-      return rootNode.contains(key, transformHashCode(key.hashCode()), 0, Object::equals);
-    } catch (ClassCastException unused) {
-      return false;
-    }
+    return containsEquivalent(o, Object::equals);
   }
 
   @Override
   public boolean containsEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     try {
       final K key = (K) o;
-      return rootNode.contains(key, transformHashCode(key.hashCode()), 0,
-          cmp);
+      return rootNode.contains(key, transformHashCode(key.hashCode()), 0, cmp);
     } catch (ClassCastException unused) {
       return false;
     }
@@ -169,19 +160,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
   @Override
   public K get(final Object o) {
-    try {
-      final K key = (K) o;
-      final Optional<K> result = rootNode
-          .findByKey(key, transformHashCode(key.hashCode()), 0, Object::equals);
-
-      if (result.isPresent()) {
-        return result.get();
-      } else {
-        return null;
-      }
-    } catch (ClassCastException unused) {
-      return null;
-    }
+    return getEquivalent(o, Object::equals);
   }
 
   @Override
@@ -203,17 +182,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
   @Override
   public Set.Immutable<K> __insert(final K key) {
-    final int keyHash = key.hashCode();
-    final SetNodeResult<K> details = SetNodeResult.unchanged();
-
-    final AbstractSetNode<K> newRootNode =
-        rootNode.updated(null, key, transformHashCode(keyHash), 0, details, Object::equals);
-
-    if (details.isModified()) {
-      return new PersistentTrieSet<K>(newRootNode, cachedHashCode + keyHash, cachedSize + 1);
-    }
-
-    return this;
+    return __insertEquivalent(key, Object::equals);
   }
 
   @Override
@@ -233,9 +202,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
   @Override
   public Set.Immutable<K> __insertAll(final java.util.Set<? extends K> set) {
-    final Set.Transient<K> tmpTransient = this.asTransient();
-    tmpTransient.__insertAll(set);
-    return tmpTransient.freeze();
+    return __insertAllEquivalent(set, Object::equals);
   }
 
   @Override
@@ -248,17 +215,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
   @Override
   public Set.Immutable<K> __remove(final K key) {
-    final int keyHash = key.hashCode();
-    final SetNodeResult<K> details = SetNodeResult.unchanged();
-
-    final AbstractSetNode<K> newRootNode =
-        rootNode.removed(null, key, transformHashCode(keyHash), 0, details, Object::equals);
-
-    if (details.isModified()) {
-      return new PersistentTrieSet<K>(newRootNode, cachedHashCode - keyHash, cachedSize - 1);
-    }
-
-    return this;
+    return __removeEquivalent(key, Object::equals);
   }
 
   @Override
@@ -278,9 +235,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
   @Override
   public Set.Immutable<K> __removeAll(final java.util.Set<? extends K> set) {
-    final Set.Transient<K> tmpTransient = this.asTransient();
-    tmpTransient.__removeAll(set);
-    return tmpTransient.freeze();
+    return __removeAllEquivalent(set, Object::equals);
   }
 
   @Override
@@ -338,12 +293,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
   @Override
   public boolean containsAll(final Collection<?> c) {
-    for (Object item : c) {
-      if (!contains(item)) {
-        return false;
-      }
-    }
-    return true;
+    return containsAllEquivalent(c, Object::equals);
   }
 
   @Override
@@ -1882,20 +1832,14 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     public boolean contains(final Object o) {
-      try {
-        final K key = (K) o;
-        return rootNode.contains(key, transformHashCode(key.hashCode()), 0, Object::equals);
-      } catch (ClassCastException unused) {
-        return false;
-      }
+      return containsEquivalent(o, Object::equals);
     }
 
     @Override
     public boolean containsEquivalent(final Object o, final EqualityComparator<Object> cmp) {
       try {
         final K key = (K) o;
-        return rootNode.contains(key, transformHashCode(key.hashCode()), 0,
-            cmp);
+        return rootNode.contains(key, transformHashCode(key.hashCode()), 0, cmp);
       } catch (ClassCastException unused) {
         return false;
       }
@@ -1903,19 +1847,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     public K get(final Object o) {
-      try {
-        final K key = (K) o;
-        final Optional<K> result = rootNode
-            .findByKey(key, transformHashCode(key.hashCode()), 0, Object::equals);
-
-        if (result.isPresent()) {
-          return result.get();
-        } else {
-          return null;
-        }
-      } catch (ClassCastException unused) {
-        return null;
-      }
+      return getEquivalent(o, Object::equals);
     }
 
     @Override
@@ -1923,8 +1855,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       try {
         final K key = (K) o;
         final Optional<K> result =
-            rootNode.findByKey(key, transformHashCode(key.hashCode()), 0,
-                cmp);
+            rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
         if (result.isPresent()) {
           return result.get();
@@ -1937,33 +1868,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     protected boolean __insertWithCapability(AtomicReference<Thread> mutator, K key) {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
-      final int keyHash = key.hashCode();
-      final SetNodeResult<K> details = SetNodeResult.unchanged();
-
-      final AbstractSetNode<K> newRootNode =
-          rootNode.updated(mutator, key, transformHashCode(keyHash), 0, details, Object::equals);
-
-      if (details.isModified()) {
-
-        rootNode = newRootNode;
-        cachedHashCode += keyHash;
-        cachedSize += 1;
-
-        if (DEBUG) {
-          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
-        }
-        return true;
-
-      }
-
-      if (DEBUG) {
-        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
-      }
-      return false;
+      return __insertEquivalentWithCapability(mutator, key, Object::equals);
     }
 
     protected boolean __insertEquivalentWithCapability(AtomicReference<Thread> mutator,
@@ -1999,13 +1904,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     public boolean __insertAll(final java.util.Set<? extends K> set) {
-      boolean modified = false;
-
-      for (final K key : set) {
-        modified |= this.__insert(key);
-      }
-
-      return modified;
+      return __insertAllEquivalent(set, Object::equals);
     }
 
     @Override
@@ -2021,32 +1920,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     protected boolean __removeWithCapability(AtomicReference<Thread> mutator, final K key) {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
-      final int keyHash = key.hashCode();
-      final SetNodeResult<K> details = SetNodeResult.unchanged();
-
-      final AbstractSetNode<K> newRootNode =
-          rootNode.removed(mutator, key, transformHashCode(keyHash), 0, details, Object::equals);
-
-      if (details.isModified()) {
-        rootNode = newRootNode;
-        cachedHashCode = cachedHashCode - keyHash;
-        cachedSize = cachedSize - 1;
-
-        if (DEBUG) {
-          assert checkHashCodeAndSize(cachedHashCode, cachedSize);
-        }
-        return true;
-      }
-
-      if (DEBUG) {
-        assert checkHashCodeAndSize(cachedHashCode, cachedSize);
-      }
-
-      return false;
+      return __removeEquivalentWithCapability(mutator, key, Object::equals);
     }
 
     protected boolean __removeEquivalentWithCapability(AtomicReference<Thread> mutator,
@@ -2081,13 +1955,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     public boolean __removeAll(final java.util.Set<? extends K> set) {
-      boolean modified = false;
-
-      for (final K key : set) {
-        modified |= this.__remove(key);
-      }
-
-      return modified;
+      return __removeAllEquivalent(set, Object::equals);
     }
 
     @Override
@@ -2135,12 +2003,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     public boolean containsAll(Collection<?> c) {
-      for (Object item : c) {
-        if (!contains(item)) {
-          return false;
-        }
-      }
-      return true;
+      return containsAllEquivalent(c, Object::equals);
     }
 
     @Override
@@ -2274,8 +2137,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     public boolean __insertEquivalent(final K key, final EqualityComparator<Object> cmp) {
-      return __insertEquivalentWithCapability(this.mutator, key,
-          cmp);
+      return __insertEquivalentWithCapability(this.mutator, key, cmp);
     }
 
     @Override
@@ -2285,8 +2147,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     public boolean __removeEquivalent(final K key, final EqualityComparator<Object> cmp) {
-      return __removeEquivalentWithCapability(this.mutator, key,
-          cmp);
+      return __removeEquivalentWithCapability(this.mutator, key, cmp);
     }
 
     @Override
