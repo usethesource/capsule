@@ -906,26 +906,6 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    public boolean containsKey(final K key, final int keyHash, final int shift) {
-      final int mask = mask(keyHash, shift);
-      final int bitpos = bitpos(mask);
-
-      final int dataMap = dataMap();
-      if ((dataMap & bitpos) != 0) {
-        final int index = index(dataMap, mask, bitpos);
-        return getKey(index).equals(key);
-      }
-
-      final int nodeMap = nodeMap();
-      if ((nodeMap & bitpos) != 0) {
-        final int index = index(nodeMap, mask, bitpos);
-        return getNode(index).containsKey(key, keyHash, shift + BIT_PARTITION_SIZE);
-      }
-
-      return false;
-    }
-
-    @Override
     public boolean containsKey(final K key, final int keyHash, final int shift,
         final EqualityComparator<Object> cmp) {
       final int mask = mask(keyHash, shift);
@@ -944,31 +924,6 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
       }
 
       return false;
-    }
-
-    @Override
-    public Optional<V> findByKey(final K key, final int keyHash, final int shift) {
-      final int mask = mask(keyHash, shift);
-      final int bitpos = bitpos(mask);
-
-      if ((dataMap() & bitpos) != 0) { // inplace value
-        final int index = dataIndex(bitpos);
-        if (getKey(index).equals(key)) {
-          final V result = getValue(index);
-
-          return Optional.of(result);
-        }
-
-        return Optional.empty();
-      }
-
-      if ((nodeMap() & bitpos) != 0) { // node (not value)
-        final AbstractMapNode<K, V> subNode = nodeAt(bitpos);
-
-        return subNode.findByKey(key, keyHash, shift + BIT_PARTITION_SIZE);
-      }
-
-      return Optional.empty();
     }
 
     @Override
@@ -995,48 +950,6 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
       }
 
       return Optional.empty();
-    }
-
-    @Override
-    public AbstractMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
-        final int keyHash, final int shift, final MapNodeResult<K, V> details) {
-      final int mask = mask(keyHash, shift);
-      final int bitpos = bitpos(mask);
-
-      if ((dataMap() & bitpos) != 0) { // inplace value
-        final int dataIndex = dataIndex(bitpos);
-        final K currentKey = getKey(dataIndex);
-
-        if (currentKey.equals(key)) {
-          final V currentVal = getValue(dataIndex);
-
-          // update mapping
-          details.updated(currentVal);
-          return copyAndSetValue(mutator, bitpos, val);
-        } else {
-          final V currentVal = getValue(dataIndex);
-          final AbstractMapNode<K, V> subNodeNew =
-              mergeTwoKeyValPairs(currentKey, currentVal, transformHashCode(currentKey.hashCode()),
-                  key, val, keyHash, shift + BIT_PARTITION_SIZE);
-
-          details.modified();
-          return copyAndMigrateFromInlineToNode(mutator, bitpos, subNodeNew);
-        }
-      } else if ((nodeMap() & bitpos) != 0) { // node (not value)
-        final AbstractMapNode<K, V> subNode = nodeAt(bitpos);
-        final AbstractMapNode<K, V> subNodeNew =
-            subNode.updated(mutator, key, val, keyHash, shift + BIT_PARTITION_SIZE, details);
-
-        if (details.isModified()) {
-          return copyAndSetNode(mutator, bitpos, subNodeNew);
-        } else {
-          return this;
-        }
-      } else {
-        // no value
-        details.modified();
-        return copyAndInsertValue(mutator, bitpos, key, val);
-      }
     }
 
     @Override
@@ -1080,70 +993,6 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
         details.modified();
         return copyAndInsertValue(mutator, bitpos, key, val);
       }
-    }
-
-    @Override
-    public AbstractMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
-        final int keyHash, final int shift, final MapNodeResult<K, V> details) {
-      final int mask = mask(keyHash, shift);
-      final int bitpos = bitpos(mask);
-
-      if ((dataMap() & bitpos) != 0) { // inplace value
-        final int dataIndex = dataIndex(bitpos);
-
-        if (getKey(dataIndex).equals(key)) {
-          final V currentVal = getValue(dataIndex);
-          details.updated(currentVal);
-
-          if (this.payloadArity() == 2 && this.nodeArity() == 0) {
-            /*
-             * Create new node with remaining pair. The new node will a) either become the new root
-             * returned, or b) unwrapped and inlined during returning.
-             */
-            final int newDataMap =
-                (shift == 0) ? (int) (dataMap() ^ bitpos) : bitpos(mask(keyHash, 0));
-
-            if (dataIndex == 0) {
-              return CompactMapNode.<K, V>nodeOf(mutator, 0, newDataMap, getKey(1), getValue(1));
-            } else {
-              return CompactMapNode.<K, V>nodeOf(mutator, 0, newDataMap, getKey(0), getValue(0));
-            }
-          } else {
-            return copyAndRemoveValue(mutator, bitpos);
-          }
-        } else {
-          return this;
-        }
-      } else if ((nodeMap() & bitpos) != 0) { // node (not value)
-        final AbstractMapNode<K, V> subNode = nodeAt(bitpos);
-        final AbstractMapNode<K, V> subNodeNew =
-            subNode.removed(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, details);
-
-        if (!details.isModified()) {
-          return this;
-        }
-
-        switch (subNodeNew.sizePredicate()) {
-          case 0: {
-            throw new IllegalStateException("Sub-node must have at least one element.");
-          }
-          case 1: {
-            if (this.payloadArity() == 0 && this.nodeArity() == 1) {
-              // escalate (singleton or empty) result
-              return subNodeNew;
-            } else {
-              // inline value (move to front)
-              return copyAndMigrateFromNodeToInline(mutator, bitpos, subNodeNew);
-            }
-          }
-          default: {
-            // modify current node (set replacement node)
-            return copyAndSetNode(mutator, bitpos, subNodeNew);
-          }
-        }
-      }
-
-      return this;
     }
 
     @Override
@@ -1642,18 +1491,6 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    public boolean containsKey(final K key, final int keyHash, final int shift) {
-      if (this.hash == keyHash) {
-        for (K k : keys) {
-          if (k.equals(key)) {
-            return true;
-          }
-        }
-      }
-      return false;
-    }
-
-    @Override
     public boolean containsKey(final K key, final int keyHash, final int shift,
         final EqualityComparator<Object> cmp) {
       if (this.hash == keyHash) {
@@ -1667,18 +1504,6 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    public Optional<V> findByKey(final K key, final int keyHash, final int shift) {
-      for (int i = 0; i < keys.length; i++) {
-        final K _key = keys[i];
-        if (key.equals(_key)) {
-          final V val = vals[i];
-          return Optional.of(val);
-        }
-      }
-      return Optional.empty();
-    }
-
-    @Override
     public Optional<V> findByKey(final K key, final int keyHash, final int shift,
         final EqualityComparator<Object> cmp) {
       for (int i = 0; i < keys.length; i++) {
@@ -1689,57 +1514,6 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
         }
       }
       return Optional.empty();
-    }
-
-    @Override
-    public AbstractMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
-        final int keyHash, final int shift, final MapNodeResult<K, V> details) {
-      assert this.hash == keyHash;
-
-      for (int idx = 0; idx < keys.length; idx++) {
-        if (keys[idx].equals(key)) {
-          final V currentVal = vals[idx];
-
-          if (currentVal.equals(val)) {
-            return this;
-          } else {
-            // add new mapping
-            final V[] src = this.vals;
-            final V[] dst = (V[]) new Object[src.length];
-
-            // copy 'src' and set 1 element(s) at position 'idx'
-            System.arraycopy(src, 0, dst, 0, src.length);
-            dst[idx + 0] = val;
-
-            final CompactMapNode<K, V> thisNew =
-                new HashCollisionMapNode<>(this.hash, this.keys, dst);
-
-            details.updated(currentVal);
-            return thisNew;
-          }
-        }
-      }
-
-      final K[] keysNew = (K[]) new Object[this.keys.length + 1];
-
-      // copy 'this.keys' and insert 1 element(s) at position
-      // 'keys.length'
-      System.arraycopy(this.keys, 0, keysNew, 0, keys.length);
-      keysNew[keys.length + 0] = key;
-      System.arraycopy(this.keys, keys.length, keysNew, keys.length + 1,
-          this.keys.length - keys.length);
-
-      final V[] valsNew = (V[]) new Object[this.vals.length + 1];
-
-      // copy 'this.vals' and insert 1 element(s) at position
-      // 'vals.length'
-      System.arraycopy(this.vals, 0, valsNew, 0, vals.length);
-      valsNew[vals.length + 0] = val;
-      System.arraycopy(this.vals, vals.length, valsNew, vals.length + 1,
-          this.vals.length - vals.length);
-
-      details.modified();
-      return new HashCollisionMapNode<>(keyHash, keysNew, valsNew);
     }
 
     @Override
@@ -1792,47 +1566,6 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
       details.modified();
       return new HashCollisionMapNode<>(keyHash, keysNew, valsNew);
-    }
-
-    @Override
-    public AbstractMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
-        final int keyHash, final int shift, final MapNodeResult<K, V> details) {
-      for (int idx = 0; idx < keys.length; idx++) {
-        if (keys[idx].equals(key)) {
-          final V currentVal = vals[idx];
-          details.updated(currentVal);
-
-          if (this.arity() == 1) {
-            return nodeOf(mutator);
-          } else if (this.arity() == 2) {
-            /*
-             * Create root node with singleton element. This node will be a) either be the new root
-             * returned, or b) unwrapped and inlined.
-             */
-            final K theOtherKey = (idx == 0) ? keys[1] : keys[0];
-            final V theOtherVal = (idx == 0) ? vals[1] : vals[0];
-            return CompactMapNode.<K, V>nodeOf(mutator).updated(mutator, theOtherKey, theOtherVal,
-                keyHash, 0, details);
-          } else {
-            final K[] keysNew = (K[]) new Object[this.keys.length - 1];
-
-            // copy 'this.keys' and remove 1 element(s) at position
-            // 'idx'
-            System.arraycopy(this.keys, 0, keysNew, 0, idx);
-            System.arraycopy(this.keys, idx + 1, keysNew, idx, this.keys.length - idx - 1);
-
-            final V[] valsNew = (V[]) new Object[this.vals.length - 1];
-
-            // copy 'this.vals' and remove 1 element(s) at position
-            // 'idx'
-            System.arraycopy(this.vals, 0, valsNew, 0, idx);
-            System.arraycopy(this.vals, idx + 1, valsNew, idx, this.vals.length - idx - 1);
-
-            return new HashCollisionMapNode<>(keyHash, keysNew, valsNew);
-          }
-        }
-      }
-      return this;
     }
 
     @Override
