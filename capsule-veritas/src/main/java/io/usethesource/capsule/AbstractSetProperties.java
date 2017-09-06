@@ -54,6 +54,18 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
   }
 
   @Property(trials = DEFAULT_TRIALS)
+  public void checkEquality(
+      @Size(min = 0, max = 0) final CT emptySet,
+      @Size(min = 1, max = MAX_SIZE) final CT input) {
+
+    final Set.Transient<T> builder = emptySet.asTransient();
+    input.forEach(builder::__insert);
+    final CT duplicate = (CT) builder.freeze();
+
+    assertEquals("input.equals(duplicate)", input, duplicate);
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
   public void streamYieldsSizeElements(CT input) {
     assertEquals(input.size(), input.stream().count());
   }

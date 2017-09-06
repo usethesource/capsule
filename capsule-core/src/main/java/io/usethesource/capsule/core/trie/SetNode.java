@@ -26,6 +26,7 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
   R removed(final AtomicReference<Thread> mutator, final K key, final int keyHash, final int shift,
       final SetNodeResult<K> details, final EqualityComparator<Object> cmp);
 
+  // TODO: move to {@code Node} interface
   boolean equivalent(final Object other, final EqualityComparator<Object> cmp);
 
   boolean hasPayload();

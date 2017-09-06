@@ -14,8 +14,6 @@ import io.usethesource.capsule.Set;
 
 public final class DefaultSetFactory {
 
-  public static final DefaultSetFactory FACTORY = new DefaultSetFactory();
-
   static final String DEFAULT_CLASS_NAME = "io.usethesource.capsule.core.PersistentTrieSet";
 
   /*
@@ -26,6 +24,8 @@ public final class DefaultSetFactory {
       .getProperty(String.format("%s.%s", Set.class.getName(), "targetClass"), DEFAULT_CLASS_NAME);
 
   private final String persistentFactoryMethodName = "of";
+
+  public static final DefaultSetFactory FACTORY = new DefaultSetFactory();
 
   private final Method of0;
   private final Method of1;
