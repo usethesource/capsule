@@ -4,12 +4,12 @@
 
   <groupId>io.usethesource</groupId>
   <artifactId>capsule-pom-parent</artifactId>
-  <version>0.6.0-SNAPSHOT</version>
+  <version>0.5.1</version>
   <packaging>pom</packaging>
 
   <scm>
     <developerConnection>scm:git:https://github.com/usethesource/capsule.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>v0.5.1</tag>
   </scm>
 
   <modules>
