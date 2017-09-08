@@ -9,8 +9,11 @@ package io.usethesource.capsule.generators.multimap;
 
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT;
 
+/*
+ * NOTE: disabled by making it abstract.
+ */
 @SuppressWarnings({"rawtypes"})
-public class SetMultimapGenerator_HHAMT<K>
+public abstract class SetMultimapGenerator_HHAMT<K>
     extends AbstractSetMultimapGenerator<TrieSetMultimap_HHAMT> {
 
   public SetMultimapGenerator_HHAMT() {

@@ -50,23 +50,6 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
     }
   }
 
-//  AbstractPersistentTrieSetMultimap(final EqualityComparator<Object> cmp,
-//      final R rootNode) {
-//    this.cmp = cmp;
-//    this.rootNode = rootNode;
-//
-//    // // this.cachedHashCode = hashCode(rootNode);
-//    this.cachedSize = size(rootNode);
-//
-//    this.cachedKeySetHashCode = keySetHashCode(rootNode);
-//    this.cachedKeySetSize = keySetSize(rootNode);
-//
-//    if (DEBUG) {
-//      // assert checkHashCodeAndSize(cachedHashCode, cachedSize, entryIterator());
-//      assert checkKeySetHashCodeAndSize(cachedKeySetHashCode, cachedKeySetSize, keyIterator());
-//    }
-//  }
-
   @Override
   final R getRootNode() {
     return rootNode;
@@ -109,6 +92,10 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
         rootNode.inserted(null, key, values, transformHashCode(keyHash), 0, details, cmp);
 
     switch (details.getModificationEffect()) {
+      case NOTHING: {
+        return this;
+      }
+
       case INSERTED_PAYLOAD: {
         // int hashCodeDeltaNew = tupleHash(keyHash, values);
         // int propertyHashCode = cachedHashCode + hashCodeDeltaNew;
@@ -126,7 +113,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
       }
 
       default: {
-        return this;
+        throw new IllegalStateException("Unhandled modification effect.");
       }
     }
   }
@@ -150,6 +137,10 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
         rootNode.updated(null, key, values, transformHashCode(keyHash), 0, details, cmp);
 
     switch (details.getModificationEffect()) {
+      case NOTHING: {
+        return this;
+      }
+
       case REPLACED_PAYLOAD: {
         // int hashCodeDeltaOld = tupleHash(keyHash, details.getEvictedPayload());
         // int hashCodeDeltaNew = tupleHash(keyHash, values);
@@ -179,7 +170,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
       }
 
       default: {
-        return this;
+        throw new IllegalStateException("Unhandled modification effect.");
       }
     }
   }
@@ -193,6 +184,10 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
         rootNode.removed(null, key, value, transformHashCode(keyHash), 0, details, cmp);
 
     switch (details.getModificationEffect()) {
+      case NOTHING: {
+        return this;
+      }
+
       case REMOVED_PAYLOAD: {
         // int hashCodeDeltaOld = tupleHash(keyHash, value); // TODO: support collection
         // int propertyHashCode = cachedHashCode - hashCodeDeltaOld;
@@ -210,7 +205,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
       }
 
       default: {
-        return this;
+        throw new IllegalStateException("Unhandled modification effect.");
       }
     }
   }
@@ -224,6 +219,10 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
         rootNode.removed(null, key, transformHashCode(keyHash), 0, details, cmp);
 
     switch (details.getModificationEffect()) {
+      case NOTHING: {
+        return this;
+      }
+
       case REMOVED_PAYLOAD: {
         assert details.getModificationDetails().contains(REMOVED_KEY);
 
@@ -241,7 +240,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
       }
 
       default: {
-        return this;
+        throw new IllegalStateException("Unhandled modification effect.");
       }
     }
   }

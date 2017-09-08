@@ -9,11 +9,13 @@ package io.usethesource.capsule;
 
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import io.usethesource.capsule.core.PersistentTrieSetMultimap;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 
+@Ignore
 @RunWith(JUnitQuickcheck.class)
 public class SetMultimapPropertiesOfHchampTest extends
-    AbstractSetMultimapProperties<Integer, Integer, PersistentTrieSetMultimap<Integer, Integer>> {
+    AbstractSetMultimapProperties<String, String, PersistentTrieSetMultimap<String, String>> {
 
   public SetMultimapPropertiesOfHchampTest() {
     super(PersistentTrieSetMultimap.class);

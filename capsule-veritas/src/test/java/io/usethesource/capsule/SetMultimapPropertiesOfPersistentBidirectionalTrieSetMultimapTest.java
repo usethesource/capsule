@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(JUnitQuickcheck.class)
 public class SetMultimapPropertiesOfPersistentBidirectionalTrieSetMultimapTest extends
-    AbstractBinaryRelationProperties<Integer, Integer, PersistentBidirectionalTrieSetMultimap<Integer, Integer>> {
+    AbstractBinaryRelationProperties<String, String, PersistentBidirectionalTrieSetMultimap<String, String>> {
 
   public SetMultimapPropertiesOfPersistentBidirectionalTrieSetMultimapTest() {
     super(PersistentBidirectionalTrieSetMultimap.class);

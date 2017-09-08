@@ -13,6 +13,7 @@ import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+@Deprecated
 @Ignore("Semantic difference in equality is not yet resolved.")
 @RunWith(Suite.class)
 @Suite.SuiteClasses({SetToLegacySetPropertiesTest.IntegerSetPropertiesTest.class,

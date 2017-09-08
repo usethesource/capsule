@@ -117,10 +117,10 @@ public interface SetMultimap<K, V> {
 
     SetMultimap.Immutable<K, V> __insert(final K key, final V value);
 
-//    SetMultimap.Immutable<K, V> __insert(final K key, final Set.Immutable<V> values);
-
     default SetMultimap.Immutable<K, V> __insert(final K key, final Set.Immutable<V> values) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
+      final SetMultimap.Transient<K, V> builder = this.asTransient();
+      values.forEach(value -> builder.__insert(key, value));
+      return builder.freeze();
     }
 
     default SetMultimap.Immutable<K, V> __insert(final Set.Immutable<K> keys, final V value) {
@@ -148,7 +148,13 @@ public interface SetMultimap<K, V> {
 
     default SetMultimap.Immutable<K, V> complement(
         final SetMultimap<? extends K, ? extends V> setMultimap) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
+      final SetMultimap.Transient<K, V> builder = SetMultimap.Transient.of();
+
+      setMultimap.entrySet().stream()
+          .filter(entry -> !this.containsEntry(entry.getKey(), entry.getValue()))
+          .forEach(entry -> builder.__insert(entry.getKey(), entry.getValue()));
+
+      return builder.freeze();
     }
 
     /*
@@ -192,17 +198,41 @@ public interface SetMultimap<K, V> {
     }
 
     default boolean __put(final K key, final Set.Immutable<V> values) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
+      final Set.Immutable<V> oldValues = this.get(key);
+
+      if (values.equals(oldValues)) {
+        return false;
+      } else {
+        this.__remove(key);
+        this.__insert(key, values);
+
+        return true;
+      }
     }
 
     boolean __insert(final K key, final V value);
 
     default boolean __insert(final K key, final Set.Immutable<V> values) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
+      final Set.Immutable<V> oldValues = this.get(key);
+
+      if (values.equals(oldValues)) {
+        return false;
+      } else {
+        values.forEach(value -> this.__insert(key, value));
+
+        return true;
+      }
     }
 
     default boolean __remove(final K key) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
+      int oldSize = this.size();
+
+      final Set.Immutable<V> values = this.get(key);
+      values.forEach(value -> this.__remove(key, value));
+
+      int newSize = this.size();
+
+      return oldSize != newSize;
     }
 
     boolean __remove(final K key, final V val);

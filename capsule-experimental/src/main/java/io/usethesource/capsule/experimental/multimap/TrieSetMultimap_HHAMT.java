@@ -3526,81 +3526,81 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
       }
     }
 
-    @Override
-    public boolean __put(K key, io.usethesource.capsule.Set.Immutable<V> valColl) {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
-      // if (valColl.size() == 1) {
-      // throw new IllegalStateException();
-      // }
-
-      final int keyHash = key.hashCode();
-      final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
-
-      final CompactSetMultimapNode<K, V> newRootNode =
-          rootNode.updated(null, key, valColl, transformHashCode(keyHash), 0, details, cmp);
-
-      if (details.isModified()) {
-        if (details.hasReplacedValue()) {
-          if (details.getType() == SINGLETON) {
-            final int valHashOld = details.getReplacedValue().hashCode();
-            final int valHashNew = valColl.hashCode();
-
-            rootNode = newRootNode;
-            // hashCode += 0;
-            // cachedSize += 0;
-
-            // return new TrieSetMultimap_HHAMT<K, V>(cmp, newRootNode,
-            // hashCode + ((keyHash ^ valHashNew)) - ((keyHash ^ valHashOld)), cachedSize);
-
-            throw new IllegalStateException();
-            //
-            // return true;
-          } else {
-            int sumOfReplacedHashes = 0;
-
-            for (V replaceValue : details.getReplacedCollection()) {
-              sumOfReplacedHashes += (keyHash ^ replaceValue.hashCode());
-            }
-
-            final int valHashNew = valColl.hashCode();
-
-            rootNode = newRootNode;
-            // hashCode += 0;
-            // cachedSize += 0;
-
-            // return new TrieSetMultimap_HHAMT<K, V>(cmp, newRootNode,
-            // hashCode + ((keyHash ^ valHashNew)) - sumOfReplacedHashes,
-            // cachedSize - details.getReplacedCollection().size() + 1);
-
-            throw new IllegalStateException();
-            //
-            // return true;
-          }
-        }
-
-        int sumOfNewHashes = 0;
-
-        // for (V newValue : valColl) {
-        // sumOfNewHashes += (keyHash ^ newValue.hashCode());
-        // }
-
-        rootNode = newRootNode;
-        hashCode += sumOfNewHashes;
-        cachedSize += valColl.size();
-
-        // final int valHash = valColl.hashCode();
-        // return new TrieSetMultimap_HHAMT<K, V>(cmp, newRootNode, hashCode + ((keyHash ^
-        // valHash)),
-        // cachedSize + 1);
-
-        return true;
-      }
-
-      return false;
-    }
+//    @Override
+//    public boolean __put(K key, io.usethesource.capsule.Set.Immutable<V> valColl) {
+//      if (mutator.get() == null) {
+//        throw new IllegalStateException("Transient already frozen.");
+//      }
+//
+//      // if (valColl.size() == 1) {
+//      // throw new IllegalStateException();
+//      // }
+//
+//      final int keyHash = key.hashCode();
+//      final SetMultimapResult<K, V> details = SetMultimapResult.unchanged();
+//
+//      final CompactSetMultimapNode<K, V> newRootNode =
+//          rootNode.updated(null, key, valColl, transformHashCode(keyHash), 0, details, cmp);
+//
+//      if (details.isModified()) {
+//        if (details.hasReplacedValue()) {
+//          if (details.getType() == SINGLETON) {
+//            final int valHashOld = details.getReplacedValue().hashCode();
+//            final int valHashNew = valColl.hashCode();
+//
+//            rootNode = newRootNode;
+//            // hashCode += 0;
+//            // cachedSize += 0;
+//
+//            // return new TrieSetMultimap_HHAMT<K, V>(cmp, newRootNode,
+//            // hashCode + ((keyHash ^ valHashNew)) - ((keyHash ^ valHashOld)), cachedSize);
+//
+//            throw new IllegalStateException();
+//            //
+//            // return true;
+//          } else {
+//            int sumOfReplacedHashes = 0;
+//
+//            for (V replaceValue : details.getReplacedCollection()) {
+//              sumOfReplacedHashes += (keyHash ^ replaceValue.hashCode());
+//            }
+//
+//            final int valHashNew = valColl.hashCode();
+//
+//            rootNode = newRootNode;
+//            // hashCode += 0;
+//            // cachedSize += 0;
+//
+//            // return new TrieSetMultimap_HHAMT<K, V>(cmp, newRootNode,
+//            // hashCode + ((keyHash ^ valHashNew)) - sumOfReplacedHashes,
+//            // cachedSize - details.getReplacedCollection().size() + 1);
+//
+//            throw new IllegalStateException();
+//            //
+//            // return true;
+//          }
+//        }
+//
+//        int sumOfNewHashes = 0;
+//
+//        // for (V newValue : valColl) {
+//        // sumOfNewHashes += (keyHash ^ newValue.hashCode());
+//        // }
+//
+//        rootNode = newRootNode;
+//        hashCode += sumOfNewHashes;
+//        cachedSize += valColl.size();
+//
+//        // final int valHash = valColl.hashCode();
+//        // return new TrieSetMultimap_HHAMT<K, V>(cmp, newRootNode, hashCode + ((keyHash ^
+//        // valHash)),
+//        // cachedSize + 1);
+//
+//        return true;
+//      }
+//
+//      return false;
+//    }
 
     @Override
     public boolean __insert(final K key, final V val) {

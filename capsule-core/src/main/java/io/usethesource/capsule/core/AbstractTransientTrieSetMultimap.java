@@ -47,10 +47,16 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
     this.cachedSize = trieSetMultimap.cachedSize;
     this.cachedKeySetHashCode = trieSetMultimap.cachedKeySetHashCode;
     this.cachedKeySetSize = trieSetMultimap.cachedKeySetSize;
-//    if (DEBUG) {
-//      // assert checkHashCodeAndSize(cachedHashCode, cachedSize, entryIterator());
-//      assert checkKeySetHashCodeAndSize(cachedKeySetHashCode, cachedKeySetSize, keyIterator());
-//    }
+
+    assertPropertiesCorrectness();
+  }
+
+  private void assertPropertiesCorrectness() {
+    if (DEBUG) {
+      assert cachedSize == size(rootNode);
+      assert cachedKeySetHashCode == keySetHashCode(rootNode);
+      assert cachedKeySetSize == keySetSize(rootNode);
+    }
   }
 
   @Override
@@ -70,7 +76,7 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
 
   @Override
   final int getCachedKeySetSize() {
-    return getCachedKeySetSize();
+    return cachedKeySetSize;
   }
 
   @Override
@@ -96,11 +102,15 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
         .inserted(mutator, key, values, transformHashCode(keyHash), 0, details, cmp);
 
     switch (details.getModificationEffect()) {
+      case NOTHING: {
+        return false;
+      }
+
       case INSERTED_PAYLOAD: {
         // int hashCodeDeltaNew = tupleHash(keyHash, values);
         // this.cachedHashCode = cachedHashCode + hashCodeDeltaNew;
 
-        this.cachedSize = cachedSize + details.sizeDelta().get();
+        this.cachedSize += details.sizeDelta().get();
         this.cachedKeySetHashCode = cachedKeySetHashCode;
         this.cachedKeySetSize = cachedKeySetSize;
 
@@ -110,11 +120,12 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
         }
 
         this.rootNode = newRootNode;
+        assertPropertiesCorrectness();
         return true;
       }
 
       default: {
-        return false;
+        throw new IllegalStateException("Unhandled modification effect.");
       }
     }
   }
@@ -142,6 +153,10 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
         rootNode.updated(mutator, key, values, transformHashCode(keyHash), 0, details, cmp);
 
     switch (details.getModificationEffect()) {
+      case NOTHING: {
+        return false;
+      }
+
       case REPLACED_PAYLOAD: {
         // int hashCodeDeltaOld = tupleHash(keyHash, details.getEvictedPayload());
         // int hashCodeDeltaNew = tupleHash(keyHash, values);
@@ -155,6 +170,7 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
         this.cachedKeySetSize = cachedKeySetSize;
 
         this.rootNode = newRootNode;
+        assertPropertiesCorrectness();
         return true;
       }
 
@@ -169,11 +185,12 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
         this.cachedKeySetSize = cachedKeySetSize + 1;
 
         this.rootNode = newRootNode;
+        assertPropertiesCorrectness();
         return true;
       }
 
       default: {
-        return false;
+        throw new IllegalStateException("Unhandled modification effect.");
       }
     }
   }
@@ -191,6 +208,10 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
         rootNode.removed(mutator, key, value, transformHashCode(keyHash), 0, details, cmp);
 
     switch (details.getModificationEffect()) {
+      case NOTHING: {
+        return false;
+      }
+
       case REMOVED_PAYLOAD: {
         // int hashCodeDeltaOld = tupleHash(keyHash, value); // TODO: support collection
         // this.cachedHashCode = cachedHashCode - hashCodeDeltaOld;
@@ -205,11 +226,12 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
         }
 
         this.rootNode = newRootNode;
+        assertPropertiesCorrectness();
         return true;
       }
 
       default: {
-        return false;
+        throw new IllegalStateException("Unhandled modification effect.");
       }
     }
   }
@@ -227,6 +249,10 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
         rootNode.removed(mutator, key, transformHashCode(keyHash), 0, details, cmp);
 
     switch (details.getModificationEffect()) {
+      case NOTHING: {
+        return false;
+      }
+
       case REMOVED_PAYLOAD: {
         assert details.getModificationDetails().contains(REMOVED_KEY);
 
@@ -241,11 +267,12 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
         this.cachedKeySetSize = cachedKeySetSize - 1;
 
         this.rootNode = newRootNode;
+        assertPropertiesCorrectness();
         return true;
       }
 
       default: {
-        return false;
+        throw new IllegalStateException("Unhandled modification effect.");
       }
     }
   }

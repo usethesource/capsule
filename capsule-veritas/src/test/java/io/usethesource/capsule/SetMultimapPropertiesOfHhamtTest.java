@@ -9,11 +9,13 @@ package io.usethesource.capsule;
 
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 
+@Ignore
 @RunWith(JUnitQuickcheck.class)
 public class SetMultimapPropertiesOfHhamtTest extends
-    AbstractSetMultimapProperties<Integer, Integer, TrieSetMultimap_HHAMT<Integer, Integer>> {
+    AbstractSetMultimapProperties<String, String, TrieSetMultimap_HHAMT<String, String>> {
 
   public SetMultimapPropertiesOfHhamtTest() {
     super(TrieSetMultimap_HHAMT.class);

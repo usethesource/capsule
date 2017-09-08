@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(JUnitQuickcheck.class)
 public class SetMultimapPropertiesTest extends
-    AbstractSetMultimapProperties<Integer, Integer, SetMultimap.Immutable<Integer, Integer>> {
+    AbstractSetMultimapProperties<String, String, SetMultimap.Immutable<String, String>> {
 
   public SetMultimapPropertiesTest() {
     super(SetMultimap.Immutable.class);
