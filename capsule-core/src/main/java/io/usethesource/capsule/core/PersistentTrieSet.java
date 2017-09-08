@@ -351,6 +351,11 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
   @Override
   public boolean equals(final Object other) {
+    return equivalent(other, Object::equals);
+  }
+
+  @Override
+  public boolean equivalent(final Object other, final EqualityComparator<Object> cmp) {
     if (other == this) {
       return true;
     }
@@ -369,7 +374,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         return false;
       }
 
-      return rootNode.equivalent(that.rootNode, Object::equals);
+      return rootNode.equivalent(that.rootNode, cmp);
     } else if (other instanceof java.util.Set) {
       java.util.Set that = (java.util.Set) other;
 
@@ -377,7 +382,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         return false;
       }
 
-      return containsAll(that);
+      return containsAllEquivalent(that, cmp);
     }
 
     return false;
@@ -2081,7 +2086,13 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       return list.toArray(a);
     }
 
+    @Override
     public boolean equals(final Object other) {
+      return equivalent(other, Object::equals);
+    }
+
+    @Override
+    public boolean equivalent(final Object other, final EqualityComparator<Object> cmp) {
       if (other == this) {
         return true;
       }
@@ -2100,7 +2111,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
           return false;
         }
 
-        return rootNode.equivalent(that.rootNode, Object::equals);
+        return rootNode.equivalent(that.rootNode, cmp);
       } else if (other instanceof java.util.Set) {
         java.util.Set that = (java.util.Set) other;
 
@@ -2108,7 +2119,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
           return false;
         }
 
-        return containsAll(that);
+        return containsAllEquivalent(that, cmp);
       }
 
       return false;

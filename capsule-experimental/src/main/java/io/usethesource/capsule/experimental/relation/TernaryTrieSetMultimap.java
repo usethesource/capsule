@@ -14,6 +14,7 @@ import io.usethesource.capsule.Set;
 import io.usethesource.capsule.SetMultimap;
 import io.usethesource.capsule.api.TernaryRelation;
 import io.usethesource.capsule.api.Triple;
+import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.collection.AbstractImmutableSet;
 
 public class TernaryTrieSetMultimap<T, U, V, R extends Triple<T, U, V>>
@@ -144,6 +145,11 @@ public class TernaryTrieSetMultimap<T, U, V, R extends Triple<T, U, V>>
   @Override
   public TernaryRelation.Transient<T, U, V, R> asTransient() {
     throw new IllegalStateException("Not yet implemented.");
+  }
+
+  @Override
+  public boolean equivalent(Object o, EqualityComparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented.");
   }
 
 }

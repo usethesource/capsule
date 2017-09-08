@@ -30,6 +30,11 @@ public interface SetEq<K> extends java.util.Set<K> {
     throw new UnsupportedOperationException("Not yet implemented @ Set.");
   }
 
+  boolean equivalent(final Object o, final EqualityComparator<Object> cmp);
+
+  @Override
+  int hashCode();
+
   @Deprecated
   interface Immutable<K> extends SetEq<K> {
 

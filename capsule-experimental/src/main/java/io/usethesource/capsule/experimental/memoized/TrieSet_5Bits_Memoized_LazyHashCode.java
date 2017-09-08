@@ -378,6 +378,11 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements
   }
 
   @Override
+  public boolean equivalent(Object o, EqualityComparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented.");
+  }
+
+  @Override
   public int hashCode() {
     if (hashCode == -1) {
       int hash = 0;
@@ -2317,6 +2322,11 @@ public class TrieSet_5Bits_Memoized_LazyHashCode<K> implements
       }
 
       return false;
+    }
+
+    @Override
+    public boolean equivalent(Object o, EqualityComparator<Object> cmp) {
+      throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Override

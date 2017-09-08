@@ -111,7 +111,12 @@ public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutab
   }
 
   @Override
-  public boolean equals(Object other) {
+  public boolean equals(final Object other) {
+    return equivalent(other, Object::equals);
+  }
+
+  @Override
+  public boolean equivalent(final Object other, final EqualityComparator<Object> cmp) {
     if (other == this) {
       return true;
     }
@@ -124,8 +129,8 @@ public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutab
         Set<K> that = (Set<K>) other;
 
         if (this.size() == that.size()) {
-          for (K e : this) {
-            if (!that.contains(e)) {
+          for (K e : that) {
+            if (!this.containsEquivalent(e, cmp)) {
               return false;
             }
           }

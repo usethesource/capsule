@@ -645,6 +645,11 @@ public class TrieMap_Heterogeneous_BleedingEdge implements
   }
 
   @Override
+  public boolean equivalent(Object o, EqualityComparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented.");
+  }
+
+  @Override
   public int hashCode() {
     return hashCode;
   }
@@ -4527,6 +4532,11 @@ public class TrieMap_Heterogeneous_BleedingEdge implements
       }
 
       return false;
+    }
+
+    @Override
+    public boolean equivalent(Object o, EqualityComparator<Object> cmp) {
+      throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Override

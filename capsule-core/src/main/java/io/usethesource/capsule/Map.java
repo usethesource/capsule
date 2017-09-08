@@ -34,6 +34,12 @@ public interface Map<K, V> extends java.util.Map<K, V>, MapEq<K, V> {
 
   Iterator<Entry<K, V>> entryIterator();
 
+  @Override
+  boolean equals(Object o);
+
+  @Override
+  int hashCode();
+
   interface Immutable<K, V> extends Map<K, V>, MapEq.Immutable<K, V> {
 
     Map.Immutable<K, V> __put(final K key, final V val);

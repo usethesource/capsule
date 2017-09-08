@@ -415,6 +415,11 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
   @Override
   public boolean equals(final Object other) {
+    return equivalent(other, Object::equals);
+  }
+
+  @Override
+  public boolean equivalent(final Object other, final EqualityComparator<Object> cmp) {
     if (other == this) {
       return true;
     }
@@ -433,7 +438,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
         return false;
       }
 
-      return rootNode.equivalent(that.rootNode, Object::equals);
+      return rootNode.equivalent(that.rootNode, cmp);
     } else if (other instanceof Map) {
       Map that = (Map) other;
 
@@ -448,14 +453,14 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
         try {
           final K key = (K) entry.getKey();
           final Optional<V> result = rootNode
-              .findByKey(key, transformHashCode(key.hashCode()), 0, Object::equals);
+              .findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
           if (!result.isPresent()) {
             return false;
           } else {
             final V val = (V) entry.getValue();
 
-            if (!result.get().equals(val)) {
+            if (!cmp.equals(result.get(), val)) {
               return false;
             }
           }
@@ -2351,8 +2356,12 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
       return entrySet;
     }
 
-    @Override
     public boolean equals(final Object other) {
+      return equivalent(other, Object::equals);
+    }
+
+    @Override
+    public boolean equivalent(final Object other, final EqualityComparator<Object> cmp) {
       if (other == this) {
         return true;
       }
@@ -2371,7 +2380,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
           return false;
         }
 
-        return rootNode.equivalent(that.rootNode, Object::equals);
+        return rootNode.equivalent(that.rootNode, cmp);
       } else if (other instanceof Map) {
         Map that = (Map) other;
 
@@ -2386,14 +2395,14 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
           try {
             final K key = (K) entry.getKey();
             final Optional<V> result =
-                rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, Object::equals);
+                rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
 
             if (!result.isPresent()) {
               return false;
             } else {
               final V val = (V) entry.getValue();
 
-              if (!result.get().equals(val)) {
+              if (!cmp.equals(result.get(), val)) {
                 return false;
               }
             }

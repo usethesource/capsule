@@ -418,6 +418,11 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
   }
 
   @Override
+  public boolean equivalent(Object o, EqualityComparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented.");
+  }
+
+  @Override
   public int hashCode() {
     return hashCode;
   }
@@ -3703,6 +3708,11 @@ public class TrieSet_5Bits_Spec0To8<K> implements io.usethesource.capsule.Set.Im
       }
 
       return false;
+    }
+
+    @Override
+    public boolean equivalent(Object o, EqualityComparator<Object> cmp) {
+      throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Override

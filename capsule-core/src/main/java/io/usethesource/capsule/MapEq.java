@@ -7,8 +7,6 @@
  */
 package io.usethesource.capsule;
 
-import java.util.Comparator;
-
 import io.usethesource.capsule.util.EqualityComparator;
 
 /**
@@ -28,6 +26,11 @@ public interface MapEq<K, V> extends java.util.Map<K, V> {
   default V getEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     throw new UnsupportedOperationException("Not yet implemented @ Map.");
   }
+
+  boolean equivalent(final Object o, final EqualityComparator<Object> cmp);
+
+  @Override
+  int hashCode();
 
   @Deprecated
   interface Immutable<K, V> extends MapEq<K, V> {

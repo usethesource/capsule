@@ -354,6 +354,11 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
   }
 
   @Override
+  public boolean equivalent(Object o, EqualityComparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented.");
+  }
+
+  @Override
   public int hashCode() {
     if (hashCode == -1) {
       int hash = 0;
@@ -2201,6 +2206,11 @@ public class TrieSet_5Bits_LazyHashCode<K> implements io.usethesource.capsule.Se
       }
 
       return false;
+    }
+
+    @Override
+    public boolean equivalent(Object o, EqualityComparator<Object> cmp) {
+      throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Override

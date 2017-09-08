@@ -106,7 +106,12 @@ public abstract class AbstractSpecialisedImmutableMap<K, V>
   }
 
   @Override
-  public boolean equals(Object other) {
+  public boolean equals(final Object other) {
+    return equivalent(other, Object::equals);
+  }
+
+  @Override
+  public boolean equivalent(final Object other, final EqualityComparator<Object> cmp) {
     if (other == this) {
       return true;
     }
@@ -119,11 +124,11 @@ public abstract class AbstractSpecialisedImmutableMap<K, V>
         Map<K, V> that = (Map<K, V>) other;
 
         if (this.size() == that.size()) {
-          for (Entry<K, V> e : this.entrySet()) {
-            if (!that.containsKey(e.getKey())) {
+          for (Entry<K, V> e : that.entrySet()) {
+            if (!this.containsKeyEquivalent(e.getKey(), cmp)) {
               return false;
             }
-            if (!Objects.equals(e.getValue(), that.get(e.getKey()))) {
+            if (!Objects.equals(e.getValue(), this.getEquivalent(e.getKey(), cmp))) {
               return false;
             }
           }

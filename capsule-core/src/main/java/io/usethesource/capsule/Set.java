@@ -39,6 +39,12 @@ public interface Set<K> extends java.util.Set<K>, SetEq<K> {
 
   Iterator<K> keyIterator();
 
+  @Override
+  boolean equals(Object o);
+
+  @Override
+  int hashCode();
+
   interface Immutable<K> extends Set<K>, SetEq.Immutable<K> {
 
     Set.Immutable<K> __insert(final K key);

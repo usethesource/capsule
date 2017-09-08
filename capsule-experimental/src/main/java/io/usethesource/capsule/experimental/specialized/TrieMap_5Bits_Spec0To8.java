@@ -519,6 +519,11 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements
   }
 
   @Override
+  public boolean equivalent(Object o, EqualityComparator<Object> cmp) {
+    throw new UnsupportedOperationException("Not yet implemented.");
+  }
+
+  @Override
   public int hashCode() {
     return hashCode;
   }
@@ -4174,6 +4179,11 @@ public class TrieMap_5Bits_Spec0To8<K, V> implements
       }
 
       return false;
+    }
+
+    @Override
+    public boolean equivalent(Object o, EqualityComparator<Object> cmp) {
+      throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Override
