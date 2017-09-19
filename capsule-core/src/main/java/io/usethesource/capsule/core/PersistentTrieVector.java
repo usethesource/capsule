@@ -19,19 +19,17 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
   private static final VectorNode EMPTY_NODE = new ContentVectorNode<>(new Object[]{});
 
   private static final PersistentTrieVector EMPTY_VECTOR =
-      new PersistentTrieVector(EMPTY_NODE, 0, 0, 0);
+      new PersistentTrieVector(EMPTY_NODE, 0, 0);
 
   private final VectorNode<K> root;
   private final int shift;
-  private final int offset;
   private final int length;
   // private final Object[] head;
   // private final Object[] tail;
 
-  public PersistentTrieVector(VectorNode<K> root, int shift, int offset, int length) {
+  public PersistentTrieVector(VectorNode<K> root, int shift, int length) {
     this.root = root;
     this.shift = shift;
-    this.offset = offset;
     this.length = length;
   }
 
@@ -46,7 +44,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
   @Override
   public Optional<K> get(int index) {
-    return root.get(index, -offset, shift);
+    return root.get(index, 0, shift);
   }
 
   private static final int blockOffset(final int index) {
@@ -73,59 +71,68 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
   @Override
   public Vector.Immutable<K> pushFront(K item) {
-    final int index = offset;
+    final int index = 0;
 
     final int newShift = minimumShift(length); // TODO size or newSize
-    final int newOffset = offset;
     final int newLength = length + 1;
 
     if (newShift > shift) {
       final VectorNode<K> newLeafNode = new ContentVectorNode<>(new Object[]{item});
       final VectorNode<K> newRootNode = new RelaxedVectorNode<>(new VectorNode[]{
-          newPath(newLeafNode, shift),
+          newRelaxedPath(newLeafNode, shift),
           root
       }, new int[]{
           1,
           length + 1
       });
 
-      return new PersistentTrieVector<>(newRootNode, newShift, newOffset, newLength);
+      return new PersistentTrieVector<>(newRootNode, newShift, newLength);
     }
 
-    final VectorNode<K> newRootNode = root.pushFront(index, offset + 1, -offset + 1, item, shift);
-    return new PersistentTrieVector<>(newRootNode, shift, newOffset, newLength);
+    final VectorNode<K> newRootNode = root.pushFront(index, 0, item, shift);
+    return new PersistentTrieVector<>(newRootNode, shift, newLength);
   }
 
   @Override
   public Vector.Immutable<K> pushBack(K item) {
-    final int index = offset + length;
+    final int index = length;
 
     final int newShift = minimumShift(length); // TODO size or newSize
-    final int newOffset = offset;
     final int newLength = length + 1;
 
     if (newShift > shift) {
       final VectorNode<K> newLeafNode = new ContentVectorNode<>(new Object[]{item});
       final VectorNode<K> newRootNode = new RegularVectorNode<>(new VectorNode[]{
           root,
-          newPath(newLeafNode, shift)
+          newRegularPath(newLeafNode, shift)
       });
 
-      return new PersistentTrieVector<>(newRootNode, newShift, newOffset, newLength);
+      return new PersistentTrieVector<>(newRootNode, newShift, newLength);
     }
 
-    final VectorNode<K> newRootNode = root.pushBack(index, -offset, item, shift);
-    return new PersistentTrieVector<>(newRootNode, shift, newOffset, newLength);
+    final VectorNode<K> newRootNode = root.pushBack(index, 0, item, shift);
+    return new PersistentTrieVector<>(newRootNode, shift, newLength);
   }
 
-  private static final <K> VectorNode<K> newPath(VectorNode<K> node, int level) {
+  private static final <K> VectorNode<K> newRegularPath(VectorNode<K> node, int level) {
     if (level == 0) {
       return node;
     } else {
       final VectorNode[] content = new VectorNode[]{
-          newPath(node, level - BIT_PARTITION_SIZE)
+          newRegularPath(node, level - BIT_PARTITION_SIZE)
       };
       return new RegularVectorNode<>(content);
+    }
+  }
+
+  private static final <K> VectorNode<K> newRelaxedPath(VectorNode<K> node, int level) {
+    if (level == 0) {
+      return node;
+    } else {
+      final VectorNode[] content = new VectorNode[]{
+          newRelaxedPath(node, level - BIT_PARTITION_SIZE)
+      };
+      return new RelaxedVectorNode<>(content, new int[]{1});
     }
   }
 
@@ -137,7 +144,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
     Optional<K> get(int index, int delta, int shift);
 
-    VectorNode<K> pushFront(int index, int offset, int delta, K item, int shift);
+    VectorNode<K> pushFront(int index, int delta, K item, int shift);
 
     VectorNode<K> pushBack(int index, int delta, K item, int shift);
 
@@ -158,44 +165,32 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
 
     @Override
-    public VectorNode<K> pushFront(int index, int offset, int delta, K item, int shift) {
+    public VectorNode<K> pushFront(int index, int delta, K item, int shift) {
       int blockRelativeIndex = ((index + delta) >>> shift) & 0b11111;
 
       // assert blockRelativeIndex < content.length;
       assert content.length <= BIT_COUNT_OF_INDEX;
 
-      if (index + 1 == offset) {
-        // copy and insert node
-        final VectorNode[] src = this.content;
-        final VectorNode[] dst = new VectorNode[src.length + 1];
+      boolean isCurrentBranchFull = content.length == BIT_COUNT_OF_INDEX;
+      assert !isCurrentBranchFull; // assumes that addPath is called on higher level;
 
-        final int idx = 0;
-        final VectorNode<K> newLeafNode = new ContentVectorNode<>(new Object[]{item});
-        final VectorNode<K> newNode = newPath(newLeafNode, shift - BIT_PARTITION_SIZE);
+      // copy and insert node
+      final VectorNode[] src = this.content;
+      final VectorNode[] dst = new VectorNode[src.length + 1];
 
-        // copy 'src' and insert 1 element(s) at position 'idx'
-        System.arraycopy(src, 0, dst, 0, idx);
-        dst[idx] = newNode;
-        System.arraycopy(src, idx, dst, idx + 1, src.length - idx);
+      final int idx = 0;
+      final VectorNode<K> newLeafNode = new ContentVectorNode<>(new Object[]{item});
+      final VectorNode<K> newNode = newRelaxedPath(newLeafNode, shift - BIT_PARTITION_SIZE);
 
-        assert dst.length <= BIT_COUNT_OF_INDEX;
-        return new RegularVectorNode<>(dst);
-      } else {
-        // copy and set node
-        final VectorNode[] src = this.content;
-        final VectorNode[] dst = new VectorNode[src.length];
+      // copy 'src' and insert 1 element(s) at position 'idx'
+      System.arraycopy(src, 0, dst, 0, idx);
+      dst[idx] = newNode;
+      System.arraycopy(src, idx, dst, idx + 1, src.length - idx);
 
-        final int idx = blockRelativeIndex;
-        final VectorNode<K> newNode = src[idx]
-            .pushFront(index, offset, delta, item, shift - BIT_PARTITION_SIZE);
+      final int[] dstSizes = { 1, (1 << shift << 1) + 1 };
 
-        // copy 'src' and set 1 element(s) at position 'idx'
-        System.arraycopy(src, 0, dst, 0, src.length);
-        dst[idx] = newNode;
-
-        assert dst.length <= BIT_COUNT_OF_INDEX;
-        return new RegularVectorNode<>(dst);
-      }
+      assert dst.length <= BIT_COUNT_OF_INDEX;
+      return new RelaxedVectorNode<>(dst, dstSizes);
     }
 
     @Override
@@ -212,7 +207,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
         final int idx = blockRelativeIndex;
         final VectorNode<K> newLeafNode = new ContentVectorNode<>(new Object[]{item});
-        final VectorNode<K> newNode = newPath(newLeafNode, shift - BIT_PARTITION_SIZE);
+        final VectorNode<K> newNode = newRegularPath(newLeafNode, shift - BIT_PARTITION_SIZE);
 
         // copy 'src' and insert 1 element(s) at position 'idx'
         System.arraycopy(src, 0, dst, 0, idx);
@@ -279,15 +274,23 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
 
     @Override
-    public VectorNode<K> pushFront(int index, int offset, int delta, K item, int shift) {
+    public VectorNode<K> pushFront(int index, int delta, K item, int shift) {
       // throw new UnsupportedOperationException("Not yet implemented.");
 
       // int blockRelativeIndex = ((index + delta) >>> shift) & 0b11111;
-      int blockRelativeIndex = offset(cumulativeSizes, index);
-      // int newDelta = delta + cumulativeSizes[blockRelativeIndex];
+      int blockRelativeIndex = offset(cumulativeSizes, index + delta);
+
+      final int newDelta;
+      if (blockRelativeIndex == 0) {
+        newDelta = delta;
+      } else {
+        newDelta = delta - cumulativeSizes[blockRelativeIndex - 1];
+      }
+
+      assert blockRelativeIndex == 0; // b/c of pushFront
 
       boolean isCurrentBranchFull = content.length == BIT_COUNT_OF_INDEX;
-      boolean isSubTreeBranchFull = cumulativeSizes[blockRelativeIndex] == BIT_COUNT_OF_INDEX; // wrong!!!
+      boolean isSubTreeBranchFull = cumulativeSizes[0] == 1 << shift;
 
       // assert blockRelativeIndex < content.length;
       assert content.length <= BIT_COUNT_OF_INDEX;
@@ -299,7 +302,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
         final int idx = 0;
         final VectorNode<K> newLeafNode = new ContentVectorNode<>(new Object[]{item});
-        final VectorNode<K> newNode = newPath(newLeafNode, shift - BIT_PARTITION_SIZE);
+        final VectorNode<K> newNode = newRelaxedPath(newLeafNode, shift - BIT_PARTITION_SIZE);
 
         // copy 'src' and insert 1 element(s) at position 'idx'
         System.arraycopy(src, 0, dst, 0, idx);
@@ -327,7 +330,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
         final int idx = blockRelativeIndex;
         final VectorNode<K> newNode = src[idx]
-            .pushFront(index, offset, delta, item, shift - BIT_PARTITION_SIZE);
+            .pushFront(index, newDelta, item, shift - BIT_PARTITION_SIZE);
 
         // copy 'src' and set 1 element(s) at position 'idx'
         System.arraycopy(src, 0, dst, 0, src.length);
@@ -386,7 +389,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
      * TODO currently ignores index and delta
      */
     @Override
-    public VectorNode<K> pushFront(int index, int offset, int delta, K item, int shift) {
+    public VectorNode<K> pushFront(int index, int delta, K item, int shift) {
       assert shift == 0;
       assert content.length < BIT_COUNT_OF_INDEX;
 
