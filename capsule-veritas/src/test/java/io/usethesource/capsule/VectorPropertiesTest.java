@@ -7,24 +7,15 @@
  */
 package io.usethesource.capsule;
 
-import java.util.Optional;
+import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
+import org.junit.runner.RunWith;
 
-public interface Vector<K> {
+@RunWith(JUnitQuickcheck.class)
+public class VectorPropertiesTest extends
+    AbstractVectorProperties<String, Vector.Immutable<String>> {
 
-  int size();
-
-  Optional<K> get(int index);
-
-  interface Immutable<K> extends Vector<K> {
-
-    Vector.Immutable<K> pushFront(K item);
-
-    Vector.Immutable<K> pushBack(K item);
-
-  }
-
-  interface Transient<K> extends Vector<K> {
-
+  public VectorPropertiesTest() {
+    super(Vector.Immutable.class);
   }
 
 }
