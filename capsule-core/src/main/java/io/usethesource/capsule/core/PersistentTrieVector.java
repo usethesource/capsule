@@ -9,6 +9,7 @@ package io.usethesource.capsule.core;
 
 import static io.usethesource.capsule.core.PersistentTrieVector.VectorNode.BIT_COUNT_OF_INDEX;
 import static io.usethesource.capsule.core.PersistentTrieVector.VectorNode.BIT_PARTITION_SIZE;
+import static io.usethesource.capsule.util.ArrayUtils.copyAndInsert;
 
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -432,14 +433,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       assert content.length < BIT_COUNT_OF_INDEX;
 
       final Object[] src = this.content;
-      final Object[] dst = new Object[src.length + 1];
-
-      final int idx = 0;
-
-      // copy 'src' and insert 1 element(s) at position 'idx'
-      System.arraycopy(src, 0, dst, 0, idx);
-      dst[idx] = item;
-      System.arraycopy(src, idx, dst, idx + 1, src.length - idx);
+      final Object[] dst = copyAndInsert(src, 0, item);
 
       return new ContentVectorNode<>(dst);
     }
@@ -453,14 +447,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       assert content.length < BIT_COUNT_OF_INDEX;
 
       final Object[] src = this.content;
-      final Object[] dst = new Object[src.length + 1];
-
-      final int idx = src.length;
-
-      // copy 'src' and insert 1 element(s) at position 'idx'
-      System.arraycopy(src, 0, dst, 0, idx);
-      dst[idx] = item;
-      System.arraycopy(src, idx, dst, idx + 1, src.length - idx);
+      final Object[] dst = copyAndInsert(src, src.length, item);
 
       return new ContentVectorNode<>(dst);
     }
