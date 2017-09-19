@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 import io.usethesource.capsule.core.PersistentTrieSet;
 import io.usethesource.capsule.core.PersistentTrieVector;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class VectorSmokeTest {
@@ -30,15 +31,43 @@ public class VectorSmokeTest {
   public static void setUpBeforeClass() throws Exception {
   }
 
+  @Ignore
   @Test
-  public void testIteration() {
-    int[] input = IntStream.rangeClosed(0, 1024).toArray();
+  public void testPushFrontAndGet() {
+    final int MIN_INDEX = 0;
+    final int MAX_INDEX = 1024;
+    final int SIZE = MAX_INDEX - MIN_INDEX + 1;
+
+    int[] input = IntStream.rangeClosed(MIN_INDEX, MAX_INDEX).toArray();
+
+    io.usethesource.capsule.Vector.Immutable<Integer> vector = PersistentTrieVector.of();
+
+    for (Integer item : input) {
+      vector = vector.pushFront(item);
+    }
+
+    assert vector.size() == SIZE;
+
+    for (int i = 0; i < input.length; i++) {
+      assertEquals(Integer.valueOf(input[i]), vector.get(MAX_INDEX - i).get());
+    }
+  }
+
+  @Test
+  public void testPushBackAndGet() {
+    final int MIN_INDEX = 0;
+    final int MAX_INDEX = 1024;
+    final int SIZE = MAX_INDEX - MIN_INDEX + 1;
+
+    int[] input = IntStream.rangeClosed(MIN_INDEX, MAX_INDEX).toArray();
 
     io.usethesource.capsule.Vector.Immutable<Integer> vector = PersistentTrieVector.of();
 
     for (Integer item : input) {
       vector = vector.pushBack(item);
     }
+
+    assert vector.size() == SIZE;
 
     for (int i = 0; i < input.length; i++) {
       assertEquals(Integer.valueOf(input[i]), vector.get(i).get());
