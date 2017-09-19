@@ -11,6 +11,7 @@ import static io.usethesource.capsule.core.PersistentTrieVector.VectorNode.BIT_C
 import static io.usethesource.capsule.core.PersistentTrieVector.VectorNode.BIT_PARTITION_SIZE;
 
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import io.usethesource.capsule.Vector;
 
@@ -86,6 +87,12 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
           length + 1
       });
 
+      assert isSizeDifferenceValid(new int[]{1, length + 1}, newShift);
+
+//      int[] dstSizes = new int[]{1};
+//      assert isSizeDifferenceValid(dstSizes, shift);
+//      return new RelaxedVectorNode<>(content, dstSizes);
+
       return new PersistentTrieVector<>(newRootNode, newShift, newLength);
     }
 
@@ -125,14 +132,16 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
   }
 
-  private static final <K> VectorNode<K> newRelaxedPath(VectorNode<K> node, int level) {
-    if (level == 0) {
+  private static final <K> VectorNode<K> newRelaxedPath(VectorNode<K> node, int shift) {
+    if (shift == 0) {
       return node;
     } else {
       final VectorNode[] content = new VectorNode[]{
-          newRelaxedPath(node, level - BIT_PARTITION_SIZE)
+          newRelaxedPath(node, shift - BIT_PARTITION_SIZE)
       };
-      return new RelaxedVectorNode<>(content, new int[]{1});
+      int[] dstSizes = new int[]{1};
+      assert isSizeDifferenceValid(dstSizes, shift);
+      return new RelaxedVectorNode<>(content, dstSizes);
     }
   }
 
@@ -148,6 +157,24 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
     VectorNode<K> pushBack(int index, int delta, K item, int shift);
 
+  }
+
+  private final static boolean isRegular(int[] cumulativeSizes, int shift) {
+    assert isSizeDifferenceValid(cumulativeSizes, shift);
+
+    return cumulativeSizes[cumulativeSizes.length - 1] == (1 << shift) * cumulativeSizes.length;
+  }
+
+  private final static boolean isSizeDifferenceValid(int[] cumulativeSizes, int shift) {
+    int[] cumulativeDiffs = new int[cumulativeSizes.length];
+    for (int i = cumulativeSizes.length - 1; i > 0; i--) {
+      cumulativeDiffs[i] = cumulativeSizes[i] - cumulativeSizes[i - 1];
+    }
+    cumulativeDiffs[0] = cumulativeSizes[0];
+
+    int maxSize = (1 << shift);
+
+    return IntStream.of(cumulativeDiffs).allMatch(size -> size <= maxSize);
   }
 
   private static final class RegularVectorNode<K> implements VectorNode<K> {
@@ -187,9 +214,18 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       dst[idx] = newNode;
       System.arraycopy(src, idx, dst, idx + 1, src.length - idx);
 
-      final int[] dstSizes = { 1, (1 << shift << 1) + 1 };
+      // final int[] dstSizes = { 1, (1 << shift << 1) + 1 };
+      int cumulativeSize = 1;
+      int sizeIncrement = (1 << shift);
+
+      final int[] dstSizes = new int[dst.length];
+      dstSizes[0] = 1;
+      for (int i = 1; i < dstSizes.length; i++) {
+        dstSizes[i] = i * sizeIncrement + 1;
+      }
 
       assert dst.length <= BIT_COUNT_OF_INDEX;
+      assert isSizeDifferenceValid(dstSizes, shift);
       return new RelaxedVectorNode<>(dst, dstSizes);
     }
 
@@ -242,6 +278,8 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     private RelaxedVectorNode(VectorNode[] content, int[] cumulativeSizes) {
       this.content = content;
       this.cumulativeSizes = cumulativeSizes;
+
+      assert content.length == cumulativeSizes.length;
     }
 
     private final static int offset(int[] cumulativeSizes, int index) {
@@ -275,8 +313,6 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
     @Override
     public VectorNode<K> pushFront(int index, int delta, K item, int shift) {
-      // throw new UnsupportedOperationException("Not yet implemented.");
-
       // int blockRelativeIndex = ((index + delta) >>> shift) & 0b11111;
       int blockRelativeIndex = offset(cumulativeSizes, index + delta);
 
@@ -318,9 +354,10 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
         }
 
         assert dst.length <= BIT_COUNT_OF_INDEX;
-        if (dstSizes.length == BIT_COUNT_OF_INDEX && dstSizes[BIT_COUNT_OF_INDEX - 1] == 1 << (shift << 1)) {
+        if (isRegular(dstSizes, shift)) {
           return new RegularVectorNode<>(dst);
         } else {
+          assert isSizeDifferenceValid(dstSizes, shift);
           return new RelaxedVectorNode<>(dst, dstSizes);
         }
       } else {
@@ -348,9 +385,10 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
         }
 
         assert dst.length <= BIT_COUNT_OF_INDEX;
-        if (dstSizes.length == BIT_COUNT_OF_INDEX && dstSizes[BIT_COUNT_OF_INDEX - 1] == 1 << (shift << 1)) {
+        if (isRegular(dstSizes, shift)) {
           return new RegularVectorNode<>(dst);
         } else {
+          assert isSizeDifferenceValid(dstSizes, shift);
           return new RelaxedVectorNode<>(dst, dstSizes);
         }
       }
