@@ -31,7 +31,6 @@ public class VectorSmokeTest {
   public static void setUpBeforeClass() throws Exception {
   }
 
-  @Ignore
   @Test
   public void testPushFrontAndGet() {
     final int MIN_INDEX = 0;
