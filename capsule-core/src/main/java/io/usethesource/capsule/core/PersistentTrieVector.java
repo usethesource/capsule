@@ -46,7 +46,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
   @Override
   public Optional<K> get(int index) {
-    return root.get(index, shift);
+    return root.get(index, -offset, shift);
   }
 
   private static final int blockOffset(final int index) {
@@ -94,7 +94,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       return new PersistentTrieVector<>(newRootNode, newShift, newOffset, newLength);
     }
 
-    final VectorNode<K> newRootNode = root.pushBack(index, item, shift);
+    final VectorNode<K> newRootNode = root.pushBack(index, -offset, item, shift);
     return new PersistentTrieVector<>(newRootNode, shift, newOffset, newLength);
   }
 
@@ -115,11 +115,11 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     int BIT_PARTITION_SIZE = 5;
     int BIT_PARTITION_MASK = 0b11111;
 
-    Optional<K> get(int index, int shift);
+    Optional<K> get(int index, int delta, int shift);
 
     VectorNode<K> pushFront(int index, K item, int shift);
 
-    VectorNode<K> pushBack(int index, K item, int shift);
+    VectorNode<K> pushBack(int index, int delta, K item, int shift);
 
   }
 
@@ -132,9 +132,9 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
 
     @Override
-    public Optional<K> get(int index, int shift) {
-      int blockRelativeIndex = (index >>> shift) & 0b11111;
-      return content[blockRelativeIndex].get(index, shift - BIT_PARTITION_SIZE);
+    public Optional<K> get(int index, int delta, int shift) {
+      int blockRelativeIndex = ((index + delta) >>> shift) & 0b11111;
+      return content[blockRelativeIndex].get(index, delta, shift - BIT_PARTITION_SIZE);
     }
 
     @Override
@@ -143,8 +143,8 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
 
     @Override
-    public VectorNode<K> pushBack(int index, K item, int shift) {
-      int blockRelativeIndex = (index >>> shift) & 0b11111;
+    public VectorNode<K> pushBack(int index, int delta, K item, int shift) {
+      int blockRelativeIndex = ((index + delta) >>> shift) & 0b11111;
 
       // assert blockRelativeIndex < content.length;
       assert content.length <= BIT_COUNT_OF_INDEX;
@@ -170,7 +170,8 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
         final VectorNode[] dst = new VectorNode[src.length];
 
         final int idx = blockRelativeIndex;
-        final VectorNode<K> newNode = src[idx].pushBack(index, item, shift - BIT_PARTITION_SIZE);
+        final VectorNode<K> newNode = src[idx]
+            .pushBack(index, delta, item, shift - BIT_PARTITION_SIZE);
 
         // copy 'src' and set 1 element(s) at position 'idx'
         System.arraycopy(src, 0, dst, 0, src.length);
@@ -185,7 +186,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
   private static final class RelaxedVectorNode<K> implements VectorNode<K> {
 
     @Override
-    public Optional<K> get(int index, int shift) {
+    public Optional<K> get(int index, int delta, int shift) {
       throw new UnsupportedOperationException("Not yet implemented.");
     }
 
@@ -195,7 +196,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
 
     @Override
-    public VectorNode<K> pushBack(int index, K item, int shift) {
+    public VectorNode<K> pushBack(int index, int delta, K item, int shift) {
       throw new UnsupportedOperationException("Not yet implemented.");
     }
 
@@ -210,11 +211,11 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
 
     @Override
-    public Optional<K> get(int index, int shift) {
+    public Optional<K> get(int index, int delta, int shift) {
       assert shift == 0;
-      assert ((index >>> shift) & 0b11111) <= content.length;
+      assert (((index + delta) >>> shift) & 0b11111) <= content.length;
 
-      int blockRelativeIndex = (index >>> shift) & 0b11111;
+      int blockRelativeIndex = ((index + delta) >>> shift) & 0b11111;
 
       if (blockRelativeIndex >= content.length) {
         return Optional.empty();
@@ -229,7 +230,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
 
     @Override
-    public VectorNode<K> pushBack(int index, K item, int shift) {
+    public VectorNode<K> pushBack(int index, int delta, K item, int shift) {
       assert shift == 0;
       assert content.length < BIT_COUNT_OF_INDEX;
 
