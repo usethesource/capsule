@@ -9,6 +9,14 @@ package io.usethesource.capsule.util;
 
 public final class BitmapUtils {
 
+//  static final int mask(final int index, final int shift) {
+//    return mask(index, shift, BIT_PARTITION_MASK);
+//  }
+
+  public static final int mask(final int index, final int shift, final int mask) {
+    return (index >>> shift) & mask;
+  }
+
   private static final boolean USE_SELF_WRITTEN_POPULATION_COUNT = false;
   private static final boolean USE_SELF_WRITTEN_POPULATION_COUNT_CHECK =
       !USE_SELF_WRITTEN_POPULATION_COUNT && false;

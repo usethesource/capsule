@@ -7,6 +7,9 @@
  */
 package io.usethesource.capsule.util;
 
+import java.util.function.IntFunction;
+import java.util.function.Supplier;
+
 public class ArrayUtils {
 
   public static final <T> T[] arrayOf(T... items) {
@@ -93,6 +96,25 @@ public class ArrayUtils {
     System.arraycopy(array, 0, arrayNew, 0, index);
     System.arraycopy(array, index + 1, arrayNew, index, array.length - index - 1);
     return arrayNew;
+  }
+
+  public static <T> T[] copyAndSet(IntFunction<T[]> supplier, T[] src, int idx, T item) {
+    final T[] dst = supplier.apply(src.length);
+
+    System.arraycopy(src, 0, dst, 0, src.length);
+    dst[idx] = item;
+
+    return dst;
+  }
+
+  public static <T> T[] copyAndInsert(IntFunction<T[]> supplier, T[] src, int idx, T item) {
+    final T[] dst = supplier.apply(src.length + 1);
+
+    System.arraycopy(src, 0, dst, 0, idx);
+    dst[idx] = item;
+    System.arraycopy(src, idx, dst, idx + 1, src.length - idx);
+
+    return dst;
   }
 
 }
