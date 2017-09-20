@@ -35,7 +35,7 @@ public class VectorSmokeTest {
   @Test
   public void testPushFrontAndGet() {
     final int MIN_INDEX = 0;
-    final int MAX_INDEX = 1024;
+    final int MAX_INDEX = 1048576; // 1024
     final int SIZE = MAX_INDEX - MIN_INDEX + 1;
 
     int[] input = IntStream.rangeClosed(MIN_INDEX, MAX_INDEX).toArray();
@@ -56,7 +56,7 @@ public class VectorSmokeTest {
   @Test
   public void testPushBackAndGet() {
     final int MIN_INDEX = 0;
-    final int MAX_INDEX = 1024;
+    final int MAX_INDEX = 1048576; // 1024
     final int SIZE = MAX_INDEX - MIN_INDEX + 1;
 
     int[] input = IntStream.rangeClosed(MIN_INDEX, MAX_INDEX).toArray();
@@ -78,7 +78,7 @@ public class VectorSmokeTest {
   public void testMixPushFrontAndPushBackAndGet() {
     final int MIN_INDEX = -1024;
     final int MID_INDEX = 0;
-    final int MAX_INDEX = 1023;
+    final int MAX_INDEX = 1048575; // 1023
     final int SIZE = MAX_INDEX - MIN_INDEX + 1;
 
     int[] inputPushFront = IntStream.range(MIN_INDEX, MID_INDEX).toArray();
