@@ -158,6 +158,11 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
     VectorNode<K> pushBack(int index, int delta, K item, int shift);
 
+    // TODO: next up: dropFront() and dropFront(int count)
+    // TODO: next up: dropBack () and dropBack (int count)
+
+    // TODO: next up: takeFront(int count)
+    // TODO: next up: takeBack (int count)
   }
 
   private final static boolean isRegular(int[] cumulativeSizes, int shift) {
