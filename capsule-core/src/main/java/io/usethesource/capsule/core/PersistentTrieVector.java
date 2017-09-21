@@ -11,6 +11,7 @@ import static io.usethesource.capsule.core.PersistentTrieVector.VectorNode.BIT_C
 import static io.usethesource.capsule.core.PersistentTrieVector.VectorNode.BIT_PARTITION_SIZE;
 import static io.usethesource.capsule.util.ArrayUtils.copyAndInsert;
 import static io.usethesource.capsule.util.ArrayUtils.copyAndSet;
+import static io.usethesource.capsule.util.ArrayUtilsInt.arraycopyAndInsertInt;
 import static io.usethesource.capsule.util.BitmapUtils.mask;
 
 import java.util.Optional;
@@ -76,23 +77,25 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
   @Override
   public Vector.Immutable<K> pushFront(K item) {
-    final int index = 0;
+    // final int index = 0;
 
     final int newShift = minimumShift(length); // TODO size or newSize
     final int newLength = length + 1;
 
     if (newShift > shift) {
       // TODO: get rid of RelaxedVectorNode::new calls below
-      final VectorNode<K> newLeafNode = new ContentVectorNode<>(new Object[]{item});
-      final VectorNode<K> newRootNode = new RelaxedVectorNode<>(new VectorNode[]{
-          newRelaxedPath(newLeafNode, shift),
+      final VectorNode<K> newRootNode = VectorNode.of(newShift, new VectorNode[]{
+          /*
+           * NOTE: the 'left shadow' is always explicit (newRelaxedPath), because by default
+           * vectors are left-aligned and right-ragged.
+           */
+          newRelaxedPath(item, shift),
           root
       }, new int[]{
           1,
           length + 1
       });
 
-      assert isSizeDifferenceValid(new int[]{1, length + 1}, newShift);
       return new PersistentTrieVector<>(newRootNode, newShift, newLength);
     }
 
@@ -108,37 +111,40 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     final int newLength = length + 1;
 
     if (newShift > shift) {
-      // TODO: get rid of RegularVectorNode::new calls below
-      final VectorNode<K> newLeafNode = new ContentVectorNode<>(new Object[]{item});
       final VectorNode<K> newRootNode = new RegularVectorNode<>(new VectorNode[]{
           root,
-          newRegularPath(newLeafNode, shift)
+          /*
+           * NOTE: here you can control if the 'right shadow' is implicit (newRegularPath)
+           * or explicit at a higher cost (newRelaxedPath).
+           */
+          newRegularPath(item, shift)
+          // newRelaxedPath(item, shift)
       });
 
       return new PersistentTrieVector<>(newRootNode, newShift, newLength);
     }
 
-    final VectorNode<K> newRootNode = root.pushBack(index, 0, item, shift);
+    final VectorNode<K> newRootNode = root.pushBack(item, shift);
     return new PersistentTrieVector<>(newRootNode, shift, newLength);
   }
 
-  private static final <K> VectorNode<K> newRegularPath(VectorNode<K> node, int shift) {
+  private static final <K> VectorNode<K> newRegularPath(K item, int shift) {
     if (shift == 0) {
-      return node;
+      return new ContentVectorNode<>(new Object[]{item});
     } else {
       final VectorNode[] dst = new VectorNode[]{
-          newRegularPath(node, shift - BIT_PARTITION_SIZE)
+          newRegularPath(item, shift - BIT_PARTITION_SIZE)
       };
       return VectorNode.of(shift, dst);
     }
   }
 
-  private static final <K> VectorNode<K> newRelaxedPath(VectorNode<K> node, int shift) {
+  private static final <K> VectorNode<K> newRelaxedPath(K item, int shift) {
     if (shift == 0) {
-      return node;
+      return new ContentVectorNode<>(new Object[]{item});
     } else {
       final VectorNode[] dst = new VectorNode[]{
-          newRelaxedPath(node, shift - BIT_PARTITION_SIZE)
+          newRelaxedPath(item, shift - BIT_PARTITION_SIZE)
       };
       int[] dstSizes = new int[]{1};
 
@@ -152,13 +158,17 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     int BIT_PARTITION_SIZE = 5;
     int BIT_PARTITION_MASK = 0b11111;
 
+    /*
+     * NOTE: pretty bad performance
+     */
+    @Deprecated
     int size();
 
     Optional<K> get(int index, int delta, int shift);
 
     VectorNode<K> pushFront(K item, int shift);
 
-    VectorNode<K> pushBack(int index, int delta, K item, int shift);
+    VectorNode<K> pushBack(K item, int shift);
 
     // TODO: next up: dropFront() and dropFront(int count)
     // TODO: next up: dropBack () and dropBack (int count)
@@ -229,7 +239,10 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     @Override
     public Optional<K> get(int index, int delta, int shift) {
       final int blockRelativeIndex = mask(index + delta, shift, BIT_PARTITION_MASK);
-      return content[blockRelativeIndex].get(index, delta, shift - BIT_PARTITION_SIZE);
+
+      final int newDelta = delta - (1 << shift) * blockRelativeIndex;
+
+      return content[blockRelativeIndex].get(index, newDelta, shift - BIT_PARTITION_SIZE);
     }
 
     @Override
@@ -244,8 +257,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       assert !isCurrentBranchFull; // assumes that addPath is called on higher level;
 
       // copy and insert node
-      final VectorNode<K> newLeafNode = new ContentVectorNode<>(new Object[]{item});
-      final VectorNode<K> newNode = newRelaxedPath(newLeafNode, shift - BIT_PARTITION_SIZE);
+      final VectorNode<K> newNode = newRelaxedPath(item, shift - BIT_PARTITION_SIZE);
 
       final VectorNode[] src = this.content;
       final VectorNode[] dst = copyAndInsert(VectorNode[]::new, src, idx, newNode);
@@ -264,8 +276,10 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
 
     @Override
-    public VectorNode<K> pushBack(int index, int delta, K item, int shift) {
-      final int blockRelativeIndex = mask(index + delta, shift, BIT_PARTITION_MASK);
+    public VectorNode<K> pushBack(K item, int shift) {
+      boolean isRightMostSubtreeFull = content[content.length - 1].size() == (1 << shift);
+
+      final int blockRelativeIndex = isRightMostSubtreeFull ? content.length : content.length - 1;
       final int idx = blockRelativeIndex;
 
       // assert blockRelativeIndex < content.length;
@@ -273,8 +287,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
       if (blockRelativeIndex == content.length) {
         // copy and insert node
-        final VectorNode<K> newLeafNode = new ContentVectorNode<>(new Object[]{item});
-        final VectorNode<K> newNode = newRegularPath(newLeafNode, shift - BIT_PARTITION_SIZE);
+        final VectorNode<K> newNode = newRegularPath(item, shift - BIT_PARTITION_SIZE);
 
         final VectorNode[] src = this.content;
         final VectorNode[] dst = copyAndInsert(VectorNode[]::new, src, idx, newNode);
@@ -285,7 +298,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
         final VectorNode[] src = this.content;
 
         final VectorNode<K> newNode = src[idx]
-            .pushBack(index, delta, item, shift - BIT_PARTITION_SIZE);
+            .pushBack(item, shift - BIT_PARTITION_SIZE);
 
         final VectorNode[] dst = copyAndSet(VectorNode[]::new, src, idx, newNode);
 
@@ -349,8 +362,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
       if (isSubTreeBranchFull && !isCurrentBranchFull) {
         // copy and insert node
-        final VectorNode<K> newLeafNode = new ContentVectorNode<>(new Object[]{item});
-        final VectorNode<K> newNode = newRelaxedPath(newLeafNode, shift - BIT_PARTITION_SIZE);
+        final VectorNode<K> newNode = newRelaxedPath(item, shift - BIT_PARTITION_SIZE);
 
         final VectorNode[] src = this.content;
         final VectorNode[] dst = copyAndInsert(VectorNode[]::new, src, idx, newNode);
@@ -393,8 +405,69 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
 
     @Override
-    public VectorNode<K> pushBack(int index, int delta, K item, int shift) {
-      throw new UnsupportedOperationException("Not yet implemented.");
+    public VectorNode<K> pushBack(K item, int shift) {
+      // int blockRelativeIndex = mask(index + delta, shift, BIT_PARTITION_MASK);
+      // final int blockRelativeIndex = offset(cumulativeSizes, index + delta);
+
+      boolean isCurrentBranchFull = content.length == BIT_COUNT_OF_INDEX;
+      boolean isSubTreeBranchFull = cumulativeSizes[cumulativeSizes.length - 1] == (1 << shift) * (cumulativeSizes.length - 1 + 1);
+
+//      final int newDelta;
+//      if (blockRelativeIndex == 0) {
+//        newDelta = delta;
+//      } else {
+//        newDelta = delta - cumulativeSizes[blockRelativeIndex - 1];
+//      }
+
+      // final int blockRelativeIndex = blockRelativeOffset; // index + newDelta; // mask(index + newDelta, shift, BIT_PARTITION_MASK);
+
+//      boolean isCurrentBranchFull = content.length == BIT_COUNT_OF_INDEX;
+//      boolean isSubTreeBranchFull = cumulativeSizes[blockRelativeIndex] == (1 << shift) * (blockRelativeIndex + 1);
+
+      if (isSubTreeBranchFull && !isCurrentBranchFull) {
+        // copy and insert node
+
+        // final int blockRelativeIndex = content.length;
+
+        final VectorNode<K> newNode = newRegularPath(item, shift - BIT_PARTITION_SIZE);
+
+        // final int idx = content.length;
+
+        final VectorNode[] src = this.content;
+        // NOTE: add to end (content.length)
+        final VectorNode[] dst = copyAndInsert(VectorNode[]::new, src, content.length, newNode);
+
+        final int[] srcSizes = this.cumulativeSizes;
+        // NOTE: add to end (content.length)
+        final int[] dstSizes = arraycopyAndInsertInt(srcSizes, content.length, srcSizes[srcSizes.length - 1] + 1);
+
+        assert dst.length <= BIT_COUNT_OF_INDEX;
+        return VectorNode.of(shift, dst, dstSizes);
+      } else {
+        // copy and set node
+
+        final int blockRelativeIndex = content.length - 1;
+
+        final VectorNode[] src = this.content;
+
+        final VectorNode<K> newNode = src[blockRelativeIndex].pushBack(item, shift - BIT_PARTITION_SIZE);
+
+        final VectorNode[] dst = copyAndSet(VectorNode[]::new, src, blockRelativeIndex, newNode);
+
+        final int[] srcSizes = this.cumulativeSizes;
+        final int[] dstSizes = new int[srcSizes.length];
+
+        for (int i = 0; i < srcSizes.length; i++) {
+          if (i < blockRelativeIndex) {
+            dstSizes[i] = srcSizes[i];
+          } else {
+            dstSizes[i] = srcSizes[i] + 1;
+          }
+        }
+
+        assert dst.length <= BIT_COUNT_OF_INDEX;
+        return VectorNode.of(shift, dst, dstSizes);
+      }
     }
 
   }
@@ -442,7 +515,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
      * TODO currently ignores index and delta
      */
     @Override
-    public VectorNode<K> pushBack(int index, int delta, K item, int shift) {
+    public VectorNode<K> pushBack(K item, int shift) {
       assert shift == 0;
 
       final Object[] src = this.content;
