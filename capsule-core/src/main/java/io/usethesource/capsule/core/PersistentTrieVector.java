@@ -50,7 +50,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
   @Override
   public Optional<K> get(int index) {
-    return root.get(index, 0, shift);
+    return root.get(index, index, shift);
   }
 
   private static final int blockOffset(final int index) {
@@ -164,7 +164,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     @Deprecated
     int size();
 
-    Optional<K> get(int index, int delta, int shift);
+    Optional<K> get(int index, int remainder, int shift);
 
     VectorNode<K> pushFront(K item, int shift);
 
@@ -237,12 +237,11 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
 
     @Override
-    public Optional<K> get(int index, int delta, int shift) {
-      final int blockRelativeIndex = mask(index + delta, shift, BIT_PARTITION_MASK);
+    public Optional<K> get(int index, int remainder, int shift) {
+      final int blockRelativeIndex = mask(remainder, shift, BIT_PARTITION_MASK);
+      final int newRemainder = remainder & ~(BIT_PARTITION_MASK << shift);
 
-      final int newDelta = delta - (1 << shift) * blockRelativeIndex;
-
-      return content[blockRelativeIndex].get(index, newDelta, shift - BIT_PARTITION_SIZE);
+      return content[blockRelativeIndex].get(index, newRemainder, shift - BIT_PARTITION_SIZE);
     }
 
     @Override
@@ -320,6 +319,9 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       assert content.length == cumulativeSizes.length;
     }
 
+    /*
+     * TODO: improve performance (binary search, etc)
+     */
     private final static int offset(int[] cumulativeSizes, int index) {
       for (int i = 0; i < cumulativeSizes.length; i++) {
         if (cumulativeSizes[i] > index) {
@@ -335,18 +337,14 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
 
     @Override
-    public Optional<K> get(int index, int delta, int shift) {
-      // int blockRelativeIndex = mask(index + delta, shift, BIT_PARTITION_MASK);
-      int blockRelativeIndex = offset(cumulativeSizes, index + delta);
+    public Optional<K> get(int index, int remainder, int shift) {
+      int blockRelativeIndex = offset(cumulativeSizes, remainder);
 
-      final int newDelta;
-      if (blockRelativeIndex == 0) {
-        newDelta = delta;
-      } else {
-        newDelta = delta - cumulativeSizes[blockRelativeIndex - 1];
-      }
+      final int newRemainder = (blockRelativeIndex == 0)
+          ? remainder
+          : remainder - cumulativeSizes[blockRelativeIndex - 1];
 
-      return content[blockRelativeIndex].get(index, newDelta, shift - BIT_PARTITION_SIZE);
+      return content[blockRelativeIndex].get(index, newRemainder, shift - BIT_PARTITION_SIZE);
     }
 
     @Override
@@ -488,11 +486,12 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
 
     @Override
-    public Optional<K> get(int index, int delta, int shift) {
+    public Optional<K> get(int index, int remainder, int shift) {
       assert shift == 0;
-      assert mask(index + delta, shift, BIT_PARTITION_MASK) <= content.length;
+      assert remainder < content.length;
 
-      int blockRelativeIndex = mask(index + delta, shift, BIT_PARTITION_MASK);
+      // int blockRelativeIndex = mask(index + delta, shift, BIT_PARTITION_MASK);
+      int blockRelativeIndex = remainder;
 
       if (blockRelativeIndex >= content.length) {
         return Optional.empty();
