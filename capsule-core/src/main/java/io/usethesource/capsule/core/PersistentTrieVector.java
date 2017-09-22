@@ -168,6 +168,24 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     // TODO: next up: takeFront(int count)
     // TODO: next up: takeBack (int count)
 
+    /**
+     *
+     * @param index of the last element we consume
+     * @param remainder
+     * @param shift
+     * @return
+     */
+    VectorNode<K> take(int index, int remainder, int shift);
+
+    /**
+     *
+     * @param index of the first element that remains
+     * @param remainder
+     * @param shift
+     * @return
+     */
+    VectorNode<K> drop(int index, int remainder, int shift);
+
     static <K> VectorNode<K> of(int shiftWitness, int sizeFringeL, VectorNode[] dst, int sizeFringeR) {
       final int normalizedFringeL = (sizeFringeL == 1 << shiftWitness) ? 0 : sizeFringeL;
       final int normalizedFringeR = (sizeFringeR == 1 << shiftWitness) ? 0 : sizeFringeR;
@@ -268,6 +286,17 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
       throw new IllegalStateException("Appending not fully implemented.");
     }
+
+    @Override
+    public VectorNode<K> take(int index, int remainder, int shift) {
+      return null;
+    }
+
+    @Override
+    public VectorNode<K> drop(int index, int remainder, int shift) {
+      return null;
+    }
+
   }
 
   private static final class ContentVectorNode<K> implements VectorNode<K> {
@@ -325,6 +354,16 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       final Object[] dst = copyAndInsert(Object[]::new, src, src.length, item);
 
       return new ContentVectorNode<>(dst);
+    }
+
+    @Override
+    public VectorNode<K> take(int index, int remainder, int shift) {
+      return null;
+    }
+
+    @Override
+    public VectorNode<K> drop(int index, int remainder, int shift) {
+      return null;
     }
 
   }
