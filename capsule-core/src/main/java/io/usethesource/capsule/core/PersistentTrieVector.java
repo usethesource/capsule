@@ -11,10 +11,12 @@ import static io.usethesource.capsule.core.PersistentTrieVector.VectorNode.BIT_C
 import static io.usethesource.capsule.core.PersistentTrieVector.VectorNode.BIT_PARTITION_SIZE;
 import static io.usethesource.capsule.util.ArrayUtils.copyAndInsert;
 import static io.usethesource.capsule.util.ArrayUtils.copyAndSet;
+import static io.usethesource.capsule.util.ArrayUtils.copyAndUpdate;
 import static io.usethesource.capsule.util.ArrayUtilsInt.arraycopyAndInsertInt;
 import static io.usethesource.capsule.util.BitmapUtils.mask;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -75,56 +77,61 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
   }
 
+  static final <T> Predicate<? super T> implies(Predicate<T> a, Predicate<? super T> b) {
+    return a.negate().or(b);
+  }
+
+  static final boolean implies(boolean a, boolean b) {
+    return !a || b;
+  }
+
+  /*
+   * NOTE: the 'left shadow' is always explicit (newRelaxedPath), because by default
+   * vectors are left-aligned and right-ragged.
+   */
   @Override
   public Vector.Immutable<K> pushFront(K item) {
-    // final int index = 0;
-
     final int newShift = minimumShift(length); // TODO size or newSize
     final int newLength = length + 1;
 
+    // TODO: fringe value of 'length' is inaccurate (b/c not considering fringe of node below)
+    assert implies(newShift > shift, root.hasRegularFront());
+
     if (newShift > shift) {
-      // TODO: get rid of RelaxedVectorNode::new calls below
-      final VectorNode<K> newRootNode = VectorNode.of(newShift, new VectorNode[]{
-          /*
-           * NOTE: the 'left shadow' is always explicit (newRelaxedPath), because by default
-           * vectors are left-aligned and right-ragged.
-           */
-          newRelaxedPath(item, shift),
+      final VectorNode<K> newRootNode = VectorNode.of(newShift, 1, new VectorNode[]{
+          newLeftFringedPath(item, shift),
           root
-      }, new int[]{
-          1,
-          length + 1
-      });
+      }, length);
 
       return new PersistentTrieVector<>(newRootNode, newShift, newLength);
     }
 
-    final VectorNode<K> newRootNode = root.pushFront(item, shift);
+    final VectorNode<K> newRootNode = root.pushFront(shift, item);
     return new PersistentTrieVector<>(newRootNode, shift, newLength);
   }
 
+  /*
+   * NOTE: here you can control if the 'right shadow' is implicit (newRegularPath)
+   * or explicit at a higher cost (newRelaxedPath).
+   */
   @Override
   public Vector.Immutable<K> pushBack(K item) {
-    final int index = length;
-
     final int newShift = minimumShift(length); // TODO size or newSize
     final int newLength = length + 1;
 
+    // TODO: fringe value of 'length' is inaccurate (b/c not considering fringe of node below)
+    assert implies(newShift > shift, root.hasRegularBack());
+
     if (newShift > shift) {
-      final VectorNode<K> newRootNode = new RegularVectorNode<>(new VectorNode[]{
+      final VectorNode<K> newRootNode = VectorNode.of(newShift, length, new VectorNode[]{
           root,
-          /*
-           * NOTE: here you can control if the 'right shadow' is implicit (newRegularPath)
-           * or explicit at a higher cost (newRelaxedPath).
-           */
-          newRegularPath(item, shift)
-          // newRelaxedPath(item, shift)
-      });
+          newRightFringedPath(item, shift)
+      }, 1);
 
       return new PersistentTrieVector<>(newRootNode, newShift, newLength);
     }
 
-    final VectorNode<K> newRootNode = root.pushBack(item, shift);
+    final VectorNode<K> newRootNode = root.pushBack(shift, item);
     return new PersistentTrieVector<>(newRootNode, shift, newLength);
   }
 
@@ -152,6 +159,28 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
   }
 
+  private static final <K> VectorNode<K> newLeftFringedPath(K item, int shift) {
+    if (shift == 0) {
+      return new ContentVectorNode<>(new Object[]{item});
+    } else {
+      final VectorNode[] dst = new VectorNode[]{
+          newLeftFringedPath(item, shift - BIT_PARTITION_SIZE)
+      };
+      return VectorNode.of(shift, 1, dst, 0);
+    }
+  }
+
+  private static final <K> VectorNode<K> newRightFringedPath(K item, int shift) {
+    if (shift == 0) {
+      return new ContentVectorNode<>(new Object[]{item});
+    } else {
+      final VectorNode[] dst = new VectorNode[]{
+          newRightFringedPath(item, shift - BIT_PARTITION_SIZE)
+      };
+      return VectorNode.of(shift, 0, dst, 1);
+    }
+  }
+
   interface VectorNode<K> {
 
     int BIT_COUNT_OF_INDEX = 32;
@@ -166,9 +195,17 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
     Optional<K> get(int index, int remainder, int shift);
 
-    VectorNode<K> pushFront(K item, int shift);
+    default boolean hasRegularFront() {
+      throw new UnsupportedOperationException("Not supported on legacy vector nodes.");
+    }
 
-    VectorNode<K> pushBack(K item, int shift);
+    default boolean hasRegularBack() {
+      throw new UnsupportedOperationException("Not supported on legacy vector nodes.");
+    }
+
+    VectorNode<K> pushFront(int shift, K item);
+
+    VectorNode<K> pushBack(int shift, K item);
 
     // TODO: next up: dropFront() and dropFront(int count)
     // TODO: next up: dropBack () and dropBack (int count)
@@ -190,6 +227,13 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 //
 //        return new RelaxedVectorNode<>(dst, dstSizes);
 //      }
+    }
+
+    static <K> VectorNode<K> of(int shiftWitness, int sizeFringeL, VectorNode[] dst, int sizeFringeR) {
+      final int normalizedFringeL = (sizeFringeL == 1 << shiftWitness) ? 0 : sizeFringeL;
+      final int normalizedFringeR = (sizeFringeR == 1 << shiftWitness) ? 0 : sizeFringeR;
+
+      return new FringedVectorNode<>(normalizedFringeL, dst, normalizedFringeR);
     }
 
     static <K> VectorNode<K> of(int shiftWitness, VectorNode[] dst, int[] dstSizes) {
@@ -247,7 +291,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
 
     @Override
-    public VectorNode<K> pushFront(K item, int shift) {
+    public VectorNode<K> pushFront(int shift, K item) {
       final int blockRelativeIndex = 0;
       final int idx = blockRelativeIndex;
 
@@ -274,7 +318,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
 
     @Override
-    public VectorNode<K> pushBack(K item, int shift) {
+    public VectorNode<K> pushBack(int shift, K item) {
       boolean isRightMostSubtreeFull = content[content.length - 1].size() == (1 << shift);
 
       final int blockRelativeIndex = isRightMostSubtreeFull ? content.length : content.length - 1;
@@ -296,7 +340,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
         final VectorNode[] src = this.content;
 
         final VectorNode<K> newNode = src[idx]
-            .pushBack(item, shift - BIT_PARTITION_SIZE);
+            .pushBack(shift - BIT_PARTITION_SIZE, item);
 
         final VectorNode[] dst = copyAndSet(VectorNode[]::new, src, idx, newNode);
 
@@ -347,7 +391,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
 
     @Override
-    public VectorNode<K> pushFront(K item, int shift) {
+    public VectorNode<K> pushFront(int shift, K item) {
       final int blockRelativeIndex = 0;
       final int idx = blockRelativeIndex;
 
@@ -381,7 +425,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
         final VectorNode[] src = this.content;
 
         final VectorNode<K> newNode = src[idx]
-            .pushFront(item, shift - BIT_PARTITION_SIZE);
+            .pushFront(shift - BIT_PARTITION_SIZE, item);
 
         final VectorNode[] dst = copyAndSet(VectorNode[]::new, src, idx, newNode);
 
@@ -402,7 +446,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
 
     @Override
-    public VectorNode<K> pushBack(K item, int shift) {
+    public VectorNode<K> pushBack(int shift, K item) {
       // int blockRelativeIndex = mask(index + delta, shift, BIT_PARTITION_MASK);
       // final int blockRelativeIndex = offset(cumulativeSizes, index + delta);
 
@@ -447,7 +491,8 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
         final VectorNode[] src = this.content;
 
-        final VectorNode<K> newNode = src[blockRelativeIndex].pushBack(item, shift - BIT_PARTITION_SIZE);
+        final VectorNode<K> newNode = src[blockRelativeIndex].pushBack(
+            shift - BIT_PARTITION_SIZE, item);
 
         final VectorNode[] dst = copyAndSet(VectorNode[]::new, src, blockRelativeIndex, newNode);
 
@@ -467,6 +512,99 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       }
     }
 
+  }
+
+  private static final class FringedVectorNode<K> implements VectorNode<K> {
+
+    private final int sizeFringeL;
+    private final VectorNode[] content;
+    private final int sizeFringeR;
+
+    private FringedVectorNode(int sizeFringeL, VectorNode[] content, int sizeFringeR) {
+      this.sizeFringeL = sizeFringeL;
+      this.content = content;
+      this.sizeFringeR = sizeFringeR;
+
+      // TODO implement assertions
+    }
+
+    @Override
+    public int size() {
+      final int sizeRegular = Stream.of(content).mapToInt(VectorNode::size).sum();
+      return sizeFringeL + sizeRegular + sizeFringeR;
+    }
+
+    @Override
+    public Optional<K> get(int index, int remainder, int shift) {
+      final int blockRelativeIndex;
+      final int newRemainder;
+
+      if (sizeFringeL == 0 || remainder < sizeFringeL) {
+        // regular
+        blockRelativeIndex = mask(remainder, shift, BIT_PARTITION_MASK);
+        newRemainder = remainder & ~(BIT_PARTITION_MASK << shift);
+      } else {
+        // semi-regular
+        blockRelativeIndex = 1 + ((remainder - sizeFringeL) >>> shift);
+        newRemainder = (remainder - sizeFringeL) & ~(BIT_PARTITION_MASK << shift);
+      }
+
+      return content[blockRelativeIndex].get(index, newRemainder, shift - BIT_PARTITION_SIZE);
+    }
+
+    @Override
+    public boolean hasRegularFront() {
+      return sizeFringeL == 0;
+    }
+
+    @Override
+    public boolean hasRegularBack() {
+      return sizeFringeR == 0;
+    }
+
+    @Override
+    public VectorNode<K> pushFront(int shift, K item) {
+      boolean isSubTreeBranchFull = sizeFringeL == 0;
+      boolean isCurrentBranchFull = isSubTreeBranchFull && content.length == BIT_COUNT_OF_INDEX;
+
+      if (!isSubTreeBranchFull) {
+        final VectorNode[] dst = copyAndUpdate(VectorNode[]::new, content, 0,
+            node -> node.pushFront(shift - BIT_PARTITION_SIZE, item));
+
+        return VectorNode.of(shift, sizeFringeL + 1, dst, sizeFringeR);
+      }
+
+      if (!isCurrentBranchFull) {
+        final VectorNode[] dst = copyAndInsert(VectorNode[]::new, content, 0,
+            newLeftFringedPath(item, shift - BIT_PARTITION_SIZE));
+
+        return VectorNode.of(shift, 1, dst, sizeFringeR);
+      }
+
+      throw new IllegalStateException("Prepending not fully implemented.");
+    }
+
+    @Override
+    public VectorNode<K> pushBack(int shift, K item) {
+      boolean isSubTreeBranchFull = sizeFringeR == 0;
+      boolean isCurrentBranchFull = isSubTreeBranchFull && content.length == BIT_COUNT_OF_INDEX;
+
+      if (!isSubTreeBranchFull) {
+        final VectorNode[] dst = copyAndUpdate(VectorNode[]::new, content, content.length - 1,
+            node -> node.pushBack(shift - BIT_PARTITION_SIZE, item));
+
+        return VectorNode.of(shift, sizeFringeL, dst, sizeFringeR + 1);
+      }
+
+      if (!isCurrentBranchFull) {
+        final VectorNode[] dst = copyAndInsert(VectorNode[]::new, content, content.length,
+            newRightFringedPath(item, shift - BIT_PARTITION_SIZE));
+
+        return VectorNode.of(shift, sizeFringeL, dst, 1);
+      }
+
+      throw new IllegalStateException("Appending not fully implemented.");
+    }
   }
 
   private static final class ContentVectorNode<K> implements VectorNode<K> {
@@ -489,7 +627,6 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       assert shift == 0;
       assert remainder < content.length;
 
-      // int blockRelativeIndex = mask(index + delta, shift, BIT_PARTITION_MASK);
       int blockRelativeIndex = remainder;
 
       if (blockRelativeIndex >= content.length) {
@@ -499,8 +636,16 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       }
     }
 
+    public boolean hasRegularFront() {
+      return true; // b/c of being a leaf node
+    }
+
+    public boolean hasRegularBack() {
+      return true; // b/c of being a leaf node
+    }
+
     @Override
-    public VectorNode<K> pushFront(K item, int shift) {
+    public VectorNode<K> pushFront(int shift, K item) {
       assert shift == 0;
 
       final Object[] src = this.content;
@@ -509,11 +654,8 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       return new ContentVectorNode<>(dst);
     }
 
-    /*
-     * TODO currently ignores index and delta
-     */
     @Override
-    public VectorNode<K> pushBack(K item, int shift) {
+    public VectorNode<K> pushBack(int shift, K item) {
       assert shift == 0;
 
       final Object[] src = this.content;

@@ -7,6 +7,7 @@
  */
 package io.usethesource.capsule.util;
 
+import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
 
@@ -103,6 +104,20 @@ public class ArrayUtils {
 
     System.arraycopy(src, 0, dst, 0, src.length);
     dst[idx] = item;
+
+    return dst;
+  }
+
+  public static <T> T[] copyAndUpdate(IntFunction<T[]> supplier, T[] src, int idx,
+      Function<T,T> updater) {
+
+    final T oldItem = src[idx];
+    final T newItem = updater.apply(oldItem);
+
+    final T[] dst = supplier.apply(src.length);
+
+    System.arraycopy(src, 0, dst, 0, src.length);
+    dst[idx] = newItem;
 
     return dst;
   }
