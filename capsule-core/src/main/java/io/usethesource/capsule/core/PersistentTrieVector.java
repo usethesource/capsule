@@ -229,6 +229,8 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
     private RegularVectorNode(VectorNode[] content) {
       this.content = content;
+
+      assert content.length <= BIT_COUNT_OF_INDEX;
     }
 
     @Override
@@ -248,9 +250,6 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     public VectorNode<K> pushFront(K item, int shift) {
       final int blockRelativeIndex = 0;
       final int idx = blockRelativeIndex;
-
-      // assert blockRelativeIndex < content.length;
-      assert content.length <= BIT_COUNT_OF_INDEX;
 
       boolean isCurrentBranchFull = content.length == BIT_COUNT_OF_INDEX;
       assert !isCurrentBranchFull; // assumes that addPath is called on higher level;
