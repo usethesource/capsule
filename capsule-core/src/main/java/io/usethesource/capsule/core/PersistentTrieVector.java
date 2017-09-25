@@ -9,7 +9,9 @@ package io.usethesource.capsule.core;
 
 import static io.usethesource.capsule.core.PersistentTrieVector.VectorNode.BIT_COUNT_OF_INDEX;
 import static io.usethesource.capsule.core.PersistentTrieVector.VectorNode.BIT_PARTITION_SIZE;
+import static io.usethesource.capsule.util.ArrayUtils.copyAndDrop;
 import static io.usethesource.capsule.util.ArrayUtils.copyAndInsert;
+import static io.usethesource.capsule.util.ArrayUtils.copyAndTake;
 import static io.usethesource.capsule.util.ArrayUtils.copyAndUpdate;
 import static io.usethesource.capsule.util.BitmapUtils.mask;
 
@@ -35,6 +37,8 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     this.root = root;
     this.shift = shift;
     this.length = length;
+
+    assert root.size() == length;
   }
 
   public static final <K> Vector.Immutable<K> of() {
@@ -72,11 +76,11 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
    */
   @Override
   public Vector.Immutable<K> pushFront(K item) {
-    final int newShift = minimumShift(length); // TODO size or newSize
+    final int newShift = root.hasFullFront() ? shift + BIT_PARTITION_SIZE : shift;
     final int newLength = length + 1;
 
-    // TODO: fringe value of 'length' is inaccurate (b/c not considering fringe of node below)
-    assert implies(newShift > shift, root.hasRegularFront());
+    assert implies(newShift > shift, root.hasFullFront());
+    assert implies(newShift == shift, !root.hasFullFront());
 
     if (newShift > shift) {
       final VectorNode<K> newRootNode = VectorNode.of(newShift, 1, new VectorNode[]{
@@ -97,11 +101,11 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
    */
   @Override
   public Vector.Immutable<K> pushBack(K item) {
-    final int newShift = minimumShift(length); // TODO size or newSize
+    final int newShift = root.hasFullBack() ? shift + BIT_PARTITION_SIZE : shift;
     final int newLength = length + 1;
 
-    // TODO: fringe value of 'length' is inaccurate (b/c not considering fringe of node below)
-    assert implies(newShift > shift, root.hasRegularBack());
+    assert implies(newShift > shift, root.hasFullBack());
+    assert implies(newShift == shift, !root.hasFullBack());
 
     if (newShift > shift) {
       final VectorNode<K> newRootNode = VectorNode.of(newShift, length, new VectorNode[]{
@@ -114,6 +118,32 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
     final VectorNode<K> newRootNode = root.pushBack(shift, item);
     return new PersistentTrieVector<>(newRootNode, shift, newLength);
+  }
+
+  @Override
+  public Vector.Immutable<K> take(int count) {
+    if (count <= 0) {
+      return EMPTY_VECTOR;
+    } else if (count >= size()) {
+      return this;
+    } else {
+      // TODO: shift may incorrect
+      final VectorNode<K> newRootNode = root.take(count - 1, count - 1, shift);
+      return new PersistentTrieVector<>(newRootNode, shift, count);
+    }
+  }
+
+  @Override
+  public Vector.Immutable<K> drop(int count) {
+    if (count <= 0) {
+      return this;
+    } else if (count >= size()) {
+      return EMPTY_VECTOR;
+    } else {
+      // TODO: shift may incorrect
+      final VectorNode<K> newRootNode = root.drop(count, count, shift);
+      return new PersistentTrieVector<>(newRootNode, shift, length - count);
+    }
   }
 
   // TODO: simplify
@@ -157,6 +187,10 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     boolean hasRegularFront();
 
     boolean hasRegularBack();
+
+    boolean hasFullFront();
+
+    boolean hasFullBack();
 
     VectorNode<K> pushFront(int shift, K item);
 
@@ -207,12 +241,15 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       this.sizeFringeR = sizeFringeR;
 
       // TODO implement assertions
+      // assert content.length >= 2; // TODO: lazy expansion / path compression
+      // assert content.length == 2 && sizeFringeL < sizeFringeR;
+      assert implies(sizeFringeL != 0, content[0].size() == sizeFringeL);
+      assert implies(sizeFringeR != 0, content[content.length - 1 ].size() == sizeFringeR);
     }
 
     @Override
     public int size() {
-      final int sizeRegular = Stream.of(content).mapToInt(VectorNode::size).sum();
-      return sizeFringeL + sizeRegular + sizeFringeR;
+      return Stream.of(content).mapToInt(VectorNode::size).sum();
     }
 
     @Override
@@ -241,6 +278,14 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     @Override
     public boolean hasRegularBack() {
       return sizeFringeR == 0;
+    }
+
+    public boolean hasFullFront() {
+      return hasRegularFront() && content.length == BIT_COUNT_OF_INDEX;
+    }
+
+    public boolean hasFullBack() {
+      return hasRegularBack() && content.length == BIT_COUNT_OF_INDEX;
     }
 
     @Override
@@ -289,12 +334,85 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
     @Override
     public VectorNode<K> take(int index, int remainder, int shift) {
-      return null;
+      final int blockRelativeIndex;
+      final int newRemainder;
+
+      final int newSizeFringeL;
+      final int newSizeFringeR;
+
+      if (sizeFringeL == 0 || remainder < sizeFringeL) {
+        // regular
+        blockRelativeIndex = mask(remainder, shift, BIT_PARTITION_MASK);
+        newRemainder = remainder & ~(BIT_PARTITION_MASK << shift);
+      } else {
+        // semi-regular
+        blockRelativeIndex = 1 + ((remainder - sizeFringeL) >>> shift);
+        newRemainder = (remainder - sizeFringeL) & ~(BIT_PARTITION_MASK << shift);
+      }
+
+      final VectorNode[] dst = copyAndTake(VectorNode[]::new, content, blockRelativeIndex,
+          node -> node.take(index, newRemainder, shift - BIT_PARTITION_SIZE));
+
+      if (blockRelativeIndex == 0) {
+        // first
+        // TODO: how to align first blocks to left or right?
+        newSizeFringeL = newRemainder + 1;
+        newSizeFringeR = 0;
+      } else if (blockRelativeIndex < content.length - 1) {
+        // middle
+        newSizeFringeL = sizeFringeL;
+        newSizeFringeR = newRemainder + 1;
+      } else {
+        // last
+        newSizeFringeL = sizeFringeL;
+        newSizeFringeR = newRemainder + 1;
+      }
+
+      return VectorNode.of(shift, newSizeFringeL, dst, newSizeFringeR);
+
     }
 
     @Override
     public VectorNode<K> drop(int index, int remainder, int shift) {
-      return null;
+      final int blockRelativeIndex;
+      final int newRemainder;
+
+      final int newSizeFringeL;
+      final int newSizeFringeR;
+
+      if (sizeFringeL == 0 || remainder < sizeFringeL) {
+        // regular
+        blockRelativeIndex = mask(remainder, shift, BIT_PARTITION_MASK);
+        newRemainder = remainder & ~(BIT_PARTITION_MASK << shift);
+      } else {
+        // semi-regular
+        blockRelativeIndex = 1 + ((remainder - sizeFringeL) >>> shift);
+        newRemainder = (remainder - sizeFringeL) & ~(BIT_PARTITION_MASK << shift);
+      }
+
+      final VectorNode[] dst = copyAndDrop(VectorNode[]::new, content, blockRelativeIndex,
+          node -> node.drop(index, newRemainder, shift - BIT_PARTITION_SIZE));
+
+      if (blockRelativeIndex == 0) {
+        // first
+        // TODO: how to align first blocks to left or right?
+        newSizeFringeL = (sizeFringeL == 0)
+            ? (1 << shift) - newRemainder
+            : sizeFringeL - newRemainder;
+        newSizeFringeR = sizeFringeR;
+      } else if (blockRelativeIndex < content.length - 1) {
+        // middle
+        newSizeFringeL = (1 << shift) - newRemainder;
+        newSizeFringeR = sizeFringeR;
+      } else {
+        // last
+        newSizeFringeL = 0;
+        newSizeFringeR = (sizeFringeR == 0)
+            ? (1 << shift) - newRemainder
+            : sizeFringeR - newRemainder;
+      }
+
+      return VectorNode.of(shift, newSizeFringeL, dst, newSizeFringeR);
     }
 
   }
@@ -329,11 +447,19 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
 
     public boolean hasRegularFront() {
-      return true; // b/c of being a leaf node
+      return size() == BIT_COUNT_OF_INDEX;
     }
 
     public boolean hasRegularBack() {
-      return true; // b/c of being a leaf node
+      return size() == BIT_COUNT_OF_INDEX;
+    }
+
+    public boolean hasFullFront() {
+      return size() == BIT_COUNT_OF_INDEX;
+    }
+
+    public boolean hasFullBack() {
+      return size() == BIT_COUNT_OF_INDEX;
     }
 
     @Override
@@ -358,12 +484,22 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
     @Override
     public VectorNode<K> take(int index, int remainder, int shift) {
-      return null;
+      assert shift == 0;
+
+      final Object[] src = this.content;
+      final Object[] dst = copyAndTake(Object[]::new, src, remainder, item -> item);
+
+      return new ContentVectorNode<>(dst);
     }
 
     @Override
     public VectorNode<K> drop(int index, int remainder, int shift) {
-      return null;
+      assert shift == 0;
+
+      final Object[] src = this.content;
+      final Object[] dst = copyAndDrop(Object[]::new, src, remainder, item -> item);
+
+      return new ContentVectorNode<>(dst);
     }
 
   }

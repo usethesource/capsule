@@ -21,6 +21,10 @@ public interface Vector<K> {
 
     Vector.Immutable<K> pushBack(K item);
 
+    Vector.Immutable<K> take(int count);
+
+    Vector.Immutable<K> drop(int count);
+
   }
 
   interface Transient<K> extends Vector<K> {

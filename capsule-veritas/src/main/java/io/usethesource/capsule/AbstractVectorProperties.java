@@ -7,17 +7,13 @@
  */
 package io.usethesource.capsule;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Random;
+import java.util.stream.IntStream;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.generator.Size;
@@ -130,23 +126,67 @@ public abstract class AbstractVectorProperties<T, CT extends Vector.Immutable<T>
 //      testSet = tmpSet;
 //    }
 //  }
-//
-//  @Property(trials = DEFAULT_TRIALS)
-//  public void containsAfterInsert(@Size(min = 0, max = 0) final CT emptySet,
-//      @Size(min = 1, max = MAX_SIZE) final HashSet<T> inputValues) {
-//
-//    CT testSet = emptySet;
-//
-//    for (T newValue : inputValues) {
-//      final CT tmpSet = (CT) testSet.__insert(newValue);
-//      testSet = tmpSet;
-//    }
-//
-//    boolean containsInsertedValues = inputValues.stream().allMatch(testSet::contains);
-//
-//    assertTrue("Must contain all inserted values.", containsInsertedValues);
-//  }
-//
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void containsAfterPushBack(@Size(min = 1, max = MAX_SIZE) final CT initialVector,
+      @Size(min = 1, max = MAX_SIZE) final ArrayList<T> inputValues) {
+
+    CT testVector = initialVector;
+
+    for (T newValue : inputValues) {
+      final CT tmpVector = (CT) testVector.pushBack(newValue);
+      testVector = tmpVector;
+    }
+
+    final CT finalTestVector = testVector;
+    assert finalTestVector.size() == initialVector.size() + inputValues.size();
+
+    boolean containsInsertedValues = IntStream.range(0, inputValues.size())
+        .allMatch(index -> {
+          Optional<T> a = Optional.of(inputValues.get(index));
+          Optional<T> b = finalTestVector.get(initialVector.size() + index);
+          return Objects.equals(a, b);
+        });
+
+    assertTrue("Must contain all inserted values.", containsInsertedValues);
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void take(final CT vector, final int seed) {
+
+    final int count = new Random(seed).nextInt(vector.size() + 1);
+    final CT result = (CT) vector.take(count);
+
+    assert result.size() == count;
+
+    boolean containsInsertedValues = IntStream.range(0, count)
+        .allMatch(index -> {
+          Optional<T> a = vector.get(index);
+          Optional<T> b = result.get(index);
+          return Objects.equals(a, b);
+        });
+
+    assertTrue("Must contain all inserted values.", containsInsertedValues);
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void drop(final CT vector, final int seed) {
+
+    final int count = new Random(seed).nextInt(vector.size() + 1);
+    final CT result = (CT) vector.drop(count);
+
+    assert result.size() == vector.size() - count;
+
+    boolean containsInsertedValues = IntStream.range(0, result.size())
+        .allMatch(index -> {
+          Optional<T> a = vector.get(count + index);
+          Optional<T> b = result.get(index);
+          return Objects.equals(a, b);
+        });
+
+    assertTrue("Must contain all inserted values.", containsInsertedValues);
+  }
+
 //  @Property(trials = DEFAULT_TRIALS)
 //  public void notContainedAfterInsertRemove(CT input, T item) {
 //    assertFalse(input.__insert(item).__remove(item).contains(item));
@@ -416,33 +456,33 @@ public abstract class AbstractVectorProperties<T, CT extends Vector.Immutable<T>
 //
 //    assertEquals(subtractDefault, subtractNative);
 //  }
-
-  @Property(trials = DEFAULT_TRIALS)
-  public void serializationRoundtripIfSerializable(CT input) throws Exception {
-    if (input instanceof Serializable) {
-      assertEquals(input, deserialize(serialize((Serializable) input), input.getClass()));
-    }
-  }
-
-  private static <T extends Serializable> byte[] serialize(T item) throws IOException {
-    try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos)) {
-      oos.writeObject(item);
-      return baos.toByteArray();
-    } catch (IOException e) {
-      throw e;
-    }
-  }
-
-  private static <T> T deserialize(byte[] bytes, Class<T> itemClass)
-      throws IOException, ClassNotFoundException {
-    try (ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-        ObjectInputStream ois = new ObjectInputStream(bais)) {
-      Object item = ois.readObject();
-      return itemClass.cast(item);
-    } catch (IOException | ClassNotFoundException e) {
-      throw e;
-    }
-  }
+//
+//  @Property(trials = DEFAULT_TRIALS)
+//  public void serializationRoundtripIfSerializable(CT input) throws Exception {
+//    if (input instanceof Serializable) {
+//      assertEquals(input, deserialize(serialize((Serializable) input), input.getClass()));
+//    }
+//  }
+//
+//  private static <T extends Serializable> byte[] serialize(T item) throws IOException {
+//    try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+//      oos.writeObject(item);
+//      return baos.toByteArray();
+//    } catch (IOException e) {
+//      throw e;
+//    }
+//  }
+//
+//  private static <T> T deserialize(byte[] bytes, Class<T> itemClass)
+//      throws IOException, ClassNotFoundException {
+//    try (ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+//        ObjectInputStream ois = new ObjectInputStream(bais)) {
+//      Object item = ois.readObject();
+//      return itemClass.cast(item);
+//    } catch (IOException | ClassNotFoundException e) {
+//      throw e;
+//    }
+//  }
 
 }
