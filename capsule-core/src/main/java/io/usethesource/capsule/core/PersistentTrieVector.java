@@ -127,9 +127,15 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     } else if (count >= size()) {
       return this;
     } else {
-      // TODO: shift may incorrect
-      final VectorNode<K> newRootNode = root.take(count - 1, count - 1, shift);
-      return new PersistentTrieVector<>(newRootNode, shift, count);
+      int newShift = shift;
+      VectorNode<K> newRootNode = root.take(count - 1, count - 1, shift);
+
+      while(newRootNode.canReduceShift()) {
+        newShift -= BIT_PARTITION_SIZE;
+        newRootNode = newRootNode.reduceShift();
+      }
+
+      return new PersistentTrieVector<>(newRootNode, newShift, count);
     }
   }
 
@@ -140,9 +146,15 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     } else if (count >= size()) {
       return EMPTY_VECTOR;
     } else {
-      // TODO: shift may incorrect
-      final VectorNode<K> newRootNode = root.drop(count, count, shift);
-      return new PersistentTrieVector<>(newRootNode, shift, length - count);
+      int newShift = shift;
+      VectorNode<K> newRootNode = root.drop(count, count, shift);
+
+      while(newRootNode.canReduceShift()) {
+        newShift -= BIT_PARTITION_SIZE;
+        newRootNode = newRootNode.reduceShift();
+      }
+
+      return new PersistentTrieVector<>(newRootNode, newShift, length - count);
     }
   }
 
@@ -191,6 +203,10 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     boolean hasFullFront();
 
     boolean hasFullBack();
+
+    boolean canReduceShift();
+
+    VectorNode<K> reduceShift();
 
     VectorNode<K> pushFront(int shift, K item);
 
@@ -286,6 +302,20 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
     public boolean hasFullBack() {
       return hasRegularBack() && content.length == BIT_COUNT_OF_INDEX;
+    }
+
+    @Override
+    public boolean canReduceShift() {
+      return content.length == 1;
+    }
+
+    @Override
+    public VectorNode<K> reduceShift() {
+      if (canReduceShift()) {
+        return content[0];
+      } else {
+        return this; // no-op
+      }
     }
 
     @Override
@@ -460,6 +490,16 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
     public boolean hasFullBack() {
       return size() == BIT_COUNT_OF_INDEX;
+    }
+
+    @Override
+    public boolean canReduceShift() {
+      return false;
+    }
+
+    @Override
+    public VectorNode<K> reduceShift() {
+      return this; // no-op
     }
 
     @Override
