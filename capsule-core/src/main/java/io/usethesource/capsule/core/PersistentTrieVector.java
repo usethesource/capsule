@@ -11,6 +11,7 @@ import static io.usethesource.capsule.core.PersistentTrieVector.VectorNode.BIT_C
 import static io.usethesource.capsule.core.PersistentTrieVector.VectorNode.BIT_PARTITION_SIZE;
 import static io.usethesource.capsule.util.ArrayUtils.copyAndDrop;
 import static io.usethesource.capsule.util.ArrayUtils.copyAndInsert;
+import static io.usethesource.capsule.util.ArrayUtils.copyAndSet;
 import static io.usethesource.capsule.util.ArrayUtils.copyAndTake;
 import static io.usethesource.capsule.util.ArrayUtils.copyAndUpdate;
 import static io.usethesource.capsule.util.BitmapUtils.mask;
@@ -18,6 +19,7 @@ import static io.usethesource.capsule.util.BitmapUtils.mask;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import com.sun.deploy.util.ArrayUtil;
 import io.usethesource.capsule.Vector;
 
 public class PersistentTrieVector<K> implements Vector.Immutable<K> {
@@ -121,6 +123,17 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
   }
 
   @Override
+  public Vector.Immutable<K> update(int index, K item) {
+    if (index < 0 || index >= length) {
+      throw new IndexOutOfBoundsException(String.format("Index %d out of interval [0,%d)",
+          index, length));
+    }
+
+    final VectorNode<K> newRootNode = root.update(index, index, shift, item);
+    return new PersistentTrieVector<>(newRootNode, shift, length);
+  }
+
+  @Override
   public Vector.Immutable<K> take(int count) {
     if (count <= 0) {
       return EMPTY_VECTOR;
@@ -212,6 +225,8 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
     VectorNode<K> pushBack(int shift, K item);
 
+    VectorNode<K> update(int index, int remainder, int shift, K item);
+
     // TODO: next up: dropFront() and dropFront(int count)
     // TODO: next up: dropBack () and dropBack (int count)
 
@@ -268,6 +283,9 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       return Stream.of(content).mapToInt(VectorNode::size).sum();
     }
 
+    /*
+     * TODO: unify with {@code #update}, only recursive function call differs.
+     */
     @Override
     public Optional<K> get(int index, int remainder, int shift) {
       final int blockRelativeIndex;
@@ -360,6 +378,30 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       }
 
       throw new IllegalStateException("Appending not fully implemented.");
+    }
+
+    /*
+     * TODO: unify with {@code #get}, only recursive function call differs.
+     */
+    @Override
+    public VectorNode<K> update(int index, int remainder, int shift, K item) {
+      final int blockRelativeIndex;
+      final int newRemainder;
+
+      if (sizeFringeL == 0 || remainder < sizeFringeL) {
+        // regular
+        blockRelativeIndex = mask(remainder, shift, BIT_PARTITION_MASK);
+        newRemainder = remainder & ~(BIT_PARTITION_MASK << shift);
+      } else {
+        // semi-regular
+        blockRelativeIndex = 1 + ((remainder - sizeFringeL) >>> shift);
+        newRemainder = (remainder - sizeFringeL) & ~(BIT_PARTITION_MASK << shift);
+      }
+
+      VectorNode<K>[] newContent = copyAndUpdate(VectorNode[]::new, content, blockRelativeIndex,
+          node -> node.update(index, newRemainder, shift - BIT_PARTITION_SIZE, item));
+
+      return VectorNode.of(shift, sizeFringeL, newContent, sizeFringeR);
     }
 
     @Override
@@ -518,6 +560,16 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
       final Object[] src = this.content;
       final Object[] dst = copyAndInsert(Object[]::new, src, src.length, item);
+
+      return new ContentVectorNode<>(dst);
+    }
+
+    @Override
+    public VectorNode<K> update(int index, int remainder, int shift, K item) {
+      assert shift == 0;
+
+      final Object[] src = this.content;
+      final Object[] dst = copyAndSet(Object[]::new, src, remainder, item);
 
       return new ContentVectorNode<>(dst);
     }

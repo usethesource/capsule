@@ -7,6 +7,7 @@
  */
 package io.usethesource.capsule;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -185,6 +186,27 @@ public abstract class AbstractVectorProperties<T, CT extends Vector.Immutable<T>
         });
 
     assertTrue("Must contain all inserted values.", containsInsertedValues);
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void update(@Size(min = 1, max = MAX_SIZE) final CT vector, final int seed,
+      final T updatedItem) {
+
+    final int index = new Random(seed).nextInt(vector.size());
+    final CT result = (CT) vector.update(index, updatedItem);
+
+    assertEquals(vector.size(), result.size());
+    assertEquals(updatedItem, result.get(index).get());
+
+    boolean unmodifiedItemsEqual = IntStream.range(0, vector.size())
+        .filter(i -> i != index)
+        .allMatch(i -> {
+          Optional<T> a = vector.get(i);
+          Optional<T> b = result.get(i);
+          return Objects.equals(a, b);
+        });
+
+    assertTrue("Eleemnts at indices (excepted the updated) must equal.", unmodifiedItemsEqual);
   }
 
 //  @Property(trials = DEFAULT_TRIALS)
