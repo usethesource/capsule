@@ -20,7 +20,10 @@ import static io.usethesource.capsule.core.trie.MultimapResult.Modification.REMO
  * TODO: remove public modifier
  */
 public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable<V>, R extends MultimapNode<K, V, C, R>>
-    extends AbstractTrieSetMultimap<K, V, C, R> implements SetMultimap.Immutable<K, V> {
+    extends AbstractTrieSetMultimap<K, V, C, R>
+    implements SetMultimap.Immutable<K, V>, java.io.Serializable {
+
+  private static final long serialVersionUID = 42L;
 
   protected static final boolean DEBUG = false;
 

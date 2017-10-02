@@ -12,8 +12,12 @@ import java.util.Objects;
 
 import io.usethesource.capsule.util.function.ToBooleanBiFunction;
 
+/*
+ * TODO: remove {@link java.io.Serializable} capability after removing comparator from
+ * multi-map base classes.
+ */
 @FunctionalInterface
-public interface EqualityComparator<T> {
+public interface EqualityComparator<T> extends java.io.Serializable {
 
   static <T> EqualityComparator<T> fromComparator(Comparator<T> comparator) {
     return (a, b) -> comparator.compare(a, b) == 0;

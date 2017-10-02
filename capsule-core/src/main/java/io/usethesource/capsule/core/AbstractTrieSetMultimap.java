@@ -39,7 +39,9 @@ import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutab
  * TODO: remove public modifier
  */
 public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R extends MultimapNode<K, V, C, R>>
-    implements SetMultimap<K, V> {
+    implements SetMultimap<K, V>, java.io.Serializable {
+
+  private static final long serialVersionUID = 42L;
 
   protected final EqualityComparator<Object> cmp;
 

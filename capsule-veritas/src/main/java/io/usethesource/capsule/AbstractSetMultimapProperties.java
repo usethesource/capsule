@@ -7,6 +7,12 @@
  */
 package io.usethesource.capsule;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -246,6 +252,34 @@ public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap
   @Property(trials = DEFAULT_TRIALS)
   public void transientGetReturnsNonNull(CT input, K key) {
     assertNotNull("Must always return a set and not null.", input.asTransient().get(key));
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void serializationRoundtripIfSerializable(CT input) throws Exception {
+    if (input instanceof java.io.Serializable) {
+      assertEquals(input, deserialize(serialize((java.io.Serializable) input), input.getClass()));
+    }
+  }
+
+  private static <T extends Serializable> byte[] serialize(T item) throws IOException {
+    try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+      oos.writeObject(item);
+      return baos.toByteArray();
+    } catch (IOException e) {
+      throw e;
+    }
+  }
+
+  private static <T> T deserialize(byte[] bytes, Class<T> itemClass)
+      throws IOException, ClassNotFoundException {
+    try (ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        ObjectInputStream ois = new ObjectInputStream(bais)) {
+      Object item = ois.readObject();
+      return itemClass.cast(item);
+    } catch (IOException | ClassNotFoundException e) {
+      throw e;
+    }
   }
 
 }
