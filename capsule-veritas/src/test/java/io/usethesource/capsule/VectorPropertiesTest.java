@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(JUnitQuickcheck.class)
 public class VectorPropertiesTest extends
-    AbstractVectorProperties<String, Vector.Immutable<String>> {
+    AbstractVectorProperties<Integer, Vector.Immutable<Integer>> {
 
   public VectorPropertiesTest() {
     super(Vector.Immutable.class);

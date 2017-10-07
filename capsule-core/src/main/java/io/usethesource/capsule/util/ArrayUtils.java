@@ -10,6 +10,7 @@ package io.usethesource.capsule.util;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public class ArrayUtils {
 
@@ -157,6 +158,19 @@ public class ArrayUtils {
     System.arraycopy(src, idx, dst, idx + 1, src.length - idx);
 
     return dst;
+  }
+
+  public static <T> T[] copyAndRemove(IntFunction<T[]> supplier, T[] src, int idx) {
+    final T[] dst = supplier.apply(src.length - 1);
+
+    System.arraycopy(src, 0, dst, 0, idx);
+    System.arraycopy(src, idx + 1, dst, idx, src.length - idx - 1);
+
+    return dst;
+  }
+
+  public static <T> T[] merge(IntFunction<T[]> supplier, T[]... args) {
+    return Stream.of(args).flatMap(arg -> Stream.of(arg)).toArray(supplier);
   }
 
 }

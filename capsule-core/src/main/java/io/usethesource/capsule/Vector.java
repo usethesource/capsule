@@ -17,15 +17,17 @@ public interface Vector<K> {
 
   interface Immutable<K> extends Vector<K> {
 
+    Vector.Immutable<K> update(int index, K item);
+
     Vector.Immutable<K> pushFront(K item);
 
     Vector.Immutable<K> pushBack(K item);
 
-    Vector.Immutable<K> update(int index, K item);
-
     Vector.Immutable<K> take(int count);
 
     Vector.Immutable<K> drop(int count);
+
+    Vector.Immutable<K> concatenate(Vector.Immutable<K> that);
 
   }
 

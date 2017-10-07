@@ -10,7 +10,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="capsule" />
+    <orderEntry type="module" module-name="capsule-core" />
     <orderEntry type="module" module-name="capsule-experimental" />
     <orderEntry type="library" name="Maven: com.pholser:junit-quickcheck-core:0.7" level="project" />
     <orderEntry type="library" name="Maven: org.javaruntype:javaruntype:1.2" level="project" />

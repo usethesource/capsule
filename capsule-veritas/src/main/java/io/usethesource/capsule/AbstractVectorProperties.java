@@ -25,9 +25,9 @@ import com.pholser.junit.quickcheck.generator.Size;
 public abstract class AbstractVectorProperties<T, CT extends Vector.Immutable<T>> {
 
   private final int DEFAULT_TRIALS = 1_000;
-  private final int MORE_TRIALS = 10_000;
+  private final int MORE_TRIALS = 1_000;
   private final int LESS_TRIALS = 100;
-  private final int MAX_SIZE = 1_000;
+  private final int MAX_SIZE = 50_000;
   private final Class<?> type;
 
   public AbstractVectorProperties(Class<?> type) {
@@ -150,6 +150,33 @@ public abstract class AbstractVectorProperties<T, CT extends Vector.Immutable<T>
         });
 
     assertTrue("Must contain all inserted values.", containsInsertedValues);
+  }
+
+  @Property(trials = MORE_TRIALS)
+  public void containsAfterConcatenate(
+      @Size(min = 1, max = MAX_SIZE) final CT vectorOne,
+      @Size(min = 1, max = MAX_SIZE) final CT vectorTwo) {
+
+    final CT result = (CT) vectorOne.concatenate(vectorTwo);
+    assert result.size() == vectorOne.size() + vectorTwo.size();
+
+    boolean containsVectorOne = IntStream.range(0, vectorOne.size())
+        .allMatch(index -> {
+          Optional<T> a = vectorOne.get(index);
+          Optional<T> b = result.get(index);
+          return Objects.equals(a, b);
+        });
+
+    assertTrue("Must retain all original values.", containsVectorOne);
+
+    boolean containsVectorTwo = IntStream.range(0, vectorTwo.size())
+        .allMatch(index -> {
+          Optional<T> a = vectorTwo.get(index);
+          Optional<T> b = result.get(vectorOne.size() + index);
+          return Objects.equals(a, b);
+        });
+
+    assertTrue("Must contain all newly inserted values.", containsVectorTwo);
   }
 
   @Property(trials = DEFAULT_TRIALS)
