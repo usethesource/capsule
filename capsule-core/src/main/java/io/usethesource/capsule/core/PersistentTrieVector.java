@@ -17,6 +17,8 @@ import static io.usethesource.capsule.util.ArrayUtils.copyAndSet;
 import static io.usethesource.capsule.util.ArrayUtils.copyAndTake;
 import static io.usethesource.capsule.util.ArrayUtils.copyAndUpdate;
 import static io.usethesource.capsule.util.ArrayUtils.merge;
+import static io.usethesource.capsule.util.BitmapUtils.bitpos;
+import static io.usethesource.capsule.util.BitmapUtils.index;
 import static io.usethesource.capsule.util.BitmapUtils.mask;
 import static io.usethesource.capsule.util.FunctionUtils.asInstanceOf;
 
@@ -35,6 +37,7 @@ import java.util.stream.Stream;
 
 import io.usethesource.capsule.Vector;
 import io.usethesource.capsule.core.PersistentTrieVector.PathVisitor.Arguments;
+import io.usethesource.capsule.util.BitmapUtils;
 import io.usethesource.capsule.util.stream.DefaultCollector;
 
 public class PersistentTrieVector<K> implements Vector.Immutable<K> {
@@ -961,7 +964,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
     return new FringedVectorNode<K>(sizeFringeL, compactedSizemap, sizeFringeR, contentSizesSingle, contentSizesSummed, content);
   }
-  
+
   private static final class FringedVectorNode<K> implements VectorNode<K> {
 
     private static final int[] EMPTY_SIZES = new int[0];
@@ -1046,32 +1049,52 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       assert 0 <= index;
       assert 0 <= remainder;
 
-      boolean isRegular =
-          0 == (sizemap & ~((1 << (content.length - 1))));
+      final boolean isFullRegular;
+      final boolean isSemiRegular;
 
-      boolean isSemiRegular =
-          0 == (sizemap & ~((1 << (content.length - 1)) ^ 0b1));
+      if (content.length < 2) {
+        // first and last node equal
+        isFullRegular = 0 == sizemap;
+        isSemiRegular = 1 == sizemap;
+      } else {
+        // ignore size of last node
+        isFullRegular = 0 == (sizemap & ~((1 << (content.length - 1))));
+        isSemiRegular = 1 == (sizemap & ~((1 << (content.length - 1))));
+      }
+
+      assert implies(isFullRegular, sizeFringeL == 0);
+      assert implies(isSemiRegular, sizeFringeL != 0);
 
       final int blockRelativeIndex;
       final int newRemainder;
 
-      if ((isRegular || isSemiRegular) && (sizeFringeL == 0 || remainder < sizeFringeL)) {
-        // regular
+      final int __mask = mask(remainder, shift, BIT_PARTITION_MASK);
+      final int __index = index(sizemap, __mask, bitpos(__mask));
+      final boolean isEffectivelyRegular =
+          (sizemap & bitpos(__mask)) == 0 && (__mask != 0 && __index == 0);
+
+      if (isFullRegular || isEffectivelyRegular || remainder < sizeFringeL) {
+        // regular (or in first sub-tree)
         blockRelativeIndex = mask(remainder, shift, BIT_PARTITION_MASK);
         newRemainder = remainder & ~(BIT_PARTITION_MASK << shift);
+
+        return content[blockRelativeIndex].get(index, newRemainder, shift - BIT_PARTITION_SIZE);
       } else if (isSemiRegular) {
         // semi-regular
+        // TODO: support {@code isEffectivelyRegular} in semi-regular
         blockRelativeIndex = 1 + ((remainder - sizeFringeL) >>> shift);
         newRemainder = (remainder - sizeFringeL) & ~(BIT_PARTITION_MASK << shift);
+
+        return content[blockRelativeIndex].get(index, newRemainder, shift - BIT_PARTITION_SIZE);
       } else {
         // irregular
         blockRelativeIndex = offset(sizesSummed, remainder);
         newRemainder = (blockRelativeIndex == 0)
             ? remainder
             : remainder - sizesSummed[blockRelativeIndex - 1];
-      }
 
-      return content[blockRelativeIndex].get(index, newRemainder, shift - BIT_PARTITION_SIZE);
+        return content[blockRelativeIndex].get(index, newRemainder, shift - BIT_PARTITION_SIZE);
+      }
     }
 
     @Override

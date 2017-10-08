@@ -17,6 +17,18 @@ public final class BitmapUtils {
     return (index >>> shift) & mask;
   }
 
+  public static final int bitpos(final int mask) {
+    return 1 << mask;
+  }
+
+  public static final int index(final int bitmap, final int bitpos) {
+    return java.lang.Integer.bitCount(bitmap & (bitpos - 1));
+  }
+
+  public static final int index(final int bitmap, final int mask, final int bitpos) {
+    return (bitmap == -1) ? mask : index(bitmap, bitpos);
+  }
+
   private static final boolean USE_SELF_WRITTEN_POPULATION_COUNT = false;
   private static final boolean USE_SELF_WRITTEN_POPULATION_COUNT_CHECK =
       !USE_SELF_WRITTEN_POPULATION_COUNT && false;
