@@ -180,6 +180,35 @@ public abstract class AbstractVectorProperties<T, CT extends Vector.Immutable<T>
   }
 
   @Property(trials = DEFAULT_TRIALS)
+  public void insertAt(final CT vector, final int seed, final T newItem) {
+
+    final int index = new Random(seed).nextInt(vector.size() + 1);
+    final CT result = (CT) vector.insertAt(index, newItem);
+
+    assertEquals(result.size(), vector.size() + 1);
+
+    assertEquals(vector.get(index).get(), newItem);
+
+    boolean containsValuesBeforeIndex = IntStream.range(0, index)
+        .allMatch(i -> {
+          Optional<T> a = vector.get(i);
+          Optional<T> b = result.get(i);
+          return Objects.equals(a, b);
+        });
+
+    assertTrue("Must contain all inserted values.", containsValuesBeforeIndex);
+
+    boolean containsValuesAfterIndex = IntStream.range(index, vector.size())
+        .allMatch(i -> {
+          Optional<T> a = vector.get(i);
+          Optional<T> b = result.get(i + 1);
+          return Objects.equals(a, b);
+        });
+
+    assertTrue("Must contain all inserted values.", containsValuesAfterIndex);
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
   public void take(final CT vector, final int seed) {
 
     final int count = new Random(seed).nextInt(vector.size() + 1);
