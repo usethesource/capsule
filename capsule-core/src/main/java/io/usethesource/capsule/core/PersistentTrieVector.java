@@ -193,8 +193,6 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
   @Override
   public Vector.Immutable<K> concatenate(Vector.Immutable<K> other) {
-    // throw new UnsupportedOperationException("Not yet implemented.");
-
     if (other instanceof PersistentTrieVector) {
       final PersistentTrieVector<K> that = (PersistentTrieVector<K>) other;
 
@@ -206,12 +204,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
           new PathVisitor(() -> new Path(that.shift)),
           Arguments.of(0, 0, that.shift));
 
-//      System.out.println(pathL);
-//      System.out.println(pathR);
-
       int maxShift = Math.max(this.shift, that.shift);
-
-      // VectorNode<K> newRootNode = mergeTrees(maxShift, pathL, pathR);
 
       final VectorNode<K> nodeL = pathL.nodeAtShift(maxShift)
           .orElse(newLeftProlongedPath(maxShift, pathL.top(), Math.min(pathL.shift, maxShift)));
@@ -235,90 +228,6 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     }
   }
 
-  private VectorNode<K> mergeTrees(int maxShift, Path pathL, Path pathR) {
-    // int maxShift = Math.max(pathL.shift, pathR.shift);
-
-    if (maxShift == 0) { // pathL.shift == 0 && pathR.shift == 0
-      return mergeLeaves(pathL.nodeAtShift(0).get(), pathR.nodeAtShift(0).get());
-    }
-
-    if (maxShift == 5) {
-      final VectorNode<K> origL =
-          pathL.nodeAtShift(maxShift)
-              .orElse(newLeftProlongedPath(maxShift, pathL.top(), Math.min(pathL.shift, maxShift)));
-
-      final VectorNode<K> origR =
-          pathR.nodeAtShift(maxShift)
-              .orElse(newRightProlongedPath(maxShift, pathR.top(), Math.min(pathR.shift, maxShift)));
-
-      final VectorNode<K> nodeL = pathL.nodeAtShift(maxShift)
-          .orElse(newLeftProlongedPath(maxShift, pathL.top(), Math.min(pathL.shift, maxShift)))
-          .init(maxShift);
-
-      final VectorNode<K> nodeM = mergeLeaves(pathL.nodeAtShift(0).get(), pathR.nodeAtShift(0).get());
-
-      final VectorNode<K> nodeR = pathR.nodeAtShift(maxShift)
-          .orElse(newRightProlongedPath(maxShift, pathR.top(), Math.min(pathR.shift, maxShift)))
-          .tail(maxShift);
-
-      assert origL.size() + origR.size() == nodeL.size() + nodeM.size() + nodeR.size();
-
-      return mergeAndRebalanceLastTwoLevels(nodeL, nodeM, nodeR);
-    }
-
-    if (maxShift >= 10) {
-      final VectorNode<K> origL =
-          pathL.nodeAtShift(maxShift)
-              .orElse(newLeftProlongedPath(maxShift, pathL.top(), Math.min(pathL.shift, maxShift)));
-
-      final VectorNode<K> origR =
-          pathR.nodeAtShift(maxShift)
-              .orElse(newRightProlongedPath(maxShift, pathR.top(), Math.min(pathR.shift, maxShift)));
-
-      final VectorNode<K> nodeL = pathL.nodeAtShift(maxShift)
-          .orElse(newLeftProlongedPath(maxShift, pathL.top(), Math.min(pathL.shift, maxShift)))
-          .init(maxShift);
-
-      final VectorNode<K> nodeR = pathR.nodeAtShift(maxShift)
-          .orElse(newRightProlongedPath(maxShift, pathR.top(), Math.min(pathR.shift, maxShift)))
-          .tail(maxShift);
-
-      // NOTE: doesn't work here: top-down recursive algorithm; uses nodes instead of paths
-      // final VectorNode<K> nodeM = mergeTrees(maxShift - BIT_PARTITION_SIZE, nodeL.last(), nodeR.first());
-
-      final VectorNode<K> nodeM = mergeTrees(maxShift - BIT_PARTITION_SIZE, pathL, pathR);
-
-      assert origL.size() + origR.size() == nodeL.size() + nodeM.size() + nodeR.size();
-
-      final VectorNode<K> newNodeM;
-      if (nodeR.size() != 0) {
-        newNodeM = mergeTrees(maxShift, nodeM, nodeR);
-        assert newNodeM.size() == nodeM.size() + nodeR.size();
-      }
-
-
-      return mergeAndRebalanceUpperLevels(maxShift - BIT_PARTITION_SIZE, nodeL, nodeM, nodeR);
-    }
-
-    throw new IllegalStateException("Not all cases covered.");
-
-//    if (shift == 0) {
-//      return mergeLeaves(nodeL, nodeR);
-//    } else {
-//      final VectorNode<K> merged;
-//
-//      if (shift == 5) {
-//        merged = mergeLeaves(nodeL.last(), nodeR.first());
-//      } else {
-//        merged = mergeTrees(shift - BIT_PARTITION_SIZE, nodeL.last(), nodeR.first());
-//      }
-//
-//      return mergeAndRebalance(nodeL.init(), merged, nodeR.tail());
-//    }
-  }
-
-
-
   private VectorNode<K> mergeTrees(int shift, VectorNode<K> nodeL, VectorNode<K> nodeR) {
     if (shift == 0) {
       return mergeLeaves(nodeL, nodeR);
@@ -333,20 +242,20 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
         nodeM = mergeLeaves(nodeL.last(), nodeR.first());
 
         return mergeAndRebalanceLastTwoLevels(nodeL, EMPTY_FRINGED_NODE, nodeR);
-      } else if (shift == 10) {
-//        merged = mergeTrees(shift - BIT_PARTITION_SIZE, nodeL.last(), nodeR.first());
+//      } else if (shift == 10) {
+////        merged = mergeTrees(shift - BIT_PARTITION_SIZE, nodeL.last(), nodeR.first());
+////
+////        return mergeAndRebalanceMiddleLevels(nodeL.init(shift), merged, nodeR.tail(shift));
 //
-//        return mergeAndRebalanceMiddleLevels(nodeL.init(shift), merged, nodeR.tail(shift));
-
-//        final VectorNode<K> merged1 =
-//            mergeTrees(shift - BIT_PARTITION_SIZE, nodeL.last(), nodeR.first());
-
-        final VectorNode<K> mergedLeaves = mergeTrees(shift - BIT_PARTITION_SIZE, nodeL.last(),
-            nodeR.first());
-
-        nodeM = mergeAndRebalanceMiddleLevels(EMPTY_FRINGED_NODE, mergedLeaves, nodeR.tail(shift)).reduceShift();
-
-        return mergeAndRebalanceUpperLevels(shift - BIT_PARTITION_SIZE, nodeL.init(shift), nodeM, EMPTY_FRINGED_NODE);
+////        final VectorNode<K> merged1 =
+////            mergeTrees(shift - BIT_PARTITION_SIZE, nodeL.last(), nodeR.first());
+//
+//        final VectorNode<K> mergedLeaves = mergeTrees(shift - BIT_PARTITION_SIZE, nodeL.last(),
+//            nodeR.first());
+//
+//        nodeM = mergeAndRebalanceMiddleLevels(EMPTY_FRINGED_NODE, mergedLeaves, nodeR.tail(shift)).reduceShift();
+//
+//        return mergeAndRebalanceUpperLevels(shift - BIT_PARTITION_SIZE, nodeL.init(shift), nodeM, EMPTY_FRINGED_NODE);
       } else {
         nodeM = mergeTrees(shift - BIT_PARTITION_SIZE, nodeL.last(), nodeR.first());
 
@@ -432,6 +341,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     return (VectorNode<K>) possibleResult;
   }
 
+  @Deprecated
   private VectorNode<K> mergeAndRebalanceMiddleLevels(
       VectorNode<K> nodeL, VectorNode<K> nodeM, VectorNode<K> nodeR) {
 
@@ -441,6 +351,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
         (FringedVectorNode<K>) nodeR);
   }
 
+  @Deprecated
   private VectorNode<K> mergeAndRebalanceMiddleLevels(
       FringedVectorNode<K> nodeL, FringedVectorNode<K> nodeM, FringedVectorNode<K> nodeR) {
 
@@ -1022,20 +933,41 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
   }
 
+  private final static int[] copyAndSum(int[] src) {
+    final int[] dst = new int[src.length];
+
+    int cumulativeSum = 0;
+    for (int i = 0; i < src.length; i++) {
+      dst[i] = (cumulativeSum += src[i]);
+    }
+    return dst;
+  }
+
   private final static <K> FringedVectorNode<K> calculateSizes(int shift, VectorNode[] content) {
 
-    final IntPredicate isFull = (i) -> content[i].size() == 1 << shift;
+    final int[] contentSizesSingle =
+        IntStream.range(0, content.length).map(i -> content[i].size()).toArray();
 
-    final int[] indices = IntStream.range(0, content.length).filter(isFull.negate()).toArray();
+    final int[] contentSizesSummed = copyAndSum(contentSizesSingle);
 
-    final int[] sizesSingle = IntStream.of(indices).map(i -> content[i].size()).toArray();
+    final IntPredicate isFull = (i) -> contentSizesSingle[i] == 1 << shift;
 
-    int[] tmp = IntStream.range(0, content.length).map(i -> content[i].size()).toArray();
-    Arrays.parallelPrefix(tmp, Integer::sum);
+//    final int[] indices = IntStream.range(0, content.length).filter(isFull.negate()).toArray();
+//
+//    final int[] compactedSizesSingle =
+//        IntStream.of(indices).map(i -> contentSizesSingle[i]).toArray();
+//
+//    final int[] compactedSizesSummed =
+//        IntStream.of(indices).map(i -> contentSizesSummed[i]).toArray();
+//
+//    final int compactedSizemap =
+//        IntStream.of(indices).map(i -> 1 << i).reduce(0, (x, y) -> x | y);
 
-    final int[] sizesSummed = IntStream.of(indices).map(i -> tmp[i]).toArray();
-
-    final int sizemap = IntStream.of(indices).map(i -> 1 << i).reduce(0, (x, y) -> x | y);
+    final int compactedSizemap =
+        IntStream.range(0, content.length)
+            .filter(isFull.negate())
+            .map(i -> 1 << i)
+            .reduce(0, (x, y) -> x | y);
 
     // assert content.length >= 2;
 
@@ -1047,8 +979,8 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       r = 0;
     } else {
       // NOTE: nodes of size 1 have {@code l == r}; TODO: make invariant?
-      l = content[0].size();
-      r = content[content.length - 1].size();
+      l = contentSizesSingle[0];
+      r = contentSizesSingle[content.length - 1];
     }
 
     final int sizeFringeL = (l == 1 << shift) ? 0 : l;
@@ -1067,9 +999,10 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 //    assert implies(content.length >= 2 && sizeFringeL == 0 && sizeFringeR != 0, Integer.bitCount(sizemap) == 1);
 //    assert implies(content.length >= 2 && sizeFringeL != 0 && sizeFringeR == 0, Integer.bitCount(sizemap) == 1);
 
-    return new FringedVectorNode<K>(sizeFringeL, sizemap, sizeFringeR, sizesSingle, sizesSummed, content);
+    return new FringedVectorNode<K>(sizeFringeL, compactedSizemap, sizeFringeR, contentSizesSingle, contentSizesSummed, content);
   }
 
+  @Deprecated
   static final int sparseBinarySearch(int fullSize, int low, int high, int sizemap, int[] sizesSummed, int remainder) {
     int[] sizesCumSum = sizesSummed.clone();
     Arrays.parallelPrefix(sizesCumSum, Integer::sum);
@@ -1159,7 +1092,23 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     @Override
     public int size() {
       if (lazySize == 0) {
-        lazySize = Stream.of(content).mapToInt(VectorNode::size).sum();
+//        final int size;
+//
+//        if (sizemap == 0) {
+//          size = ???;
+//        } else {
+//          size = Stream.of(content).mapToInt(VectorNode::size).sum();
+//        }
+//
+//        lazySize = size;
+
+        if (content.length == 0) {
+          lazySize = 0;
+        } else {
+          lazySize = sizesSummed[content.length - 1];
+        }
+
+//        lazySize = Stream.of(content).mapToInt(VectorNode::size).sum();
       }
 
       return lazySize;
@@ -1170,9 +1119,8 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
      */
     @Override
     public Optional<K> get(int index, int remainder, int shift) {
-      assert index >= 0;
-      assert remainder >= 0;
-      // assert sizemap == 0;
+      assert 0 <= index;
+      assert 0 <= remainder;
 
 //      int maskPlusOne = mask(remainder, shift, BIT_PARTITION_MASK) + 1;
 //      int bitpos = 1 << maskPlusOne;
@@ -1207,11 +1155,14 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
           sizemap == 0
               || sizemap == ((1 << (content.length - 1)));
 
+      assert ((sizemap & ~(1 << (content.length - 1))) == 0) == isRegular;
+
       boolean isSemiRegular =
           sizemap == 0b1
               || sizemap == (((1 << (content.length - 1))))
               || sizemap == (((1 << (content.length - 1))) ^ 0b1);
 
+      assert ((sizemap & ~(1 << (content.length - 1)) & ~0b1) == 0) == isRegular || isSemiRegular;
 
 //      boolean isIrregular =
 //          sizemap == 0
@@ -1231,13 +1182,13 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
         newRemainder = (remainder - sizeFringeL) & ~(BIT_PARTITION_MASK << shift);
       } else {
         // irregular
-        int[] cumulativeSizes = IntStream.range(0, content.length).map(i -> content[i].size()).toArray();
-        Arrays.parallelPrefix(cumulativeSizes, Integer::sum);
+//        int[] cumulativeSizes = IntStream.range(0, content.length).map(i -> content[i].size()).toArray();
+//        Arrays.parallelPrefix(cumulativeSizes, Integer::sum);
 
-        blockRelativeIndex = offset(cumulativeSizes, remainder);
+        blockRelativeIndex = offset(sizesSummed, remainder);
         newRemainder = (blockRelativeIndex == 0)
             ? remainder
-            : remainder - cumulativeSizes[blockRelativeIndex - 1];
+            : remainder - sizesSummed[blockRelativeIndex - 1];
       }
 
       return content[blockRelativeIndex].get(index, newRemainder, shift - BIT_PARTITION_SIZE);
