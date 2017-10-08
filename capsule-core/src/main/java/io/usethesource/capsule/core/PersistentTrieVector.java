@@ -880,32 +880,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
     <T, A, E extends Throwable> T accept(NodeVisitor<T, A, E> visitor, A args); // throws E
 
-    static <K> VectorNode<K> of(int shiftWitness, int sizeFringeL, Object[] dst,
-        int sizeFringeR) {
-
-//      if (sizeFringeL == 32) {
-//        sizeFringeL = 0;
-//      }
-//
-//      if (sizeFringeR == 32) {
-//        sizeFringeR = 0;
-//      }
-//
-//      assert shiftWitness == 0;
-//      assert sizeFringeL < BIT_COUNT_OF_INDEX;
-//      assert sizeFringeR < BIT_COUNT_OF_INDEX;
-//      assert implies(dst.length == 0, sizeFringeL == 0);
-//      assert implies(dst.length == 0, sizeFringeR == 0);
-//      assert implies(dst.length == 32, sizeFringeL == 0);
-//      assert implies(dst.length == 32, sizeFringeR == 0);
-//      assert implies(0 < dst.length && dst.length < 32,
-//          sizeFringeL == dst.length || dst.length == sizeFringeR);
-//
-////      assert implies(dst.length != 0, sizeFringeL + dst.length + sizeFringeR == BIT_COUNT_OF_INDEX);
-////
-////      assert implies(0 < dst.length && dst.length < 32, sizeFringeL + dst.length == 32 || dst.length + sizeFringeR == 32);
-////      assert implies(0 < dst.length && dst.length < 32, sizeFringeL + dst.length + sizeFringeR == BIT_COUNT_OF_INDEX);
-
+    static <K> VectorNode<K> of(int shiftWitness, int sizeFringeL, Object[] dst, int sizeFringeR) {
       return new ContentVectorNode<>(sizeFringeL, dst, sizeFringeR);
     }
 
@@ -969,8 +944,6 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
             .map(i -> 1 << i)
             .reduce(0, (x, y) -> x | y);
 
-    // assert content.length >= 2;
-
     final int l;
     final int r;
 
@@ -986,58 +959,9 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     final int sizeFringeL = (l == 1 << shift) ? 0 : l;
     final int sizeFringeR = (r == 1 << shift) ? 0 : r;
 
-//    assert implies(Integer.bitCount(sizemap) == 2,
-//        sizemap == ((1 << (content.length - 1)) ^ 0b1));
-//
-//    assert implies(Integer.bitCount(sizemap) == 1,
-//        sizemap == ((1 << (content.length - 1))) || sizemap == 0b1);
-//
-//    assert implies(content.length == 1 && sizeFringeL != 0, Integer.bitCount(sizemap) == 1 && sizeFringeR == sizeFringeL);
-//    assert implies(content.length == 1 && sizeFringeR != 0, Integer.bitCount(sizemap) == 1 && sizeFringeL == sizeFringeR);
-//
-//    assert implies(content.length >= 2 && sizeFringeL != 0 && sizeFringeR != 0, Integer.bitCount(sizemap) == 2);
-//    assert implies(content.length >= 2 && sizeFringeL == 0 && sizeFringeR != 0, Integer.bitCount(sizemap) == 1);
-//    assert implies(content.length >= 2 && sizeFringeL != 0 && sizeFringeR == 0, Integer.bitCount(sizemap) == 1);
-
     return new FringedVectorNode<K>(sizeFringeL, compactedSizemap, sizeFringeR, contentSizesSingle, contentSizesSummed, content);
   }
-
-  @Deprecated
-  static final int sparseBinarySearch(int fullSize, int low, int high, int sizemap, int[] sizesSummed, int remainder) {
-    int[] sizesCumSum = sizesSummed.clone();
-    Arrays.parallelPrefix(sizesCumSum, Integer::sum);
-
-    do {
-      final int mask = (low + high) / 2;
-      int bitpos = 1 << mask;
-
-      int anyslotCount = mask;
-      int specialSizes = Integer.bitCount(sizemap & (bitpos - 1));
-      int regularSizes = Integer.bitCount(~sizemap & (bitpos - 1));
-
-      final int sizeMid;
-      if (specialSizes != 0) {
-        sizeMid = sizesCumSum[specialSizes - 1] + fullSize * regularSizes;
-      } else {
-        sizeMid = fullSize * regularSizes;
-      }
-
-//      int sizeMid = sizesCumSum[specialSizes] + fullSize * regularSizes;
-          // IntStream.range(0, specialSizes).map(i -> sizesSingle[i]).sum() + (1 << shift) * regularSizes;
-
-//      int x = Integer.bitCount(sizemap & ((1 << mask) - 1));
-
-      if (sizeMid <= remainder) {
-        low = mask;
-      } else {
-        high = mask;
-      }
-
-    } while ((high - low) > 1);
-
-    return 0;
-  }
-
+  
   private static final class FringedVectorNode<K> implements VectorNode<K> {
 
     private static final int[] EMPTY_SIZES = new int[0];
@@ -1122,52 +1046,11 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       assert 0 <= index;
       assert 0 <= remainder;
 
-//      int maskPlusOne = mask(remainder, shift, BIT_PARTITION_MASK) + 1;
-//      int bitpos = 1 << maskPlusOne;
-//
-//      int anyslotCount = maskPlusOne;
-//      int specialSizes = Integer.bitCount(sizemap & (bitpos - 1));
-//      int regularSizes = Integer.bitCount(~sizemap & (bitpos - 1));
-//
-//      int totalSizeTot =
-//          IntStream.range(0, specialSizes).map(i -> sizesSingle[i]).sum() + (1 << shift) * regularSizes;
-
-//      if (sizesSummed.length >= 2) {
-//        sparseBinarySearch(1 << shift, 0, content.length, sizemap, sizesSingle, remainder);
-//      }
-
-      // NOTE: in semi-regular case I'm deciding how many slots to skip ...
-
-//      assert implies(Integer.bitCount(sizemap) == 2,
-//          sizemap == ((1 << (content.length - 1)) ^ 0b1));
-//
-//      assert implies(Integer.bitCount(sizemap) == 1,
-//          sizemap == ((1 << (content.length - 1))) || sizemap == 0b1);
-//
-//      assert implies(content.length == 1 && sizeFringeL != 0, Integer.bitCount(sizemap) == 1 && sizeFringeR == sizeFringeL);
-//      assert implies(content.length == 1 && sizeFringeR != 0, Integer.bitCount(sizemap) == 1 && sizeFringeL == sizeFringeR);
-//
-//      assert implies(content.length >= 2 && sizeFringeL != 0 && sizeFringeR != 0, Integer.bitCount(sizemap) == 2);
-//      assert implies(content.length >= 2 && sizeFringeL == 0 && sizeFringeR != 0, Integer.bitCount(sizemap) == 1);
-//      assert implies(content.length >= 2 && sizeFringeL != 0 && sizeFringeR == 0, Integer.bitCount(sizemap) == 1);
-
       boolean isRegular =
-          sizemap == 0
-              || sizemap == ((1 << (content.length - 1)));
-
-      assert ((sizemap & ~(1 << (content.length - 1))) == 0) == isRegular;
+          0 == (sizemap & ~((1 << (content.length - 1))));
 
       boolean isSemiRegular =
-          sizemap == 0b1
-              || sizemap == (((1 << (content.length - 1))))
-              || sizemap == (((1 << (content.length - 1))) ^ 0b1);
-
-      assert ((sizemap & ~(1 << (content.length - 1)) & ~0b1) == 0) == isRegular || isSemiRegular;
-
-//      boolean isIrregular =
-//          sizemap == 0
-//              || sizemap == 0b1|| sizemap == ((1 << (content.length - 1)))
-//              || sizemap == ((1 << (content.length - 1)));
+          0 == (sizemap & ~((1 << (content.length - 1)) ^ 0b1));
 
       final int blockRelativeIndex;
       final int newRemainder;
@@ -1182,9 +1065,6 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
         newRemainder = (remainder - sizeFringeL) & ~(BIT_PARTITION_MASK << shift);
       } else {
         // irregular
-//        int[] cumulativeSizes = IntStream.range(0, content.length).map(i -> content[i].size()).toArray();
-//        Arrays.parallelPrefix(cumulativeSizes, Integer::sum);
-
         blockRelativeIndex = offset(sizesSummed, remainder);
         newRemainder = (blockRelativeIndex == 0)
             ? remainder
