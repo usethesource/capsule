@@ -146,10 +146,34 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
   }
 
   @Override
+  public Immutable<K> insertAt(int index, K item) {
+    if (index < 0 || index > length) {
+      throw new IndexOutOfBoundsException(
+          String.format("Index %d out of interval [0,%d]", index, length));
+    }
+
+    if (index == 0) {
+      return pushFront(item);
+    }
+
+    if (index == length) {
+      return pushBack(item);
+    }
+
+    final Vector.Immutable<K> lhs = take(index);
+    final Vector.Immutable<K> rhs = drop(index);
+
+    final Vector.Immutable<K> tmp = lhs.pushBack(item);
+    final Vector.Immutable<K> res = tmp.concatenate(rhs);
+
+    return res;
+  }
+
+  @Override
   public Vector.Immutable<K> update(int index, K item) {
     if (index < 0 || index >= length) {
-      throw new IndexOutOfBoundsException(String.format("Index %d out of interval [0,%d)",
-          index, length));
+      throw new IndexOutOfBoundsException(
+          String.format("Index %d out of interval [0,%d)", index, length));
     }
 
     final VectorNode<K> newRootNode = root.update(index, index, shift, item);

@@ -17,6 +17,8 @@ public interface Vector<K> {
 
   interface Immutable<K> extends Vector<K> {
 
+    Vector.Immutable<K> insertAt(int index, K item);
+
     Vector.Immutable<K> update(int index, K item);
 
     Vector.Immutable<K> pushFront(K item);
