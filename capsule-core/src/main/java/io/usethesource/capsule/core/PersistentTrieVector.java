@@ -1071,7 +1071,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       final int __mask = mask(remainder, shift, BIT_PARTITION_MASK);
       final int __index = index(sizemap, __mask, bitpos(__mask));
       final boolean isEffectivelyRegular =
-          (sizemap & bitpos(__mask)) == 0 && (__mask != 0 && __index == 0);
+          (sizemap & bitpos(__mask)) == 0 && __index == 0;
 
       if (isFullRegular || isEffectivelyRegular || remainder < sizeFringeL) {
         // regular (or in first sub-tree)
