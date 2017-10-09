@@ -73,6 +73,11 @@ public abstract class AbstractVectorGenerator<T extends Vector.Immutable>
       Object item = componentGenerators().get(0).generate(random, status);
       // items = (T) items.pushBack(item);
 
+//      /* TODO: enable code below after all lookups can handle relaxed inner nodes */
+//      if (i > 0 && random.nextInt() % 13 == 0) {
+//        final int index = random.nextInt(i);
+//        items = (T) items.insertAt(index, item);
+//      } else
       if (random.nextBoolean()) {
         items = (T) items.pushFront(item);
       } else {
