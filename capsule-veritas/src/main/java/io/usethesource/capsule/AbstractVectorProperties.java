@@ -187,7 +187,7 @@ public abstract class AbstractVectorProperties<T, CT extends Vector.Immutable<T>
 
     assertEquals(result.size(), vector.size() + 1);
 
-    assertEquals(vector.get(index).get(), newItem);
+    assertEquals(result.get(index).get(), newItem);
 
     boolean containsValuesBeforeIndex = IntStream.range(0, index)
         .allMatch(i -> {
