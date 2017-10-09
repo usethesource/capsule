@@ -23,7 +23,6 @@ import static io.usethesource.capsule.util.BitmapUtils.mask;
 import static io.usethesource.capsule.util.FunctionUtils.asInstanceOf;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -37,13 +36,12 @@ import java.util.stream.Stream;
 
 import io.usethesource.capsule.Vector;
 import io.usethesource.capsule.core.PersistentTrieVector.PathVisitor.Arguments;
-import io.usethesource.capsule.util.BitmapUtils;
 import io.usethesource.capsule.util.stream.DefaultCollector;
 
 public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
   private static final VectorNode EMPTY_FRINGED_NODE = VectorNode.of(0, 0, new VectorNode[]{}, 0);
-  private static final VectorNode EMPTY_NODE = VectorNode.of(0, 0, new Object[]{}, 0);
+  private static final VectorNode EMPTY_NODE = VectorNode.of(0, new Object[]{});
 
   private static final PersistentTrieVector EMPTY_VECTOR =
       new PersistentTrieVector(EMPTY_NODE, 0, 0);
@@ -64,6 +62,11 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
   public static final <K> Vector.Immutable<K> of() {
     return EMPTY_VECTOR;
+  }
+
+  public static final <K> Vector.Immutable<K> of(K item) {
+    final VectorNode<K> newRootNode = VectorNode.of(0, new Object[]{item});
+    return new PersistentTrieVector<>(newRootNode, 0, 1);
   }
 
   @Override
@@ -101,6 +104,8 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
    */
   @Override
   public Vector.Immutable<K> pushFront(K item) {
+//    return PersistentTrieVector.of(item).concatenate(this);
+
     final int newShift = root.hasFullFront() ? shift + BIT_PARTITION_SIZE : shift;
     final int newLength = length + 1;
 
@@ -126,6 +131,8 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
    */
   @Override
   public Vector.Immutable<K> pushBack(K item) {
+//    return this.concatenate(PersistentTrieVector.of(item));
+
     final int newShift = root.hasFullBack() ? shift + BIT_PARTITION_SIZE : shift;
     final int newLength = length + 1;
 
@@ -316,8 +323,8 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
         final Object[] contentR = new Object[newSizeR];
         System.arraycopy(leafR.content, leafR.content.length - newSizeR, contentR, 0, newSizeR);
 
-        final VectorNode<K> newLeafL = VectorNode.of(0, 0, contentL, 0);
-        final VectorNode<K> newLeafR = VectorNode.of(0, 0, contentR, newSizeR);
+        final VectorNode<K> newLeafL = VectorNode.of(0, contentL);
+        final VectorNode<K> newLeafR = VectorNode.of(0, contentR);
 
         return VectorNode
             .of(BIT_PARTITION_SIZE, newSizeL, new VectorNode[]{newLeafL, newLeafR}, newSizeR);
@@ -329,7 +336,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
         System.arraycopy(leafR.content, 0, contentR, leafL.content.length,
             newSizeR - leafL.content.length);
 
-        final VectorNode<K> newLeafR = VectorNode.of(0, 0, contentR, newSizeR);
+        final VectorNode<K> newLeafR = VectorNode.of(0, contentR);
 
         return VectorNode
             .of(BIT_PARTITION_SIZE, 0, new VectorNode[]{newLeafR}, newSizeR);
@@ -421,7 +428,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
       // overflow level 0?
       if (leafBuffer.size() == BIT_COUNT_OF_INDEX) {
-        VectorNode<K> nextLeaf = VectorNode.of(0, 0, leafBuffer.toArray(), 0);
+        VectorNode<K> nextLeaf = VectorNode.of(0, leafBuffer.toArray());
 
         treeBuffer.add(nextLeaf);
         leafBuffer.clear();
@@ -444,7 +451,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       int sizeFringeR = 0;
 
       if (leafBuffer.size() > 0) {
-        final VectorNode<K> lastLeaf = VectorNode.of(0, 0, leafBuffer.toArray(), leafBuffer.size());
+        final VectorNode<K> lastLeaf = VectorNode.of(0, leafBuffer.toArray());
         treeBuffer.add(lastLeaf);
 
         sizeFringeR = leafBuffer.size();
@@ -808,7 +815,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
   // TODO: simplify
   private static final <K> VectorNode<K> newLeftFringedPath(K item, int shift) {
     if (shift == 0) {
-      return VectorNode.of(0, 1, new Object[]{item}, 0);
+      return VectorNode.of(0, new Object[]{item});
     } else {
       final VectorNode[] dst = new VectorNode[]{
           newLeftFringedPath(item, shift - BIT_PARTITION_SIZE)
@@ -820,7 +827,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
   // TODO: simplify
   private static final <K> VectorNode<K> newRightFringedPath(K item, int shift) {
     if (shift == 0) {
-      return VectorNode.of(0, 0, new Object[]{item}, 1);
+      return VectorNode.of(0, new Object[]{item});
     } else {
       final VectorNode[] dst = new VectorNode[]{
           newRightFringedPath(item, shift - BIT_PARTITION_SIZE)
@@ -907,8 +914,8 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
     <T, A, E extends Throwable> T accept(NodeVisitor<T, A, E> visitor, A args); // throws E
 
-    static <K> VectorNode<K> of(int shiftWitness, int sizeFringeL, Object[] dst, int sizeFringeR) {
-      return new ContentVectorNode<>(sizeFringeL, dst, sizeFringeR);
+    static <K> VectorNode<K> of(int shiftWitness, Object[] dst) {
+      return new ContentVectorNode<>(dst);
     }
 
     static <K> VectorNode<K> of(int shiftWitness, int sizeFringeL, VectorNode[] dst,
@@ -981,10 +988,26 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       // NOTE: nodes of size 1 have {@code l == r}; TODO: make invariant?
       l = contentSizesSingle[0];
       r = contentSizesSingle[content.length - 1];
+
+//      l = content[0].sizeFringeL();
+//      r = content[content.length - 1].sizeFringeR();
     }
 
     final int sizeFringeL = (l == 1 << shift) ? 0 : l;
     final int sizeFringeR = (r == 1 << shift) ? 0 : r;
+
+//    if (content.length != 0) {
+////      assert (1 << shift) - (1 << shift - BIT_COUNT_OF_INDEX) + sizeFringeL
+////          == contentSizesSingle[0] % (1 << shift);
+//////          == content[0].sizeFringeL();
+////
+////      assert (1 << shift) - (1 << shift - BIT_COUNT_OF_INDEX) + sizeFringeR
+////          == contentSizesSingle[content.length - 1] % (1 << shift);
+//////          == content[content.length - 1].sizeFringeR();
+//
+//      assert sizeFringeL == content[0].sizeFringeL();
+//      assert sizeFringeR == content[content.length - 1].sizeFringeR();
+//    }
 
     return new FringedVectorNode<K>(sizeFringeL, compactedSizemap, sizeFringeR, contentSizesSingle, contentSizesSummed, content);
   }
@@ -1014,6 +1037,8 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       assert implies(content.length == 0, sizeFringeL == 0 && sizeFringeR == 0);
       assert implies(sizeFringeL != 0, content.length > 0 && content[0].size() == sizeFringeL);
       assert implies(sizeFringeR != 0, content.length > 0 && content[content.length - 1].size() == sizeFringeR);
+//      assert implies(sizeFringeL != 0, content.length > 0 && content[0].sizeFringeL() == sizeFringeL);
+//      assert implies(sizeFringeR != 0, content.length > 0 && content[content.length - 1].sizeFringeR() == sizeFringeR);
     }
 
     private FringedVectorNode(int l, int b, int r, int[] sizesSingle, int[] sizesSummed, VectorNode[] content) {
@@ -1347,23 +1372,10 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
   private static final class ContentVectorNode<K> implements VectorNode<K> {
 
-    private final int sizeFringeL = 0;
     private final Object[] content;
-    private final int sizeFringeR = 0;
 
-//    @Deprecated
-//    private ContentVectorNode(Object[] content) {
-//      this.sizeFringeL = -1;
-//      this.content = content;
-//      this.sizeFringeR = -1;
-//
-//      assert content.length <= BIT_COUNT_OF_INDEX;
-//    }
-
-    private ContentVectorNode(int sizeFringeL, Object[] content, int sizeFringeR) {
-//      this.sizeFringeL = sizeFringeL;
+    private ContentVectorNode(Object[] content) {
       this.content = content;
-//      this.sizeFringeR = sizeFringeR;
 
       assert content.length <= BIT_COUNT_OF_INDEX;
     }
@@ -1405,20 +1417,12 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
     @Override
     public int sizeFringeL() {
-      if (size() == 0) {
-        return 0;
-      } else {
-        return BIT_COUNT_OF_INDEX - size();
-      }
+      return size() % BIT_COUNT_OF_INDEX;
     }
 
     @Override
     public int sizeFringeR() {
-      if (size() == 0) {
-        return 0;
-      } else {
-        return BIT_COUNT_OF_INDEX - size();
-      }
+      return size() % BIT_COUNT_OF_INDEX;
     }
 
     @Override
@@ -1434,25 +1438,23 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     @Override
     public VectorNode<K> pushFront(int shift, K item) {
       assert shift == 0;
-      assert sizeFringeL < BIT_COUNT_OF_INDEX;
 
       final Object[] src = this.content;
       final Object[] dst = copyAndInsert(Object[]::new, src, 0, item);
 
       // TODO: correct?
-      return VectorNode.of(0, sizeFringeL + 1, dst, sizeFringeR);
+      return VectorNode.of(0, dst);
     }
 
     @Override
     public VectorNode<K> pushBack(int shift, K item) {
       assert shift == 0;
-      assert sizeFringeR < BIT_COUNT_OF_INDEX;
 
       final Object[] src = this.content;
       final Object[] dst = copyAndInsert(Object[]::new, src, src.length, item);
 
       // TODO: correct?
-      return VectorNode.of(0, sizeFringeL, dst, sizeFringeR + 1);
+      return VectorNode.of(0, dst);
     }
 
     @Override
@@ -1462,19 +1464,17 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       final Object[] src = this.content;
       final Object[] dst = copyAndSet(Object[]::new, src, remainder, item);
 
-      return VectorNode.of(0, sizeFringeL, dst, sizeFringeR);
+      return VectorNode.of(0, dst);
     }
 
     @Override
     public VectorNode<K> take(int index, int remainder, int shift) {
       assert shift == 0;
-      assert sizeFringeL == 0;
 
       final Object[] src = this.content;
       final Object[] dst = copyAndTake(Object[]::new, src, remainder, item -> item);
 
-      // TODO: correct? incorrect!
-      return VectorNode.of(0, sizeFringeL, dst, sizeFringeR);
+      return VectorNode.of(0, dst);
     }
 
     @Override
@@ -1484,8 +1484,7 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       final Object[] src = this.content;
       final Object[] dst = copyAndDrop(Object[]::new, src, remainder, item -> item);
 
-      // TODO: correct? incorrect!
-      return VectorNode.of(0, sizeFringeL, dst, sizeFringeR);
+      return VectorNode.of(0, dst);
     }
 
     @Override
