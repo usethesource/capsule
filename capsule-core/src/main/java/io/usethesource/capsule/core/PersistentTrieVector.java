@@ -1090,60 +1090,98 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
       return lazySize;
     }
 
+    private final boolean isFullRegular() {
+      final boolean isFullRegular;
+
+      if (content.length < 2) {
+        // first and last node equal
+        isFullRegular = 0 == sizemap;
+      } else {
+        // ignore size of last node
+        isFullRegular = 0 == (sizemap & ~((1 << (content.length - 1))));
+      }
+
+      assert implies(isFullRegular, sizeFringeL == 0);
+      return isFullRegular;
+    }
+
+    private final boolean isSemiRegular() {
+      final boolean isSemiRegular;
+
+      if (content.length < 2) {
+        // first and last node equal
+        isSemiRegular = 1 == sizemap;
+      } else {
+        // ignore size of last node
+        isSemiRegular = 1 == (sizemap & ~((1 << (content.length - 1))));
+      }
+      assert implies(isSemiRegular, sizeFringeL != 0);
+
+      return isSemiRegular;
+    }
+
+    private final boolean isEffectivelyRegular(int remainder, int shift) {
+      final int __mask = mask(remainder, shift, BIT_PARTITION_MASK);
+      final int __index = index(sizemap, __mask, bitpos(__mask));
+      return (sizemap & bitpos(__mask)) == 0 && __index == 0;
+    }
+
+    private Object[] nextNodeAndArguments(PathVisitor.Arguments args) {
+      assert 0 <= args.index;
+      assert 0 <= args.remainder;
+
+      final int blockRelativeIndex;
+      final int newRemainder;
+
+      if (isFullRegular() || isEffectivelyRegular(args.remainder, args.shift)
+          || args.remainder < sizeFringeL) {
+        // regular (or in first sub-tree)
+        blockRelativeIndex = mask(args.remainder, args.shift, BIT_PARTITION_MASK);
+        newRemainder = args.remainder & ~(BIT_PARTITION_MASK << args.shift);
+      } else if (isSemiRegular()) {
+        // semi-regular
+        // TODO: support {@code isEffectivelyRegular} in semi-regular
+        blockRelativeIndex = 1 + ((args.remainder - sizeFringeL) >>> args.shift);
+        newRemainder = (args.remainder - sizeFringeL) & ~(BIT_PARTITION_MASK << args.shift);
+      } else {
+        // irregular
+        blockRelativeIndex = offset(sizesSummed, args.remainder);
+        newRemainder = (blockRelativeIndex == 0)
+            ? args.remainder
+            : args.remainder - sizesSummed[blockRelativeIndex - 1];
+      }
+
+      final VectorNode<K> nextNode = content[blockRelativeIndex];
+
+      final PathVisitor.Arguments nextArgs =
+          PathVisitor.Arguments.of(args.index, newRemainder, args.shift - BIT_PARTITION_SIZE);
+
+      return new Object[]{blockRelativeIndex, nextNode, nextArgs};
+    }
+
+    private int nextNodeIndex(PathVisitor.Arguments args) {
+      return (Integer) nextNodeAndArguments(args)[0];
+    }
+
+    private VectorNode<K> nextNode(PathVisitor.Arguments args) {
+      return (VectorNode<K>) nextNodeAndArguments(args)[1];
+    }
+
+    private PathVisitor.Arguments nextArguments(PathVisitor.Arguments args) {
+      return (PathVisitor.Arguments) nextNodeAndArguments(args)[2];
+    }
+
     /*
      * TODO: unify with {@code #update}, only recursive function call differs.
      */
     @Override
     public Optional<K> get(int index, int remainder, int shift) {
-      assert 0 <= index;
-      assert 0 <= remainder;
+      final PathVisitor.Arguments args = Arguments.of(index, remainder, shift);
 
-      final boolean isFullRegular;
-      final boolean isSemiRegular;
+      final VectorNode<K> nextNode = this.nextNode(args);
+      final PathVisitor.Arguments nextArgs = this.nextArguments(args);
 
-      if (content.length < 2) {
-        // first and last node equal
-        isFullRegular = 0 == sizemap;
-        isSemiRegular = 1 == sizemap;
-      } else {
-        // ignore size of last node
-        isFullRegular = 0 == (sizemap & ~((1 << (content.length - 1))));
-        isSemiRegular = 1 == (sizemap & ~((1 << (content.length - 1))));
-      }
-
-      assert implies(isFullRegular, sizeFringeL == 0);
-      assert implies(isSemiRegular, sizeFringeL != 0);
-
-      final int blockRelativeIndex;
-      final int newRemainder;
-
-      final int __mask = mask(remainder, shift, BIT_PARTITION_MASK);
-      final int __index = index(sizemap, __mask, bitpos(__mask));
-      final boolean isEffectivelyRegular =
-          (sizemap & bitpos(__mask)) == 0 && __index == 0;
-
-      if (isFullRegular || isEffectivelyRegular || remainder < sizeFringeL) {
-        // regular (or in first sub-tree)
-        blockRelativeIndex = mask(remainder, shift, BIT_PARTITION_MASK);
-        newRemainder = remainder & ~(BIT_PARTITION_MASK << shift);
-
-        return content[blockRelativeIndex].get(index, newRemainder, shift - BIT_PARTITION_SIZE);
-      } else if (isSemiRegular) {
-        // semi-regular
-        // TODO: support {@code isEffectivelyRegular} in semi-regular
-        blockRelativeIndex = 1 + ((remainder - sizeFringeL) >>> shift);
-        newRemainder = (remainder - sizeFringeL) & ~(BIT_PARTITION_MASK << shift);
-
-        return content[blockRelativeIndex].get(index, newRemainder, shift - BIT_PARTITION_SIZE);
-      } else {
-        // irregular
-        blockRelativeIndex = offset(sizesSummed, remainder);
-        newRemainder = (blockRelativeIndex == 0)
-            ? remainder
-            : remainder - sizesSummed[blockRelativeIndex - 1];
-
-        return content[blockRelativeIndex].get(index, newRemainder, shift - BIT_PARTITION_SIZE);
-      }
+      return nextNode.get(nextArgs.index, nextArgs.remainder, nextArgs.shift);
     }
 
     @Override
@@ -1237,59 +1275,45 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
      */
     @Override
     public VectorNode<K> update(int index, int remainder, int shift, K item) {
-      final int blockRelativeIndex;
-      final int newRemainder;
+      final PathVisitor.Arguments args = Arguments.of(index, remainder, shift);
 
-      if (sizeFringeL == 0 || remainder < sizeFringeL) {
-        // regular
-        blockRelativeIndex = mask(remainder, shift, BIT_PARTITION_MASK);
-        newRemainder = remainder & ~(BIT_PARTITION_MASK << shift);
-      } else {
-        // semi-regular
-        blockRelativeIndex = 1 + ((remainder - sizeFringeL) >>> shift);
-        newRemainder = (remainder - sizeFringeL) & ~(BIT_PARTITION_MASK << shift);
-      }
+      final int blockRelativeIndex = this.nextNodeIndex(args);
+      // final VectorNode<K> nextNode = this.nextNode(args);
+      final PathVisitor.Arguments nextArgs = this.nextArguments(args);
 
       VectorNode<K>[] newContent = copyAndUpdate(VectorNode[]::new, content, blockRelativeIndex,
-          node -> node.update(index, newRemainder, shift - BIT_PARTITION_SIZE, item));
+          node -> node.update(nextArgs.index, nextArgs.remainder, nextArgs.shift, item));
 
       return VectorNode.of(shift, sizeFringeL, newContent, sizeFringeR);
     }
 
     @Override
     public VectorNode<K> take(int index, int remainder, int shift) {
-      final int blockRelativeIndex;
-      final int newRemainder;
+      final PathVisitor.Arguments args = Arguments.of(index, remainder, shift);
+
+      final int blockRelativeIndex = this.nextNodeIndex(args);
+      // final VectorNode<K> nextNode = this.nextNode(args);
+      final PathVisitor.Arguments nextArgs = this.nextArguments(args);
+
+      final VectorNode[] dst = copyAndTake(VectorNode[]::new, content, blockRelativeIndex,
+          node -> node.take(nextArgs.index, nextArgs.remainder, nextArgs.shift));
 
       final int newSizeFringeL;
       final int newSizeFringeR;
 
-      if (sizeFringeL == 0 || remainder < sizeFringeL) {
-        // regular
-        blockRelativeIndex = mask(remainder, shift, BIT_PARTITION_MASK);
-        newRemainder = remainder & ~(BIT_PARTITION_MASK << shift);
-      } else {
-        // semi-regular
-        blockRelativeIndex = 1 + ((remainder - sizeFringeL) >>> shift);
-        newRemainder = (remainder - sizeFringeL) & ~(BIT_PARTITION_MASK << shift);
-      }
-
-      final VectorNode[] dst = copyAndTake(VectorNode[]::new, content, blockRelativeIndex,
-          node -> node.take(index, newRemainder, shift - BIT_PARTITION_SIZE));
-
       if (blockRelativeIndex == 0) {
         // first
         // TODO: how to align first blocks to left or right?
-        newSizeFringeL = newRemainder + 1;
+        newSizeFringeL = nextArgs.remainder + 1;
         newSizeFringeR = 0;
       } else if (blockRelativeIndex < content.length - 1) {
         // middle
         newSizeFringeL = sizeFringeL;
-        newSizeFringeR = newRemainder + 1;
+        newSizeFringeR = nextArgs.remainder + 1;
       } else {
         // last
         newSizeFringeL = sizeFringeL;
-        newSizeFringeR = newRemainder + 1;
+        newSizeFringeR = nextArgs.remainder + 1;
       }
 
       return VectorNode.of(shift, newSizeFringeL, dst, newSizeFringeR);
@@ -1298,42 +1322,35 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
 
     @Override
     public VectorNode<K> drop(int index, int remainder, int shift) {
-      final int blockRelativeIndex;
-      final int newRemainder;
+      final PathVisitor.Arguments args = Arguments.of(index, remainder, shift);
+
+      final int blockRelativeIndex = this.nextNodeIndex(args);
+      // final VectorNode<K> nextNode = this.nextNode(args);
+      final PathVisitor.Arguments nextArgs = this.nextArguments(args);
+
+      final VectorNode[] dst = copyAndDrop(VectorNode[]::new, content, blockRelativeIndex,
+          node -> node.drop(nextArgs.index, nextArgs.remainder, nextArgs.shift));
 
       final int newSizeFringeL;
       final int newSizeFringeR;
-
-      if (sizeFringeL == 0 || remainder < sizeFringeL) {
-        // regular
-        blockRelativeIndex = mask(remainder, shift, BIT_PARTITION_MASK);
-        newRemainder = remainder & ~(BIT_PARTITION_MASK << shift);
-      } else {
-        // semi-regular
-        blockRelativeIndex = 1 + ((remainder - sizeFringeL) >>> shift);
-        newRemainder = (remainder - sizeFringeL) & ~(BIT_PARTITION_MASK << shift);
-      }
-
-      final VectorNode[] dst = copyAndDrop(VectorNode[]::new, content, blockRelativeIndex,
-          node -> node.drop(index, newRemainder, shift - BIT_PARTITION_SIZE));
 
       if (blockRelativeIndex == 0) {
         // first
         // TODO: how to align first blocks to left or right?
         newSizeFringeL = (sizeFringeL == 0)
-            ? (1 << shift) - newRemainder
-            : sizeFringeL - newRemainder;
+            ? (1 << shift) - nextArgs.remainder
+            : sizeFringeL - nextArgs.remainder;
         newSizeFringeR = sizeFringeR;
       } else if (blockRelativeIndex < content.length - 1) {
         // middle
-        newSizeFringeL = (1 << shift) - newRemainder;
+        newSizeFringeL = (1 << shift) - nextArgs.remainder;
         newSizeFringeR = sizeFringeR;
       } else {
         // last
         newSizeFringeL = 0;
         newSizeFringeR = (sizeFringeR == 0)
-            ? (1 << shift) - newRemainder
-            : sizeFringeR - newRemainder;
+            ? (1 << shift) - nextArgs.remainder
+            : sizeFringeR - nextArgs.remainder;
       }
 
       return VectorNode.of(shift, newSizeFringeL, dst, newSizeFringeR);
@@ -1512,6 +1529,10 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
         this.index = index;
         this.remainder = remainder;
         this.shift = shift;
+
+        assert 0 <= index;
+        assert 0 <= remainder;
+        assert 0 <= shift;
       }
 
       static Arguments of(int index, int remainder, int shift) {
@@ -1524,25 +1545,10 @@ public class PersistentTrieVector<K> implements Vector.Immutable<K> {
     public Path visitFringedNode(FringedVectorNode node, PathVisitor.Arguments args) {
       path.put(args.shift, node); // mutable update
 
-      final int blockRelativeIndex;
-      final int newRemainder;
+      final VectorNode nextNode = node.nextNode(args);
+      final PathVisitor.Arguments nextArgs = node.nextArguments(args);
 
-      if (node.sizeFringeL == 0 || args.remainder < node.sizeFringeL) {
-        // regular
-        blockRelativeIndex = mask(args.remainder, args.shift, BIT_PARTITION_MASK);
-        newRemainder = args.remainder & ~(BIT_PARTITION_MASK << args.shift);
-      } else {
-        // semi-regular
-        blockRelativeIndex = 1 + ((args.remainder - node.sizeFringeL) >>> args.shift);
-        newRemainder = (args.remainder - node.sizeFringeL) & ~(BIT_PARTITION_MASK << args.shift);
-      }
-
-      final VectorNode subNode = node.content[blockRelativeIndex];
-
-      final Arguments subArgs = Arguments
-          .of(args.index, newRemainder, args.shift - BIT_PARTITION_SIZE);
-
-      return (Path) subNode.accept(this, subArgs);
+      return (Path) nextNode.accept(this, nextArgs);
     }
 
     @Override
