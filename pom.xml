@@ -43,7 +43,8 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
-    <topleveldir>${basedir}</topleveldir>
+    <topleveldir>${project.basedir}</topleveldir>
+    <jacoco.reportPath>${project.basedir}/../target/jacoco.exec</jacoco.reportPath>
   </properties>
 
   <build>
@@ -75,14 +76,18 @@
                   <goals>
                       <goal>prepare-agent</goal>
                   </goals>
+                  <configuration>
+                    <append>true</append>
+                    <destFile>${jacoco.reportPath}</destFile>
+                  </configuration>
               </execution>
-              <execution>
+              <!--  <execution>
                   <id>report</id>
                   <phase>test</phase>
                   <goals>
                       <goal>report</goal>
                   </goals>
-              </execution>
+              </execution> -->
           </executions>
       </plugin>
 
