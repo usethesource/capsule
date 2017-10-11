@@ -16,6 +16,18 @@
     <topleveldir>${project.parent.basedir}</topleveldir>
   </properties>
 
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.20.1</version>
+        <configuration>
+          <argLine>${argLine}</argLine>
+        </configuration>
+      </plugin>      
+    </plugins>
+  </build>
+
   <dependencies>
     <dependency>
       <groupId>io.usethesource</groupId>
