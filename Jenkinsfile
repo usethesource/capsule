@@ -9,7 +9,7 @@ node {
       }
 
       stage('Build and Test') {
-          sh "mvn -B clean jacoco:prepare-agent install jacoco:report"
+          sh "mvn -B clean install jacoco:report"
       }
 
       stage('Report Code Coverage') {
