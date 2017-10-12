@@ -68,27 +68,31 @@
         <version>2.5.3</version>
       </plugin>
       <plugin>
-          <groupId>org.jacoco</groupId>
-          <artifactId>jacoco-maven-plugin</artifactId>
-          <version>0.7.9</version>
-          <executions>
-              <execution>
-                  <goals>
-                      <goal>prepare-agent</goal>
-                  </goals>
-                  <configuration>
-                    <append>true</append>
-                    <destFile>${jacoco.reportPath}</destFile>
-                  </configuration>
-              </execution>
-              <!--  <execution>
-                  <id>report</id>
-                  <phase>test</phase>
-                  <goals>
-                      <goal>report</goal>
-                  </goals>
-              </execution> -->
-          </executions>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.7.9</version>
+        <configuration>
+          <destfile>${topleveldir}/target/jacoco.exec</destfile>
+          <datafile>${topleveldir}/target/jacoco.exec</datafile>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+                <goal>prepare-agent</goal>
+            </goals>
+            <configuration>
+              <append>true</append>
+              <destFile>${jacoco.reportPath}</destFile>
+            </configuration>
+          </execution>
+          <!-- <execution>
+            <id>report</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution> -->
+        </executions>
       </plugin>
 
 

@@ -10,7 +10,7 @@ node {
 
       stage('Build and Test') {
           sh "mvn -B clean install"
-          sh "curl https://codecov.io/bash | bash -s - -K -X gcov -t 5f64115f-81e9-4128-b761-e23ce5e20f95"
+          sh "cd capsule-core && curl https://codecov.io/bash | bash -s - -K -X gcov -t 5f64115f-81e9-4128-b761-e23ce5e20f95"
       }
 
 
