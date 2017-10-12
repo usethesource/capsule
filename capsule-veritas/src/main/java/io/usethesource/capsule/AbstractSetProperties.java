@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 
-  private final int DEFAULT_TRIALS = 1_000;
+  private final int DEFAULT_TRIALS = 10;
   private final int MORE_TRIALS = 10_000;
   private final int LESS_TRIALS = 100;
   private final int MAX_SIZE = 1_000;

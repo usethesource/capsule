@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap.Immutable<K, V>> {
 
-  protected final int DEFAULT_TRIALS = 1_000;
+  protected final int DEFAULT_TRIALS = 10;
   protected final int MAX_SIZE = 1_000;
   protected final Class<?> type;
 
