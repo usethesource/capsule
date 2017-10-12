@@ -44,7 +44,6 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
     <topleveldir>${project.basedir}</topleveldir>
-    <jacoco.reportPath>${topleveldir}/target/jacoco.exec</jacoco.reportPath>
   </properties>
 
   <build>
@@ -80,10 +79,6 @@
             <goals>
                 <goal>prepare-agent</goal>
             </goals>
-            <!-- <configuration>
-              <append>true</append>
-              <destFile>${jacoco.reportPath}</destFile>
-            </configuration> -->
           </execution>
           <execution>
             <id>report</id>
