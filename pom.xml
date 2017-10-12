@@ -71,10 +71,10 @@
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <version>0.7.9</version>
-        <configuration>
-          <destfile>${jacoco.reportPath}</destfile>
-          <datafile>${jacoco.reportPath}</datafile>
-        </configuration>
+        <!-- <configuration>
+          <destfile>${topleveldir}/target/jacoco.exec</destfile>
+          <datafile>${topleveldir}/target/jacoco.exec</datafile>
+        </configuration> -->
         <executions>
           <execution>
             <goals>
@@ -82,16 +82,17 @@
             </goals>
             <configuration>
               <append>true</append>
-              <destFile>${jacoco.reportPath}</destFile>
+              <dataFile>${topleveldir}/target/jacoco.exec</dataFile>
+              <destFile>${topleveldir}/target/jacoco.exec</destFile>
             </configuration>
           </execution>
-          <execution>
+          <!-- <execution>
             <id>report</id>
             <phase>prepare-package</phase>
             <goals>
               <goal>report</goal>
             </goals>
-          </execution>
+          </execution> -->
         </executions>
       </plugin>
 
