@@ -1,26 +1,24 @@
 node {
-  def mvnHome = tool 'M3'
-  env.JAVA_HOME="${tool 'jdk-oracle-8'}"
-  env.PATH="${env.JAVA_HOME}/bin:${mvnHome}/bin:${env.PATH}"
-
   try {
       stage('Clone'){
           checkout scm
       }
 
-      stage('Build and Test') {
-          sh "mvn -B clean install jacoco:report"
-      }
+      withMaven(maven: 'M3') {
+          stage('Build and Test') {
+              sh "mvn clean install jacoco:report"
+          }
 
-      stage('Report Code Coverage') {
-          sh "                           curl https://codecov.io/bash | bash -s - -K -X gcov -t 5f64115f-81e9-4128-b761-e23ce5e20f95"
-          sh "cd capsule-core         && curl https://codecov.io/bash | bash -s - -K -X gcov -t 5f64115f-81e9-4128-b761-e23ce5e20f95"
-          sh "cd capsule-experimental && curl https://codecov.io/bash | bash -s - -K -X gcov -t 5f64115f-81e9-4128-b761-e23ce5e20f95"
-          sh "cd capsule-veritas      && curl https://codecov.io/bash | bash -s - -K -X gcov -t 5f64115f-81e9-4128-b761-e23ce5e20f95"
-      }
+          stage('Report Code Coverage') {
+              sh "                           curl https://codecov.io/bash | bash -s - -K -X gcov -t 5f64115f-81e9-4128-b761-e23ce5e20f95"
+              sh "cd capsule-core         && curl https://codecov.io/bash | bash -s - -K -X gcov -t 5f64115f-81e9-4128-b761-e23ce5e20f95"
+              sh "cd capsule-experimental && curl https://codecov.io/bash | bash -s - -K -X gcov -t 5f64115f-81e9-4128-b761-e23ce5e20f95"
+              sh "cd capsule-veritas      && curl https://codecov.io/bash | bash -s - -K -X gcov -t 5f64115f-81e9-4128-b761-e23ce5e20f95"
+          }
 
-      stage('Deploy') {
-          sh "mvn -s ${env.HOME}/usethesource-maven-settings.xml -B deploy -DskipTests"
+          stage('Deploy') {
+              sh "mvn deploy -DskipTests"
+          }
       }
 
       stage('Archive') {
