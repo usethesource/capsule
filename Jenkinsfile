@@ -4,7 +4,7 @@ node {
           checkout scm
       }
 
-      withMaven(maven: 'M3') {
+      withMaven(maven: 'M3', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: false)] ) {
           stage('Build and Test') {
               sh "mvn clean install jacoco:report"
           }
