@@ -34,10 +34,8 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
   protected final int cachedKeySetSize;
   protected final int cachedKeySetHashCode;
 
-  protected AbstractPersistentTrieSetMultimap(final EqualityComparator<Object> cmp,
-      final R rootNode, int cachedSize, int keySetHashCode, int keySetSize) {
-    super(cmp);
-
+  protected AbstractPersistentTrieSetMultimap(final R rootNode, int cachedSize, int keySetHashCode,
+      int keySetSize) {
     this.rootNode = rootNode;
 
     // this.cachedHashCode = cachedHashCode;
@@ -78,11 +76,16 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
 
   @Override
   public final SetMultimap.Immutable<K, V> __insert(final K key, final V value) {
-    return __insert(key, valueToTemporaryBox(value));
+    return __insertEquivalent(key, valueToTemporaryBox(value), Object::equals);
   }
 
   @Override
-  public final SetMultimap.Immutable<K, V> __insert(K key, Set.Immutable<V> valueCollection) {
+  public final SetMultimap.Immutable<K, V> __insertEquivalent(final K key, final V value, final EqualityComparator<Object> cmp) {
+    return __insertEquivalent(key, valueToTemporaryBox(value), cmp);
+  }
+
+  @Override
+  public final SetMultimap.Immutable<K, V> __insertEquivalent(K key, Set.Immutable<V> valueCollection, final EqualityComparator<Object> cmp) {
     if (valueCollection.isEmpty()) {
       return this;
     }
@@ -127,7 +130,12 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
   }
 
   @Override
-  public final SetMultimap.Immutable<K, V> __put(K key, Set.Immutable<V> valueCollection) {
+  public final SetMultimap.Immutable<K, V> __putEquivalent(K key, V value, final EqualityComparator<Object> cmp) {
+    return __putEquivalent(key, valueToTemporaryBox(value), cmp);
+  }
+
+  @Override
+  public final SetMultimap.Immutable<K, V> __putEquivalent(K key, Set.Immutable<V> valueCollection, final EqualityComparator<Object> cmp) {
     if (valueCollection.isEmpty()) {
       return __remove(key);
     }
@@ -180,6 +188,11 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
 
   @Override
   public final SetMultimap.Immutable<K, V> __remove(final K key, final V value) {
+    return __removeEquivalent(key, value, Object::equals);
+  }
+
+  @Override
+  public final SetMultimap.Immutable<K, V> __removeEquivalent(final K key, final V value, final EqualityComparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MultimapResult<K, V, C> details = MultimapResult.unchanged();
 
@@ -214,7 +227,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
   }
 
   @Override
-  public final SetMultimap.Immutable<K, V> __remove(K key) {
+  public final SetMultimap.Immutable<K, V> __removeEquivalent(K key, final EqualityComparator<Object> cmp) {
     final int keyHash = key.hashCode();
     final MultimapResult<K, V, C> details = MultimapResult.unchanged();
 

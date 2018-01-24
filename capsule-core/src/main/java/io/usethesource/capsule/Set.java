@@ -45,7 +45,7 @@ public interface Set<K> extends java.util.Set<K>, SetEq<K> {
   @Override
   int hashCode();
 
-  interface Immutable<K> extends Set<K>, SetEq.Immutable<K> {
+  interface Immutable<K> extends Set<K>, SetEq.Immutable<K>, AsTransient<Set.Transient<K>> {
 
     Set.Immutable<K> __insert(final K key);
 
@@ -68,10 +68,6 @@ public interface Set<K> extends java.util.Set<K>, SetEq<K> {
     default Set.Immutable<K> intersect(Set.Immutable<K> other) {
       return intersect(this, other);
     }
-
-    boolean isTransientSupported();
-
-    Set.Transient<K> asTransient();
 
     static <K> Set.Immutable<K> of() {
       return FACTORY.of();
@@ -215,7 +211,7 @@ public interface Set<K> extends java.util.Set<K>, SetEq<K> {
     }
   }
 
-  interface Transient<K> extends Set<K>, SetEq.Transient<K> {
+  interface Transient<K> extends Set<K>, SetEq.Transient<K>, AsPersistent<Set.Immutable<K>> {
 
     boolean __insert(final K key);
 
@@ -226,8 +222,6 @@ public interface Set<K> extends java.util.Set<K>, SetEq<K> {
     boolean __removeAll(final java.util.Set<? extends K> set);
 
     boolean __retainAll(final java.util.Set<? extends K> set);
-
-    Set.Immutable<K> freeze();
 
     static <K> Set.Transient<K> of() {
       return FACTORY.transientOf();

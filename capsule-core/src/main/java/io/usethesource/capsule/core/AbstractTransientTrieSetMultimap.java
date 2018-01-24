@@ -15,6 +15,7 @@ import io.usethesource.capsule.Set;
 import io.usethesource.capsule.SetMultimap;
 import io.usethesource.capsule.core.trie.MultimapNode;
 import io.usethesource.capsule.core.trie.MultimapResult;
+import io.usethesource.capsule.util.EqualityComparator;
 
 import static io.usethesource.capsule.core.trie.MultimapResult.Modification.INSERTED_KEY;
 import static io.usethesource.capsule.core.trie.MultimapResult.Modification.REMOVED_KEY;
@@ -39,8 +40,6 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
 
   protected AbstractTransientTrieSetMultimap(
       AbstractPersistentTrieSetMultimap<K, V, C, R> trieSetMultimap) {
-    super(trieSetMultimap.cmp);
-
     this.mutator = new AtomicReference<Thread>(Thread.currentThread());
     this.rootNode = trieSetMultimap.rootNode;
     // // this.cachedHashCode = trieSetMultimap.cachedHashCode;
@@ -81,11 +80,19 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
 
   @Override
   public final boolean __insert(final K key, final V value) {
-    return __insert(key, valueToTemporaryBox(value));
+    return __insertEquivalent(key, valueToTemporaryBox(value), Object::equals);
   }
 
   @Override
-  public final boolean __insert(K key, io.usethesource.capsule.Set.Immutable<V> valueCollection) {
+  public final boolean __insertEquivalent(final K key, final V value,
+      final EqualityComparator<Object> cmp) {
+    return __insertEquivalent(key, valueToTemporaryBox(value), cmp);
+  }
+
+  @Override
+  public final boolean __insertEquivalent(K key,
+      io.usethesource.capsule.Set.Immutable<V> valueCollection,
+      final EqualityComparator<Object> cmp) {
     if (mutator.get() == null) {
       throw new IllegalStateException("Transient already frozen.");
     }
@@ -134,9 +141,14 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
   public final boolean __put(K key, V value) {
     return __put(key, valueToTemporaryBox(value));
   }
-  
+
   @Override
-  public final boolean __put(K key, io.usethesource.capsule.Set.Immutable<V> valueCollection) {
+  public final boolean __putEquivalent(K key, V value, final EqualityComparator<Object> cmp) {
+    return __putEquivalent(key, valueToTemporaryBox(value), cmp);
+  }
+
+  @Override
+  public final boolean __putEquivalent(K key, io.usethesource.capsule.Set.Immutable<V> valueCollection, final EqualityComparator<Object> cmp) {
     if (mutator.get() == null) {
       throw new IllegalStateException("Transient already frozen.");
     }
@@ -197,6 +209,11 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
 
   @Override
   public final boolean __remove(final K key, final V value) {
+    return __removeEquivalent(key, value, Object::equals);
+  }
+
+  @Override
+  public final boolean __removeEquivalent(final K key, final V value, final EqualityComparator<Object> cmp) {
     if (mutator.get() == null) {
       throw new IllegalStateException("Transient already frozen.");
     }
@@ -237,7 +254,7 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
   }
 
   @Override
-  public final boolean __remove(K key) {
+  public final boolean __removeEquivalent(K key, final EqualityComparator<Object> cmp) {
     if (mutator.get() == null) {
       throw new IllegalStateException("Transient already frozen.");
     }
