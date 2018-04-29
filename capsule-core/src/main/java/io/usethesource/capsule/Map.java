@@ -40,13 +40,17 @@ public interface Map<K, V> extends java.util.Map<K, V>, MapEq<K, V> {
   @Override
   int hashCode();
 
-  interface Immutable<K, V> extends Map<K, V>, MapEq.Immutable<K, V>, AsTransient<Map.Transient<K, V>> {
+  interface Immutable<K, V> extends Map<K, V>, MapEq.Immutable<K, V> {
 
     Map.Immutable<K, V> __put(final K key, final V val);
 
     Map.Immutable<K, V> __remove(final K key);
 
     Map.Immutable<K, V> __putAll(final java.util.Map<? extends K, ? extends V> map);
+
+    boolean isTransientSupported();
+
+    Map.Transient<K, V> asTransient();
 
     static <K, V> Map.Immutable<K, V> of() {
       return PersistentTrieMap.of();
@@ -62,7 +66,7 @@ public interface Map<K, V> extends java.util.Map<K, V>, MapEq<K, V> {
 
   }
 
-  interface Transient<K, V> extends Map<K, V>, MapEq.Transient<K, V>, AsPersistent<Map.Immutable<K, V>> {
+  interface Transient<K, V> extends Map<K, V>, MapEq.Transient<K, V> {
 
     V __put(final K key, final V val);
 
@@ -90,6 +94,8 @@ public interface Map<K, V> extends java.util.Map<K, V>, MapEq<K, V> {
 //    default boolean complement(final Map<? extends K, ? extends V> map) {
 //      throw new UnsupportedOperationException("Not yet implemented @ Map");
 //    }
+
+    Map.Immutable<K, V> freeze();
 
     static <K, V> Map.Transient<K, V> of() {
       return PersistentTrieMap.transientOf();

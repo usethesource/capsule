@@ -65,7 +65,7 @@ public class PersistentTrieSetMultimap<K, V> extends
   private static final long serialVersionUID = 42L;
 
   private static final PersistentTrieSetMultimap EMPTY_SETMULTIMAP = new PersistentTrieSetMultimap(
-      CompactSetMultimapNode.EMPTY_NODE, 0, 0, 0);
+      EqualityComparator.EQUALS, CompactSetMultimapNode.EMPTY_NODE, 0, 0, 0);
 
 //  PersistentTrieSetMultimap(EqualityComparator<Object> cmp,
 //      AbstractSetMultimapNode<K, V> rootNode) {
@@ -84,9 +84,9 @@ public class PersistentTrieSetMultimap<K, V> extends
 //    }
 //  }
 
-  PersistentTrieSetMultimap(AbstractSetMultimapNode<K, V> rootNode,
+  PersistentTrieSetMultimap(EqualityComparator<Object> cmp, AbstractSetMultimapNode<K, V> rootNode,
       int cachedSize, int keySetHashCode, int keySetSize) {
-    super(rootNode, cachedSize, keySetHashCode, keySetSize);
+    super(cmp, rootNode, cachedSize, keySetHashCode, keySetSize);
   }
 
   @Override
@@ -109,7 +109,7 @@ public class PersistentTrieSetMultimap<K, V> extends
   @Override
   protected final PersistentTrieSetMultimap<K, V> wrap(EqualityComparator<Object> cmp,
       AbstractSetMultimapNode<K, V> rootNode, int cachedSize, int keySetHashCode, int keySetSize) {
-    return new PersistentTrieSetMultimap(rootNode, cachedSize, keySetHashCode, keySetSize);
+    return new PersistentTrieSetMultimap(cmp, rootNode, cachedSize, keySetHashCode, keySetSize);
   }
 
   public static final <K, V> SetMultimap.Immutable<K, V> of() {
@@ -118,7 +118,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
   public static final <K, V> SetMultimap.Immutable<K, V> of(EqualityComparator<Object> cmp) {
     // TODO: unify with `of()`
-    return new PersistentTrieSetMultimap(CompactSetMultimapNode.EMPTY_NODE, 0, 0, 0);
+    return new PersistentTrieSetMultimap(cmp, CompactSetMultimapNode.EMPTY_NODE, 0, 0, 0);
   }
 
   public static final <K, V> SetMultimap.Immutable<K, V> of(K key, V... values) {
@@ -168,7 +168,7 @@ public class PersistentTrieSetMultimap<K, V> extends
   }
 
   @Override
-  public SetMultimap.Immutable<V, K> inverse() {
+  public SetMultimap.Immutable<V, K> inverseMap() {
     final SetMultimap.Transient<V, K> builder = PersistentTrieSetMultimap.transientOf();
 
     entryIterator().forEachRemaining(tuple -> builder.__insert(tuple.getValue(), tuple.getKey()));
@@ -2767,7 +2767,7 @@ public class PersistentTrieSetMultimap<K, V> extends
       }
 
       mutator.set(null);
-      return new PersistentTrieSetMultimap<K, V>(rootNode, cachedSize,
+      return new PersistentTrieSetMultimap<K, V>(cmp, rootNode, cachedSize,
           cachedKeySetHashCode, cachedKeySetSize);
     }
   }

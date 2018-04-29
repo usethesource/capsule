@@ -22,7 +22,7 @@ import io.usethesource.capsule.util.EqualityComparator;
 /**
  * Experimental interface for a multimap data type.
  */
-public interface SetMultimap<K, V> extends SetMultimapEq<K, V> {
+public interface SetMultimap<K, V> {
 
   /**
    * Return the number of key-value pairs contained in this multimap.
@@ -107,19 +107,12 @@ public interface SetMultimap<K, V> extends SetMultimapEq<K, V> {
   @Override
   boolean equals(Object other);
 
-  interface Immutable<K, V> extends SetMultimap<K, V>, SetMultimapEq.Immutable<K, V>, AsTransient<SetMultimap.Transient<K, V>> {
+  interface Immutable<K, V> extends SetMultimap<K, V>, SetMultimapEq.Immutable<K, V> {
 
     SetMultimap.Immutable<K, V> __put(final K key, final V value);
 
     default SetMultimap.Immutable<K, V> __put(final K key, final Set.Immutable<V> values) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-    }
-
-    @Deprecated
-    default SetMultimap.Immutable<K, V> __put(final Set.Immutable<K> keys, final V value) {
-      final SetMultimap.Transient<K, V> tmp = this.asTransient();
-      keys.forEach(key -> tmp.__put(key, value));
-      return tmp.freeze();
     }
 
     SetMultimap.Immutable<K, V> __insert(final K key, final V value);
@@ -130,7 +123,6 @@ public interface SetMultimap<K, V> extends SetMultimapEq<K, V> {
       return builder.freeze();
     }
 
-    @Deprecated
     default SetMultimap.Immutable<K, V> __insert(final Set.Immutable<K> keys, final V value) {
       final SetMultimap.Transient<K, V> tmp = this.asTransient();
       keys.forEach(key -> tmp.__insert(key, value));
@@ -144,39 +136,38 @@ public interface SetMultimap<K, V> extends SetMultimapEq<K, V> {
 
     SetMultimap.Immutable<K, V> __remove(final K key, final V val);
 
-    @Deprecated
-    default SetMultimap.Immutable<K, V> __remove(final Set.Immutable<K> keys, final V value) {
-      final SetMultimap.Transient<K, V> tmp = this.asTransient();
-      keys.forEach(key -> tmp.__remove(key, value));
-      return tmp.freeze();
-    }
-
     default SetMultimap.Immutable<K, V> union(
         final SetMultimap<? extends K, ? extends V> setMultimap) {
-      return unionEquivalent(setMultimap, Object::equals);
+      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
     default SetMultimap.Immutable<K, V> intersect(
         final SetMultimap<? extends K, ? extends V> setMultimap) {
-      return intersectEquivalent(setMultimap, Object::equals);
+      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
     default SetMultimap.Immutable<K, V> complement(
         final SetMultimap<? extends K, ? extends V> setMultimap) {
-      return complementEquivalent(setMultimap, Object::equals);
-    }
+      final SetMultimap.Transient<K, V> builder = SetMultimap.Transient.of();
 
-    @Deprecated
-    default SetMultimap.Immutable<V, K> inverseMap() {
-      return inverse();
+      setMultimap.entrySet().stream()
+          .filter(entry -> !this.containsEntry(entry.getKey(), entry.getValue()))
+          .forEach(entry -> builder.__insert(entry.getKey(), entry.getValue()));
+
+      return builder.freeze();
     }
 
     /*
      * TODO: also include a transient variant?
+     * TODO: resolve name clash with BinaryRelation
      */
-    default SetMultimap.Immutable<V, K> inverse() {
+    default SetMultimap.Immutable<V, K> inverseMap() {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
+
+    boolean isTransientSupported();
+
+    SetMultimap.Transient<K, V> asTransient();
 
     static <K, V> SetMultimap.Immutable<K, V> of() {
       return PersistentTrieSetMultimap.of();
@@ -200,7 +191,7 @@ public interface SetMultimap<K, V> extends SetMultimapEq<K, V> {
   /*
    * TODO: consider return types for observability: i.e., either returning Immutable<V> or boolean?
    */
-  interface Transient<K, V> extends SetMultimap<K, V>, SetMultimapEq.Transient<K, V>, AsPersistent<SetMultimap.Immutable<K, V>> {
+  interface Transient<K, V> extends SetMultimap<K, V>, SetMultimapEq.Transient<K, V> {
 
     default boolean __put(final K key, final V value) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
@@ -246,28 +237,19 @@ public interface SetMultimap<K, V> extends SetMultimapEq<K, V> {
 
     boolean __remove(final K key, final V val);
 
-    @Deprecated
-    default boolean __remove(final Set.Immutable<K> keys, final V value) {
-      return keys.stream()
-          .map(key -> this.__remove(key, value))
-          .reduce(Boolean::logicalOr)
-          .orElse(false);
-    }
-
-    @Deprecated
     default boolean union(final SetMultimap<? extends K, ? extends V> setMultimap) {
-      return unionEquivalent(setMultimap, Object::equals);
+      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
-//    @Deprecated
-//    default boolean intersect(final SetMultimap<? extends K, ? extends V> setMultimap) {
-//      return intersectEquivalent(setMultimap, Object::equals);
-//    }
-//
-//    @Deprecated
-//    default boolean complement(final SetMultimap<? extends K, ? extends V> setMultimap) {
-//      return complementEquivalent(setMultimap, Object::equals);
-//    }
+    default boolean intersect(final SetMultimap<? extends K, ? extends V> setMultimap) {
+      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
+    }
+
+    default boolean complement(final SetMultimap<? extends K, ? extends V> setMultimap) {
+      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
+    }
+
+    SetMultimap.Immutable<K, V> freeze();
 
     static <K, V> SetMultimap.Transient<K, V> of() {
       return PersistentTrieSetMultimap.transientOf();

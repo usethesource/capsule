@@ -43,6 +43,12 @@ public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R ext
 
   private static final long serialVersionUID = 42L;
 
+  protected final EqualityComparator<Object> cmp;
+
+  public AbstractTrieSetMultimap(final EqualityComparator<Object> cmp) {
+    this.cmp = cmp;
+  }
+
   abstract R getRootNode();
 
   abstract int getCachedSize();
@@ -199,13 +205,9 @@ public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R ext
     return sumNodes;
   }
 
-  @Override
-  public final boolean containsKey(final Object o) {
-    return containsKeyEquivalent(o, Object::equals);
-  }
 
   @Override
-  public final boolean containsKeyEquivalent(final Object o, final EqualityComparator<Object> cmp) {
+  public final boolean containsKey(final Object o) {
     try {
       final K key = (K) o;
       return getRootNode().containsKey(key, transformHashCode(key.hashCode()), 0, cmp);
@@ -216,11 +218,6 @@ public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R ext
 
   @Override
   public final boolean containsValue(final Object o) {
-    return containsValueEquivalent(o, Object::equals);
-  }
-
-  @Override
-  public final boolean containsValueEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
       if (cmp.equals(iterator.next(), o)) {
         return true;
@@ -230,12 +227,7 @@ public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R ext
   }
 
   @Override
-  public final boolean containsEntry(final Object o1, final Object o2) {
-    return containsEntryEquivalent(o1, o2, Object::equals);
-  }
-
-  @Override
-  public final boolean containsEntryEquivalent(final Object o0, final Object o1, final EqualityComparator<Object> cmp) {
+  public final boolean containsEntry(final Object o0, final Object o1) {
     try {
       final K key = (K) o0;
       final V val = (V) o1;
@@ -247,11 +239,6 @@ public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R ext
 
   @Override
   public final Set.Immutable<V> get(final Object o) {
-    return getEquivalent(o, Object::equals);
-  }
-
-  @Override
-  public final Set.Immutable<V> getEquivalent(final Object o, final EqualityComparator<Object> cmp) {
     try {
       final K key = (K) o;
       final Optional<C> values =
@@ -495,13 +482,8 @@ public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R ext
           final K key = (K) entry.getKey();
           final V value = (V) entry.getValue();
 
-          // TODO: like with sets and maps introduce proper abstraction between equals and equivalent
-
-//          boolean containsTuple =
-//              getRootNode().containsTuple(key, value, transformHashCode(key.hashCode()), 0, cmp);
-
           boolean containsTuple =
-              getRootNode().containsTuple(key, value, transformHashCode(key.hashCode()), 0, Object::equals);
+              getRootNode().containsTuple(key, value, transformHashCode(key.hashCode()), 0, cmp);
 
           if (!containsTuple) {
             return false;

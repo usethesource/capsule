@@ -559,63 +559,6 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
     return sumNodes;
   }
 
-  @Override
-  public boolean containsKeyEquivalent(Object o, EqualityComparator<Object> cmp) {
-    throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-  }
-
-  @Override
-  public boolean containsValueEquivalent(Object o, EqualityComparator<Object> cmp) {
-    throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-  }
-
-  @Override
-  public boolean containsEntryEquivalent(Object o0, Object o1,
-      EqualityComparator<Object> cmp) {
-    throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-  }
-
-  @Override
-  public io.usethesource.capsule.Set.Immutable<V> getEquivalent(Object o,
-      EqualityComparator<Object> cmp) {
-    throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-  }
-
-  @Override
-  public SetMultimap.Immutable<K, V> __putEquivalent(K key, V value,
-      EqualityComparator<Object> cmp) {
-    throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-  }
-
-  @Override
-  public SetMultimap.Immutable<K, V> __putEquivalent(K key, io.usethesource.capsule.Set.Immutable<V> values,
-      EqualityComparator<Object> cmp) {
-    throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-  }
-
-  @Override
-  public SetMultimap.Immutable<K, V> __insertEquivalent(K key, V value,
-      EqualityComparator<Object> cmp) {
-    throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-  }
-
-  @Override
-  public SetMultimap.Immutable<K, V> __insertEquivalent(K key, io.usethesource.capsule.Set.Immutable<V> values,
-      EqualityComparator<Object> cmp) {
-    throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-  }
-
-  @Override
-  public SetMultimap.Immutable<K, V> __removeEquivalent(K key, EqualityComparator<Object> cmp) {
-    throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-  }
-
-  @Override
-  public SetMultimap.Immutable<K, V> __removeEquivalent(K key, V val,
-      EqualityComparator<Object> cmp) {
-    throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-  }
-
   static final class SetMultimapResult<K, V> {
 
     private V replacedValue;
@@ -3781,62 +3724,6 @@ public class TrieSetMultimap_HHAMT<K, V> implements SetMultimap.Immutable<K, V> 
     private Stream<io.usethesource.capsule.Set.Immutable<V>> valueCollectionsStream() {
       boolean isParallel = false;
       return StreamSupport.stream(valueCollectionsSpliterator(), isParallel);
-    }
-
-    @Override
-    public boolean containsKeyEquivalent(Object o, EqualityComparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-    }
-
-    @Override
-    public boolean containsValueEquivalent(Object o, EqualityComparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-    }
-
-    @Override
-    public boolean containsEntryEquivalent(Object o0, Object o1,
-        EqualityComparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-    }
-
-    @Override
-    public io.usethesource.capsule.Set.Immutable<V> getEquivalent(Object o,
-        EqualityComparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-    }
-
-    @Override
-    public boolean __putEquivalent(K key, V value, EqualityComparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-    }
-
-    @Override
-    public boolean __putEquivalent(K key, io.usethesource.capsule.Set.Immutable<V> values,
-        EqualityComparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-    }
-
-    @Override
-    public boolean __insertEquivalent(K key, V value,
-        EqualityComparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-    }
-
-    @Override
-    public boolean __insertEquivalent(K key, io.usethesource.capsule.Set.Immutable<V> values,
-        EqualityComparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-    }
-
-    @Override
-    public boolean __removeEquivalent(K key, EqualityComparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-    }
-
-    @Override
-    public boolean __removeEquivalent(K key, V val,
-        EqualityComparator<Object> cmp) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
     }
 
     public static class TransientSetMultimapKeyIterator<K, V> extends
