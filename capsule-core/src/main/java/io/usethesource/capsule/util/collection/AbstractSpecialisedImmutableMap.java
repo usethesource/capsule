@@ -10,7 +10,6 @@ package io.usethesource.capsule.util.collection;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -22,9 +21,14 @@ import io.usethesource.capsule.util.iterator.EmptySupplierIterator;
 import io.usethesource.capsule.util.iterator.SupplierIterator;
 
 public abstract class AbstractSpecialisedImmutableMap<K, V>
-    implements io.usethesource.capsule.Map.Immutable<K, V>, Cloneable {
+    implements io.usethesource.capsule.Map.Immutable<K, V>, java.lang.Cloneable, java.io.Serializable {
 
   private static io.usethesource.capsule.Map.Immutable EMPTY_MAP = new Map0();
+
+  // add method required for property-based test suite
+  private static <K, V> io.usethesource.capsule.Map.Immutable<K, V> of() {
+    return EMPTY_MAP;
+  }
 
   public static <K, V> io.usethesource.capsule.Map.Immutable<K, V> mapOf() {
     return EMPTY_MAP;
@@ -187,7 +191,7 @@ public abstract class AbstractSpecialisedImmutableMap<K, V>
 }
 
 
-class MapEntry<K, V> implements Map.Entry<K, V> {
+class MapEntry<K, V> implements java.util.Map.Entry<K, V>, java.lang.Cloneable, java.io.Serializable {
 
   private final K key1;
   private final V val1;
@@ -232,6 +236,11 @@ class MapEntry<K, V> implements Map.Entry<K, V> {
   @Override
   public String toString() {
     return String.format("<%s, %s>", key1, val1);
+  }
+
+  @Override
+  public Object clone() throws CloneNotSupportedException {
+    return super.clone();
   }
 
 }

@@ -8,7 +8,6 @@
 package io.usethesource.capsule.util.collection;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -19,9 +18,14 @@ import io.usethesource.capsule.util.iterator.EmptySupplierIterator;
 import io.usethesource.capsule.util.iterator.SupplierIterator;
 
 public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutableSet<K>
-    implements io.usethesource.capsule.Set.Immutable<K>, Cloneable {
+    implements io.usethesource.capsule.Set.Immutable<K>, java.lang.Cloneable, java.io.Serializable {
 
   private static io.usethesource.capsule.Set.Immutable EMPTY_SET = new Set0();
+
+  // add method required for property-based test suite
+  private static <K> io.usethesource.capsule.Set.Immutable<K> of() {
+    return EMPTY_SET;
+  }
 
   public static <K> io.usethesource.capsule.Set.Immutable<K> setOf() {
     return EMPTY_SET;

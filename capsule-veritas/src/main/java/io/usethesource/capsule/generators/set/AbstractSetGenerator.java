@@ -50,7 +50,8 @@ public abstract class AbstractSetGenerator<T extends Set.Immutable>
 
   protected T empty() {
     try {
-      final Method persistentSetOfEmpty = target.getMethod("of");
+      final Method persistentSetOfEmpty = target.getDeclaredMethod("of");
+      persistentSetOfEmpty.setAccessible(true); // support AbstractSpecialisedImmutableSet
       return (T) persistentSetOfEmpty.invoke(null);
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException
         | IllegalArgumentException | InvocationTargetException e) {

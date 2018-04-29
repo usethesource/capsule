@@ -7,6 +7,10 @@
  */
 package io.usethesource.capsule;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,16 +22,12 @@ import java.util.HashSet;
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.generator.Size;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 /*
  * NOTE: use e.g. @When(seed = 3666151076704776907L) to fix seed for reproducing test run.
  */
 public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 
-  private final int DEFAULT_TRIALS = 10;
+  private final int DEFAULT_TRIALS = 1_000;
   private final int MORE_TRIALS = 10_000;
   private final int LESS_TRIALS = 100;
   private final int MAX_SIZE = 1_000;
@@ -415,6 +415,11 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     CT subtractDefault = (CT) Set.Immutable.subtract(oneWithShared, twoWithShared);
 
     assertEquals(subtractDefault, subtractNative);
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void serializationRoundtrip(CT input) throws Exception {
+    assertEquals(input, deserialize(serialize((java.io.Serializable) input), input.getClass()));
   }
 
   @Property(trials = DEFAULT_TRIALS)
