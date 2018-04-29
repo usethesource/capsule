@@ -8,7 +8,7 @@
   <packaging>pom</packaging>
 
   <scm>
-    <developerConnection>scm:git:https://github.com/usethesource/capsule.git</developerConnection>
+    <developerConnection>scm:git:ssh://git@github.com/usethesource/capsule.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
