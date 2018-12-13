@@ -7,8 +7,10 @@
  */
 package io.usethesource.capsule.core.trie;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Optional;
+import java.util.Set;
 
 import static io.usethesource.capsule.core.trie.MultimapResult.Modification.NOTHING;
 
@@ -16,7 +18,10 @@ final class MultimapResultImpl<K, V, C> implements
     MultimapResult<K, V, C> {
 
   private Modification modificationEffect = NOTHING;
-  private EnumSet<Modification> modificationDetails = EnumSet.noneOf(Modification.class);
+
+  // we cache the empty set, since there is only read-only access to this field, and it causes quite some memory allocations
+  private static final Set<Modification> EMPTY_MODIFICATIONS_DETAILS = Collections.unmodifiableSet(EnumSet.noneOf(Modification.class));
+  private Set<Modification> modificationDetails = EMPTY_MODIFICATIONS_DETAILS;
   private Optional<Integer> sizeDelta = Optional.empty();
   private Optional<C> evictedPayload = Optional.empty();
 
@@ -26,7 +31,7 @@ final class MultimapResultImpl<K, V, C> implements
   }
 
   @Override
-  public EnumSet<Modification> getModificationDetails() {
+  public Set<Modification> getModificationDetails() {
     return modificationDetails;
   }
 
@@ -42,21 +47,21 @@ final class MultimapResultImpl<K, V, C> implements
 
   @Override
   public void modified(Modification modificationEffect,
-      EnumSet<Modification> modificationDetails) {
+      Set<Modification> modificationDetails) {
     this.modificationEffect = modificationEffect;
     this.modificationDetails = modificationDetails;
   }
 
   @Override
   public void modified(Modification modificationEffect,
-      EnumSet<Modification> modificationDetails, int sizeDelta) {
+      Set<Modification> modificationDetails, int sizeDelta) {
     this.modificationEffect = modificationEffect;
     this.modificationDetails = modificationDetails;
     this.sizeDelta = Optional.of(sizeDelta);
   }
 
   @Override
-  public void modified(Modification modificationEffect, EnumSet<Modification> modificationDetails,
+  public void modified(Modification modificationEffect, Set<Modification> modificationDetails,
       C evictedPayload) {
     this.modificationEffect = modificationEffect;
     this.modificationDetails = modificationDetails;
