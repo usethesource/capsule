@@ -7,15 +7,12 @@
  */
 package io.usethesource.capsule.core.trie;
 
-import java.util.Collection;
+import static io.usethesource.capsule.core.trie.MultimapResult.Modification.NOTHING;
+
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
-
-import static io.usethesource.capsule.core.trie.MultimapResult.Modification.NOTHING;
 
 final class MultimapResultImpl<K, V, C> implements
     MultimapResult<K, V, C> {
