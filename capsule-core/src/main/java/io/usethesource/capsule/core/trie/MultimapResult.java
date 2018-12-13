@@ -9,7 +9,6 @@ package io.usethesource.capsule.core.trie;
 
 import java.util.EnumSet;
 import java.util.Optional;
-import java.util.Set;
 
 public interface MultimapResult<K, V, C> {
 
@@ -19,14 +18,14 @@ public interface MultimapResult<K, V, C> {
 
   Modification getModificationEffect();
 
-  Set<Modification> getModificationDetails();
+  boolean containsModification(Modification m);
 
-  void modified(Modification modificationEffect, Set<Modification> modificationDetails);
+  void modified(Modification modificationEffect, EnumSet<Modification> modificationDetails);
 
-  void modified(Modification modificationEffect, Set<Modification> modificationDetails,
+  void modified(Modification modificationEffect, EnumSet<Modification> modificationDetails,
       int sizeDelta);
 
-  void modified(Modification modificationEffect, Set<Modification> modificationDetails,
+  void modified(Modification modificationEffect, EnumSet<Modification> modificationDetails,
       C evictedPayload);
 
   Optional<C> getEvictedPayload();

@@ -107,7 +107,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
         int propertyKeySetHashCode = cachedKeySetHashCode;
         int propertyKeySetSize = cachedKeySetSize;
 
-        if (details.getModificationDetails().contains(INSERTED_KEY)) {
+        if (details.containsModification(INSERTED_KEY)) {
           propertyKeySetHashCode += keyHash;
           propertyKeySetSize += 1;
         }
@@ -160,7 +160,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
       }
 
       case INSERTED_PAYLOAD: {
-        assert details.getModificationDetails().contains(INSERTED_KEY);
+        assert details.containsModification(INSERTED_KEY);
 
         // int hashCodeDeltaNew = tupleHash(keyHash, values);
         // int propertyHashCode = cachedHashCode + hashCodeDeltaNew;
@@ -199,7 +199,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
         int propertyKeySetHashCode = cachedKeySetHashCode;
         int propertyKeySetSize = cachedKeySetSize;
 
-        if (details.getModificationDetails().contains(REMOVED_KEY)) {
+        if (details.containsModification(REMOVED_KEY)) {
           propertyKeySetHashCode -= keyHash;
           propertyKeySetSize -= 1;
         }
@@ -227,7 +227,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
       }
 
       case REMOVED_PAYLOAD: {
-        assert details.getModificationDetails().contains(REMOVED_KEY);
+        assert details.containsModification(REMOVED_KEY);
 
         // int hashCodeDeltaOld = tupleHash(keyHash, details.getEvictedPayload());
         // int propertyHashCode = cachedHashCode - hashCodeDeltaOld;
