@@ -19,7 +19,7 @@ final class MultimapResultImpl<K, V, C> implements
 
   private Modification modificationEffect = NOTHING;
 
-  private Set<Modification> modificationDetails = Collections.emptySet();
+  private int modificationDetails = 0;
   private Optional<Integer> sizeDelta = Optional.empty();
   private Optional<C> evictedPayload = Optional.empty();
 
@@ -30,7 +30,7 @@ final class MultimapResultImpl<K, V, C> implements
 
   @Override
   public boolean containsModification(Modification m) {
-    return modificationDetails.contains(m);
+    return Modification.isSet(modificationDetails, m);
   }
 
   @Override
@@ -44,22 +44,22 @@ final class MultimapResultImpl<K, V, C> implements
   }
 
   @Override
-  public void modified(Modification modificationEffect,
-      EnumSet<Modification> modificationDetails) {
+  public void modified(Modification modificationEffect, 
+      int modificationDetails) {
     this.modificationEffect = modificationEffect;
     this.modificationDetails = modificationDetails;
   }
 
   @Override
   public void modified(Modification modificationEffect,
-      EnumSet<Modification> modificationDetails, int sizeDelta) {
+      int modificationDetails, int sizeDelta) {
     this.modificationEffect = modificationEffect;
     this.modificationDetails = modificationDetails;
     this.sizeDelta = Optional.of(sizeDelta);
   }
 
   @Override
-  public void modified(Modification modificationEffect, EnumSet<Modification> modificationDetails,
+  public void modified(Modification modificationEffect, int modificationDetails,
       C evictedPayload) {
     this.modificationEffect = modificationEffect;
     this.modificationDetails = modificationDetails;

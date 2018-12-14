@@ -827,7 +827,7 @@ public class PersistentTrieSetMultimap<K, V> extends
             final io.usethesource.capsule.Set.Immutable<V> valColl =
                 io.usethesource.capsule.Set.Immutable.of(currentVal, value);
 
-            details.modified(INSERTED_PAYLOAD, EnumSet.of(INSERTED_VALUE), 1);
+            details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_VALUE), 1);
             return copyAndMigrateFromSingletonToCollection(mutator, bitpos, currentKey, valColl);
           }
         } else {
@@ -838,7 +838,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               currentVal, transformHashCode(currentKey.hashCode()), key, value, keyHash,
               shift + BIT_PARTITION_SIZE, cmp);
 
-          details.modified(INSERTED_PAYLOAD, EnumSet.of(INSERTED_KEY, INSERTED_VALUE), 1);
+          details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE), 1);
           return copyAndMigrateFromSingletonToNode(mutator, bitpos, subNodeNew);
         }
       }
@@ -858,7 +858,7 @@ public class PersistentTrieSetMultimap<K, V> extends
             final io.usethesource.capsule.Set.Immutable<V> newCollVal =
                 currentCollVal.__insert(value);
 
-            details.modified(INSERTED_PAYLOAD, EnumSet.of(INSERTED_VALUE), 1);
+            details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_VALUE), 1);
             return copyAndSetCollectionValue(mutator, bitpos, newCollVal);
           }
         } else {
@@ -869,7 +869,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               currentCollKey, currentValues, transformHashCode(currentCollKey.hashCode()), key,
               value, keyHash, shift + BIT_PARTITION_SIZE, cmp);
 
-          details.modified(INSERTED_PAYLOAD, EnumSet.of(INSERTED_KEY, INSERTED_VALUE), 1);
+          details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE), 1);
           return copyAndMigrateFromCollectionToNode(mutator, bitpos, subNodeNew);
         }
       }
@@ -889,7 +889,7 @@ public class PersistentTrieSetMultimap<K, V> extends
       }
 
       // default
-      details.modified(INSERTED_PAYLOAD, EnumSet.of(INSERTED_KEY, INSERTED_VALUE), 1);
+      details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE), 1);
       return copyAndInsertSingleton(mutator, bitpos, key, value);
     }
 
@@ -921,7 +921,7 @@ public class PersistentTrieSetMultimap<K, V> extends
           final io.usethesource.capsule.Set.Immutable<V> mergedValues = values.__insert(currentVal);
           final int sizeDelta = 2 * values.size() - mergedValues.size();
 
-          details.modified(INSERTED_PAYLOAD, EnumSet.of(INSERTED_VALUE_COLLECTION), sizeDelta);
+          details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_VALUE_COLLECTION), sizeDelta);
           return copyAndMigrateFromSingletonToCollection(mutator, bitpos, currentKey, mergedValues);
         } else {
           // prefix-collision (case: singleton x collection)
@@ -932,7 +932,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               shift + BIT_PARTITION_SIZE, cmp);
           final int sizeDelta = values.size();
 
-          details.modified(INSERTED_PAYLOAD, EnumSet.of(INSERTED_KEY, INSERTED_VALUE_COLLECTION),
+          details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE_COLLECTION),
               sizeDelta);
           return copyAndMigrateFromSingletonToNode(mutator, bitpos, subNodeNew);
         }
@@ -954,7 +954,7 @@ public class PersistentTrieSetMultimap<K, V> extends
           if (sizeDelta == 0) {
             return this;
           } else {
-            details.modified(INSERTED_PAYLOAD, EnumSet.of(INSERTED_VALUE_COLLECTION), sizeDelta);
+            details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_VALUE_COLLECTION), sizeDelta);
             return copyAndSetCollectionValue(mutator, bitpos, mergedValues);
           }
         } else {
@@ -966,7 +966,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               values, keyHash, shift + BIT_PARTITION_SIZE, cmp);
           final int sizeDelta = values.size();
 
-          details.modified(INSERTED_PAYLOAD, EnumSet.of(INSERTED_KEY, INSERTED_VALUE_COLLECTION),
+          details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE_COLLECTION),
               sizeDelta);
           return copyAndMigrateFromCollectionToNode(mutator, bitpos, subNodeNew);
         }
@@ -987,7 +987,7 @@ public class PersistentTrieSetMultimap<K, V> extends
       }
 
       // default
-      details.modified(INSERTED_PAYLOAD, EnumSet.of(INSERTED_KEY, INSERTED_VALUE_COLLECTION),
+      details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE_COLLECTION),
           values.size());
       return copyAndInsertCollection(mutator, bitpos, key, values);
     }
@@ -1030,7 +1030,7 @@ public class PersistentTrieSetMultimap<K, V> extends
           final V currentVal = getSingletonValue(dataIndex);
 
           // update singleton value
-          details.modified(REPLACED_PAYLOAD, EnumSet.of(REPLACED_VALUE),
+          details.modified(REPLACED_PAYLOAD, MultimapResult.Modification.flag(REPLACED_VALUE),
               io.usethesource.capsule.Set.Immutable.of(currentVal));
           return copyAndSetSingletonValue(mutator, bitpos, value);
         } else {
@@ -1041,7 +1041,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               currentVal, transformHashCode(currentKey.hashCode()), key, value, keyHash,
               shift + BIT_PARTITION_SIZE, cmp);
 
-          details.modified(INSERTED_PAYLOAD, EnumSet.of(INSERTED_KEY, INSERTED_VALUE));
+          details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE));
           return copyAndMigrateFromSingletonToNode(mutator, bitpos, subNodeNew);
         }
       }
@@ -1055,7 +1055,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               getCollectionValue(collIndex);
 
           // migrate from collection to singleton
-          details.modified(REPLACED_PAYLOAD, EnumSet.of(REPLACED_VALUE_COLLECTION), currentCollVal);
+          details.modified(REPLACED_PAYLOAD, MultimapResult.Modification.flag(REPLACED_VALUE_COLLECTION), currentCollVal);
           return copyAndMigrateFromCollectionToSingleton(mutator, bitpos, currentCollKey, value);
         } else {
           // prefix-collision (case: collection x singleton)
@@ -1065,7 +1065,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               currentCollKey, currentValues, transformHashCode(currentCollKey.hashCode()), key,
               value, keyHash, shift + BIT_PARTITION_SIZE, cmp);
 
-          details.modified(INSERTED_PAYLOAD, EnumSet.of(INSERTED_KEY, INSERTED_VALUE));
+          details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE));
           return copyAndMigrateFromCollectionToNode(mutator, bitpos, subNodeNew);
         }
       }
@@ -1084,7 +1084,7 @@ public class PersistentTrieSetMultimap<K, V> extends
       }
 
       // default
-      details.modified(INSERTED_PAYLOAD, EnumSet.of(INSERTED_KEY, INSERTED_VALUE));
+      details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE));
       return copyAndInsertSingleton(mutator, bitpos, key, value);
     }
 
@@ -1112,7 +1112,7 @@ public class PersistentTrieSetMultimap<K, V> extends
           final V currentVal = getSingletonValue(dataIndex);
 
           // replace singleton value with collection
-          details.modified(REPLACED_PAYLOAD, EnumSet.of(REPLACED_VALUE),
+          details.modified(REPLACED_PAYLOAD, MultimapResult.Modification.flag(REPLACED_VALUE),
               io.usethesource.capsule.Set.Immutable.of(currentVal));
           return copyAndMigrateFromSingletonToCollection(mutator, bitpos, key, values);
         } else {
@@ -1123,7 +1123,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               values, keyHash, currentKey, currentVal,
               transformHashCode(currentKey.hashCode()), shift + BIT_PARTITION_SIZE, cmp);
 
-          details.modified(INSERTED_PAYLOAD, EnumSet.of(INSERTED_KEY, INSERTED_VALUE_COLLECTION));
+          details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE_COLLECTION));
           return copyAndMigrateFromSingletonToNode(mutator, bitpos, subNodeNew);
         }
       }
@@ -1137,7 +1137,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               getCollectionValue(collIndex);
 
           // update collection
-          details.modified(REPLACED_PAYLOAD, EnumSet.of(REPLACED_VALUE_COLLECTION), currentCollVal);
+          details.modified(REPLACED_PAYLOAD, MultimapResult.Modification.flag(REPLACED_VALUE_COLLECTION), currentCollVal);
           return copyAndSetCollectionValue(mutator, bitpos, values);
         } else {
           // prefix-collision (case: collection x collection)
@@ -1147,7 +1147,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               currentCollKey, currentValues, transformHashCode(currentCollKey.hashCode()), key,
               values, keyHash, shift + BIT_PARTITION_SIZE, cmp);
 
-          details.modified(INSERTED_PAYLOAD, EnumSet.of(INSERTED_KEY, INSERTED_VALUE_COLLECTION));
+          details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE_COLLECTION));
           return copyAndMigrateFromCollectionToNode(mutator, bitpos, subNodeNew);
         }
       }
@@ -1167,7 +1167,7 @@ public class PersistentTrieSetMultimap<K, V> extends
       }
 
       // default
-      details.modified(INSERTED_PAYLOAD, EnumSet.of(INSERTED_KEY, INSERTED_VALUE_COLLECTION));
+      details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE_COLLECTION));
       return copyAndInsertCollection(mutator, bitpos, key, values);
     }
 
@@ -1197,7 +1197,7 @@ public class PersistentTrieSetMultimap<K, V> extends
           if (cmp.equals(currentVal, value)) {
 
             // remove mapping
-            details.modified(REMOVED_PAYLOAD, EnumSet.of(REMOVED_KEY, REMOVED_VALUE),
+            details.modified(REMOVED_PAYLOAD, MultimapResult.Modification.flag(REMOVED_KEY, REMOVED_VALUE),
                 io.usethesource.capsule.Set.Immutable.of(currentVal));
             return copyAndRemoveSingleton(mutator, bitpos).canonicalize(mutator, keyHash, shift);
 
@@ -1220,7 +1220,7 @@ public class PersistentTrieSetMultimap<K, V> extends
           if (currentValColl.contains(value)) {
 
             // remove mapping
-            details.modified(REMOVED_PAYLOAD, EnumSet.of(REMOVED_VALUE),
+            details.modified(REMOVED_PAYLOAD, MultimapResult.Modification.flag(REMOVED_VALUE),
                 io.usethesource.capsule.Set.Immutable.of(value));
 
             final io.usethesource.capsule.Set.Immutable<V> newValColl =
@@ -1314,7 +1314,7 @@ public class PersistentTrieSetMultimap<K, V> extends
           // return this;
           // }
 
-          details.modified(REMOVED_PAYLOAD, EnumSet.of(REMOVED_KEY, REMOVED_VALUE),
+          details.modified(REMOVED_PAYLOAD, MultimapResult.Modification.flag(REMOVED_KEY, REMOVED_VALUE),
               io.usethesource.capsule.Set.Immutable.of(currentVal));
           return copyAndRemoveSingleton(mutator, bitpos).canonicalize(mutator, keyHash, shift);
         } else {
@@ -1348,7 +1348,7 @@ public class PersistentTrieSetMultimap<K, V> extends
           // return this;
           // }
 
-          details.modified(REMOVED_PAYLOAD, EnumSet.of(REMOVED_KEY, REMOVED_VALUE_COLLECTION),
+          details.modified(REMOVED_PAYLOAD, MultimapResult.Modification.flag(REMOVED_KEY, REMOVED_VALUE_COLLECTION),
               currentValColl);
           return copyAndRemoveCollection(mutator, bitpos).canonicalize(mutator, keyHash, shift);
         } else {
@@ -2510,7 +2510,7 @@ public class PersistentTrieSetMultimap<K, V> extends
                   && entry.getValue().containsEquivalent(value, cmp))
               .findAny().isPresent();
 
-          details.modified(INSERTED_PAYLOAD, EnumSet.of(INSERTED_VALUE), 1);
+          details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_VALUE), 1);
           return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
         }
       } else {
@@ -2534,7 +2534,7 @@ public class PersistentTrieSetMultimap<K, V> extends
             .findAny()
             .isPresent();
 
-        details.modified(INSERTED_PAYLOAD, EnumSet.of(INSERTED_KEY, INSERTED_VALUE), 1);
+        details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE), 1);
         return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
       }
     }
@@ -2569,9 +2569,9 @@ public class PersistentTrieSetMultimap<K, V> extends
             collisionContent.stream().map(substitutionMapper).collect(Collectors.toList());
 
         if (values.size() == 1) {
-          details.modified(REPLACED_PAYLOAD, EnumSet.of(REPLACED_VALUE), values);
+          details.modified(REPLACED_PAYLOAD, MultimapResult.Modification.flag(REPLACED_VALUE), values);
         } else {
-          details.modified(REPLACED_PAYLOAD, EnumSet.of(REPLACED_VALUE_COLLECTION), values);
+          details.modified(REPLACED_PAYLOAD, MultimapResult.Modification.flag(REPLACED_VALUE_COLLECTION), values);
         }
 
         return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
@@ -2587,7 +2587,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> updatedCollisionContent =
             builder.build().collect(Collectors.toList());
 
-        details.modified(INSERTED_PAYLOAD, EnumSet.of(INSERTED_KEY, INSERTED_VALUE));
+        details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE));
         return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
       }
     }
@@ -2616,7 +2616,7 @@ public class PersistentTrieSetMultimap<K, V> extends
                 .filter(kImmutableSetEntry -> kImmutableSetEntry != optionalTuple.get())
                 .collect(Collectors.toList());
 
-            details.modified(REMOVED_PAYLOAD, EnumSet.of(REMOVED_KEY, REMOVED_VALUE));
+            details.modified(REMOVED_PAYLOAD, MultimapResult.Modification.flag(REMOVED_KEY, REMOVED_VALUE));
             return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
           } else {
             Function<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>, Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> substitutionMapper =
@@ -2633,7 +2633,7 @@ public class PersistentTrieSetMultimap<K, V> extends
             updatedCollisionContent =
                 collisionContent.stream().map(substitutionMapper).collect(Collectors.toList());
 
-            details.modified(REMOVED_PAYLOAD, EnumSet.of(REMOVED_VALUE));
+            details.modified(REMOVED_PAYLOAD, MultimapResult.Modification.flag(REMOVED_VALUE));
             return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
           }
         }
@@ -2664,11 +2664,11 @@ public class PersistentTrieSetMultimap<K, V> extends
             .collect(Collectors.toList());
 
         if (values.size() == 1) {
-          details.modified(REMOVED_PAYLOAD, EnumSet.of(REMOVED_KEY, REMOVED_VALUE), values);
+          details.modified(REMOVED_PAYLOAD, MultimapResult.Modification.flag(REMOVED_KEY, REMOVED_VALUE), values);
           return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
         } else {
           details
-              .modified(REMOVED_PAYLOAD, EnumSet.of(REMOVED_KEY, REMOVED_VALUE_COLLECTION), values);
+              .modified(REMOVED_PAYLOAD, MultimapResult.Modification.flag(REMOVED_KEY, REMOVED_VALUE_COLLECTION), values);
           return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
         }
       }
