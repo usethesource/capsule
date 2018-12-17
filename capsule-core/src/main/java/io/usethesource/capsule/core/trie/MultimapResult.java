@@ -7,7 +7,6 @@
  */
 package io.usethesource.capsule.core.trie;
 
-import java.util.EnumSet;
 import java.util.Optional;
 
 public interface MultimapResult<K, V, C> {
@@ -18,15 +17,13 @@ public interface MultimapResult<K, V, C> {
 
   Modification getModificationEffect();
 
-  EnumSet<Modification> getModificationDetails();
+  boolean containsModification(Modification m);
 
-  void modified(Modification modificationEffect, EnumSet<Modification> modificationDetails);
+  void modified(Modification modificationEffect, int modificationDetails);
 
-  void modified(Modification modificationEffect, EnumSet<Modification> modificationDetails,
-      int sizeDelta);
+  void modified(Modification modificationEffect, int modificationDetails, int sizeDelta);
 
-  void modified(Modification modificationEffect, EnumSet<Modification> modificationDetails,
-      C evictedPayload);
+  void modified(Modification modificationEffect, int modificationDetails, C evictedPayload);
 
   Optional<C> getEvictedPayload();
 
@@ -51,6 +48,23 @@ public interface MultimapResult<K, V, C> {
     REMOVED_VALUE,
     REMOVED_VALUE_COLLECTION,
     REMOVED_KEY_VALUE,
-    REMOVED_KEY_VALUE_COLLECTION
+    REMOVED_KEY_VALUE_COLLECTION;
+
+    public static int flag(Modification a) {
+      return 1 << a.ordinal();
+    }
+
+    public static int flag(Modification a, Modification b) {
+      return 1 << a.ordinal() | 1 << b.ordinal();
+    }
+
+    public static int flag(Modification a, Modification b, Modification c) {
+      return 1 << a.ordinal() | 1 << b.ordinal() | 1  << c.ordinal();
+    }
+
+    public static boolean isSet(int flags, Modification test) {
+      return (flags & flag(test)) != 0;
+    }
   }
+
 }

@@ -7,16 +7,19 @@
  */
 package io.usethesource.capsule.core.trie;
 
+import static io.usethesource.capsule.core.trie.MultimapResult.Modification.NOTHING;
+
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Optional;
-
-import static io.usethesource.capsule.core.trie.MultimapResult.Modification.NOTHING;
+import java.util.Set;
 
 final class MultimapResultImpl<K, V, C> implements
     MultimapResult<K, V, C> {
 
   private Modification modificationEffect = NOTHING;
-  private EnumSet<Modification> modificationDetails = EnumSet.noneOf(Modification.class);
+
+  private int modificationDetails = 0;
   private Optional<Integer> sizeDelta = Optional.empty();
   private Optional<C> evictedPayload = Optional.empty();
 
@@ -26,8 +29,8 @@ final class MultimapResultImpl<K, V, C> implements
   }
 
   @Override
-  public EnumSet<Modification> getModificationDetails() {
-    return modificationDetails;
+  public boolean containsModification(Modification m) {
+    return Modification.isSet(modificationDetails, m);
   }
 
   @Override
@@ -41,22 +44,22 @@ final class MultimapResultImpl<K, V, C> implements
   }
 
   @Override
-  public void modified(Modification modificationEffect,
-      EnumSet<Modification> modificationDetails) {
+  public void modified(Modification modificationEffect, 
+      int modificationDetails) {
     this.modificationEffect = modificationEffect;
     this.modificationDetails = modificationDetails;
   }
 
   @Override
   public void modified(Modification modificationEffect,
-      EnumSet<Modification> modificationDetails, int sizeDelta) {
+      int modificationDetails, int sizeDelta) {
     this.modificationEffect = modificationEffect;
     this.modificationDetails = modificationDetails;
     this.sizeDelta = Optional.of(sizeDelta);
   }
 
   @Override
-  public void modified(Modification modificationEffect, EnumSet<Modification> modificationDetails,
+  public void modified(Modification modificationEffect, int modificationDetails,
       C evictedPayload) {
     this.modificationEffect = modificationEffect;
     this.modificationDetails = modificationDetails;

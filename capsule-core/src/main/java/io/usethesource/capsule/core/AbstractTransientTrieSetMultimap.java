@@ -114,7 +114,7 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
         this.cachedKeySetHashCode = cachedKeySetHashCode;
         this.cachedKeySetSize = cachedKeySetSize;
 
-        if (details.getModificationDetails().contains(INSERTED_KEY)) {
+        if (details.containsModification(INSERTED_KEY)) {
           this.cachedKeySetHashCode += keyHash;
           this.cachedKeySetSize += 1;
         }
@@ -175,7 +175,7 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
       }
 
       case INSERTED_PAYLOAD: {
-        assert details.getModificationDetails().contains(INSERTED_KEY);
+        assert details.containsModification(INSERTED_KEY);
 
         // int hashCodeDeltaNew = tupleHash(keyHash, values);
         // this.cachedHashCode = cachedHashCode + hashCodeDeltaNew;
@@ -220,7 +220,7 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
         this.cachedKeySetHashCode = cachedKeySetHashCode;
         this.cachedKeySetSize = cachedKeySetSize;
 
-        if (details.getModificationDetails().contains(REMOVED_KEY)) {
+        if (details.containsModification(REMOVED_KEY)) {
           this.cachedKeySetHashCode -= keyHash;
           this.cachedKeySetSize -= 1;
         }
@@ -254,7 +254,7 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
       }
 
       case REMOVED_PAYLOAD: {
-        assert details.getModificationDetails().contains(REMOVED_KEY);
+        assert details.containsModification(REMOVED_KEY);
 
         // int hashCodeDeltaOld = tupleHash(keyHash, details.getEvictedPayload());
         // this.cachedHashCode = cachedHashCode - hashCodeDeltaOld;
