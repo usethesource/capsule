@@ -7,6 +7,13 @@
   <version>0.6.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
+  <licenses>
+    <license>
+      <name>BSD 2-Clause Simplified License</name>
+      <url>https://raw.githubusercontent.com/usethesource/capsule/master/LICENSE</url>
+    </license>
+  </licenses>
+  
   <scm>
     <developerConnection>scm:git:ssh://git@github.com/usethesource/capsule.git</developerConnection>
     <tag>HEAD</tag>
