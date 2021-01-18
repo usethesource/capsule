@@ -52,7 +52,6 @@
     <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
     <topleveldir>${project.basedir}</topleveldir>
     <jacoco.reportPath>${topleveldir}/target/jacoco.exec</jacoco.reportPath>
-    <maven.deploy.skip>true</maven.deploy.skip>
   </properties>
 
   <build>
