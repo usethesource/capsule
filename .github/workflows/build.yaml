@@ -20,7 +20,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Test with Maven
-        run: mvn -B --update-snapshots compile
+        run: mvn -B --update-snapshots compile test
 
       - name: Deploy
         if: github.ref == 'refs/heads/master'
