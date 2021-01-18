@@ -27,7 +27,6 @@
 
   <!-- deployment configuration (usethesource) -->
   <distributionManagement>
-      <!--
     <repository>
       <id>usethesource-releases</id>
       <url>http://nexus.usethesource.io/content/repositories/releases/</url>
@@ -36,17 +35,6 @@
       <id>usethesource-snapshots</id>
       <url>http://nexus.usethesource.io/content/repositories/snapshots/</url>
     </snapshotRepository>
-    -->
-        <repository>
-            <id>github</id>
-            <name>GitHub OWNER Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/usethesource</url>
-        </repository>
-    <snapshotRepository>
-            <id>github</id>
-            <name>GitHub OWNER Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/usethesource</url>
-        </snapshotRepository>
   </distributionManagement>
 
   <!-- dependency resolution configuration (usethesource) -->
