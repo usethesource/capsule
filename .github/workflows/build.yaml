@@ -20,14 +20,10 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Test with Maven
-        run: mvn --batch-mode --update-snapshots test
+        run: mvn -B --update-snapshots compile
 
       - name: Deploy
         if: github.ref == 'refs/heads/master'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: "gh::default::https://maven.pkg.github.com/usethesource"
-        run: |
-          mkdir -p ~/.m2
-          echo "<settings><servers><server><id>gh</id><username>gh-actions</username><password>${GITHUB_TOKEN}</password></server></servers></settings>" > ~/.m2/settings.xml
-          mvn deploy --batch-mode -DskipTests --update-snapshots -DaltReleaseDeploymentRepository="${REPO}" -DaltSnapshotDeploymentRepository="${REPO}"
+        run: mvn deploy -B -DskipTests

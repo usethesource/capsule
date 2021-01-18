@@ -28,12 +28,12 @@
   <!-- deployment configuration (usethesource) -->
   <distributionManagement>
     <repository>
-      <id>usethesource-releases</id>
-      <url>http://nexus.usethesource.io/content/repositories/releases/</url>
+      <id>github</id>
+      <url>https://maven.pkg.github.com/usethesource</url>
     </repository>
     <snapshotRepository>
-      <id>usethesource-snapshots</id>
-      <url>http://nexus.usethesource.io/content/repositories/snapshots/</url>
+      <id>github</id>
+      <url>https://maven.pkg.github.com/usethesource</url>
     </snapshotRepository>
   </distributionManagement>
 
