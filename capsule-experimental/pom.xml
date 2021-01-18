@@ -14,6 +14,7 @@
 
   <properties>
     <topleveldir>${project.parent.basedir}</topleveldir>
+    <maven.deploy.skip>false</maven.deploy.skip>
   </properties>
 
   <build>
