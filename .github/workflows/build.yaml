@@ -23,10 +23,11 @@ jobs:
         run: mvn --batch-mode --update-snapshots test
 
       - name: Deploy
+        if: github.ref == 'refs/heads/master'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: "gh::default::https://maven.pkg.github.com/usethesource"
         run: |
-          mkdir ~/.m2
+          mkdir -p ~/.m2
           echo "<settings><servers><server><id>gh</id><username>gh-actions</username><password>${GITHUB_TOKEN}</password></server></servers></settings>" > ~/.m2/settings.xml
           mvn deploy --batch-mode -DskipTests --update-snapshots -DaltReleaseDeploymentRepository="${REPO}" -DaltSnapshotDeploymentRepository="${REPO}"
