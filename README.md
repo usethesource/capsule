@@ -48,6 +48,6 @@ We introduce CHAMP (Compressed Hash-Array Mapped Prefix-tree), an evolutionary i
 ## Publications
 * [PhD Thesis: Efficient Immutable Collections (2017)](https://michael.steindorfer.name/publications/phd-thesis-efficient-immutable-collections)
 * [Paper: Optimizing Hash-Array Mapped Tries for Fast and Lean Immutable JVM Collections (OOPSLA 2015)](https://michael.steindorfer.name/publications/oopsla15.pdf)
-* [Paper: Fast and Lean Immutable Multi-Maps on the JVM based on Heterogeneous Hash-Array Mapped Tries (Draft, 2016)](https://arxiv.org/abs/1608.01036)
+* [Paper: To-Many or To-One? All-in-One! Efficient Purely Functional Multi-maps with Type-Heterogeneous Hash-Tries (PLDI 2018)](https://michael.steindorfer.name/publications/pldi18.pdf)
 * [Paper: Towards a Software Product Line of Trie-Based Collections (Short Paper, GPCE 2016)](https://michael.steindorfer.name/publications/gpce16.pdf)
 * [Paper: Code Specialization for Memory Efficient Hash Tries (Short Paper, GPCE 2014)](https://michael.steindorfer.name/publications/gpce14.pdf)
