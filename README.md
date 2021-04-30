@@ -27,7 +27,7 @@ Furthermore, you have to declare capsule as a dependency. To obtain the latest s
 <dependency>
 	<groupId>io.usethesource</groupId>
 	<artifactId>capsule</artifactId>
-	<version>0.6.1</version>
+	<version>0.6.3</version>
 </dependency>
 ```
 
