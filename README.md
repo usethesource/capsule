@@ -31,16 +31,6 @@ Furthermore, you have to declare capsule as a dependency. To obtain the latest s
 </dependency>
 ```
 
-To obtain the latest stable backport for Java 7 (that lags behind the Java 8+ release), insert the following snippet in your pom.xml file:
-
-```
-<dependency>
-	<groupId>io.usethesource</groupId>
-	<artifactId>capsule-jdk7</artifactId>
-	<version>0.2.1</version>
-</dependency>
-```
-
 Snippets for other build tools and dependency management systems may vary slightly.
 
 # Background: Efficient Immutable Data Structures on the JVM
