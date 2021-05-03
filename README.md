@@ -2,7 +2,7 @@
 
 ## Status
 
-![capsule build status](https://github.com/usethesource/capsule/.github/workflows/build.yaml/badge.svg)
+![capsule build status](https://github.com/usethesource/capsule/actions/workflows/build.yaml/badge.svg)
 
 ## Synopsis
 
