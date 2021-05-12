@@ -25,26 +25,6 @@
     <module>capsule-veritas</module>
   </modules>
 
-  <!-- deployment configuration (usethesource) -->
-  <distributionManagement>
-    <repository>
-      <id>github</id>
-      <url>https://maven.pkg.github.com/usethesource/capsule</url>
-    </repository>
-    <snapshotRepository>
-      <id>github</id>
-      <url>https://maven.pkg.github.com/usethesource/capsule</url>
-    </snapshotRepository>
-  </distributionManagement>
-
-  <!-- dependency resolution configuration (usethesource) -->
-  <repositories>
-    <repository>
-      <id>usethesource</id>
-      <url>http://nexus.usethesource.io/content/repositories/public/</url>
-    </repository>
-  </repositories>
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.target>1.8</maven.compiler.target>
@@ -73,6 +53,9 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
         <version>3.0.0-M4</version>
+        <configuration>
+          <tagNameFormat>v@{project.version}</tagNameFormat>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.jacoco</groupId>
@@ -89,7 +72,6 @@
             </goals>
             <configuration>
               <append>true</append>
-              <dataFile>${topleveldir}/target/jacoco.exec</dataFile>
               <destFile>${topleveldir}/target/jacoco.exec</destFile>
             </configuration>
           </execution>
