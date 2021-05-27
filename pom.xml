@@ -3,9 +3,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.usethesource</groupId>
-  <artifactId>capsule-pom-parent</artifactId>
+  <artifactId>capsule</artifactId>
   <version>0.6.4-SNAPSHOT</version>
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
 
   <licenses>
     <license>
@@ -19,10 +19,6 @@
     <tag>HEAD</tag>
   </scm>
 
-  <modules>
-    <module>capsule-core</module>
-  </modules>
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.target>1.8</maven.compiler.target>
@@ -30,10 +26,20 @@
     <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
     <topleveldir>${project.basedir}</topleveldir>
     <jacoco.reportPath>${topleveldir}/target/jacoco.exec</jacoco.reportPath>
+
+    <junitVersion>5.7.2</junitVersion>
+    <junitQuickcheckVersion>1.0</junitQuickcheckVersion>
   </properties>
 
   <build>
     <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0-M5</version>
+        <configuration>
+          <argLine>${argLine}</argLine>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -116,4 +122,25 @@
       </plugin>
     </plugins>
   </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.pholser</groupId>
+      <artifactId>junit-quickcheck-core</artifactId>
+      <version>${junitQuickcheckVersion}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.pholser</groupId>
+      <artifactId>junit-quickcheck-generators</artifactId>
+      <version>${junitQuickcheckVersion}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.vintage</groupId>
+      <artifactId>junit-vintage-engine</artifactId>
+      <version>${junitVersion}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>
