@@ -17,10 +17,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import io.usethesource.capsule.core.PersistentTrieSet;
-import io.usethesource.capsule.experimental.lazy.TrieSet_5Bits_LazyHashCode;
-import io.usethesource.capsule.experimental.memoized.TrieSet_5Bits_Memoized_LazyHashCode;
-import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8;
 import javax.tools.FileObject;
 import javax.tools.ForwardingJavaFileManager;
 import javax.tools.JavaCompiler;
@@ -45,10 +41,7 @@ public class RuntimeCodeGenerationTestSuite extends Suite {
     // @formatter:off
     final List<Class> componentTypes = Arrays.asList(Integer.class, String.class);
     final List<Class> setTypes = Arrays.asList(
-        PersistentTrieSet.class
-        , TrieSet_5Bits_Spec0To8.class
-        , TrieSet_5Bits_LazyHashCode.class
-        , TrieSet_5Bits_Memoized_LazyHashCode.class
+        io.usethesource.capsule.core.PersistentTrieSet.class
     );
 
     final String javaClassNameTemplate = "io.usethesource.capsule.$CLASS_NAME$$COMPONENT_TYPE$SetPropertiesTest";
