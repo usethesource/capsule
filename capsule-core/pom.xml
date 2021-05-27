@@ -14,6 +14,8 @@
 
   <properties>
     <topleveldir>${project.parent.basedir}</topleveldir>
+    <junitVersion>5.7.2</junitVersion>
+    <junitQuickcheckVersion>1.0</junitQuickcheckVersion>
   </properties>
 
   <build>
@@ -32,19 +34,19 @@
     <dependency>
       <groupId>com.pholser</groupId>
       <artifactId>junit-quickcheck-core</artifactId>
-      <version>1.0</version>
+      <version>${junitQuickcheckVersion}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.pholser</groupId>
       <artifactId>junit-quickcheck-generators</artifactId>
-      <version>1.0</version>
+      <version>${junitQuickcheckVersion}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.junit.vintage</groupId>
       <artifactId>junit-vintage-engine</artifactId>
-      <version>5.7.2</version>
+      <version>${junitVersion}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
