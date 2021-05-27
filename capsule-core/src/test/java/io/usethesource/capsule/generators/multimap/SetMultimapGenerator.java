@@ -9,10 +9,10 @@ package io.usethesource.capsule.generators.multimap;
 
 import io.usethesource.capsule.core.PersistentTrieSetMultimap;
 
-public class SetMultimapGenerator_HCHAMP<K>
+public class SetMultimapGenerator<K>
     extends AbstractSetMultimapGenerator<PersistentTrieSetMultimap> {
 
-  public SetMultimapGenerator_HCHAMP() {
+  public SetMultimapGenerator() {
     super(PersistentTrieSetMultimap.class);
   }
 
