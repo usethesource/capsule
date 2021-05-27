@@ -1,0 +1,7 @@
+io.usethesource.capsule.generators.map.MapGeneratorDefault
+io.usethesource.capsule.generators.map.SpecializedMapGenerator
+io.usethesource.capsule.generators.multimap.SetMultimapGenerator_HCHAMP
+io.usethesource.capsule.generators.relation.BidirectionalTrieSetMultimapGenerator
+io.usethesource.capsule.generators.set.SetGeneratorDefault
+io.usethesource.capsule.generators.set.SpecializedSetGenerator
+io.usethesource.capsule.generators.MapEntryGenerator
