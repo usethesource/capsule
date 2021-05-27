@@ -21,7 +21,6 @@
 
   <modules>
     <module>capsule-core</module>
-    <module>capsule-experimental</module>
     <module>capsule-veritas</module>
   </modules>
 
