@@ -14,7 +14,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(JUnitQuickcheck.class)
 public class SpecializedSetPropertiesTest
-    extends AbstractSetProperties<String, AbstractSpecialisedImmutableSet<String>> {
+    extends AbstractSetProperties<Integer, AbstractSpecialisedImmutableSet<Integer>> { // TODO replace `Integer` with future `CollidableInteger` type
 
   public SpecializedSetPropertiesTest() {
     super(AbstractSpecialisedImmutableSet.class);

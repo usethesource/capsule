@@ -15,7 +15,7 @@ import org.junit.runner.RunWith;
 @Ignore
 @RunWith(JUnitQuickcheck.class)
 public class SetMultimapPropertiesOfHchampTest extends
-    AbstractSetMultimapProperties<String, String, PersistentTrieSetMultimap<String, String>> {
+    AbstractSetMultimapProperties<Integer, Integer, PersistentTrieSetMultimap<Integer, Integer>> { // TODO replace `Integer` with new `CollidableInteger` type
 
   public SetMultimapPropertiesOfHchampTest() {
     super(PersistentTrieSetMultimap.class);

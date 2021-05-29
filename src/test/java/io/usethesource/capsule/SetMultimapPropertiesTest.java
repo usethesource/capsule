@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(JUnitQuickcheck.class)
 public class SetMultimapPropertiesTest extends
-    AbstractSetMultimapProperties<String, String, SetMultimap.Immutable<String, String>> {
+    AbstractSetMultimapProperties<Integer, Integer, SetMultimap.Immutable<Integer, Integer>> { // TODO replace `Integer` with future `CollidableInteger` type
 
   public SetMultimapPropertiesTest() {
     super(SetMultimap.Immutable.class);

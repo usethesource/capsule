@@ -14,10 +14,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Static aggregation of set test. Superseeded by {@link RuntimeCodeGenerationTest}.
+ * Static aggregation of set tests. Superseded by {@link RuntimeCodeGenerationTest}.
  */
 @Deprecated
-@Ignore
 @RunWith(Suite.class)
 @Suite.SuiteClasses({SetPropertiesTest.IntegerSetPropertiesTest.class,
     SetPropertiesTest.StringSetPropertiesTest.class})
@@ -25,13 +24,14 @@ public class SetPropertiesTest {
 
   @RunWith(JUnitQuickcheck.class)
   public static class IntegerSetPropertiesTest
-      extends AbstractSetProperties<Integer, PersistentTrieSet<Integer>> {
+      extends AbstractSetProperties<Integer, PersistentTrieSet<Integer>> { // TODO replace `Integer` with future `CollidableInteger` type
 
     public IntegerSetPropertiesTest() {
       super(PersistentTrieSet.class);
     }
   }
 
+  @Ignore
   @RunWith(JUnitQuickcheck.class)
   public static class StringSetPropertiesTest
       extends AbstractSetProperties<String, PersistentTrieSet<String>> {

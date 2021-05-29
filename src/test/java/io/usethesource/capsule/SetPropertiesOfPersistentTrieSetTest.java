@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(JUnitQuickcheck.class)
 public class SetPropertiesOfPersistentTrieSetTest
-    extends AbstractSetProperties<String, PersistentTrieSet<String>> {
+    extends AbstractSetProperties<Integer, PersistentTrieSet<Integer>> { // TODO replace `Integer` with future `CollidableInteger` type
 
   public SetPropertiesOfPersistentTrieSetTest() {
     super(PersistentTrieSet.class);
