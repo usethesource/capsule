@@ -8,6 +8,7 @@
 package io.usethesource.capsule;
 
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
+import io.usethesource.capsule.core.PersistentTrieSetMultimap;
 import org.junit.runner.RunWith;
 
 @RunWith(JUnitQuickcheck.class)
@@ -15,7 +16,7 @@ public class SetMultimapPropertiesTest extends
     AbstractSetMultimapProperties<Integer, Integer, SetMultimap.Immutable<Integer, Integer>> { // TODO replace `Integer` with future `CollidableInteger` type
 
   public SetMultimapPropertiesTest() {
-    super(SetMultimap.Immutable.class);
+    super(PersistentTrieSetMultimap.class);
   }
 
 }
