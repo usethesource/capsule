@@ -18,9 +18,6 @@ import java.io.Serializable;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-import io.usethesource.capsule.core.PersistentTrieMap;
-import io.usethesource.capsule.generators.MapEntryGenerator;
-import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
 import org.junit.runner.RunWith;
 
 @RunWith(JUnitQuickcheck.class)
