@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 import java.util.Random;
 
 import io.usethesource.capsule.core.PersistentTrieMap;
+import io.usethesource.capsule.generators.CollidableInteger;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -177,12 +178,12 @@ public class MapSmokeTest {
     assert !res1.equals(res2);
   }
 
-  public static PureSeparateHashCodeInteger p(int value, int hash) {
-    return new PureSeparateHashCodeInteger(value, hash);
+  public static CollidableInteger p(int value, int hash) {
+    return new CollidableInteger(value, hash);
   }
 
-  public static PureSeparateHashCodeInteger p(int value) {
-    return new PureSeparateHashCodeInteger(value, value);
+  public static CollidableInteger p(int value) {
+    return new CollidableInteger(value, value);
   }
 
   @Test
@@ -372,46 +373,6 @@ public class MapSmokeTest {
     assertTrue(res.isEmpty());
     assertFalse(res.containsKey(63));
     assertEquals(mapOf(), res);
-  }
-
-}
-
-
-class PureSeparateHashCodeInteger {
-
-  private final int value;
-  private final int hash;
-
-  PureSeparateHashCodeInteger(int value, int hash) {
-    this.value = value;
-    this.hash = hash;
-  }
-
-  @Override
-  public int hashCode() {
-    return hash;
-  }
-
-  @Override
-  public boolean equals(Object other) {
-    if (other == null) {
-      return false;
-    }
-    if (other == this) {
-      return true;
-    }
-
-    if (other instanceof PureSeparateHashCodeInteger) {
-      int otherValue = ((PureSeparateHashCodeInteger) other).value;
-
-      return value == otherValue;
-    }
-    return false;
-  }
-
-  @Override
-  public String toString() {
-    return String.format("%d [hash = %d]", value, hash);
   }
 
 }

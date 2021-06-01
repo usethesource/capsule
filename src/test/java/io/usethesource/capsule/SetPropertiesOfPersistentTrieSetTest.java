@@ -9,11 +9,12 @@ package io.usethesource.capsule;
 
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import io.usethesource.capsule.core.PersistentTrieSet;
+import io.usethesource.capsule.generators.CollidableInteger;
 import org.junit.runner.RunWith;
 
 @RunWith(JUnitQuickcheck.class)
 public class SetPropertiesOfPersistentTrieSetTest
-    extends AbstractSetProperties<Integer, PersistentTrieSet<Integer>> { // TODO replace `Integer` with future `CollidableInteger` type
+    extends AbstractSetProperties<CollidableInteger, PersistentTrieSet<CollidableInteger>> {
 
   public SetPropertiesOfPersistentTrieSetTest() {
     super(PersistentTrieSet.class);

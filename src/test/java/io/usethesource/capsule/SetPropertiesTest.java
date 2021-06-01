@@ -9,7 +9,7 @@ package io.usethesource.capsule;
 
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import io.usethesource.capsule.core.PersistentTrieSet;
-import org.junit.Ignore;
+import io.usethesource.capsule.generators.CollidableInteger;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -18,25 +18,14 @@ import org.junit.runners.Suite;
  */
 @Deprecated
 @RunWith(Suite.class)
-@Suite.SuiteClasses({SetPropertiesTest.IntegerSetPropertiesTest.class,
-    SetPropertiesTest.StringSetPropertiesTest.class})
+@Suite.SuiteClasses({SetPropertiesTest.CollidableIntegerSetPropertiesTest.class})
 public class SetPropertiesTest {
 
   @RunWith(JUnitQuickcheck.class)
-  public static class IntegerSetPropertiesTest
-      extends AbstractSetProperties<Integer, PersistentTrieSet<Integer>> { // TODO replace `Integer` with future `CollidableInteger` type
+  public static class CollidableIntegerSetPropertiesTest
+      extends AbstractSetProperties<CollidableInteger, PersistentTrieSet<CollidableInteger>> {
 
-    public IntegerSetPropertiesTest() {
-      super(PersistentTrieSet.class);
-    }
-  }
-
-  @Ignore
-  @RunWith(JUnitQuickcheck.class)
-  public static class StringSetPropertiesTest
-      extends AbstractSetProperties<String, PersistentTrieSet<String>> {
-
-    public StringSetPropertiesTest() {
+    public CollidableIntegerSetPropertiesTest() {
       super(PersistentTrieSet.class);
     }
   }

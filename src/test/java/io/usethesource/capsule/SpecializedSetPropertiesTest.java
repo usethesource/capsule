@@ -8,13 +8,13 @@
 package io.usethesource.capsule;
 
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
+import io.usethesource.capsule.generators.CollidableInteger;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableSet;
 import org.junit.runner.RunWith;
 
 @RunWith(JUnitQuickcheck.class)
 public class SpecializedSetPropertiesTest
-    extends AbstractSetProperties<Integer, AbstractSpecialisedImmutableSet<Integer>> { // TODO replace `Integer` with future `CollidableInteger` type
+    extends AbstractSetProperties<CollidableInteger, AbstractSpecialisedImmutableSet<CollidableInteger>> {
 
   public SpecializedSetPropertiesTest() {
     super(AbstractSpecialisedImmutableSet.class);

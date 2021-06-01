@@ -9,11 +9,12 @@ package io.usethesource.capsule;
 
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import io.usethesource.capsule.core.PersistentTrieMap;
+import io.usethesource.capsule.generators.CollidableInteger;
 import org.junit.runner.RunWith;
 
 @RunWith(JUnitQuickcheck.class)
 public class MapPropertiesTest
-    extends AbstractMapProperties<String, PersistentTrieMap<String, String>> {
+    extends AbstractMapProperties<CollidableInteger, PersistentTrieMap<CollidableInteger, CollidableInteger>> {
 
   public MapPropertiesTest() {
     super(PersistentTrieMap.class);

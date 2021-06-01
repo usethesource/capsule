@@ -9,11 +9,12 @@ package io.usethesource.capsule;
 
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import io.usethesource.capsule.core.PersistentBidirectionalTrieSetMultimap;
+import io.usethesource.capsule.generators.CollidableInteger;
 import org.junit.runner.RunWith;
 
 @RunWith(JUnitQuickcheck.class)
 public class SetMultimapPropertiesOfPersistentBidirectionalTrieSetMultimapTest extends
-    AbstractBinaryRelationProperties<Integer, Integer, PersistentBidirectionalTrieSetMultimap<Integer, Integer>> { // TODO replace `Integer` with future `CollidableInteger` type
+    AbstractBinaryRelationProperties<CollidableInteger, CollidableInteger, PersistentBidirectionalTrieSetMultimap<CollidableInteger, CollidableInteger>> {
 
   public SetMultimapPropertiesOfPersistentBidirectionalTrieSetMultimapTest() {
     super(PersistentBidirectionalTrieSetMultimap.class);
