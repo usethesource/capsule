@@ -10,22 +10,29 @@ package io.usethesource.capsule;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import io.usethesource.capsule.core.PersistentTrieSet;
 import io.usethesource.capsule.generators.CollidableInteger;
+import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableSet;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-/**
- * Static aggregation of set tests. Superseded by {@link RuntimeCodeGenerationTest}.
- */
-@Deprecated
-@RunWith(Suite.class)
-@Suite.SuiteClasses({SetPropertiesTest.CollidableIntegerSetPropertiesTest.class})
-public class SetPropertiesTest {
+@Suite.SuiteClasses({
+    SetPropertiesTestSuite.AbstractSpecialisedImmutableSetTest.class,
+    SetPropertiesTestSuite.PersistentTrieSetTest.class})
+public class SetPropertiesTestSuite {
 
   @RunWith(JUnitQuickcheck.class)
-  public static class CollidableIntegerSetPropertiesTest
+  public static class AbstractSpecialisedImmutableSetTest
+      extends AbstractSetProperties<CollidableInteger, AbstractSpecialisedImmutableSet<CollidableInteger>> {
+
+    public AbstractSpecialisedImmutableSetTest() {
+      super(AbstractSpecialisedImmutableSet.class);
+    }
+  }
+
+  @RunWith(JUnitQuickcheck.class)
+  public static class PersistentTrieSetTest
       extends AbstractSetProperties<CollidableInteger, PersistentTrieSet<CollidableInteger>> {
 
-    public CollidableIntegerSetPropertiesTest() {
+    public PersistentTrieSetTest() {
       super(PersistentTrieSet.class);
     }
   }
