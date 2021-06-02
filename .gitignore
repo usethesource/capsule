@@ -8,3 +8,6 @@ target/
 
 **/.idea
 **/*.iml
+
+.gradle
+build
