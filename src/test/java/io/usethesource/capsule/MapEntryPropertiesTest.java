@@ -7,8 +7,6 @@
  */
 package io.usethesource.capsule;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,10 +18,11 @@ import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.runner.RunWith;
 
+import static io.usethesource.capsule.StaticConfiguration.*;
+import static org.junit.Assert.*;
+
 @RunWith(JUnitQuickcheck.class)
 public class MapEntryPropertiesTest {
-
-  private final int DEFAULT_TRIALS = 1_000;
 
   @Property(trials = DEFAULT_TRIALS)
   public void serializationRoundtrip(Map.Entry<String, String> input) throws Exception {

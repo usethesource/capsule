@@ -7,8 +7,6 @@
  */
 package io.usethesource.capsule;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,17 +16,13 @@ import java.io.Serializable;
 
 import com.pholser.junit.quickcheck.Property;
 
+import static io.usethesource.capsule.StaticConfiguration.*;
+import static org.junit.Assert.*;
+
 /*
  * NOTE: use e.g. @When(seed = 3666151076704776907L) to fix seed for reproducing test run.
  */
 public abstract class AbstractMapProperties<T, CT extends Map.Immutable<T, T>> {
-
-  private final int DEFAULT_TRIALS = 1_000;
-  private final Class<?> type;
-
-  public AbstractMapProperties(Class<?> type) {
-    this.type = type;
-  }
 
   @Property(trials = DEFAULT_TRIALS)
   public void serializationRoundtrip(CT input) throws Exception {

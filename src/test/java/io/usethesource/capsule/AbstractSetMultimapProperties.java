@@ -25,20 +25,10 @@ import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.generator.Size;
 import io.usethesource.capsule.core.PersistentTrieSet;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static io.usethesource.capsule.StaticConfiguration.*;
+import static org.junit.Assert.*;
 
 public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap.Immutable<K, V>> {
-
-  protected final int DEFAULT_TRIALS = 1_000;
-  protected final int MAX_SIZE = 1_000;
-  protected final Class<?> type;
-
-  public AbstractSetMultimapProperties(Class<?> type) {
-    this.type = type;
-  }
 
   @Property(trials = DEFAULT_TRIALS)
   public void convertToJavaSetAndCheckSize(CT input) {
@@ -123,7 +113,7 @@ public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap
    * tuples and checks after each insertion if all inserted tuples are contained (quadratic
    * operation).
    */
-  @Property(trials = DEFAULT_TRIALS)
+  @Property(trials = SQRT_TRIALS)
   public void stepwiseContainsAfterInsert(@Size(max = 0) final CT emptyCollection,
       @Size(min = 1, max = MAX_SIZE) final java.util.HashSet<Map.Entry<K, V>> inputValues) {
 

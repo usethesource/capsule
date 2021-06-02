@@ -22,19 +22,11 @@ public class SetPropertiesTestSuite {
   @RunWith(JUnitQuickcheck.class)
   public static class AbstractSpecialisedImmutableSetTest
       extends AbstractSetProperties<CollidableInteger, AbstractSpecialisedImmutableSet<CollidableInteger>> {
-
-    public AbstractSpecialisedImmutableSetTest() {
-      super(AbstractSpecialisedImmutableSet.class);
-    }
   }
 
   @RunWith(JUnitQuickcheck.class)
   public static class PersistentTrieSetTest
       extends AbstractSetProperties<CollidableInteger, PersistentTrieSet<CollidableInteger>> {
-
-    public PersistentTrieSetTest() {
-      super(PersistentTrieSet.class);
-    }
   }
 
 }

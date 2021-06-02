@@ -7,10 +7,6 @@
  */
 package io.usethesource.capsule;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -22,20 +18,13 @@ import java.util.HashSet;
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.generator.Size;
 
+import static io.usethesource.capsule.StaticConfiguration.*;
+import static org.junit.Assert.*;
+
 /*
  * NOTE: use e.g. @When(seed = 3666151076704776907L) to fix seed for reproducing test run.
  */
 public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
-
-  private final int DEFAULT_TRIALS = 1_000;
-  private final int MORE_TRIALS = 10_000;
-  private final int LESS_TRIALS = 100;
-  private final int MAX_SIZE = 1_000;
-  private final Class<?> type;
-
-  public AbstractSetProperties(Class<?> type) {
-    this.type = type;
-  }
 
   @Property(trials = DEFAULT_TRIALS)
   public void convertToJavaSetAndCheckSize(CT input) {
@@ -83,7 +72,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
    * values and checks after each insertion if all inserted elements are contained (quadratic
    * operation).
    */
-  @Property(trials = DEFAULT_TRIALS)
+  @Property(trials = SQRT_TRIALS)
   public void stepwiseCheckSizeAfterInsertAll(@Size(max = 0) final CT emptySet,
       @Size(min = 1, max = MAX_SIZE) final java.util.HashSet<T> inputValues) {
 
@@ -110,7 +99,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
    * values and checks after each insertion if all inserted elements are contained (quadratic
    * operation).
    */
-  @Property(trials = DEFAULT_TRIALS)
+  @Property(trials = SQRT_TRIALS)
   public void stepwiseContainsAfterInsert(@Size(max = 0) final CT emptySet,
       @Size(min = 1, max = MAX_SIZE) final java.util.HashSet<T> inputValues) {
 
@@ -152,13 +141,13 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     assertFalse(input.__insert(item).__remove(item).contains(item));
   }
 
-  @Property(trials = LESS_TRIALS)
+  @Property(trials = DEFAULT_TRIALS)
   public void intersectIdentityReference(@Size(max = 0) final CT emptySet,
       @Size(max = MAX_SIZE) final CT inputShared) {
     assertEquals("intersect reference equal", inputShared, inputShared.intersect(inputShared));
   }
 
-  @Property(trials = LESS_TRIALS)
+  @Property(trials = DEFAULT_TRIALS)
   public void intersectIdentityStructural(@Size(max = 0) final CT emptySet,
       @Size(max = MAX_SIZE) final CT inputShared) {
     final Set.Transient<T> builder = emptySet.asTransient();
@@ -167,7 +156,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     assertEquals("intersect copy equal", inputShared, inputShared.intersect(builder.freeze()));
   }
 
-  @Property(trials = LESS_TRIALS)
+  @Property(trials = DEFAULT_TRIALS)
   public void intersect(
       @Size(max = MAX_SIZE) final CT inputOne,
       @Size(max = MAX_SIZE) final CT inputTwo,
@@ -192,7 +181,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     assertTrue(intersectedWithShared.stream().noneMatch(twoWithoutShared::contains));
   }
 
-  @Property(trials = LESS_TRIALS)
+  @Property(trials = DEFAULT_TRIALS)
   public void intersectMaintainsSizeAndHashCode(
       @Size(max = MAX_SIZE) final CT inputOne,
       @Size(max = MAX_SIZE) final CT inputTwo,
@@ -206,7 +195,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     convertToJavaSetAndCheckHashCode(intersectedWithShared);
   }
 
-  @Property(trials = LESS_TRIALS)
+  @Property(trials = DEFAULT_TRIALS)
   public void intersectEqualToDefaultImplementation(
       @Size(max = MAX_SIZE) final CT inputOne,
       @Size(max = MAX_SIZE) final CT inputTwo,
@@ -221,7 +210,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     assertEquals(intersectDefault, intersectNative);
   }
 
-  @Property(trials = LESS_TRIALS)
+  @Property(trials = DEFAULT_TRIALS)
   public void intersectIdentityMostlyReference(
       @Size(max = MAX_SIZE) final CT input, T key) {
 
@@ -240,13 +229,13 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     assertEquals(input, intersectionR);
   }
 
-  @Property(trials = LESS_TRIALS)
+  @Property(trials = DEFAULT_TRIALS)
   public void unionIdentityReference(@Size(max = 0) final CT emptySet,
       @Size(max = MAX_SIZE) final CT inputShared) {
     assertEquals("union reference equal", inputShared, inputShared.union(inputShared));
   }
 
-  @Property(trials = LESS_TRIALS)
+  @Property(trials = DEFAULT_TRIALS)
   public void unionIdentityMostlyReference(@Size(max = 0) final CT emptySet,
       @Size(max = MAX_SIZE) final CT input, T key) {
 
@@ -265,7 +254,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     assertEquals(input, unionR);
   }
 
-  @Property(trials = LESS_TRIALS)
+  @Property(trials = DEFAULT_TRIALS)
   public void unionIdentityStructural(@Size(max = 0) final CT emptySet,
       @Size(max = MAX_SIZE) final CT inputShared) {
     final Set.Transient<T> builder = emptySet.asTransient();
@@ -274,7 +263,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     assertEquals("union copy equal", inputShared, inputShared.union(builder.freeze()));
   }
 
-  @Property(trials = LESS_TRIALS)
+  @Property(trials = DEFAULT_TRIALS)
   public void union(
       @Size(max = MAX_SIZE) final CT inputOne,
       @Size(max = MAX_SIZE) final CT inputTwo) {
@@ -285,7 +274,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     assertTrue(unioned.stream().allMatch(inputTwo::contains));
   }
 
-  @Property(trials = LESS_TRIALS)
+  @Property(trials = DEFAULT_TRIALS)
   public void unionMaintainsSizeAndHashCode(
       @Size(max = MAX_SIZE) final CT inputOne,
       @Size(max = MAX_SIZE) final CT inputTwo) {
@@ -296,7 +285,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     convertToJavaSetAndCheckHashCode(unioned);
   }
 
-  @Property(trials = LESS_TRIALS)
+  @Property(trials = DEFAULT_TRIALS)
   public void unionEqualToDefaultImplementation(
       @Size(max = MAX_SIZE) final CT inputOne,
       @Size(max = MAX_SIZE) final CT inputTwo) {
@@ -307,7 +296,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     assertEquals(unionDefault, unionNative);
   }
 
-  @Property(trials = LESS_TRIALS)
+  @Property(trials = DEFAULT_TRIALS)
   public void subtract(
       @Size(max = MAX_SIZE) final CT inputOne,
       @Size(max = MAX_SIZE) final CT inputTwo) {
@@ -318,7 +307,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     assertTrue(subtracted.stream().noneMatch(inputTwo::contains));
   }
 
-  @Property(trials = LESS_TRIALS)
+  @Property(trials = DEFAULT_TRIALS)
   public void subtractMaintainsSizeAndHashCode(
       @Size(max = MAX_SIZE) final CT inputOne,
       @Size(max = MAX_SIZE) final CT inputTwo) {
@@ -329,13 +318,13 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     convertToJavaSetAndCheckHashCode(subtracted);
   }
 
-  @Property(trials = LESS_TRIALS)
+  @Property(trials = DEFAULT_TRIALS)
   public void subtractIdentityReference(@Size(max = 0) final CT emptySet,
       @Size(max = MAX_SIZE) final CT inputShared) {
     assertEquals("subtract reference equal", emptySet, inputShared.subtract(inputShared));
   }
 
-  @Property(trials = LESS_TRIALS)
+  @Property(trials = DEFAULT_TRIALS)
   public void subtractIdentityMostlyReference(@Size(max = 0) final CT emptySet,
       @Size(max = MAX_SIZE) final CT input, T key) {
 
@@ -354,7 +343,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     assertEquals(emptySet, subtractionR);
   }
 
-  @Property(trials = LESS_TRIALS)
+  @Property(trials = DEFAULT_TRIALS)
   public void subtractIdentityStructural(@Size(max = 0) final CT emptySet,
       @Size(max = MAX_SIZE) final CT inputShared) {
     final Set.Transient<T> builder = emptySet.asTransient();
@@ -363,7 +352,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     assertEquals("subtract copy equal", emptySet, inputShared.subtract(builder.freeze()));
   }
 
-  @Property(trials = LESS_TRIALS)
+  @Property(trials = DEFAULT_TRIALS)
   public void subtract(
       @Size(max = MAX_SIZE) final CT inputOne,
       @Size(max = MAX_SIZE) final CT inputTwo,
@@ -388,7 +377,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     assertTrue(subtractedWithShared.stream().noneMatch(twoWithoutShared::contains));
   }
 
-  @Property(trials = LESS_TRIALS)
+  @Property(trials = DEFAULT_TRIALS)
   public void subtractMaintainsSizeAndHashCode(
       @Size(max = MAX_SIZE) final CT inputOne,
       @Size(max = MAX_SIZE) final CT inputTwo,
@@ -402,7 +391,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
     convertToJavaSetAndCheckHashCode(subtractedWithShared);
   }
 
-  @Property(trials = LESS_TRIALS)
+  @Property(trials = DEFAULT_TRIALS)
   public void subtractEqualToDefaultImplementation(
       @Size(max = MAX_SIZE) final CT inputOne,
       @Size(max = MAX_SIZE) final CT inputTwo,

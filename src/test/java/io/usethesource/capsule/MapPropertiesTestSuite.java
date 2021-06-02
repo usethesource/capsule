@@ -22,19 +22,11 @@ public class MapPropertiesTestSuite {
   @RunWith(JUnitQuickcheck.class)
   public static class AbstractSpecialisedImmutableMapTest
       extends AbstractMapProperties<CollidableInteger, AbstractSpecialisedImmutableMap<CollidableInteger, CollidableInteger>> {
-
-    public AbstractSpecialisedImmutableMapTest() {
-      super(AbstractSpecialisedImmutableMap.class);
-    }
   }
 
   @RunWith(JUnitQuickcheck.class)
   public static class PersistentTrieMapTest
       extends AbstractMapProperties<CollidableInteger, PersistentTrieMap<CollidableInteger, CollidableInteger>> {
-
-    public PersistentTrieMapTest() {
-      super(PersistentTrieMap.class);
-    }
   }
 
 }
