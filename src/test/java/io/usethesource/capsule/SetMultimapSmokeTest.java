@@ -24,7 +24,7 @@ public class SetMultimapSmokeTest<K, V, CT extends SetMultimap.Immutable<K, V>> 
 
   @Property
   public void testInsertTwoTuplesThatShareSameKey(
-      @Size(min = 0, max = 0) final SetMultimap.Immutable<Integer, String> emptyCollection) {
+      @Size(max = 0) final SetMultimap.Immutable<Integer, String> emptyCollection) {
 
     SetMultimap.Immutable<Integer, String> map = emptyCollection
         .__insert(1, "x")
@@ -36,7 +36,7 @@ public class SetMultimapSmokeTest<K, V, CT extends SetMultimap.Immutable<K, V>> 
 
   @Property
   public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyX(
-      @Size(min = 0, max = 0) final SetMultimap.Immutable<Integer, String> emptyCollection) {
+      @Size(max = 0) final SetMultimap.Immutable<Integer, String> emptyCollection) {
 
     SetMultimap.Immutable<Integer, String> map = emptyCollection
         .__insert(1, "x")
@@ -49,7 +49,7 @@ public class SetMultimapSmokeTest<K, V, CT extends SetMultimap.Immutable<K, V>> 
 
   @Property
   public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyY(
-      @Size(min = 0, max = 0) final SetMultimap.Immutable<Integer, String> emptyCollection) {
+      @Size(max = 0) final SetMultimap.Immutable<Integer, String> emptyCollection) {
 
     SetMultimap.Immutable<Integer, String> map = emptyCollection
         .__insert(1, "x")
@@ -62,7 +62,7 @@ public class SetMultimapSmokeTest<K, V, CT extends SetMultimap.Immutable<K, V>> 
 
   @Property
   public void testInsertTwoTuplesWithOneRemoveThatShareSameKeyXY(
-      @Size(min = 0, max = 0) final SetMultimap.Immutable<Integer, String> emptyCollection) {
+      @Size(max = 0) final SetMultimap.Immutable<Integer, String> emptyCollection) {
 
     SetMultimap.Immutable<Integer, String> map = emptyCollection
         .__insert(1, "x")
@@ -75,7 +75,7 @@ public class SetMultimapSmokeTest<K, V, CT extends SetMultimap.Immutable<K, V>> 
 
   @Property
   public void testInsertTwoTuplesThatShareSameKey_Iterate(
-      @Size(min = 0, max = 0) final SetMultimap.Immutable<Integer, String> emptyCollection) {
+      @Size(max = 0) final SetMultimap.Immutable<Integer, String> emptyCollection) {
 
     SetMultimap.Immutable<Integer, String> map = emptyCollection
         .__insert(1, "x")
@@ -90,7 +90,7 @@ public class SetMultimapSmokeTest<K, V, CT extends SetMultimap.Immutable<K, V>> 
 
   @Property
   public void testHashCollisionReproduction(
-      @Size(min = 0, max = 0) final SetMultimap.Immutable<Object, String> emptyCollection) {
+      @Size(max = 0) final SetMultimap.Immutable<Object, String> emptyCollection) {
 
     Object a = new Object() {
       public int hashCode() {
