@@ -3,9 +3,10 @@ plugins {
 }
 
 val majorMinorPatchVersion = "0.7.1"
+val isSnapshotBuild = !project.hasProperty("isReleaseBuild")
 
 version = majorMinorPatchVersion.let {
-  if (project.hasProperty("isReleaseBuild")) "${it}" else "${it}-SNAPSHOT"
+  if (isSnapshotBuild) "${it}-SNAPSHOT" else "${it}"
 }
 
 val junitVersion by extra { "5.8.2" }
@@ -40,6 +41,10 @@ tasks.test {
   maxHeapSize = "1G"
 
   filter {
+    if (isSnapshotBuild) {
+      excludeTestsMatching("*stepwise*")
+    }
+
     if (project.hasProperty("ignoreKnownFailures")) {
       excludeTestsMatching("*SetMultimapPropertiesTestSuite\$PersistentTrieSetMultimapTest.sizeAfterInsertKeyValues")
       excludeTestsMatching("*SetMultimapPropertiesTestSuite\$PersistentTrieSetMultimapTest.sizeAfterTransientInsertKeyValues")
