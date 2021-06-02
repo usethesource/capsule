@@ -55,7 +55,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 
   @Property(trials = DEFAULT_TRIALS)
   public void checkEquality(
-      @Size(min = 0, max = 0) final CT emptySet,
+      @Size(max = 0) final CT emptySet,
       @Size(min = 1, max = MAX_SIZE) final CT input) {
 
     final Set.Transient<T> builder = emptySet.asTransient();
@@ -72,7 +72,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 
   @Property(trials = DEFAULT_TRIALS)
   public void checkSizeAfterInsertAll(
-      @Size(min = 0, max = 0) final CT emptySet,
+      @Size(max = 0) final CT emptySet,
       @Size(min = 1, max = MAX_SIZE) final java.util.HashSet<T> inputValues) {
     CT testSet = (CT) emptySet.__insertAll(inputValues);
     assertEquals(inputValues.size(), testSet.size());
@@ -84,7 +84,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
    * operation).
    */
   @Property(trials = DEFAULT_TRIALS)
-  public void stepwiseCheckSizeAfterInsertAll(@Size(min = 0, max = 0) final CT emptySet,
+  public void stepwiseCheckSizeAfterInsertAll(@Size(max = 0) final CT emptySet,
       @Size(min = 1, max = MAX_SIZE) final java.util.HashSet<T> inputValues) {
 
     int expectedSize = 0;
@@ -111,7 +111,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
    * operation).
    */
   @Property(trials = DEFAULT_TRIALS)
-  public void stepwiseContainsAfterInsert(@Size(min = 0, max = 0) final CT emptySet,
+  public void stepwiseContainsAfterInsert(@Size(max = 0) final CT emptySet,
       @Size(min = 1, max = MAX_SIZE) final java.util.HashSet<T> inputValues) {
 
     final HashSet<T> insertedValues = new HashSet<>(inputValues.size());
@@ -132,7 +132,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
   }
 
   @Property(trials = DEFAULT_TRIALS)
-  public void containsAfterInsert(@Size(min = 0, max = 0) final CT emptySet,
+  public void containsAfterInsert(@Size(max = 0) final CT emptySet,
       @Size(min = 1, max = MAX_SIZE) final java.util.HashSet<T> inputValues) {
 
     CT testSet = emptySet;
@@ -153,14 +153,14 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
   }
 
   @Property(trials = LESS_TRIALS)
-  public void intersectIdentityReference(@Size(min = 0, max = 0) final CT emptySet,
-      @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
+  public void intersectIdentityReference(@Size(max = 0) final CT emptySet,
+      @Size(max = MAX_SIZE) final CT inputShared) {
     assertEquals("intersect reference equal", inputShared, inputShared.intersect(inputShared));
   }
 
   @Property(trials = LESS_TRIALS)
-  public void intersectIdentityStructural(@Size(min = 0, max = 0) final CT emptySet,
-      @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
+  public void intersectIdentityStructural(@Size(max = 0) final CT emptySet,
+      @Size(max = MAX_SIZE) final CT inputShared) {
     final Set.Transient<T> builder = emptySet.asTransient();
     inputShared.forEach(builder::__insert);
 
@@ -169,9 +169,9 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 
   @Property(trials = LESS_TRIALS)
   public void intersect(
-      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
-      @Size(min = 0, max = MAX_SIZE) final CT inputTwo,
-      @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
+      @Size(max = MAX_SIZE) final CT inputOne,
+      @Size(max = MAX_SIZE) final CT inputTwo,
+      @Size(max = MAX_SIZE) final CT inputShared) {
 
     CT oneWithoutShared = (CT) inputOne.__removeAll(inputShared).__removeAll(inputTwo);
     CT twoWithoutShared = (CT) inputTwo.__removeAll(inputShared).__removeAll(inputOne);
@@ -194,9 +194,9 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 
   @Property(trials = LESS_TRIALS)
   public void intersectMaintainsSizeAndHashCode(
-      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
-      @Size(min = 0, max = MAX_SIZE) final CT inputTwo,
-      @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
+      @Size(max = MAX_SIZE) final CT inputOne,
+      @Size(max = MAX_SIZE) final CT inputTwo,
+      @Size(max = MAX_SIZE) final CT inputShared) {
 
     CT oneWithShared = (CT) inputOne.__insertAll(inputShared);
     CT twoWithShared = (CT) inputTwo.__insertAll(inputShared);
@@ -208,9 +208,9 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 
   @Property(trials = LESS_TRIALS)
   public void intersectEqualToDefaultImplementation(
-      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
-      @Size(min = 0, max = MAX_SIZE) final CT inputTwo,
-      @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
+      @Size(max = MAX_SIZE) final CT inputOne,
+      @Size(max = MAX_SIZE) final CT inputTwo,
+      @Size(max = MAX_SIZE) final CT inputShared) {
 
     CT oneWithShared = (CT) inputOne.__insertAll(inputShared);
     CT twoWithShared = (CT) inputTwo.__insertAll(inputShared);
@@ -223,7 +223,7 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 
   @Property(trials = LESS_TRIALS)
   public void intersectIdentityMostlyReference(
-      @Size(min = 0, max = MAX_SIZE) final CT input, T key) {
+      @Size(max = MAX_SIZE) final CT input, T key) {
 
     final CT inputCopy;
 
@@ -241,14 +241,14 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
   }
 
   @Property(trials = LESS_TRIALS)
-  public void unionIdentityReference(@Size(min = 0, max = 0) final CT emptySet,
-      @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
+  public void unionIdentityReference(@Size(max = 0) final CT emptySet,
+      @Size(max = MAX_SIZE) final CT inputShared) {
     assertEquals("union reference equal", inputShared, inputShared.union(inputShared));
   }
 
   @Property(trials = LESS_TRIALS)
-  public void unionIdentityMostlyReference(@Size(min = 0, max = 0) final CT emptySet,
-      @Size(min = 0, max = MAX_SIZE) final CT input, T key) {
+  public void unionIdentityMostlyReference(@Size(max = 0) final CT emptySet,
+      @Size(max = MAX_SIZE) final CT input, T key) {
 
     final CT inputCopy;
 
@@ -266,8 +266,8 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
   }
 
   @Property(trials = LESS_TRIALS)
-  public void unionIdentityStructural(@Size(min = 0, max = 0) final CT emptySet,
-      @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
+  public void unionIdentityStructural(@Size(max = 0) final CT emptySet,
+      @Size(max = MAX_SIZE) final CT inputShared) {
     final Set.Transient<T> builder = emptySet.asTransient();
     inputShared.forEach(builder::__insert);
 
@@ -276,8 +276,8 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 
   @Property(trials = LESS_TRIALS)
   public void union(
-      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
-      @Size(min = 0, max = MAX_SIZE) final CT inputTwo) {
+      @Size(max = MAX_SIZE) final CT inputOne,
+      @Size(max = MAX_SIZE) final CT inputTwo) {
 
     CT unioned = (CT) inputOne.intersect(inputTwo);
 
@@ -287,8 +287,8 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 
   @Property(trials = LESS_TRIALS)
   public void unionMaintainsSizeAndHashCode(
-      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
-      @Size(min = 0, max = MAX_SIZE) final CT inputTwo) {
+      @Size(max = MAX_SIZE) final CT inputOne,
+      @Size(max = MAX_SIZE) final CT inputTwo) {
 
     CT unioned = (CT) inputOne.union(inputTwo);
 
@@ -298,8 +298,8 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 
   @Property(trials = LESS_TRIALS)
   public void unionEqualToDefaultImplementation(
-      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
-      @Size(min = 0, max = MAX_SIZE) final CT inputTwo) {
+      @Size(max = MAX_SIZE) final CT inputOne,
+      @Size(max = MAX_SIZE) final CT inputTwo) {
 
     CT unionNative = (CT) inputOne.union(inputTwo);
     CT unionDefault = (CT) Set.Immutable.union(inputOne, inputTwo);
@@ -309,8 +309,8 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 
   @Property(trials = LESS_TRIALS)
   public void subtract(
-      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
-      @Size(min = 0, max = MAX_SIZE) final CT inputTwo) {
+      @Size(max = MAX_SIZE) final CT inputOne,
+      @Size(max = MAX_SIZE) final CT inputTwo) {
 
     CT subtracted = (CT) inputOne.subtract(inputTwo);
 
@@ -320,8 +320,8 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 
   @Property(trials = LESS_TRIALS)
   public void subtractMaintainsSizeAndHashCode(
-      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
-      @Size(min = 0, max = MAX_SIZE) final CT inputTwo) {
+      @Size(max = MAX_SIZE) final CT inputOne,
+      @Size(max = MAX_SIZE) final CT inputTwo) {
 
     CT subtracted = (CT) inputOne.subtract(inputTwo);
 
@@ -330,14 +330,14 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
   }
 
   @Property(trials = LESS_TRIALS)
-  public void subtractIdentityReference(@Size(min = 0, max = 0) final CT emptySet,
-      @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
+  public void subtractIdentityReference(@Size(max = 0) final CT emptySet,
+      @Size(max = MAX_SIZE) final CT inputShared) {
     assertEquals("subtract reference equal", emptySet, inputShared.subtract(inputShared));
   }
 
   @Property(trials = LESS_TRIALS)
-  public void subtractIdentityMostlyReference(@Size(min = 0, max = 0) final CT emptySet,
-      @Size(min = 0, max = MAX_SIZE) final CT input, T key) {
+  public void subtractIdentityMostlyReference(@Size(max = 0) final CT emptySet,
+      @Size(max = MAX_SIZE) final CT input, T key) {
 
     final CT inputCopy;
 
@@ -355,8 +355,8 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
   }
 
   @Property(trials = LESS_TRIALS)
-  public void subtractIdentityStructural(@Size(min = 0, max = 0) final CT emptySet,
-      @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
+  public void subtractIdentityStructural(@Size(max = 0) final CT emptySet,
+      @Size(max = MAX_SIZE) final CT inputShared) {
     final Set.Transient<T> builder = emptySet.asTransient();
     inputShared.forEach(builder::__insert);
 
@@ -365,9 +365,9 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 
   @Property(trials = LESS_TRIALS)
   public void subtract(
-      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
-      @Size(min = 0, max = MAX_SIZE) final CT inputTwo,
-      @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
+      @Size(max = MAX_SIZE) final CT inputOne,
+      @Size(max = MAX_SIZE) final CT inputTwo,
+      @Size(max = MAX_SIZE) final CT inputShared) {
 
     CT oneWithoutShared = (CT) inputOne.__removeAll(inputShared).__removeAll(inputTwo);
     CT twoWithoutShared = (CT) inputTwo.__removeAll(inputShared).__removeAll(inputOne);
@@ -390,9 +390,9 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 
   @Property(trials = LESS_TRIALS)
   public void subtractMaintainsSizeAndHashCode(
-      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
-      @Size(min = 0, max = MAX_SIZE) final CT inputTwo,
-      @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
+      @Size(max = MAX_SIZE) final CT inputOne,
+      @Size(max = MAX_SIZE) final CT inputTwo,
+      @Size(max = MAX_SIZE) final CT inputShared) {
 
     CT oneWithShared = (CT) inputOne.__insertAll(inputShared);
     CT twoWithShared = (CT) inputTwo.__insertAll(inputShared);
@@ -404,9 +404,9 @@ public abstract class AbstractSetProperties<T, CT extends Set.Immutable<T>> {
 
   @Property(trials = LESS_TRIALS)
   public void subtractEqualToDefaultImplementation(
-      @Size(min = 0, max = MAX_SIZE) final CT inputOne,
-      @Size(min = 0, max = MAX_SIZE) final CT inputTwo,
-      @Size(min = 0, max = MAX_SIZE) final CT inputShared) {
+      @Size(max = MAX_SIZE) final CT inputOne,
+      @Size(max = MAX_SIZE) final CT inputTwo,
+      @Size(max = MAX_SIZE) final CT inputShared) {
 
     CT oneWithShared = (CT) inputOne.__insertAll(inputShared);
     CT twoWithShared = (CT) inputTwo.__insertAll(inputShared);

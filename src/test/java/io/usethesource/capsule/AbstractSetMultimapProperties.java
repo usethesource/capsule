@@ -60,7 +60,7 @@ public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap
   }
 
   @Property(trials = DEFAULT_TRIALS)
-  public void mapEqualsOtherMap(@Size(min = 0, max = 0) final CT emptyCollection,
+  public void mapEqualsOtherMap(@Size(max = 0) final CT emptyCollection,
       final SetMultimap.Immutable<K, V> thatMap) {
     final SetMultimap.Transient builder = emptyCollection.asTransient();
     thatMap.entryIterator()
@@ -124,7 +124,7 @@ public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap
    * operation).
    */
   @Property(trials = DEFAULT_TRIALS)
-  public void stepwiseContainsAfterInsert(@Size(min = 0, max = 0) final CT emptyCollection,
+  public void stepwiseContainsAfterInsert(@Size(max = 0) final CT emptyCollection,
       @Size(min = 1, max = MAX_SIZE) final java.util.HashSet<Map.Entry<K, V>> inputValues) {
 
     final HashSet<Map.Entry<K, V>> insertedValues = new HashSet<>(inputValues.size());
@@ -146,7 +146,7 @@ public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap
   }
 
   @Property(trials = DEFAULT_TRIALS)
-  public void containsAfterInsert(@Size(min = 0, max = 0) final CT emptyCollection,
+  public void containsAfterInsert(@Size(max = 0) final CT emptyCollection,
       @Size(min = 1, max = MAX_SIZE) final java.util.HashSet<Map.Entry<K, V>> inputValues) {
 
     CT testCollection = emptyCollection;
@@ -171,7 +171,7 @@ public abstract class AbstractSetMultimapProperties<K, V, CT extends SetMultimap
   }
 
   @Property(trials = DEFAULT_TRIALS)
-  public void entryIteratorAfterInsert(@Size(min = 0, max = 0) final CT emptyCollection,
+  public void entryIteratorAfterInsert(@Size(max = 0) final CT emptyCollection,
       @Size(min = 1, max = MAX_SIZE) final java.util.HashSet<Map.Entry<K, V>> inputValues) {
 
     CT testCollection = emptyCollection;
