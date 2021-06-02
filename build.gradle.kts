@@ -29,6 +29,12 @@ tasks.compileJava {
   options.release.set(11)
 }
 
+tasks.jar {
+  manifest {
+    attributes["Automatic-Module-Name"] = "io.usethesource.capsule"
+  }
+}
+
 tasks.test {
   maxParallelForks = 8
   maxHeapSize = "1G"
