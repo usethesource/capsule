@@ -12,14 +12,11 @@ import java.util.stream.Stream;
 
 import com.pholser.junit.quickcheck.Property;
 
-import static org.junit.Assert.assertTrue;
+import static io.usethesource.capsule.StaticConfiguration.*;
+import static org.junit.Assert.*;
 
 public abstract class AbstractBinaryRelationProperties<K, V, CT extends BinaryRelation.Immutable<K, V>>
     extends AbstractSetMultimapProperties<K, V, CT> {
-
-  public AbstractBinaryRelationProperties(Class<?> type) {
-    super(type);
-  }
 
   @Property(trials = DEFAULT_TRIALS)
   public void inverse(CT input) {

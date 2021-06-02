@@ -22,19 +22,11 @@ public class SetMultimapPropertiesTestSuite {
   @RunWith(JUnitQuickcheck.class)
   public static class PersistentBidirectionalTrieSetMultimapTest extends
       AbstractBinaryRelationProperties<CollidableInteger, CollidableInteger, PersistentBidirectionalTrieSetMultimap<CollidableInteger, CollidableInteger>> {
-
-    public PersistentBidirectionalTrieSetMultimapTest() {
-      super(PersistentBidirectionalTrieSetMultimap.class);
-    }
   }
 
   @RunWith(JUnitQuickcheck.class)
   public static class PersistentTrieSetMultimapTest extends
       AbstractSetMultimapProperties<CollidableInteger, CollidableInteger, PersistentTrieSetMultimap<CollidableInteger, CollidableInteger>> {
-
-    public PersistentTrieSetMultimapTest() {
-      super(PersistentTrieSetMultimap.class);
-    }
   }
 
 }
