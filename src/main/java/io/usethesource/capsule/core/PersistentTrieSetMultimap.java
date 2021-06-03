@@ -2463,6 +2463,11 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
+    public AbstractSetMultimapNode<K, V> inserted(AtomicReference<Thread> mutator, K key, io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details, EqualityComparator<Object> cmp) {
+      throw UOE_NOT_YET_IMPLEMENTED_FACTORY.get(); // TODO
+    }
+
+    @Override
     public AbstractSetMultimapNode<K, V> insertedSingle(AtomicReference<Thread> mutator, K key,
         V value,
         int keyHash, int shift,
@@ -2540,6 +2545,11 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
+    public AbstractSetMultimapNode<K, V> insertedMultiple(AtomicReference<Thread> mutator, K key, io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details, EqualityComparator<Object> cmp) {
+      throw UOE_NOT_YET_IMPLEMENTED_FACTORY.get(); // TODO
+    }
+
+    @Override
     public AbstractSetMultimapNode<K, V> updatedSingle(AtomicReference<Thread> mutator, K key,
         V value,
         int keyHash,
@@ -2590,6 +2600,11 @@ public class PersistentTrieSetMultimap<K, V> extends
         details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE));
         return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
       }
+    }
+
+    @Override
+    public AbstractSetMultimapNode<K, V> updatedMultiple(AtomicReference<Thread> mutator, K key, io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details, EqualityComparator<Object> cmp) {
+      throw UOE_NOT_YET_IMPLEMENTED_FACTORY.get(); // TODO
     }
 
     @Override
