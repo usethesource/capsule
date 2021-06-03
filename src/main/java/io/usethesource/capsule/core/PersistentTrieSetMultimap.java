@@ -596,7 +596,7 @@ public class PersistentTrieSetMultimap<K, V> extends
       assert !(cmp.equals(key0, key1));
 
       if (shift >= HASH_CODE_LENGTH) {
-        return AbstractHashCollisionNode.of(keyHash0, key1, valColl1, key0, valColl1);
+        return AbstractHashCollisionNode.of(keyHash0, key1, valColl1, key0, valColl0);
       }
 
       final int mask0 = mask(keyHash0, shift);
