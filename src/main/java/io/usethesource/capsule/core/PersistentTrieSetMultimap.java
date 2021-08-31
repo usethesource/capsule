@@ -783,20 +783,6 @@ public class PersistentTrieSetMultimap<K, V> extends
       return Optional.empty();
     }
 
-    @Override
-    public AbstractSetMultimapNode<K, V> inserted(final AtomicReference<Thread> mutator,
-        final K key, final io.usethesource.capsule.Set.Immutable<V> values, final int keyHash,
-        final int shift,
-        final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details,
-        EqualityComparator<Object> cmp) {
-      if (values.size() == 1) {
-        final V value = values.findFirst().get();
-        return insertedSingle(mutator, key, value, keyHash, shift, details, cmp);
-      } else {
-        return insertedMultiple(mutator, key, values, keyHash, shift, details, cmp);
-      }
-    }
-
     @Override // TODO: final
     public AbstractSetMultimapNode<K, V> insertedSingle(final AtomicReference<Thread> mutator,
         final K key,
@@ -2463,11 +2449,6 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
-    public AbstractSetMultimapNode<K, V> inserted(AtomicReference<Thread> mutator, K key, io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details, EqualityComparator<Object> cmp) {
-      throw UOE_NOT_YET_IMPLEMENTED_FACTORY.get(); // TODO
-    }
-
-    @Override
     public AbstractSetMultimapNode<K, V> insertedSingle(AtomicReference<Thread> mutator, K key,
         V value,
         int keyHash, int shift,
@@ -2546,7 +2527,84 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     @Override
     public AbstractSetMultimapNode<K, V> insertedMultiple(AtomicReference<Thread> mutator, K key, io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details, EqualityComparator<Object> cmp) {
-      throw UOE_NOT_YET_IMPLEMENTED_FACTORY.get(); // TODO
+      Optional<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> optionalTuple =
+          collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
+
+      if (optionalTuple.isPresent()) {
+        // contains key
+
+        io.usethesource.capsule.Set.Immutable<V> currentValues =
+            optionalTuple.get().getValue();
+
+        if (currentValues.containsAllEquivalent(values, cmp)) {
+          // contains key and (all) values
+          // // details.unchanged();
+          return this;
+
+        } else {
+          // contains key but not (all) values
+
+          Function<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>, Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> substitutionMapper =
+              (kImmutableSetEntry) -> {
+                if (kImmutableSetEntry == optionalTuple.get()) {
+                  io.usethesource.capsule.Set.Immutable<V> updatedValues =
+                      currentValues.__insertAllEquivalent(values, cmp); // TODO capture size delta
+                  return entryOf(key, updatedValues);
+                } else {
+                  return kImmutableSetEntry;
+                }
+              };
+
+          List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> updatedCollisionContent =
+              collisionContent.stream().map(substitutionMapper).collect(Collectors.toList());
+
+          // TODO not all API uses EqualityComparator
+          // TODO does not check that remainder is unmodified
+          assert updatedCollisionContent.size() == collisionContent.size();
+          assert updatedCollisionContent.contains(optionalTuple.get()) == false;
+          // assert updatedCollisionContent.contains(entryOf(key, values.__insertEquivalent(val,
+          // cmp)));
+          assert updatedCollisionContent.stream()
+              .filter(entry -> cmp.equals(key, entry.getKey())
+                  && entry.getValue().containsAllEquivalent(values, cmp))
+              .findAny().isPresent();
+
+          final io.usethesource.capsule.Set.Immutable<V> updatedValues =
+              updatedCollisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny().get().getValue();
+          final int sizeDelta = updatedValues.size() - currentValues.size();
+
+          if (sizeDelta == 1) {
+            details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_VALUE), sizeDelta);
+          } else {
+            details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_VALUE_COLLECTION), sizeDelta);
+          }
+
+          return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
+        }
+      } else {
+        // does not contain key
+
+        Stream.Builder<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> builder =
+            Stream.<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>>builder()
+                .add(entryOf(key, io.usethesource.capsule.Set.Immutable.<V>of().__insertAllEquivalent(values, cmp)));
+
+        collisionContent.forEach(builder::accept);
+
+        List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> updatedCollisionContent =
+            builder.build().collect(Collectors.toList());
+
+        // TODO not all API uses EqualityComparator
+        assert updatedCollisionContent.size() == collisionContent.size() + 1;
+        assert updatedCollisionContent.containsAll(collisionContent);
+        // assert updatedCollisionContent.contains(entryOf(key, setOf(val)));
+        assert updatedCollisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())
+                && Objects.equals(io.usethesource.capsule.Set.Immutable.<V>of().__insertAllEquivalent(values, cmp), entry.getValue()))
+            .findAny()
+            .isPresent();
+
+        details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE_COLLECTION), values.size());
+        return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
+      }
     }
 
     @Override
@@ -2604,7 +2662,51 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     @Override
     public AbstractSetMultimapNode<K, V> updatedMultiple(AtomicReference<Thread> mutator, K key, io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details, EqualityComparator<Object> cmp) {
-      throw UOE_NOT_YET_IMPLEMENTED_FACTORY.get(); // TODO
+      Optional<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> optionalTuple =
+          collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
+
+      if (optionalTuple.isPresent()) {
+        // contains key -> replace val anyways
+
+        io.usethesource.capsule.Set.Immutable<V> currentValues =
+            optionalTuple.get().getValue();
+
+        Function<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>, Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> substitutionMapper =
+            (kImmutableSetEntry) -> {
+              if (kImmutableSetEntry == optionalTuple.get()) {
+                io.usethesource.capsule.Set.Immutable<V> updatedValues =
+                    io.usethesource.capsule.Set.Immutable.<V>of().__insertAllEquivalent(values, cmp);
+                return entryOf(key, updatedValues);
+              } else {
+                return kImmutableSetEntry;
+              }
+            };
+
+        List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> updatedCollisionContent =
+            collisionContent.stream().map(substitutionMapper).collect(Collectors.toList());
+
+        if (currentValues.size() == 1) {
+          details.modified(REPLACED_PAYLOAD, MultimapResult.Modification.flag(REPLACED_VALUE), currentValues);
+        } else {
+          details.modified(REPLACED_PAYLOAD, MultimapResult.Modification.flag(REPLACED_VALUE_COLLECTION), currentValues);
+        }
+
+        return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
+      } else {
+        // does not contain key
+
+        Stream.Builder<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> builder =
+            Stream.<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>>builder()
+                .add(entryOf(key, io.usethesource.capsule.Set.Immutable.<V>of().__insertAllEquivalent(values, cmp)));
+
+        collisionContent.forEach(builder::accept);
+
+        List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> updatedCollisionContent =
+            builder.build().collect(Collectors.toList());
+
+        details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE_COLLECTION));
+        return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
+      }
     }
 
     @Override
