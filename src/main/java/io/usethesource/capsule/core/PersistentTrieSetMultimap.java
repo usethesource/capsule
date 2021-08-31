@@ -2568,7 +2568,7 @@ public class PersistentTrieSetMultimap<K, V> extends
             (kImmutableSetEntry) -> {
               if (kImmutableSetEntry == optionalTuple.get()) {
                 io.usethesource.capsule.Set.Immutable<V> updatedValues =
-                    values.__insertEquivalent(value, cmp);
+                    io.usethesource.capsule.Set.Immutable.of(value);
                 return entryOf(key, updatedValues);
               } else {
                 return kImmutableSetEntry;
