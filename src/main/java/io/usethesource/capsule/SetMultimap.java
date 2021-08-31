@@ -111,9 +111,8 @@ public interface SetMultimap<K, V> {
 
     SetMultimap.Immutable<K, V> __put(final K key, final V value);
 
-    default SetMultimap.Immutable<K, V> __put(final K key, final Set.Immutable<V> values) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-    }
+    // Map-like semantics: removes all mappings with 'key', for 'key' / 'value' tuples for each of the 'values'
+    SetMultimap.Immutable<K, V> __put(final K key, final Set.Immutable<V> values); // TODO add default implementation?
 
     SetMultimap.Immutable<K, V> __insert(final K key, final V value);
 
@@ -129,10 +128,8 @@ public interface SetMultimap<K, V> {
       return tmp.freeze();
     }
 
-    // removes all mappings with 'key'
-    default SetMultimap.Immutable<K, V> __remove(final K key) {
-      throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
-    }
+    // Map-like semantics: removes all mappings with 'key'
+    SetMultimap.Immutable<K, V> __remove(final K key);
 
     SetMultimap.Immutable<K, V> __remove(final K key, final V val);
 
