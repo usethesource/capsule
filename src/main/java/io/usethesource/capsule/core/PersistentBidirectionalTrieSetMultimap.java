@@ -167,6 +167,11 @@ public class PersistentBidirectionalTrieSetMultimap<K, V> implements
   }
 
   @Override
+  public SetMultimap.Immutable<K, V> __put(K key, Set.Immutable<V> values) {
+    throw new UnsupportedOperationException("Map semantic unavailable @ Bidirectional Multi-Map.");
+  }
+
+  @Override
   public SetMultimap.Immutable<K, V> __insert(K key, V value) {
     return wireTuple(key, value, fwd::__insert, bwd::__insert);
   }
@@ -177,6 +182,11 @@ public class PersistentBidirectionalTrieSetMultimap<K, V> implements
   @Override
   public SetMultimap.Immutable<K, V> __insert(K key, Set.Immutable<V> values) {
     return batchWireTuple(key, values, fwd::__insert, bwd::__insert);
+  }
+
+  @Override
+  public SetMultimap.Immutable<K, V> __remove(K key) {
+    throw new UnsupportedOperationException("Map semantic unavailable @ Bidirectional Multi-Map.");
   }
 
   @Override
