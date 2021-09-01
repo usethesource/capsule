@@ -37,10 +37,7 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
   protected int cachedKeySetSize;
 
 
-  protected AbstractTransientTrieSetMultimap(
-      AbstractPersistentTrieSetMultimap<K, V, C, R> trieSetMultimap) {
-    super(trieSetMultimap.cmp);
-
+  protected AbstractTransientTrieSetMultimap(AbstractPersistentTrieSetMultimap<K, V, C, R> trieSetMultimap) {
     this.mutator = new AtomicReference<Thread>(Thread.currentThread());
     this.rootNode = trieSetMultimap.rootNode;
     // // this.cachedHashCode = trieSetMultimap.cachedHashCode;
@@ -99,7 +96,7 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
 
     final C values = collectionToInternalFormat(valueCollection);
     final R newRootNode = rootNode
-        .inserted(mutator, key, values, transformHashCode(keyHash), 0, details, cmp);
+        .inserted(mutator, key, values, transformHashCode(keyHash), 0, details);
 
     switch (details.getModificationEffect()) {
       case NOTHING: {
@@ -150,7 +147,7 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
 
     final C values = collectionToInternalFormat(valueCollection);
     final R newRootNode =
-        rootNode.updated(mutator, key, values, transformHashCode(keyHash), 0, details, cmp);
+        rootNode.updated(mutator, key, values, transformHashCode(keyHash), 0, details);
 
     switch (details.getModificationEffect()) {
       case NOTHING: {
@@ -205,7 +202,7 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
     final MultimapResult<K, V, C> details = MultimapResult.unchanged();
 
     final R newRootNode =
-        rootNode.removed(mutator, key, value, transformHashCode(keyHash), 0, details, cmp);
+        rootNode.removed(mutator, key, value, transformHashCode(keyHash), 0, details);
 
     switch (details.getModificationEffect()) {
       case NOTHING: {
@@ -246,7 +243,7 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
     final MultimapResult<K, V, C> details = MultimapResult.unchanged();
 
     final R newRootNode =
-        rootNode.removed(mutator, key, transformHashCode(keyHash), 0, details, cmp);
+        rootNode.removed(mutator, key, transformHashCode(keyHash), 0, details);
 
     switch (details.getModificationEffect()) {
       case NOTHING: {

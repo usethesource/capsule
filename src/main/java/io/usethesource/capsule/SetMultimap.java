@@ -18,7 +18,6 @@ import java.util.stream.StreamSupport;
 
 import io.usethesource.capsule.annotation.Experimental;
 import io.usethesource.capsule.core.PersistentTrieSetMultimap;
-import io.usethesource.capsule.util.EqualityComparator;
 
 @Experimental
 public interface SetMultimap<K, V> {
@@ -178,11 +177,6 @@ public interface SetMultimap<K, V> {
       return PersistentTrieSetMultimap.of(key0, value0, key1, value1);
     }
 
-    @Deprecated
-    static <K, V> SetMultimap.Immutable<K, V> of(EqualityComparator<Object> cmp) {
-      return PersistentTrieSetMultimap.of(cmp);
-    }
-
   }
 
   /*
@@ -251,11 +245,6 @@ public interface SetMultimap<K, V> {
 
     static <K, V> SetMultimap.Transient<K, V> of() {
       return PersistentTrieSetMultimap.transientOf();
-    }
-
-    @Deprecated
-    static <K, V> SetMultimap.Transient<K, V> of(EqualityComparator<Object> cmp) {
-      return PersistentTrieSetMultimap.transientOf(cmp);
     }
 
   }

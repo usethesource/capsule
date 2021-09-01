@@ -11,7 +11,6 @@ import io.usethesource.capsule.Set;
 import io.usethesource.capsule.SetMultimap;
 import io.usethesource.capsule.core.trie.MultimapNode;
 import io.usethesource.capsule.core.trie.MultimapResult;
-import io.usethesource.capsule.util.EqualityComparator;
 
 import static io.usethesource.capsule.core.trie.MultimapResult.Modification.INSERTED_KEY;
 import static io.usethesource.capsule.core.trie.MultimapResult.Modification.REMOVED_KEY;
@@ -34,10 +33,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
   protected final int cachedKeySetSize;
   protected final int cachedKeySetHashCode;
 
-  protected AbstractPersistentTrieSetMultimap(final EqualityComparator<Object> cmp,
-      final R rootNode, int cachedSize, int keySetHashCode, int keySetSize) {
-    super(cmp);
-
+  protected AbstractPersistentTrieSetMultimap(final R rootNode, int cachedSize, int keySetHashCode, int keySetSize) {
     this.rootNode = rootNode;
 
     // this.cachedHashCode = cachedHashCode;
@@ -73,8 +69,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
     return cachedKeySetSize;
   }
 
-  protected abstract SetMultimap.Immutable<K, V> wrap(EqualityComparator<Object> cmp, R rootNode,
-      int cachedSize, int cachedKeySetHashCode, int cachedKeySetSize);
+  protected abstract SetMultimap.Immutable<K, V> wrap(R rootNode, int cachedSize, int cachedKeySetHashCode, int cachedKeySetSize);
 
   @Override
   public final SetMultimap.Immutable<K, V> __insert(final K key, final V value) {
@@ -92,7 +87,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
 
     final C values = collectionToInternalFormat(valueCollection);
     final R newRootNode =
-        rootNode.inserted(null, key, values, transformHashCode(keyHash), 0, details, cmp);
+        rootNode.inserted(null, key, values, transformHashCode(keyHash), 0, details);
 
     switch (details.getModificationEffect()) {
       case NOTHING: {
@@ -112,7 +107,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
           propertyKeySetSize += 1;
         }
 
-        return wrap(cmp, newRootNode, propertySize, propertyKeySetHashCode, propertyKeySetSize);
+        return wrap(newRootNode, propertySize, propertyKeySetHashCode, propertyKeySetSize);
       }
 
       default: {
@@ -137,7 +132,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
 
     final C values = collectionToInternalFormat(valueCollection);
     final R newRootNode =
-        rootNode.updated(null, key, values, transformHashCode(keyHash), 0, details, cmp);
+        rootNode.updated(null, key, values, transformHashCode(keyHash), 0, details);
 
     switch (details.getModificationEffect()) {
       case NOTHING: {
@@ -156,7 +151,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
         int propertyKeySetHashCode = cachedKeySetHashCode;
         int propertyKeySetSize = cachedKeySetSize;
 
-        return wrap(cmp, newRootNode, propertySize, propertyKeySetHashCode, propertyKeySetSize);
+        return wrap(newRootNode, propertySize, propertyKeySetHashCode, propertyKeySetSize);
       }
 
       case INSERTED_PAYLOAD: {
@@ -169,7 +164,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
         int propertyKeySetHashCode = cachedKeySetHashCode + keyHash;
         int propertyKeySetSize = cachedKeySetSize + 1;
 
-        return wrap(cmp, newRootNode, propertySize, propertyKeySetHashCode, propertyKeySetSize);
+        return wrap(newRootNode, propertySize, propertyKeySetHashCode, propertyKeySetSize);
       }
 
       default: {
@@ -184,7 +179,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
     final MultimapResult<K, V, C> details = MultimapResult.unchanged();
 
     final R newRootNode =
-        rootNode.removed(null, key, value, transformHashCode(keyHash), 0, details, cmp);
+        rootNode.removed(null, key, value, transformHashCode(keyHash), 0, details);
 
     switch (details.getModificationEffect()) {
       case NOTHING: {
@@ -204,7 +199,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
           propertyKeySetSize -= 1;
         }
 
-        return wrap(cmp, newRootNode, propertySize, propertyKeySetHashCode, propertyKeySetSize);
+        return wrap(newRootNode, propertySize, propertyKeySetHashCode, propertyKeySetSize);
       }
 
       default: {
@@ -219,7 +214,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
     final MultimapResult<K, V, C> details = MultimapResult.unchanged();
 
     final R newRootNode =
-        rootNode.removed(null, key, transformHashCode(keyHash), 0, details, cmp);
+        rootNode.removed(null, key, transformHashCode(keyHash), 0, details);
 
     switch (details.getModificationEffect()) {
       case NOTHING: {
@@ -239,7 +234,7 @@ public abstract class AbstractPersistentTrieSetMultimap<K, V, C extends Iterable
         int propertyKeySetHashCode = cachedKeySetHashCode - keyHash;
         int propertyKeySetSize = cachedKeySetSize - 1;
 
-        return wrap(cmp, newRootNode, propertySize, propertyKeySetHashCode, propertyKeySetSize);
+        return wrap(newRootNode, propertySize, propertyKeySetHashCode, propertyKeySetSize);
       }
 
       default: {

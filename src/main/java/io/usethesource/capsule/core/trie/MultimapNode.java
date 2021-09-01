@@ -10,64 +10,54 @@ package io.usethesource.capsule.core.trie;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
-import io.usethesource.capsule.util.EqualityComparator;
-
 /**
  * @param <C> is a (collection) representation of one or more values
  */
 public interface MultimapNode<K, V, C, R extends MultimapNode<K, V, C, R>> extends Node {
 
-  boolean containsKey(K key, int keyHash, int shift, EqualityComparator<Object> cmp);
+  boolean containsKey(K key, int keyHash, int shift);
 
-  boolean containsTuple(K key, V value, int keyHash, int shift, EqualityComparator<Object> cmp);
+  boolean containsTuple(K key, V value, int keyHash, int shift);
 
-  Optional<C> findByKey(K key, int keyHash, int shift, EqualityComparator<Object> cmp);
+  Optional<C> findByKey(K key, int keyHash, int shift);
 
   boolean mustUnbox(C values);
   
   V unbox(C values);
 
-  default R inserted(AtomicReference<Thread> mutator, K key, C values, int keyHash, int shift,
-      MultimapResult<K, V, C> details, EqualityComparator<Object> cmp) {
+  default R inserted(AtomicReference<Thread> mutator, K key, C values, int keyHash, int shift, MultimapResult<K, V, C> details) {
     if (mustUnbox(values)) {
-      return insertedSingle(mutator, key, unbox(values), keyHash, shift, details, cmp);
+      return insertedSingle(mutator, key, unbox(values), keyHash, shift, details);
     } else {
-      return insertedMultiple(mutator, key, values, keyHash, shift, details, cmp);
+      return insertedMultiple(mutator, key, values, keyHash, shift, details);
     }
   }
 
-  R insertedSingle(AtomicReference<Thread> mutator, K key, V value, int keyHash, int shift,
-      MultimapResult<K, V, C> details, EqualityComparator<Object> cmp);
+  R insertedSingle(AtomicReference<Thread> mutator, K key, V value, int keyHash, int shift, MultimapResult<K, V, C> details);
 
-  R insertedMultiple(AtomicReference<Thread> mutator, K key, C values, int keyHash, int shift,
-      MultimapResult<K, V, C> details, EqualityComparator<Object> cmp);
+  R insertedMultiple(AtomicReference<Thread> mutator, K key, C values, int keyHash, int shift, MultimapResult<K, V, C> details);
 
-  default R updated(AtomicReference<Thread> mutator, K key, C values, int keyHash, int shift,
-      MultimapResult<K, V, C> details, EqualityComparator<Object> cmp) {
+  default R updated(AtomicReference<Thread> mutator, K key, C values, int keyHash, int shift, MultimapResult<K, V, C> details) {
     if (mustUnbox(values)) {
-      return updatedSingle(mutator, key, unbox(values), keyHash, shift, details, cmp);
+      return updatedSingle(mutator, key, unbox(values), keyHash, shift, details);
     } else {
-      return updatedMultiple(mutator, key, values, keyHash, shift, details, cmp);
+      return updatedMultiple(mutator, key, values, keyHash, shift, details);
     }
   }
 
-  R updatedSingle(AtomicReference<Thread> mutator, K key, V value, int keyHash, int shift,
-      MultimapResult<K, V, C> details, EqualityComparator<Object> cmp);
+  R updatedSingle(AtomicReference<Thread> mutator, K key, V value, int keyHash, int shift, MultimapResult<K, V, C> details);
 
-  R updatedMultiple(AtomicReference<Thread> mutator, K key, C values, int keyHash, int shift,
-      MultimapResult<K, V, C> details, EqualityComparator<Object> cmp);
+  R updatedMultiple(AtomicReference<Thread> mutator, K key, C values, int keyHash, int shift, MultimapResult<K, V, C> details);
 
   /**
    * Removes the {@code key} / {@code val} tuple.
    */
-  R removed(AtomicReference<Thread> mutator, K key, V value, int keyHash, int shift,
-      MultimapResult<K, V, C> details, EqualityComparator<Object> cmp);
+  R removed(AtomicReference<Thread> mutator, K key, V value, int keyHash, int shift, MultimapResult<K, V, C> details);
 
   /**
    * Removes all values associated with {@code key}.
    */
-  R removed(AtomicReference<Thread> mutator, K key, int keyHash, int shift,
-      MultimapResult<K, V, C> details, EqualityComparator<Object> cmp);
+  R removed(AtomicReference<Thread> mutator, K key, int keyHash, int shift, MultimapResult<K, V, C> details);
 
   // TODO: remove from interface
   @Deprecated
