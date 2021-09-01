@@ -7,14 +7,17 @@
  */
 package io.usethesource.capsule;
 
+import io.usethesource.capsule.annotation.Experimental;
 import io.usethesource.capsule.core.PersistentBidirectionalTrieSetMultimap;
 
+@Experimental
 public interface BinaryRelation<T, U> extends SetMultimap<T, U> {
 
   BinaryRelation<U, T> inverse();
 
   SetMultimap<T, U> toSetMultimap();
 
+  @Experimental
   interface Immutable<K, V> extends BinaryRelation<K, V>, SetMultimap.Immutable<K, V> {
 
     @Override
@@ -99,6 +102,7 @@ public interface BinaryRelation<T, U> extends SetMultimap<T, U> {
 
   }
 
+  @Experimental
   interface Transient<K, V> extends BinaryRelation<K, V>, SetMultimap.Transient<K, V> {
 
     @Override
