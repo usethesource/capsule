@@ -29,7 +29,6 @@ import io.usethesource.capsule.Set;
 import io.usethesource.capsule.core.trie.ArrayView;
 import io.usethesource.capsule.core.trie.SetNode;
 import io.usethesource.capsule.core.trie.SetNodeResult;
-import io.usethesource.capsule.util.EqualityComparator;
 
 public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializable {
 
@@ -147,7 +146,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
   public boolean contains(final Object o) {
     try {
       final K key = (K) o;
-      return rootNode.contains(key, transformHashCode(key.hashCode()), 0, Object::equals);
+      return rootNode.contains(key, transformHashCode(key.hashCode()), 0);
     } catch (ClassCastException unused) {
       return false;
     }
@@ -157,8 +156,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
   public K get(final Object o) {
     try {
       final K key = (K) o;
-      final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0,
-          Object::equals);
+      final Optional<K> result = rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
       if (result.isPresent()) {
         return result.get();
@@ -176,7 +174,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     final SetNodeResult<K> details = SetNodeResult.unchanged();
 
     final AbstractSetNode<K> newRootNode = rootNode.updated(null, key,
-        transformHashCode(keyHash), 0, details, Object::equals);
+        transformHashCode(keyHash), 0, details);
 
     if (details.isModified()) {
       return new PersistentTrieSet<K>(newRootNode, cachedHashCode + keyHash, cachedSize + 1);
@@ -198,7 +196,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     final SetNodeResult<K> details = SetNodeResult.unchanged();
 
     final AbstractSetNode<K> newRootNode = rootNode.removed(null, key,
-        transformHashCode(keyHash), 0, details, Object::equals);
+        transformHashCode(keyHash), 0, details);
 
     if (details.isModified()) {
       return new PersistentTrieSet<K>(newRootNode, cachedHashCode - keyHash, cachedSize - 1);
@@ -727,35 +725,33 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    public boolean contains(final K key, final int keyHash, final int shift,
-        final EqualityComparator<Object> cmp) {
+    public boolean contains(final K key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
       final int dataMap = dataMap();
       if ((dataMap & bitpos) != 0) {
         final int index = index(dataMap, mask, bitpos);
-        return cmp.equals(getKey(index), key);
+        return Objects.equals(getKey(index), key);
       }
 
       final int nodeMap = nodeMap();
       if ((nodeMap & bitpos) != 0) {
         final int index = index(nodeMap, mask, bitpos);
-        return getNode(index).contains(key, keyHash, shift + BIT_PARTITION_SIZE, cmp);
+        return getNode(index).contains(key, keyHash, shift + BIT_PARTITION_SIZE);
       }
 
       return false;
     }
 
     @Override
-    public Optional<K> findByKey(final K key, final int keyHash, final int shift,
-        final EqualityComparator<Object> cmp) {
+    public Optional<K> findByKey(final K key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
       if ((dataMap() & bitpos) != 0) { // inplace value
         final int index = dataIndex(bitpos);
-        if (cmp.equals(getKey(index), key)) {
+        if (Objects.equals(getKey(index), key)) {
           return Optional.of(getKey(index));
         }
 
@@ -765,7 +761,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       if ((nodeMap() & bitpos) != 0) { // node (not value)
         final AbstractSetNode<K> subNode = nodeAt(bitpos);
 
-        return subNode.findByKey(key, keyHash, shift + BIT_PARTITION_SIZE, cmp);
+        return subNode.findByKey(key, keyHash, shift + BIT_PARTITION_SIZE);
       }
 
       return Optional.empty();
@@ -773,8 +769,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     public AbstractSetNode<K> updated(final AtomicReference<Thread> mutator, final K key,
-        final int keyHash, final int shift, final SetNodeResult<K> details,
-        final EqualityComparator<Object> cmp) {
+                                      final int keyHash, final int shift, final SetNodeResult<K> details) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -782,7 +777,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         final int dataIndex = dataIndex(bitpos);
         final K currentKey = getKey(dataIndex);
 
-        if (cmp.equals(currentKey, key)) {
+        if (Objects.equals(currentKey, key)) {
           return this;
         } else {
           final AbstractSetNode<K> subNodeNew = mergeTwoKeyValPairs(currentKey,
@@ -796,7 +791,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       } else if ((nodeMap() & bitpos) != 0) { // node (not value)
         final AbstractSetNode<K> subNode = nodeAt(bitpos);
         final AbstractSetNode<K> subNodeNew =
-            subNode.updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, details, cmp);
+            subNode.updated(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, details);
 
         if (details.isModified()) {
           /*
@@ -819,14 +814,14 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     public AbstractSetNode<K> removed(final AtomicReference<Thread> mutator, final K key, final int keyHash,
-        final int shift, final SetNodeResult<K> details, final EqualityComparator<Object> cmp) {
+                                      final int shift, final SetNodeResult<K> details) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
       if ((dataMap() & bitpos) != 0) { // inplace value
         final int dataIndex = dataIndex(bitpos);
 
-        if (cmp.equals(getKey(dataIndex), key)) {
+        if (Objects.equals(getKey(dataIndex), key)) {
           details.modified();
           details.updateDeltaSize(-1);
           details.updateDeltaHashCode(-keyHash);
@@ -853,7 +848,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       } else if ((nodeMap() & bitpos) != 0) { // node (not value)
         final AbstractSetNode<K> subNode = nodeAt(bitpos);
         final AbstractSetNode<K> subNodeNew =
-            subNode.removed(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, details, cmp);
+            subNode.removed(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, details);
 
         if (!details.isModified()) {
           return this;
@@ -1107,11 +1102,6 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     public boolean equals(final Object other) {
-      return equivalent(other, Object::equals);
-    }
-
-    @Override
-    public boolean equivalent(final Object other, EqualityComparator<Object> cmp) {
       if (null == other) {
         return false;
       }
@@ -1128,15 +1118,14 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       if (dataMap() != that.dataMap()) {
         return false;
       }
-      if (!deepContentEquality(nodes, that.nodes, payloadArity(), slotArity(), cmp)) {
+      if (!deepContentEquality(nodes, that.nodes, payloadArity(), slotArity())) {
         return false;
       }
       return true;
     }
 
     private final boolean deepContentEquality(
-        /* @NotNull */ Object[] a1, /* @NotNull */ Object[] a2, int splitAt, int length,
-        EqualityComparator<Object> cmp) {
+        /* @NotNull */ Object[] a1, /* @NotNull */ Object[] a2, int splitAt, int length) {
 
 //      assert a1 != null && a2 != null;
 //      assert a1.length == a2.length;
@@ -1150,7 +1139,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         Object o1 = a1[i];
         Object o2 = a2[i];
 
-        if (!EqualityComparator.equals(o1, o2, cmp::equals)) {
+        if (!Objects.equals(o1, o2)) {
           return false;
         }
       }
@@ -1160,7 +1149,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         AbstractSetNode o1 = (AbstractSetNode) a1[i];
         AbstractSetNode o2 = (AbstractSetNode) a2[i];
 
-        if (!EqualityComparator.equals(o1, o2, (a, b) -> a.equivalent(b, cmp))) {
+        if (!Objects.equals(o1, o2)) {
           return false;
         }
       }
@@ -1316,11 +1305,10 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    public boolean contains(final K key, final int keyHash, final int shift,
-        final EqualityComparator<Object> cmp) {
+    public boolean contains(final K key, final int keyHash, final int shift) {
       if (this.hash == keyHash) {
         for (K k : keys) {
-          if (cmp.equals(k, key)) {
+          if (Objects.equals(k, key)) {
             return true;
           }
         }
@@ -1329,11 +1317,10 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    public Optional<K> findByKey(final K key, final int keyHash, final int shift,
-        final EqualityComparator<Object> cmp) {
+    public Optional<K> findByKey(final K key, final int keyHash, final int shift) {
       for (int i = 0; i < keys.length; i++) {
         final K _key = keys[i];
-        if (cmp.equals(key, _key)) {
+        if (Objects.equals(key, _key)) {
           return Optional.of(_key);
         }
       }
@@ -1342,12 +1329,11 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     public AbstractSetNode<K> updated(final AtomicReference<Thread> mutator, final K key,
-        final int keyHash, final int shift, final SetNodeResult<K> details,
-        final EqualityComparator<Object> cmp) {
+                                      final int keyHash, final int shift, final SetNodeResult<K> details) {
       assert this.hash == keyHash;
 
       for (int idx = 0; idx < keys.length; idx++) {
-        if (cmp.equals(keys[idx], key)) {
+        if (Objects.equals(keys[idx], key)) {
           return this;
         }
       }
@@ -1369,10 +1355,9 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     public AbstractSetNode<K> removed(final AtomicReference<Thread> mutator, final K key,
-        final int keyHash, final int shift, final SetNodeResult<K> details,
-        final EqualityComparator<Object> cmp) {
+                                      final int keyHash, final int shift, final SetNodeResult<K> details) {
       for (int idx = 0; idx < keys.length; idx++) {
-        if (cmp.equals(keys[idx], key)) {
+        if (Objects.equals(keys[idx], key)) {
           details.modified();
           details.updateDeltaSize(-1);
           details.updateDeltaHashCode(-keyHash);
@@ -1387,7 +1372,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
             final K theOtherKey = (idx == 0) ? keys[1] : keys[0];
 
             return CompactSetNode.<K>nodeOf(mutator).updated(mutator, theOtherKey, keyHash, 0,
-                SetNodeResult.unchanged(), cmp);
+                SetNodeResult.unchanged());
           } else {
             final K[] keysNew = (K[]) new Object[this.keys.length - 1];
 
@@ -1484,11 +1469,6 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     public boolean equals(final Object other) {
-      return equivalent(other, Object::equals);
-    }
-
-    @Override
-    public boolean equivalent(Object other, EqualityComparator<Object> cmp) {
       if (null == other) {
         return false;
       }
@@ -1519,7 +1499,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
         for (int j = 0; j < keys.length; j++) {
           final K key = keys[j];
 
-          if (cmp.equals(key, otherKey)) {
+          if (Objects.equals(key, otherKey)) {
             continue outerLoop;
           }
         }
@@ -1791,7 +1771,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     public boolean contains(final Object o) {
       try {
         final K key = (K) o;
-        return rootNode.contains(key, transformHashCode(key.hashCode()), 0, Object::equals);
+        return rootNode.contains(key, transformHashCode(key.hashCode()), 0);
       } catch (ClassCastException unused) {
         return false;
       }
@@ -1802,7 +1782,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       try {
         final K key = (K) o;
         final Optional<K> result =
-            rootNode.findByKey(key, transformHashCode(key.hashCode()), 0, Object::equals);
+            rootNode.findByKey(key, transformHashCode(key.hashCode()), 0);
 
         if (result.isPresent()) {
           return result.get();
@@ -1815,11 +1795,6 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     protected boolean __insertWithCapability(AtomicReference<Thread> mutator, K key) {
-      return __insertEquivalentWithCapability(mutator, key, Object::equals);
-    }
-
-    protected boolean __insertEquivalentWithCapability(AtomicReference<Thread> mutator,
-        final K key, final EqualityComparator<Object> cmp) {
       if (mutator.get() == null) {
         throw new IllegalStateException("Transient already frozen.");
       }
@@ -1828,7 +1803,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       final SetNodeResult<K> details = SetNodeResult.unchanged();
 
       final AbstractSetNode<K> newRootNode =
-          rootNode.updated(mutator, key, transformHashCode(keyHash), 0, details, cmp);
+          rootNode.updated(mutator, key, transformHashCode(keyHash), 0, details);
 
       if (details.isModified()) {
 
@@ -1869,7 +1844,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       final SetNodeResult<K> details = SetNodeResult.unchanged();
 
       final AbstractSetNode<K> newRootNode =
-          rootNode.removed(mutator, key, transformHashCode(keyHash), 0, details, Object::equals);
+          rootNode.removed(mutator, key, transformHashCode(keyHash), 0, details);
 
       if (details.isModified()) {
         rootNode = newRootNode;
