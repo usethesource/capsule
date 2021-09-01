@@ -9,10 +9,8 @@ package io.usethesource.capsule.util.collection;
 
 import java.util.AbstractSet;
 import java.util.Collection;
-import java.util.Comparator;
 
 import io.usethesource.capsule.Set;
-import io.usethesource.capsule.util.EqualityComparator;
 
 @Deprecated
 public abstract class AbstractImmutableSet<E> extends AbstractSet<E> implements Set.Immutable<E> {
