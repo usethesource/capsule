@@ -11,7 +11,7 @@ import java.util.Iterator;
 
 import io.usethesource.capsule.core.PersistentTrieMap;
 
-public interface Map<K, V> extends java.util.Map<K, V>, MapEq<K, V> {
+public interface Map<K, V> extends java.util.Map<K, V> {
 
   @Override
   int size();
@@ -40,7 +40,7 @@ public interface Map<K, V> extends java.util.Map<K, V>, MapEq<K, V> {
   @Override
   int hashCode();
 
-  interface Immutable<K, V> extends Map<K, V>, MapEq.Immutable<K, V> {
+  interface Immutable<K, V> extends Map<K, V> {
 
     Map.Immutable<K, V> __put(final K key, final V val);
 
@@ -66,7 +66,7 @@ public interface Map<K, V> extends java.util.Map<K, V>, MapEq<K, V> {
 
   }
 
-  interface Transient<K, V> extends Map<K, V>, MapEq.Transient<K, V> {
+  interface Transient<K, V> extends Map<K, V> {
 
     V __put(final K key, final V val);
 

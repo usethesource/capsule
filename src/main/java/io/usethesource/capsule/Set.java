@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
 
-public interface Set<K> extends java.util.Set<K>, SetEq<K> {
+public interface Set<K> extends java.util.Set<K> {
 
   @Override
   int size();
@@ -45,7 +45,7 @@ public interface Set<K> extends java.util.Set<K>, SetEq<K> {
   @Override
   int hashCode();
 
-  interface Immutable<K> extends Set<K>, SetEq.Immutable<K> {
+  interface Immutable<K> extends Set<K> {
 
     Set.Immutable<K> __insert(final K key);
 
@@ -215,7 +215,7 @@ public interface Set<K> extends java.util.Set<K>, SetEq<K> {
     }
   }
 
-  interface Transient<K> extends Set<K>, SetEq.Transient<K> {
+  interface Transient<K> extends Set<K> {
 
     boolean __insert(final K key);
 

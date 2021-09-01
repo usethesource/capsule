@@ -67,14 +67,4 @@ public abstract class AbstractImmutableSet<E> extends AbstractSet<E> implements 
     return true;
   }
 
-  @Override
-  public boolean containsAllEquivalent(Collection<?> c, EqualityComparator<Object> cmp) {
-    for (Object item : c) {
-      if (!containsEquivalent(item, cmp)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
 }

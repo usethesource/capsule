@@ -721,7 +721,7 @@ public class PersistentTrieSetMultimap<K, V> extends
       if (isBitInBitmap(collMap, bitpos)) {
         final int index = index(collMap, mask, bitpos);
         return cmp.equals(getCollectionKey(index), key)
-            && getCollectionValue(index).containsEquivalent(value, cmp);
+            && getCollectionValue(index).contains(value);
       }
 
       if (isBitInBitmap(nodeMap, bitpos)) {
@@ -2437,7 +2437,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         EqualityComparator<Object> cmp) {
       return collisionContent.stream()
           .filter(entry -> cmp.equals(key, entry.getKey())
-              && entry.getValue().containsEquivalent(value, cmp))
+              && entry.getValue().contains(value))
           .findAny().isPresent();
     }
 
@@ -2463,7 +2463,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         io.usethesource.capsule.Set.Immutable<V> values =
             optionalTuple.get().getValue();
 
-        if (values.containsEquivalent(value, cmp)) {
+        if (values.contains(value)) {
           // contains key and value
           // // details.unchanged();
           return this;
@@ -2475,7 +2475,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               (kImmutableSetEntry) -> {
                 if (kImmutableSetEntry == optionalTuple.get()) {
                   io.usethesource.capsule.Set.Immutable<V> updatedValues =
-                      values.__insertEquivalent(value, cmp);
+                      values.__insert(value);
                   return entryOf(key, updatedValues);
                 } else {
                   return kImmutableSetEntry;
@@ -2493,7 +2493,7 @@ public class PersistentTrieSetMultimap<K, V> extends
           // cmp)));
           assert updatedCollisionContent.stream()
               .filter(entry -> cmp.equals(key, entry.getKey())
-                  && entry.getValue().containsEquivalent(value, cmp))
+                  && entry.getValue().contains(value))
               .findAny().isPresent();
 
           details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_VALUE), 1);
@@ -2536,7 +2536,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         io.usethesource.capsule.Set.Immutable<V> currentValues =
             optionalTuple.get().getValue();
 
-        if (currentValues.containsAllEquivalent(values, cmp)) {
+        if (currentValues.containsAll(values)) {
           // contains key and (all) values
           // // details.unchanged();
           return this;
@@ -2548,7 +2548,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               (kImmutableSetEntry) -> {
                 if (kImmutableSetEntry == optionalTuple.get()) {
                   io.usethesource.capsule.Set.Immutable<V> updatedValues =
-                      currentValues.__insertAllEquivalent(values, cmp); // TODO capture size delta
+                      currentValues.__insertAll(values); // TODO capture size delta
                   return entryOf(key, updatedValues);
                 } else {
                   return kImmutableSetEntry;
@@ -2575,7 +2575,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
         Stream.Builder<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> builder =
             Stream.<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>>builder()
-                .add(entryOf(key, io.usethesource.capsule.Set.Immutable.<V>of().__insertAllEquivalent(values, cmp)));
+                .add(entryOf(key, io.usethesource.capsule.Set.Immutable.<V>of().__insertAll(values)));
 
         collisionContent.forEach(builder::accept);
 
@@ -2655,7 +2655,7 @@ public class PersistentTrieSetMultimap<K, V> extends
             (kImmutableSetEntry) -> {
               if (kImmutableSetEntry == optionalTuple.get()) {
                 io.usethesource.capsule.Set.Immutable<V> updatedValues =
-                    io.usethesource.capsule.Set.Immutable.<V>of().__insertAllEquivalent(values, cmp);
+                    io.usethesource.capsule.Set.Immutable.<V>of().__insertAll(values);
                 return entryOf(key, updatedValues);
               } else {
                 return kImmutableSetEntry;
@@ -2677,7 +2677,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
         Stream.Builder<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> builder =
             Stream.<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>>builder()
-                .add(entryOf(key, io.usethesource.capsule.Set.Immutable.<V>of().__insertAllEquivalent(values, cmp)));
+                .add(entryOf(key, io.usethesource.capsule.Set.Immutable.<V>of().__insertAll(values)));
 
         collisionContent.forEach(builder::accept);
 
@@ -2703,7 +2703,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         io.usethesource.capsule.Set.Immutable<V> values =
             optionalTuple.get().getValue();
 
-        if (values.containsEquivalent(value, cmp)) {
+        if (values.contains(value)) {
           // contains key and value -> remove mapping
 
           final List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> updatedCollisionContent;
@@ -2720,7 +2720,7 @@ public class PersistentTrieSetMultimap<K, V> extends
                 (kImmutableSetEntry) -> {
                   if (kImmutableSetEntry == optionalTuple.get()) {
                     io.usethesource.capsule.Set.Immutable<V> updatedValues =
-                        values.__removeEquivalent(value, cmp);
+                        values.__remove(value);
                     return entryOf(key, updatedValues);
                   } else {
                     return kImmutableSetEntry;

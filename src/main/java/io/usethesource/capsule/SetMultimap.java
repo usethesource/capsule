@@ -107,7 +107,7 @@ public interface SetMultimap<K, V> {
   boolean equals(Object other);
 
   @Experimental
-  interface Immutable<K, V> extends SetMultimap<K, V>, SetMultimapEq.Immutable<K, V> {
+  interface Immutable<K, V> extends SetMultimap<K, V> {
 
     SetMultimap.Immutable<K, V> __put(final K key, final V value);
 
@@ -189,7 +189,7 @@ public interface SetMultimap<K, V> {
    * TODO: consider return types for observability: i.e., either returning Immutable<V> or boolean?
    */
   @Experimental
-  interface Transient<K, V> extends SetMultimap<K, V>, SetMultimapEq.Transient<K, V> {
+  interface Transient<K, V> extends SetMultimap<K, V> {
 
     default boolean __put(final K key, final V value) {
       throw new UnsupportedOperationException("Not yet implemented @ Multi-Map.");
