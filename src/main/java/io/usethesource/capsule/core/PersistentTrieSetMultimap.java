@@ -2558,17 +2558,6 @@ public class PersistentTrieSetMultimap<K, V> extends
           List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> updatedCollisionContent =
               collisionContent.stream().map(substitutionMapper).collect(Collectors.toList());
 
-          // TODO not all API uses EqualityComparator
-          // TODO does not check that remainder is unmodified
-          assert updatedCollisionContent.size() == collisionContent.size();
-          assert updatedCollisionContent.contains(optionalTuple.get()) == false;
-          // assert updatedCollisionContent.contains(entryOf(key, values.__insertEquivalent(val,
-          // cmp)));
-          assert updatedCollisionContent.stream()
-              .filter(entry -> cmp.equals(key, entry.getKey())
-                  && entry.getValue().containsAllEquivalent(values, cmp))
-              .findAny().isPresent();
-
           final io.usethesource.capsule.Set.Immutable<V> updatedValues =
               updatedCollisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny().get().getValue();
           final int sizeDelta = updatedValues.size() - currentValues.size();
@@ -2592,15 +2581,6 @@ public class PersistentTrieSetMultimap<K, V> extends
 
         List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> updatedCollisionContent =
             builder.build().collect(Collectors.toList());
-
-        // TODO not all API uses EqualityComparator
-        assert updatedCollisionContent.size() == collisionContent.size() + 1;
-        assert updatedCollisionContent.containsAll(collisionContent);
-        // assert updatedCollisionContent.contains(entryOf(key, setOf(val)));
-        assert updatedCollisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())
-                && Objects.equals(io.usethesource.capsule.Set.Immutable.<V>of().__insertAllEquivalent(values, cmp), entry.getValue()))
-            .findAny()
-            .isPresent();
 
         details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE_COLLECTION), values.size());
         return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
