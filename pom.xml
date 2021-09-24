@@ -27,6 +27,7 @@
 
     <junitVersion>5.7.2</junitVersion>
     <junitQuickcheckVersion>1.0</junitQuickcheckVersion>
+    <slf4jVersion>1.7.32</slf4jVersion>
   </properties>
 
   <build>
@@ -151,7 +152,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>1.6.1</version>
+      <version>${slf4jVersion}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
