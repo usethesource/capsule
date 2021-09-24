@@ -21,8 +21,6 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <maven.compiler.source>1.8</maven.compiler.source>
     <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
     <topleveldir>${project.basedir}</topleveldir>
     <jacoco.reportPath>${topleveldir}/target/jacoco.exec</jacoco.reportPath>
@@ -33,6 +31,14 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.0</version>
+          <configuration>
+            <release>11</release>
+          </configuration>
+      </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.0.0-M5</version>
@@ -142,5 +148,15 @@
       <version>${junitVersion}</version>
       <scope>test</scope>
     </dependency>
-  </dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.6.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>1.6.1</version>
+    </dependency>
+</dependencies>
 </project>
