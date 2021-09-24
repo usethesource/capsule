@@ -4,7 +4,7 @@
 
   <groupId>io.usethesource</groupId>
   <artifactId>capsule</artifactId>
-  <version>0.6.4-SNAPSHOT</version>
+  <version>0.7.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <licenses>
@@ -21,18 +21,25 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <maven.compiler.source>1.8</maven.compiler.source>
     <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
     <topleveldir>${project.basedir}</topleveldir>
     <jacoco.reportPath>${topleveldir}/target/jacoco.exec</jacoco.reportPath>
 
     <junitVersion>5.7.2</junitVersion>
     <junitQuickcheckVersion>1.0</junitQuickcheckVersion>
+    <slf4jVersion>1.7.32</slf4jVersion>
   </properties>
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.0</version>
+          <configuration>
+            <release>11</release>
+          </configuration>
+      </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.0.0-M5</version>
@@ -140,6 +147,12 @@
       <groupId>org.junit.vintage</groupId>
       <artifactId>junit-vintage-engine</artifactId>
       <version>${junitVersion}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${slf4jVersion}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
