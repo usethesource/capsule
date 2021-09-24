@@ -1,162 +1,146 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.usethesource</groupId>
-    <artifactId>capsule</artifactId>
-    <version>0.7.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+  <groupId>io.usethesource</groupId>
+  <artifactId>capsule</artifactId>
+  <version>0.7.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
 
-    <licenses>
-        <license>
-            <name>BSD 2-Clause Simplified License</name>
-            <url>https://raw.githubusercontent.com/usethesource/capsule/main/LICENSE</url>
-        </license>
-    </licenses>
+  <licenses>
+    <license>
+      <name>BSD 2-Clause Simplified License</name>
+      <url>https://raw.githubusercontent.com/usethesource/capsule/main/LICENSE</url>
+    </license>
+  </licenses>
 
-    <scm>
-        <developerConnection>scm:git:ssh://git@github.com/usethesource/capsule.git</developerConnection>
-        <tag>HEAD</tag>
-    </scm>
+  <scm>
+    <developerConnection>scm:git:ssh://git@github.com/usethesource/capsule.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
-        <topleveldir>${project.basedir}</topleveldir>
-        <jacoco.reportPath>${topleveldir}/target/jacoco.exec</jacoco.reportPath>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
+    <topleveldir>${project.basedir}</topleveldir>
+    <jacoco.reportPath>${topleveldir}/target/jacoco.exec</jacoco.reportPath>
 
-        <junitVersion>5.7.2</junitVersion>
-        <junitQuickcheckVersion>1.0</junitQuickcheckVersion>
-    </properties>
+    <junitVersion>5.7.2</junitVersion>
+    <junitQuickcheckVersion>1.0</junitQuickcheckVersion>
+  </properties>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
-                <configuration>
-                    <release>11</release>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M5</version>
-                <configuration>
-                    <argLine>${argLine}</argLine>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>3.0.0-M4</version>
-                <configuration>
-                    <tagNameFormat>v@{project.version}</tagNameFormat>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.7</version>
-                    <!-- <configuration>
-                        <destfile>${topleveldir}/target/jacoco.exec</destfile>
-                        <datafile>${topleveldir}/target/jacoco.exec</datafile>
-                    </configuration> -->
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>prepare-agent</goal>
-                            </goals>
-                            <configuration>
-                                <append>true</append>
-                                <destFile>${topleveldir}/target/jacoco.exec</destFile>
-                            </configuration>
-                        </execution>
-                        <!-- <execution>
-                            <id>report</id>
-                            <phase>prepare-package</phase>
-                            <goals>
-                            <goal>report</goal>
-                            </goals>
-                        </execution> -->
-                    </executions>
-                </plugin>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0-M5</version>
+        <configuration>
+          <argLine>${argLine}</argLine>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.2.0</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>3.0.0-M4</version>
+        <configuration>
+          <tagNameFormat>v@{project.version}</tagNameFormat>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.7</version>
+        <!-- <configuration>
+          <destfile>${topleveldir}/target/jacoco.exec</destfile>
+          <datafile>${topleveldir}/target/jacoco.exec</datafile>
+        </configuration> -->
+        <executions>
+          <execution>
+            <goals>
+                <goal>prepare-agent</goal>
+            </goals>
+            <configuration>
+              <append>true</append>
+              <destFile>${topleveldir}/target/jacoco.exec</destFile>
+            </configuration>
+          </execution>
+          <!-- <execution>
+            <id>report</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution> -->
+        </executions>
+      </plugin>
 
 
-                <!--
-                    Goals (http://code.mycila.com/license-maven-plugin/#goals):
-                    * license:check: verify if some files miss license header. This goal is attached to the verify phase if declared in your pom.xml like above.
-                    * license:format: add the license header when missing. If a header is existing, it is updated to the new one.
-                    * license:remove: remove existing license header
-                -->
-                <plugin>
-                    <groupId>com.mycila</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <version>3.0</version>
-                    <configuration>
-                        <header>${topleveldir}/LICENSE.header-template</header>
-                        <mapping>
-                            <rsc>SLASHSTAR_STYLE</rsc>
-                        </mapping>
-                        <includes>
-                            <include>src/**</include>
-                        </includes>
-                        <excludes>
-                            <!-- nothing so far -->
-                        </excludes>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </build>
+      <!--
+          Goals (http://code.mycila.com/license-maven-plugin/#goals):
+              * license:check: verify if some files miss license header. This goal is attached to the verify phase if declared in your pom.xml like above.
+              * license:format: add the license header when missing. If a header is existing, it is updated to the new one.
+              * license:remove: remove existing license header
+      -->
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>3.0</version>
+        <configuration>
+          <header>${topleveldir}/LICENSE.header-template</header>
+          <mapping>
+            <rsc>SLASHSTAR_STYLE</rsc>
+          </mapping>
+          <includes>
+            <include>src/**</include>
+          </includes>
+          <excludes>
+            <!-- nothing so far -->
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
-        <dependencies>
-            <dependency>
-                <groupId>com.pholser</groupId>
-                <artifactId>junit-quickcheck-core</artifactId>
-                <version>${junitQuickcheckVersion}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.pholser</groupId>
-                <artifactId>junit-quickcheck-generators</artifactId>
-                <version>${junitQuickcheckVersion}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>1.6.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-simple</artifactId>
-                <version>1.6.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.vintage</groupId>
-                <artifactId>junit-vintage-engine</artifactId>
-                <version>${junitVersion}</version>
-                <scope>test</scope>
-            </dependency>
-        </dependencies>
-    </project>
+  <dependencies>
+    <dependency>
+      <groupId>com.pholser</groupId>
+      <artifactId>junit-quickcheck-core</artifactId>
+      <version>${junitQuickcheckVersion}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.pholser</groupId>
+      <artifactId>junit-quickcheck-generators</artifactId>
+      <version>${junitQuickcheckVersion}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.vintage</groupId>
+      <artifactId>junit-vintage-engine</artifactId>
+      <version>${junitVersion}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
