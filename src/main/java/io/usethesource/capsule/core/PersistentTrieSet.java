@@ -395,7 +395,9 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
   @Override
   public String toString() {
-    String body = stream().map(k -> k.toString()).reduce((o1, o2) -> String.join(", ", o1, o2))
+    String body = stream()
+        .map(element -> element.toString())
+        .reduce((left, right) -> String.join(", ", left, right))
         .orElse("");
     return String.format("{%s}", body);
   }
@@ -2128,6 +2130,15 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     @Override
     public int hashCode() {
       return cachedHashCode;
+    }
+
+    @Override
+    public String toString() {
+      String body = stream()
+          .map(element -> element.toString())
+          .reduce((left, right) -> String.join(", ", left, right))
+          .orElse("");
+      return String.format("{%s}", body);
     }
 
   }

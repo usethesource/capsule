@@ -482,9 +482,10 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
   @Override
   public String toString() {
-    String body =
-        entrySet().stream().map(entry -> String.format("%s: %s", entry.getKey(), entry.getValue()))
-            .reduce((o1, o2) -> String.join(", ", o1, o2)).orElse("");
+    String body = entrySet().stream()
+        .map(entry -> String.format("%s: %s", entry.getKey(), entry.getValue()))
+        .reduce((left, right) -> String.join(", ", left, right))
+        .orElse("");
     return String.format("{%s}", body);
   }
 
@@ -2420,6 +2421,15 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     @Override
     public int hashCode() {
       return cachedHashCode;
+    }
+
+    @Override
+    public String toString() {
+      String body = entrySet().stream()
+          .map(entry -> String.format("%s: %s", entry.getKey(), entry.getValue()))
+          .reduce((left, right) -> String.join(", ", left, right))
+          .orElse("");
+      return String.format("{%s}", body);
     }
 
     @Override
