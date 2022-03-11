@@ -4,7 +4,7 @@
 
   <groupId>io.usethesource</groupId>
   <artifactId>capsule</artifactId>
-  <version>0.6.4-SNAPSHOT</version>
+  <version>0.6.4</version>
   <packaging>jar</packaging>
 
   <licenses>
@@ -16,7 +16,7 @@
 
   <scm>
     <developerConnection>scm:git:ssh://git@github.com/usethesource/capsule.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>v0.6.4</tag>
   </scm>
 
   <properties>
