@@ -4,7 +4,7 @@
 
   <groupId>io.usethesource</groupId>
   <artifactId>capsule</artifactId>
-  <version>0.7.1-SNAPSHOT</version>
+  <version>0.6.4-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <licenses>
@@ -37,7 +37,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.0</version>
           <configuration>
-            <release>11</release>
+            <release>8</release>
           </configuration>
       </plugin>
       <plugin>
