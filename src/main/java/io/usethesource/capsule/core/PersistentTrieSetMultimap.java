@@ -489,7 +489,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     static final <K, V> CompactSetMultimapNode<K, V> mergeTwoSingletonPairs(final K key0,
         final V val0, final int keyHash0, final K key1, final V val1, final int keyHash1, final int shift) {
-      // assert !(cmp.equals(key0, key1));
+      // assert !(Objects.equals(key0, key1));
 
       if (shift >= HASH_CODE_LENGTH) {
         return AbstractHashCollisionNode
@@ -525,7 +525,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         final K key0,
         final io.usethesource.capsule.Set.Immutable<V> valColl0, final int keyHash0,
         final K key1, final V val1, final int keyHash1, final int shift) {
-      // assert !(cmp.equals(key0, key1));
+      // assert !(Objects.equals(key0, key1));
 
       if (shift >= HASH_CODE_LENGTH) {
         return AbstractHashCollisionNode
@@ -1237,7 +1237,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         if (Objects.equals(currentKey, key)) {
 
           final V currentVal = getSingletonValue(dataIndex);
-          // if (cmp.equals(currentVal, val)) {
+          // if (Objects.equals(currentVal, val)) {
           //
           // // remove mapping
           // details.updated(val);
