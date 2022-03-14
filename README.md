@@ -6,11 +6,11 @@
 
 ## Synopsis
 
-Capsule aims to become a full-fledged (immutable) collections library for Java 8+ that is solely built around persistent tries. The library is designed for standalone use and for being embedded in domain-specific languages. Capsule still has to undergo some incubation before it can ship as a well-rounded collection library. Nevertheless, the code is stable and performance is solid. Feel free to use it and let us know about your experiences!
+Capsule aims to become a full-fledged (immutable) collections library for Java 11+ that is solely built around persistent tries. The library is designed for standalone use and for being embedded in domain-specific languages. Capsule still has to undergo some incubation before it can ship as a well-rounded collection library. Nevertheless, the code is stable and performance is solid. Feel free to use it and let us know about your experiences!
 
 # Getting Started
 
-Binary builds of capsule are deployed in the usethesource repository. In case you use Maven for dependency management, you have to add another repository location to your pom.xml file:
+Binary builds of Capsule are deployed in the usethesource repository. In case you use Maven for dependency management, you have to add another repository location to your pom.xml file:
 
 ```
 <repositories>
@@ -21,13 +21,25 @@ Binary builds of capsule are deployed in the usethesource repository. In case yo
 </repositories>
 ```
 
-Furthermore, you have to declare capsule as a dependency. To obtain the latest stable version for Java 8+, insert the following snippet in your pom.xml file:
+Furthermore, you have to declare Capsule as a dependency.
+
+To obtain the latest release for Java 11+, insert the following snippet in your `pom.xml` file:
 
 ```
 <dependency>
   <groupId>io.usethesource</groupId>
   <artifactId>capsule</artifactId>
-  <version>0.6.3</version>
+  <version>0.7.1</version>
+</dependency>
+```
+
+To obtain the latest available version for Java 8, insert the following snippet in your `pom.xml` file:
+
+```
+<dependency>
+  <groupId>io.usethesource</groupId>
+  <artifactId>capsule</artifactId>
+  <version>0.6.4</version>
 </dependency>
 ```
 
