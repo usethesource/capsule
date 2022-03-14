@@ -14,10 +14,10 @@ Binary builds of capsule are deployed in the usethesource repository. In case yo
 
 ```
 <repositories>
-	<repository>
-		<id>usethesource</id>
-		<url>https://releases.usethesource.io/maven/</url>
-	</repository>
+  <repository>
+    <id>usethesource</id>
+    <url>https://releases.usethesource.io/maven/</url>
+  </repository>
 </repositories>
 ```
 
@@ -25,9 +25,9 @@ Furthermore, you have to declare capsule as a dependency. To obtain the latest s
 
 ```
 <dependency>
-	<groupId>io.usethesource</groupId>
-	<artifactId>capsule</artifactId>
-	<version>0.6.3</version>
+  <groupId>io.usethesource</groupId>
+  <artifactId>capsule</artifactId>
+  <version>0.6.3</version>
 </dependency>
 ```
 
@@ -36,7 +36,7 @@ Snippets for other build tools and dependency management systems may vary slight
 # Background: Efficient Immutable Data Structures on the JVM
 The standard libraries of recent Java Virtual Machine languages, such as Clojure or Scala, contain scalable and well-performing immutable collection data structures that are implemented as Hash-Array Mapped Tries (HAMTs). HAMTs already feature efficient lookup, insert, and delete operations, however due to their tree-based nature their memory footprints and the runtime performance of iteration and equality checking lag behind array-based counterparts.
 
-We introduce CHAMP (Compressed Hash-Array Mapped Prefix-tree), an evolutionary improvement over HAMTs. The new design increases the overall performance of immutable sets and maps. Furthermore, its resulting general purpose design increases cache locality and features a canonical representation. 
+We introduce CHAMP (Compressed Hash-Array Mapped Prefix-tree), an evolutionary improvement over HAMTs. The new design increases the overall performance of immutable sets and maps. Furthermore, its resulting general purpose design increases cache locality and features a canonical representation.
 
 # References and Further Readings
 
