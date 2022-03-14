@@ -2,7 +2,7 @@ plugins {
   `java-library`
 }
 
-val majorMinorPatchVersion = "0.7.1"
+val majorMinorPatchVersion = "0.7.2"
 val isSnapshotBuild = !project.hasProperty("isReleaseBuild")
 
 version = majorMinorPatchVersion.let {
