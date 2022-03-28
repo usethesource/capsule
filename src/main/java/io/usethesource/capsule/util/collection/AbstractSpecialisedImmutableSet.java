@@ -13,7 +13,6 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 
-import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.iterator.EmptySupplierIterator;
 import io.usethesource.capsule.util.iterator.SupplierIterator;
 
@@ -116,11 +115,6 @@ public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutab
 
   @Override
   public boolean equals(final Object other) {
-    return equivalent(other, Object::equals);
-  }
-
-  @Override
-  public boolean equivalent(final Object other, final EqualityComparator<Object> cmp) {
     if (other == this) {
       return true;
     }
@@ -134,7 +128,7 @@ public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutab
 
         if (this.size() == that.size()) {
           for (K e : that) {
-            if (!this.containsEquivalent(e, cmp)) {
+            if (!this.contains(e)) {
               return false;
             }
           }
@@ -169,17 +163,6 @@ public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutab
   }
 
   @Override
-  public io.usethesource.capsule.Set.Immutable<K> __insertAllEquivalent(Set<? extends K> set,
-      EqualityComparator<Object> cmp) {
-    io.usethesource.capsule.Set.Transient<K> tmp = asTransient();
-    if (tmp.__insertAllEquivalent(set, cmp)) {
-      return tmp.freeze();
-    } else {
-      return this;
-    }
-  }
-
-  @Override
   public io.usethesource.capsule.Set.Immutable<K> __retainAll(Set<? extends K> set) {
     io.usethesource.capsule.Set.Transient<K> tmp = asTransient();
     if (tmp.__retainAll(set)) {
@@ -190,32 +173,9 @@ public abstract class AbstractSpecialisedImmutableSet<K> extends AbstractImmutab
   }
 
   @Override
-  public io.usethesource.capsule.Set.Immutable<K> __retainAllEquivalent(
-      io.usethesource.capsule.Set.Transient<? extends K> set,
-      EqualityComparator<Object> cmp) {
-    io.usethesource.capsule.Set.Transient<K> tmp = asTransient();
-    if (tmp.__retainAllEquivalent(set, cmp)) {
-      return tmp.freeze();
-    } else {
-      return this;
-    }
-  }
-
-  @Override
   public io.usethesource.capsule.Set.Immutable<K> __removeAll(Set<? extends K> set) {
     io.usethesource.capsule.Set.Transient<K> tmp = asTransient();
     if (tmp.__removeAll(set)) {
-      return tmp.freeze();
-    } else {
-      return this;
-    }
-  }
-
-  @Override
-  public io.usethesource.capsule.Set.Immutable<K> __removeAllEquivalent(Set<? extends K> set,
-      EqualityComparator<Object> cmp) {
-    io.usethesource.capsule.Set.Transient<K> tmp = asTransient();
-    if (tmp.__removeAllEquivalent(set, cmp)) {
       return tmp.freeze();
     } else {
       return this;
@@ -236,17 +196,7 @@ class Set0<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public boolean containsEquivalent(Object key, EqualityComparator<Object> cmp) {
-    return false;
-  }
-
-  @Override
   public K get(Object key) {
-    return null;
-  }
-
-  @Override
-  public K getEquivalent(Object key, EqualityComparator<Object> cmp) {
     return null;
   }
 
@@ -266,19 +216,7 @@ class Set0<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public io.usethesource.capsule.Set.Immutable<K> __insertEquivalent(K key,
-      EqualityComparator<Object> cmp) {
-    return setOf(key);
-  }
-
-  @Override
   public io.usethesource.capsule.Set.Immutable<K> __remove(K key) {
-    return this;
-  }
-
-  @Override
-  public io.usethesource.capsule.Set.Immutable<K> __removeEquivalent(K key,
-      EqualityComparator<Object> cmp) {
     return this;
   }
 
@@ -318,26 +256,8 @@ class Set1<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public boolean containsEquivalent(Object key, EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public K get(Object key) {
     if (key.equals(key1)) {
-      return key1;
-    } else {
-      return null;
-    }
-  }
-
-  @Override
-  public K getEquivalent(Object key, EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
       return key1;
     } else {
       return null;
@@ -404,28 +324,8 @@ class Set1<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public io.usethesource.capsule.Set.Immutable<K> __insertEquivalent(K key,
-      EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return setOf(key);
-    } else {
-      return setOf(key1, key);
-    }
-  }
-
-  @Override
   public io.usethesource.capsule.Set.Immutable<K> __remove(K key) {
     if (key.equals(key1)) {
-      return setOf();
-    } else {
-      return this;
-    }
-  }
-
-  @Override
-  public io.usethesource.capsule.Set.Immutable<K> __removeEquivalent(K key,
-      EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
       return setOf();
     } else {
       return this;
@@ -477,32 +377,10 @@ class Set2<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public boolean containsEquivalent(Object key, EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return true;
-    } else if (cmp.equals(key, key2)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public K get(Object key) {
     if (key.equals(key1)) {
       return key1;
     } else if (key.equals(key2)) {
-      return key2;
-    } else {
-      return null;
-    }
-  }
-
-  @Override
-  public K getEquivalent(Object key, EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return key1;
-    } else if (cmp.equals(key, key2)) {
       return key2;
     } else {
       return null;
@@ -575,34 +453,10 @@ class Set2<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public io.usethesource.capsule.Set.Immutable<K> __insertEquivalent(K key,
-      EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return setOf(key, key2);
-    } else if (cmp.equals(key, key2)) {
-      return setOf(key1, key);
-    } else {
-      return setOf(key1, key2, key);
-    }
-  }
-
-  @Override
   public io.usethesource.capsule.Set.Immutable<K> __remove(K key) {
     if (key.equals(key1)) {
       return setOf(key2);
     } else if (key.equals(key2)) {
-      return setOf(key1);
-    } else {
-      return this;
-    }
-  }
-
-  @Override
-  public io.usethesource.capsule.Set.Immutable<K> __removeEquivalent(K key,
-      EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return setOf(key2);
-    } else if (cmp.equals(key, key2)) {
       return setOf(key1);
     } else {
       return this;
@@ -659,38 +513,12 @@ class Set3<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public boolean containsEquivalent(Object key, EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return true;
-    } else if (cmp.equals(key, key2)) {
-      return true;
-    } else if (cmp.equals(key, key3)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public K get(Object key) {
     if (key.equals(key1)) {
       return key1;
     } else if (key.equals(key2)) {
       return key2;
     } else if (key.equals(key3)) {
-      return key3;
-    } else {
-      return null;
-    }
-  }
-
-  @Override
-  public K getEquivalent(Object key, EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return key1;
-    } else if (cmp.equals(key, key2)) {
-      return key2;
-    } else if (cmp.equals(key, key3)) {
       return key3;
     } else {
       return null;
@@ -769,40 +597,12 @@ class Set3<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public io.usethesource.capsule.Set.Immutable<K> __insertEquivalent(K key,
-      EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return setOf(key, key2, key3);
-    } else if (cmp.equals(key, key2)) {
-      return setOf(key1, key, key3);
-    } else if (cmp.equals(key, key3)) {
-      return setOf(key1, key2, key);
-    } else {
-      return setOf(key1, key2, key3, key);
-    }
-  }
-
-  @Override
   public io.usethesource.capsule.Set.Immutable<K> __remove(K key) {
     if (key.equals(key1)) {
       return setOf(key2, key3);
     } else if (key.equals(key2)) {
       return setOf(key1, key3);
     } else if (key.equals(key3)) {
-      return setOf(key1, key2);
-    } else {
-      return this;
-    }
-  }
-
-  @Override
-  public io.usethesource.capsule.Set.Immutable<K> __removeEquivalent(K key,
-      EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return setOf(key2, key3);
-    } else if (cmp.equals(key, key2)) {
-      return setOf(key1, key3);
-    } else if (cmp.equals(key, key3)) {
       return setOf(key1, key2);
     } else {
       return this;
@@ -865,21 +665,6 @@ class Set4<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public boolean containsEquivalent(Object key, EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return true;
-    } else if (cmp.equals(key, key2)) {
-      return true;
-    } else if (cmp.equals(key, key3)) {
-      return true;
-    } else if (cmp.equals(key, key4)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public K get(Object key) {
     if (key.equals(key1)) {
       return key1;
@@ -888,21 +673,6 @@ class Set4<K> extends AbstractSpecialisedImmutableSet<K> {
     } else if (key.equals(key3)) {
       return key3;
     } else if (key.equals(key4)) {
-      return key4;
-    } else {
-      return null;
-    }
-  }
-
-  @Override
-  public K getEquivalent(Object key, EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return key1;
-    } else if (cmp.equals(key, key2)) {
-      return key2;
-    } else if (cmp.equals(key, key3)) {
-      return key3;
-    } else if (cmp.equals(key, key4)) {
       return key4;
     } else {
       return null;
@@ -987,22 +757,6 @@ class Set4<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public io.usethesource.capsule.Set.Immutable<K> __insertEquivalent(K key,
-      EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return setOf(key, key2, key3, key4);
-    } else if (cmp.equals(key, key2)) {
-      return setOf(key1, key, key3, key4);
-    } else if (cmp.equals(key, key3)) {
-      return setOf(key1, key2, key, key4);
-    } else if (cmp.equals(key, key4)) {
-      return setOf(key1, key2, key3, key);
-    } else {
-      return setOf(key1, key2, key3, key4, key);
-    }
-  }
-
-  @Override
   public io.usethesource.capsule.Set.Immutable<K> __remove(K key) {
     if (key.equals(key1)) {
       return setOf(key2, key3, key4);
@@ -1011,22 +765,6 @@ class Set4<K> extends AbstractSpecialisedImmutableSet<K> {
     } else if (key.equals(key3)) {
       return setOf(key1, key2, key4);
     } else if (key.equals(key4)) {
-      return setOf(key1, key2, key3);
-    } else {
-      return this;
-    }
-  }
-
-  @Override
-  public io.usethesource.capsule.Set.Immutable<K> __removeEquivalent(K key,
-      EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return setOf(key2, key3, key4);
-    } else if (cmp.equals(key, key2)) {
-      return setOf(key1, key3, key4);
-    } else if (cmp.equals(key, key3)) {
-      return setOf(key1, key2, key4);
-    } else if (cmp.equals(key, key4)) {
       return setOf(key1, key2, key3);
     } else {
       return this;
@@ -1096,23 +834,6 @@ class Set5<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public boolean containsEquivalent(Object key, EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return true;
-    } else if (cmp.equals(key, key2)) {
-      return true;
-    } else if (cmp.equals(key, key3)) {
-      return true;
-    } else if (cmp.equals(key, key4)) {
-      return true;
-    } else if (cmp.equals(key, key5)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public K get(Object key) {
     if (key.equals(key1)) {
       return key1;
@@ -1123,23 +844,6 @@ class Set5<K> extends AbstractSpecialisedImmutableSet<K> {
     } else if (key.equals(key4)) {
       return key4;
     } else if (key.equals(key5)) {
-      return key5;
-    } else {
-      return null;
-    }
-  }
-
-  @Override
-  public K getEquivalent(Object key, EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return key1;
-    } else if (cmp.equals(key, key2)) {
-      return key2;
-    } else if (cmp.equals(key, key3)) {
-      return key3;
-    } else if (cmp.equals(key, key4)) {
-      return key4;
-    } else if (cmp.equals(key, key5)) {
       return key5;
     } else {
       return null;
@@ -1230,24 +934,6 @@ class Set5<K> extends AbstractSpecialisedImmutableSet<K> {
   }
 
   @Override
-  public io.usethesource.capsule.Set.Immutable<K> __insertEquivalent(K key,
-      EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return setOf(key, key2, key3, key4, key5);
-    } else if (cmp.equals(key, key2)) {
-      return setOf(key1, key, key3, key4, key5);
-    } else if (cmp.equals(key, key3)) {
-      return setOf(key1, key2, key, key4, key5);
-    } else if (cmp.equals(key, key4)) {
-      return setOf(key1, key2, key3, key, key5);
-    } else if (cmp.equals(key, key5)) {
-      return setOf(key1, key2, key3, key4, key);
-    } else {
-      return setOf(key1, key2, key3, key4, key5, key);
-    }
-  }
-
-  @Override
   public io.usethesource.capsule.Set.Immutable<K> __remove(K key) {
     if (key.equals(key1)) {
       return setOf(key2, key3, key4, key5);
@@ -1258,24 +944,6 @@ class Set5<K> extends AbstractSpecialisedImmutableSet<K> {
     } else if (key.equals(key4)) {
       return setOf(key1, key2, key3, key5);
     } else if (key.equals(key5)) {
-      return setOf(key1, key2, key3, key4);
-    } else {
-      return this;
-    }
-  }
-
-  @Override
-  public io.usethesource.capsule.Set.Immutable<K> __removeEquivalent(K key,
-      EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return setOf(key2, key3, key4, key5);
-    } else if (cmp.equals(key, key2)) {
-      return setOf(key1, key3, key4, key5);
-    } else if (cmp.equals(key, key3)) {
-      return setOf(key1, key2, key4, key5);
-    } else if (cmp.equals(key, key4)) {
-      return setOf(key1, key2, key3, key5);
-    } else if (cmp.equals(key, key5)) {
       return setOf(key1, key2, key3, key4);
     } else {
       return this;

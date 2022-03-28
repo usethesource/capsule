@@ -8,7 +8,6 @@
 package io.usethesource.capsule.core;
 
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,6 @@ import io.usethesource.capsule.core.trie.EitherSingletonOrCollection.Type;
 import io.usethesource.capsule.core.trie.MultimapNode;
 import io.usethesource.capsule.core.trie.MultimapResult;
 import io.usethesource.capsule.util.ArrayUtils;
-import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableSet;
 
@@ -64,29 +62,11 @@ public class PersistentTrieSetMultimap<K, V> extends
 
   private static final long serialVersionUID = 42L;
 
-  private static final PersistentTrieSetMultimap EMPTY_SETMULTIMAP = new PersistentTrieSetMultimap(
-      EqualityComparator.EQUALS, CompactSetMultimapNode.EMPTY_NODE, 0, 0, 0);
+  private static final PersistentTrieSetMultimap EMPTY_SETMULTIMAP =
+      new PersistentTrieSetMultimap(CompactSetMultimapNode.EMPTY_NODE, 0, 0, 0);
 
-//  PersistentTrieSetMultimap(EqualityComparator<Object> cmp,
-//      AbstractSetMultimapNode<K, V> rootNode) {
-//    this.cmp = cmp;
-//    this.rootNode = rootNode;
-//
-//    // // this.cachedHashCode = hashCode(rootNode);
-//    this.cachedSize = size(rootNode);
-//
-//    this.cachedKeySetHashCode = keySetHashCode(rootNode);
-//    this.cachedKeySetSize = keySetSize(rootNode);
-//
-//    if (DEBUG) {
-//      // assert checkHashCodeAndSize(cachedHashCode, cachedSize, entryIterator());
-//      assert checkKeySetHashCodeAndSize(cachedKeySetHashCode, cachedKeySetSize, keyIterator());
-//    }
-//  }
-
-  PersistentTrieSetMultimap(EqualityComparator<Object> cmp, AbstractSetMultimapNode<K, V> rootNode,
-      int cachedSize, int keySetHashCode, int keySetSize) {
-    super(cmp, rootNode, cachedSize, keySetHashCode, keySetSize);
+  PersistentTrieSetMultimap(AbstractSetMultimapNode<K, V> rootNode, int cachedSize, int keySetHashCode, int keySetSize) {
+    super(rootNode, cachedSize, keySetHashCode, keySetSize);
   }
 
   @Override
@@ -107,18 +87,12 @@ public class PersistentTrieSetMultimap<K, V> extends
   }
 
   @Override
-  protected final PersistentTrieSetMultimap<K, V> wrap(EqualityComparator<Object> cmp,
-      AbstractSetMultimapNode<K, V> rootNode, int cachedSize, int keySetHashCode, int keySetSize) {
-    return new PersistentTrieSetMultimap(cmp, rootNode, cachedSize, keySetHashCode, keySetSize);
+  protected final PersistentTrieSetMultimap<K, V> wrap(AbstractSetMultimapNode<K, V> rootNode, int cachedSize, int keySetHashCode, int keySetSize) {
+    return new PersistentTrieSetMultimap(rootNode, cachedSize, keySetHashCode, keySetSize);
   }
 
   public static final <K, V> SetMultimap.Immutable<K, V> of() {
     return PersistentTrieSetMultimap.EMPTY_SETMULTIMAP;
-  }
-
-  public static final <K, V> SetMultimap.Immutable<K, V> of(EqualityComparator<Object> cmp) {
-    // TODO: unify with `of()`
-    return new PersistentTrieSetMultimap(cmp, CompactSetMultimapNode.EMPTY_NODE, 0, 0, 0);
   }
 
   public static final <K, V> SetMultimap.Immutable<K, V> of(K key, V... values) {
@@ -140,12 +114,6 @@ public class PersistentTrieSetMultimap<K, V> extends
 
   public static final <K, V> SetMultimap.Transient<K, V> transientOf() {
     return PersistentTrieSetMultimap.EMPTY_SETMULTIMAP.asTransient();
-  }
-
-  public static final <K, V> SetMultimap.Transient<K, V> transientOf(
-      EqualityComparator<Object> cmp) {
-    // TODO: unify with `of()`
-    return (SetMultimap.Transient<K, V>) of(cmp).asTransient();
   }
 
   public static final <K, V> SetMultimap.Transient<K, V> transientOf(K key, V... values) {
@@ -520,9 +488,8 @@ public class PersistentTrieSetMultimap<K, V> extends
         final AtomicReference<Thread> mutator, final int bitpos, final K key, final V val);
 
     static final <K, V> CompactSetMultimapNode<K, V> mergeTwoSingletonPairs(final K key0,
-        final V val0, final int keyHash0, final K key1, final V val1, final int keyHash1,
-        final int shift, EqualityComparator<Object> cmp) {
-      // assert !(cmp.equals(key0, key1));
+        final V val0, final int keyHash0, final K key1, final V val1, final int keyHash1, final int shift) {
+      // assert !(Objects.equals(key0, key1));
 
       if (shift >= HASH_CODE_LENGTH) {
         return AbstractHashCollisionNode
@@ -545,8 +512,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         }
       } else {
         final CompactSetMultimapNode<K, V> node = mergeTwoSingletonPairs(key0, val0, keyHash0,
-            key1,
-            val1, keyHash1, shift + BIT_PARTITION_SIZE, cmp);
+            key1, val1, keyHash1, shift + BIT_PARTITION_SIZE);
         // values fit on next level
 
         final int rawMap1 = bitpos(mask0);
@@ -558,9 +524,8 @@ public class PersistentTrieSetMultimap<K, V> extends
     static final <K, V> CompactSetMultimapNode<K, V> mergeCollectionAndSingletonPairs(
         final K key0,
         final io.usethesource.capsule.Set.Immutable<V> valColl0, final int keyHash0,
-        final K key1, final V val1, final int keyHash1, final int shift,
-        EqualityComparator<Object> cmp) {
-      // assert !(cmp.equals(key0, key1));
+        final K key1, final V val1, final int keyHash1, final int shift) {
+      // assert !(Objects.equals(key0, key1));
 
       if (shift >= HASH_CODE_LENGTH) {
         return AbstractHashCollisionNode
@@ -579,7 +544,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         return nodeOf(null, rawMap1, rawMap2, new Object[]{key1, val1, key0, valColl0});
       } else {
         final CompactSetMultimapNode<K, V> node = mergeCollectionAndSingletonPairs(key0, valColl0,
-            keyHash0, key1, val1, keyHash1, shift + BIT_PARTITION_SIZE, cmp);
+            keyHash0, key1, val1, keyHash1, shift + BIT_PARTITION_SIZE);
         // values fit on next level
 
         final int rawMap1 = bitpos(mask0);
@@ -591,9 +556,8 @@ public class PersistentTrieSetMultimap<K, V> extends
     static final <K, V, C extends io.usethesource.capsule.Set.Immutable<V>> AbstractSetMultimapNode<K, V> mergeTwoCollectionPairs(
         final K key0,
         final C valColl0, final int keyHash0, final K key1,
-        final C valColl1, final int keyHash1, final int shift,
-        EqualityComparator<Object> cmp) {
-      assert !(cmp.equals(key0, key1));
+        final C valColl1, final int keyHash1, final int shift) {
+      assert !(Objects.equals(key0, key1));
 
       if (shift >= HASH_CODE_LENGTH) {
         return AbstractHashCollisionNode.of(keyHash0, key1, valColl1, key0, valColl0);
@@ -614,7 +578,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         }
       } else {
         final AbstractSetMultimapNode<K, V> node = mergeTwoCollectionPairs(key0, valColl0, keyHash0,
-            key1, valColl1, keyHash1, shift + BIT_PARTITION_SIZE, cmp);
+            key1, valColl1, keyHash1, shift + BIT_PARTITION_SIZE);
         // values fit on next level
         int bitmap0 = 1 << mask0;
         int bitmap1 = 0;
@@ -669,8 +633,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override // TODO: final
-    public boolean containsKey(final K key, final int keyHash, final int shift,
-        EqualityComparator<Object> cmp) {
+    public boolean containsKey(final K key, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -683,25 +646,24 @@ public class PersistentTrieSetMultimap<K, V> extends
 
       if (isBitInBitmap(dataMap, bitpos)) {
         final int index = index(dataMap, mask, bitpos);
-        return cmp.equals(getSingletonKey(index), key);
+        return Objects.equals(getSingletonKey(index), key);
       }
 
       if (isBitInBitmap(collMap, bitpos)) {
         final int index = index(collMap, mask, bitpos);
-        return cmp.equals(getCollectionKey(index), key);
+        return Objects.equals(getCollectionKey(index), key);
       }
 
       if (isBitInBitmap(nodeMap, bitpos)) {
         final int index = index(nodeMap, mask, bitpos);
-        return getNode(index).containsKey(key, keyHash, shift + BIT_PARTITION_SIZE, cmp);
+        return getNode(index).containsKey(key, keyHash, shift + BIT_PARTITION_SIZE);
       }
 
       return false;
     }
 
     @Override // TODO: final
-    public boolean containsTuple(final K key, final V value, final int keyHash, final int shift,
-        EqualityComparator<Object> cmp) {
+    public boolean containsTuple(final K key, final V value, final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -714,19 +676,18 @@ public class PersistentTrieSetMultimap<K, V> extends
 
       if (isBitInBitmap(dataMap, bitpos)) {
         final int index = index(dataMap, mask, bitpos);
-        return cmp.equals(getSingletonKey(index), key) && cmp
-            .equals(getSingletonValue(index), value);
+        return Objects.equals(getSingletonKey(index), key) && Objects.equals(getSingletonValue(index), value);
       }
 
       if (isBitInBitmap(collMap, bitpos)) {
         final int index = index(collMap, mask, bitpos);
-        return cmp.equals(getCollectionKey(index), key)
-            && getCollectionValue(index).containsEquivalent(value, cmp);
+        return Objects.equals(getCollectionKey(index), key)
+            && getCollectionValue(index).contains(value);
       }
 
       if (isBitInBitmap(nodeMap, bitpos)) {
         final int index = index(nodeMap, mask, bitpos);
-        return getNode(index).containsTuple(key, value, keyHash, shift + BIT_PARTITION_SIZE, cmp);
+        return getNode(index).containsTuple(key, value, keyHash, shift + BIT_PARTITION_SIZE);
       }
 
       return false;
@@ -734,7 +695,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     @Override // TODO: final
     public Optional<io.usethesource.capsule.Set.Immutable<V>> findByKey(final K key,
-        final int keyHash, final int shift, EqualityComparator<Object> cmp) {
+                                                                        final int keyHash, final int shift) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -749,7 +710,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         final int index = index(dataMap, mask, bitpos);
 
         final K currentKey = getSingletonKey(index);
-        if (cmp.equals(currentKey, key)) {
+        if (Objects.equals(currentKey, key)) {
 
           final V currentVal = getSingletonValue(index);
           return Optional.of(io.usethesource.capsule.Set.Immutable.of(currentVal));
@@ -762,7 +723,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         final int index = index(collMap, mask, bitpos);
 
         final K currentKey = getCollectionKey(index);
-        if (cmp.equals(currentKey, key)) {
+        if (Objects.equals(currentKey, key)) {
 
           final io.usethesource.capsule.Set.Immutable<V> currentValColl =
               getCollectionValue(index);
@@ -776,7 +737,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         final int index = index(nodeMap, mask, bitpos);
 
         final AbstractSetMultimapNode<K, V> subNode = getNode(index);
-        return subNode.findByKey(key, keyHash, shift + BIT_PARTITION_SIZE, cmp);
+        return subNode.findByKey(key, keyHash, shift + BIT_PARTITION_SIZE);
       }
 
       // default
@@ -785,10 +746,9 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     @Override // TODO: final
     public AbstractSetMultimapNode<K, V> insertedSingle(final AtomicReference<Thread> mutator,
-        final K key,
-        final V value, final int keyHash, final int shift,
-        final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details,
-        EqualityComparator<Object> cmp) {
+                                                        final K key,
+                                                        final V value, final int keyHash, final int shift,
+                                                        final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -803,10 +763,10 @@ public class PersistentTrieSetMultimap<K, V> extends
         final int dataIndex = index(dataMap, mask, bitpos);
         final K currentKey = getSingletonKey(dataIndex);
 
-        if (cmp.equals(currentKey, key)) {
+        if (Objects.equals(currentKey, key)) {
           final V currentVal = getSingletonValue(dataIndex);
 
-          if (cmp.equals(currentVal, value)) {
+          if (Objects.equals(currentVal, value)) {
             return this;
           } else {
             // migrate from singleton to collection
@@ -822,7 +782,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
           final AbstractSetMultimapNode<K, V> subNodeNew = mergeTwoSingletonPairs(currentKey,
               currentVal, transformHashCode(currentKey.hashCode()), key, value, keyHash,
-              shift + BIT_PARTITION_SIZE, cmp);
+              shift + BIT_PARTITION_SIZE);
 
           details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE), 1);
           return copyAndMigrateFromSingletonToNode(mutator, bitpos, subNodeNew);
@@ -833,7 +793,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         final int collIndex = index(collMap, mask, bitpos);
         final K currentCollKey = getCollectionKey(collIndex);
 
-        if (cmp.equals(currentCollKey, key)) {
+        if (Objects.equals(currentCollKey, key)) {
           final io.usethesource.capsule.Set.Immutable<V> currentCollVal =
               getCollectionValue(collIndex);
 
@@ -853,7 +813,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               getCollectionValue(collIndex);
           final AbstractSetMultimapNode<K, V> subNodeNew = mergeCollectionAndSingletonPairs(
               currentCollKey, currentValues, transformHashCode(currentCollKey.hashCode()), key,
-              value, keyHash, shift + BIT_PARTITION_SIZE, cmp);
+              value, keyHash, shift + BIT_PARTITION_SIZE);
 
           details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE), 1);
           return copyAndMigrateFromCollectionToNode(mutator, bitpos, subNodeNew);
@@ -863,9 +823,7 @@ public class PersistentTrieSetMultimap<K, V> extends
       if (isBitInBitmap(nodeMap, bitpos)) {
         final AbstractSetMultimapNode<K, V> subNode = getNode(nodeIndex(bitpos));
         final AbstractSetMultimapNode<K, V> subNodeNew =
-            subNode
-                .insertedSingle(mutator, key, value, keyHash, shift + BIT_PARTITION_SIZE, details,
-                    cmp);
+            subNode.insertedSingle(mutator, key, value, keyHash, shift + BIT_PARTITION_SIZE, details);
 
         if (details.getModificationEffect() != NOTHING) {
           return copyAndSetNode(mutator, bitpos, subNodeNew);
@@ -882,10 +840,9 @@ public class PersistentTrieSetMultimap<K, V> extends
     // TODO: final
     @Override
     public AbstractSetMultimapNode<K, V> insertedMultiple(final AtomicReference<Thread> mutator,
-        final K key, final io.usethesource.capsule.Set.Immutable<V> values, final int keyHash,
-        final int shift,
-        final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details,
-        EqualityComparator<Object> cmp) {
+                                                          final K key, final io.usethesource.capsule.Set.Immutable<V> values, final int keyHash,
+                                                          final int shift,
+                                                          final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -900,7 +857,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         final int dataIndex = index(dataMap, mask, bitpos);
         final K currentKey = getSingletonKey(dataIndex);
 
-        if (cmp.equals(currentKey, key)) {
+        if (Objects.equals(currentKey, key)) {
           final V currentVal = getSingletonValue(dataIndex);
 
           // migrate from singleton to collection
@@ -915,7 +872,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
           final AbstractSetMultimapNode<K, V> subNodeNew = mergeCollectionAndSingletonPairs(key,
               values, keyHash, currentKey, currentVal, transformHashCode(currentKey.hashCode()),
-              shift + BIT_PARTITION_SIZE, cmp);
+              shift + BIT_PARTITION_SIZE);
           final int sizeDelta = values.size();
 
           details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE_COLLECTION),
@@ -928,7 +885,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         final int collIndex = index(collMap, mask, bitpos);
         final K currentCollKey = getCollectionKey(collIndex);
 
-        if (cmp.equals(currentCollKey, key)) {
+        if (Objects.equals(currentCollKey, key)) {
           final io.usethesource.capsule.Set.Immutable<V> currentCollVal =
               getCollectionValue(collIndex);
 
@@ -949,7 +906,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               getCollectionValue(collIndex);
           final AbstractSetMultimapNode<K, V> subNodeNew = mergeTwoCollectionPairs(
               currentCollKey, currentValues, transformHashCode(currentCollKey.hashCode()), key,
-              values, keyHash, shift + BIT_PARTITION_SIZE, cmp);
+              values, keyHash, shift + BIT_PARTITION_SIZE);
           final int sizeDelta = values.size();
 
           details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE_COLLECTION),
@@ -961,9 +918,7 @@ public class PersistentTrieSetMultimap<K, V> extends
       if (isBitInBitmap(nodeMap, bitpos)) {
         final AbstractSetMultimapNode<K, V> subNode = getNode(nodeIndex(bitpos));
         final AbstractSetMultimapNode<K, V> subNodeNew =
-            subNode
-                .insertedMultiple(mutator, key, values, keyHash, shift + BIT_PARTITION_SIZE,
-                    details, cmp);
+            subNode.insertedMultiple(mutator, key, values, keyHash, shift + BIT_PARTITION_SIZE, details);
 
         if (details.getModificationEffect() != NOTHING) {
           return copyAndSetNode(mutator, bitpos, subNodeNew);
@@ -980,24 +935,22 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     @Override
     public final AbstractSetMultimapNode<K, V> updated(AtomicReference<Thread> mutator,
-        K key,
-        io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift,
-        MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details,
-        EqualityComparator<Object> cmp) {
+                                                       K key,
+                                                       io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift,
+                                                       MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
       if (values.size() == 1) {
         final V value = values.findFirst().get();
-        return updatedSingle(mutator, key, value, keyHash, shift, details, cmp);
+        return updatedSingle(mutator, key, value, keyHash, shift, details);
       } else {
-        return updatedMultiple(mutator, key, values, keyHash, shift, details, cmp);
+        return updatedMultiple(mutator, key, values, keyHash, shift, details);
       }
     }
 
     @Override // TODO: final
     public AbstractSetMultimapNode<K, V> updatedSingle(final AtomicReference<Thread> mutator,
-        final K key,
-        final V value, final int keyHash, final int shift,
-        final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details,
-        EqualityComparator<Object> cmp) {
+                                                       final K key,
+                                                       final V value, final int keyHash, final int shift,
+                                                       final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1012,7 +965,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         final int dataIndex = index(dataMap, mask, bitpos);
         final K currentKey = getSingletonKey(dataIndex);
 
-        if (cmp.equals(currentKey, key)) {
+        if (Objects.equals(currentKey, key)) {
           final V currentVal = getSingletonValue(dataIndex);
 
           // update singleton value
@@ -1025,7 +978,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
           final AbstractSetMultimapNode<K, V> subNodeNew = mergeTwoSingletonPairs(currentKey,
               currentVal, transformHashCode(currentKey.hashCode()), key, value, keyHash,
-              shift + BIT_PARTITION_SIZE, cmp);
+              shift + BIT_PARTITION_SIZE);
 
           details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE));
           return copyAndMigrateFromSingletonToNode(mutator, bitpos, subNodeNew);
@@ -1036,7 +989,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         final int collIndex = index(collMap, mask, bitpos);
         final K currentCollKey = getCollectionKey(collIndex);
 
-        if (cmp.equals(currentCollKey, key)) {
+        if (Objects.equals(currentCollKey, key)) {
           final io.usethesource.capsule.Set.Immutable<V> currentCollVal =
               getCollectionValue(collIndex);
 
@@ -1049,7 +1002,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               getCollectionValue(collIndex);
           final AbstractSetMultimapNode<K, V> subNodeNew = mergeCollectionAndSingletonPairs(
               currentCollKey, currentValues, transformHashCode(currentCollKey.hashCode()), key,
-              value, keyHash, shift + BIT_PARTITION_SIZE, cmp);
+              value, keyHash, shift + BIT_PARTITION_SIZE);
 
           details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE));
           return copyAndMigrateFromCollectionToNode(mutator, bitpos, subNodeNew);
@@ -1059,8 +1012,7 @@ public class PersistentTrieSetMultimap<K, V> extends
       if (isBitInBitmap(nodeMap, bitpos)) {
         final AbstractSetMultimapNode<K, V> subNode = getNode(nodeIndex(bitpos));
         final AbstractSetMultimapNode<K, V> subNodeNew =
-            subNode.updatedSingle(mutator, key, value, keyHash, shift + BIT_PARTITION_SIZE, details,
-                cmp);
+            subNode.updatedSingle(mutator, key, value, keyHash, shift + BIT_PARTITION_SIZE, details);
 
         if (details.getModificationEffect() != NOTHING) {
           return copyAndSetNode(mutator, bitpos, subNodeNew);
@@ -1076,10 +1028,9 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     @Override // TODO: final
     public AbstractSetMultimapNode<K, V> updatedMultiple(AtomicReference<Thread> mutator,
-        K key,
-        io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift,
-        MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details,
-        EqualityComparator<Object> cmp) {
+                                                         K key,
+                                                         io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift,
+                                                         MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1094,7 +1045,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         final int dataIndex = index(dataMap, mask, bitpos);
         final K currentKey = getSingletonKey(dataIndex);
 
-        if (cmp.equals(currentKey, key)) {
+        if (Objects.equals(currentKey, key)) {
           final V currentVal = getSingletonValue(dataIndex);
 
           // replace singleton value with collection
@@ -1107,7 +1058,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
           final AbstractSetMultimapNode<K, V> subNodeNew = mergeCollectionAndSingletonPairs(key,
               values, keyHash, currentKey, currentVal,
-              transformHashCode(currentKey.hashCode()), shift + BIT_PARTITION_SIZE, cmp);
+              transformHashCode(currentKey.hashCode()), shift + BIT_PARTITION_SIZE);
 
           details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE_COLLECTION));
           return copyAndMigrateFromSingletonToNode(mutator, bitpos, subNodeNew);
@@ -1118,7 +1069,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         final int collIndex = index(collMap, mask, bitpos);
         final K currentCollKey = getCollectionKey(collIndex);
 
-        if (cmp.equals(currentCollKey, key)) {
+        if (Objects.equals(currentCollKey, key)) {
           final io.usethesource.capsule.Set.Immutable<V> currentCollVal =
               getCollectionValue(collIndex);
 
@@ -1131,7 +1082,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               collIndex);
           final AbstractSetMultimapNode<K, V> subNodeNew = mergeTwoCollectionPairs(
               currentCollKey, currentValues, transformHashCode(currentCollKey.hashCode()), key,
-              values, keyHash, shift + BIT_PARTITION_SIZE, cmp);
+              values, keyHash, shift + BIT_PARTITION_SIZE);
 
           details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_KEY, INSERTED_VALUE_COLLECTION));
           return copyAndMigrateFromCollectionToNode(mutator, bitpos, subNodeNew);
@@ -1141,9 +1092,7 @@ public class PersistentTrieSetMultimap<K, V> extends
       if (isBitInBitmap(nodeMap, bitpos)) {
         final AbstractSetMultimapNode<K, V> subNode = getNode(nodeIndex(bitpos));
         final AbstractSetMultimapNode<K, V> subNodeNew =
-            subNode
-                .updatedMultiple(mutator, key, values, keyHash, shift + BIT_PARTITION_SIZE, details,
-                    cmp);
+            subNode.updatedMultiple(mutator, key, values, keyHash, shift + BIT_PARTITION_SIZE, details);
 
         if (details.getModificationEffect() != NOTHING) {
           return copyAndSetNode(mutator, bitpos, subNodeNew);
@@ -1159,10 +1108,9 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     @Override // TODO: final
     public AbstractSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator,
-        final K key,
-        final V value, final int keyHash, final int shift,
-        final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details,
-        EqualityComparator<Object> cmp) {
+                                                 final K key,
+                                                 final V value, final int keyHash, final int shift,
+                                                 final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1177,10 +1125,10 @@ public class PersistentTrieSetMultimap<K, V> extends
         final int dataIndex = index(dataMap, mask, bitpos);
 
         final K currentKey = getSingletonKey(dataIndex);
-        if (cmp.equals(currentKey, key)) {
+        if (Objects.equals(currentKey, key)) {
 
           final V currentVal = getSingletonValue(dataIndex);
-          if (cmp.equals(currentVal, value)) {
+          if (Objects.equals(currentVal, value)) {
 
             // remove mapping
             details.modified(REMOVED_PAYLOAD, MultimapResult.Modification.flag(REMOVED_KEY, REMOVED_VALUE),
@@ -1199,7 +1147,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         final int collIndex = index(collMap, mask, bitpos);
 
         final K currentKey = getCollectionKey(collIndex);
-        if (cmp.equals(currentKey, key)) {
+        if (Objects.equals(currentKey, key)) {
 
           final io.usethesource.capsule.Set.Immutable<V> currentValColl =
               getCollectionValue(collIndex);
@@ -1230,7 +1178,7 @@ public class PersistentTrieSetMultimap<K, V> extends
       if (isBitInBitmap(nodeMap, bitpos)) {
         final AbstractSetMultimapNode<K, V> subNode = getNode(index(nodeMap, mask, bitpos));
         final AbstractSetMultimapNode<K, V> subNodeNew =
-            subNode.removed(mutator, key, value, keyHash, shift + BIT_PARTITION_SIZE, details, cmp);
+            subNode.removed(mutator, key, value, keyHash, shift + BIT_PARTITION_SIZE, details);
 
         if (details.getModificationEffect() == NOTHING) {
           return this;
@@ -1269,10 +1217,9 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     @Override // TODO: final
     public AbstractSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator,
-        final K key,
-        final int keyHash, final int shift,
-        final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details,
-        EqualityComparator<Object> cmp) {
+                                                 final K key,
+                                                 final int keyHash, final int shift,
+                                                 final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
 
@@ -1287,10 +1234,10 @@ public class PersistentTrieSetMultimap<K, V> extends
         final int dataIndex = index(dataMap, mask, bitpos);
 
         final K currentKey = getSingletonKey(dataIndex);
-        if (cmp.equals(currentKey, key)) {
+        if (Objects.equals(currentKey, key)) {
 
           final V currentVal = getSingletonValue(dataIndex);
-          // if (cmp.equals(currentVal, val)) {
+          // if (Objects.equals(currentVal, val)) {
           //
           // // remove mapping
           // details.updated(val);
@@ -1312,7 +1259,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         final int collIndex = index(collMap, mask, bitpos);
 
         final K currentKey = getCollectionKey(collIndex);
-        if (cmp.equals(currentKey, key)) {
+        if (Objects.equals(currentKey, key)) {
 
           final io.usethesource.capsule.Set.Immutable<V> currentValColl =
               getCollectionValue(collIndex);
@@ -1345,7 +1292,7 @@ public class PersistentTrieSetMultimap<K, V> extends
       if (isBitInBitmap(nodeMap, bitpos)) {
         final AbstractSetMultimapNode<K, V> subNode = getNode(index(nodeMap, mask, bitpos));
         final AbstractSetMultimapNode<K, V> subNodeNew =
-            subNode.removed(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, details, cmp);
+            subNode.removed(mutator, key, keyHash, shift + BIT_PARTITION_SIZE, details);
 
         if (details.getModificationEffect() == NOTHING) {
           return this;
@@ -2426,36 +2373,33 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
-    public boolean containsKey(K key, int keyHash, int shift,
-        EqualityComparator<Object> cmp) {
-      return collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny()
+    public boolean containsKey(K key, int keyHash, int shift) {
+      return collisionContent.stream().filter(entry -> Objects.equals(key, entry.getKey())).findAny()
           .isPresent();
     }
 
     @Override
-    public boolean containsTuple(K key, V value, int keyHash, int shift,
-        EqualityComparator<Object> cmp) {
+    public boolean containsTuple(K key, V value, int keyHash, int shift) {
       return collisionContent.stream()
-          .filter(entry -> cmp.equals(key, entry.getKey())
-              && entry.getValue().containsEquivalent(value, cmp))
+          .filter(entry -> Objects.equals(key, entry.getKey())
+              && entry.getValue().contains(value))
           .findAny().isPresent();
     }
 
     @Override
     public final Optional<io.usethesource.capsule.Set.Immutable<V>> findByKey(K key, int keyHash,
-        int shift, EqualityComparator<Object> cmp) {
-      return collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny()
+                                                                              int shift) {
+      return collisionContent.stream().filter(entry -> Objects.equals(key, entry.getKey())).findAny()
           .map(Map.Entry::getValue);
     }
 
     @Override
     public AbstractSetMultimapNode<K, V> insertedSingle(AtomicReference<Thread> mutator, K key,
-        V value,
-        int keyHash, int shift,
-        MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details,
-        EqualityComparator<Object> cmp) {
+                                                        V value,
+                                                        int keyHash, int shift,
+                                                        MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
       Optional<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> optionalTuple =
-          collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
+          collisionContent.stream().filter(entry -> Objects.equals(key, entry.getKey())).findAny();
 
       if (optionalTuple.isPresent()) {
         // contains key
@@ -2463,7 +2407,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         io.usethesource.capsule.Set.Immutable<V> values =
             optionalTuple.get().getValue();
 
-        if (values.containsEquivalent(value, cmp)) {
+        if (values.contains(value)) {
           // contains key and value
           // // details.unchanged();
           return this;
@@ -2475,7 +2419,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               (kImmutableSetEntry) -> {
                 if (kImmutableSetEntry == optionalTuple.get()) {
                   io.usethesource.capsule.Set.Immutable<V> updatedValues =
-                      values.__insertEquivalent(value, cmp);
+                      values.__insert(value);
                   return entryOf(key, updatedValues);
                 } else {
                   return kImmutableSetEntry;
@@ -2485,15 +2429,13 @@ public class PersistentTrieSetMultimap<K, V> extends
           List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> updatedCollisionContent =
               collisionContent.stream().map(substitutionMapper).collect(Collectors.toList());
 
-          // TODO not all API uses EqualityComparator
           // TODO does not check that remainder is unmodified
           assert updatedCollisionContent.size() == collisionContent.size();
           assert updatedCollisionContent.contains(optionalTuple.get()) == false;
-          // assert updatedCollisionContent.contains(entryOf(key, values.__insertEquivalent(val,
-          // cmp)));
+          // assert updatedCollisionContent.contains(entryOf(key, values.__insert(val)));
           assert updatedCollisionContent.stream()
-              .filter(entry -> cmp.equals(key, entry.getKey())
-                  && entry.getValue().containsEquivalent(value, cmp))
+              .filter(entry -> Objects.equals(key, entry.getKey())
+                  && entry.getValue().contains(value))
               .findAny().isPresent();
 
           details.modified(INSERTED_PAYLOAD, MultimapResult.Modification.flag(INSERTED_VALUE), 1);
@@ -2511,11 +2453,10 @@ public class PersistentTrieSetMultimap<K, V> extends
         List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> updatedCollisionContent =
             builder.build().collect(Collectors.toList());
 
-        // TODO not all API uses EqualityComparator
         assert updatedCollisionContent.size() == collisionContent.size() + 1;
         assert updatedCollisionContent.containsAll(collisionContent);
         // assert updatedCollisionContent.contains(entryOf(key, setOf(val)));
-        assert updatedCollisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())
+        assert updatedCollisionContent.stream().filter(entry -> Objects.equals(key, entry.getKey())
             && Objects.equals(io.usethesource.capsule.Set.Immutable.of(value), entry.getValue()))
             .findAny()
             .isPresent();
@@ -2526,9 +2467,9 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
-    public AbstractSetMultimapNode<K, V> insertedMultiple(AtomicReference<Thread> mutator, K key, io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details, EqualityComparator<Object> cmp) {
+    public AbstractSetMultimapNode<K, V> insertedMultiple(AtomicReference<Thread> mutator, K key, io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
       Optional<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> optionalTuple =
-          collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
+          collisionContent.stream().filter(entry -> Objects.equals(key, entry.getKey())).findAny();
 
       if (optionalTuple.isPresent()) {
         // contains key
@@ -2536,7 +2477,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         io.usethesource.capsule.Set.Immutable<V> currentValues =
             optionalTuple.get().getValue();
 
-        if (currentValues.containsAllEquivalent(values, cmp)) {
+        if (currentValues.containsAll(values)) {
           // contains key and (all) values
           // // details.unchanged();
           return this;
@@ -2548,7 +2489,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               (kImmutableSetEntry) -> {
                 if (kImmutableSetEntry == optionalTuple.get()) {
                   io.usethesource.capsule.Set.Immutable<V> updatedValues =
-                      currentValues.__insertAllEquivalent(values, cmp); // TODO capture size delta
+                      currentValues.__insertAll(values); // TODO capture size delta
                   return entryOf(key, updatedValues);
                 } else {
                   return kImmutableSetEntry;
@@ -2559,7 +2500,7 @@ public class PersistentTrieSetMultimap<K, V> extends
               collisionContent.stream().map(substitutionMapper).collect(Collectors.toList());
 
           final io.usethesource.capsule.Set.Immutable<V> updatedValues =
-              updatedCollisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny().get().getValue();
+              updatedCollisionContent.stream().filter(entry -> Objects.equals(key, entry.getKey())).findAny().get().getValue();
           final int sizeDelta = updatedValues.size() - currentValues.size();
 
           if (sizeDelta == 1) {
@@ -2575,7 +2516,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
         Stream.Builder<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> builder =
             Stream.<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>>builder()
-                .add(entryOf(key, io.usethesource.capsule.Set.Immutable.<V>of().__insertAllEquivalent(values, cmp)));
+                .add(entryOf(key, io.usethesource.capsule.Set.Immutable.<V>of().__insertAll(values)));
 
         collisionContent.forEach(builder::accept);
 
@@ -2589,12 +2530,11 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     @Override
     public AbstractSetMultimapNode<K, V> updatedSingle(AtomicReference<Thread> mutator, K key,
-        V value,
-        int keyHash,
-        int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details,
-        EqualityComparator<Object> cmp) {
+                                                       V value,
+                                                       int keyHash,
+                                                       int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
       Optional<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> optionalTuple =
-          collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
+          collisionContent.stream().filter(entry -> Objects.equals(key, entry.getKey())).findAny();
 
       if (optionalTuple.isPresent()) {
         // contains key -> replace val anyways
@@ -2641,9 +2581,9 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
-    public AbstractSetMultimapNode<K, V> updatedMultiple(AtomicReference<Thread> mutator, K key, io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details, EqualityComparator<Object> cmp) {
+    public AbstractSetMultimapNode<K, V> updatedMultiple(AtomicReference<Thread> mutator, K key, io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
       Optional<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> optionalTuple =
-          collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
+          collisionContent.stream().filter(entry -> Objects.equals(key, entry.getKey())).findAny();
 
       if (optionalTuple.isPresent()) {
         // contains key -> replace val anyways
@@ -2655,7 +2595,7 @@ public class PersistentTrieSetMultimap<K, V> extends
             (kImmutableSetEntry) -> {
               if (kImmutableSetEntry == optionalTuple.get()) {
                 io.usethesource.capsule.Set.Immutable<V> updatedValues =
-                    io.usethesource.capsule.Set.Immutable.<V>of().__insertAllEquivalent(values, cmp);
+                    io.usethesource.capsule.Set.Immutable.<V>of().__insertAll(values);
                 return entryOf(key, updatedValues);
               } else {
                 return kImmutableSetEntry;
@@ -2677,7 +2617,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
         Stream.Builder<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> builder =
             Stream.<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>>builder()
-                .add(entryOf(key, io.usethesource.capsule.Set.Immutable.<V>of().__insertAllEquivalent(values, cmp)));
+                .add(entryOf(key, io.usethesource.capsule.Set.Immutable.<V>of().__insertAll(values)));
 
         collisionContent.forEach(builder::accept);
 
@@ -2691,11 +2631,10 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     @Override
     public AbstractSetMultimapNode<K, V> removed(AtomicReference<Thread> mutator, K key, V value,
-        int keyHash,
-        int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details,
-        EqualityComparator<Object> cmp) {
+                                                 int keyHash,
+                                                 int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
       Optional<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> optionalTuple =
-          collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
+          collisionContent.stream().filter(entry -> Objects.equals(key, entry.getKey())).findAny();
 
       if (optionalTuple.isPresent()) {
         // contains key
@@ -2703,7 +2642,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         io.usethesource.capsule.Set.Immutable<V> values =
             optionalTuple.get().getValue();
 
-        if (values.containsEquivalent(value, cmp)) {
+        if (values.contains(value)) {
           // contains key and value -> remove mapping
 
           final List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> updatedCollisionContent;
@@ -2720,7 +2659,7 @@ public class PersistentTrieSetMultimap<K, V> extends
                 (kImmutableSetEntry) -> {
                   if (kImmutableSetEntry == optionalTuple.get()) {
                     io.usethesource.capsule.Set.Immutable<V> updatedValues =
-                        values.__removeEquivalent(value, cmp);
+                        values.__remove(value);
                     return entryOf(key, updatedValues);
                   } else {
                     return kImmutableSetEntry;
@@ -2742,11 +2681,10 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     @Override
     public AbstractSetMultimapNode<K, V> removed(AtomicReference<Thread> mutator, K key,
-        int keyHash,
-        int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details,
-        EqualityComparator<Object> cmp) {
+                                                 int keyHash,
+                                                 int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
       final Optional<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> optionalTuple =
-          collisionContent.stream().filter(entry -> cmp.equals(key, entry.getKey())).findAny();
+          collisionContent.stream().filter(entry -> Objects.equals(key, entry.getKey())).findAny();
 
       if (optionalTuple.isPresent()) {
         // contains key
@@ -2864,8 +2802,7 @@ public class PersistentTrieSetMultimap<K, V> extends
       }
 
       mutator.set(null);
-      return new PersistentTrieSetMultimap<K, V>(cmp, rootNode, cachedSize,
-          cachedKeySetHashCode, cachedKeySetSize);
+      return new PersistentTrieSetMultimap<K, V>(rootNode, cachedSize, cachedKeySetHashCode, cachedKeySetSize);
     }
   }
 

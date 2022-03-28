@@ -30,7 +30,6 @@ import io.usethesource.capsule.SetMultimap;
 import io.usethesource.capsule.core.trie.ArrayView;
 import io.usethesource.capsule.core.trie.MultimapNode;
 import io.usethesource.capsule.core.trie.Node;
-import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
 
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
@@ -43,10 +42,7 @@ public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R ext
 
   private static final long serialVersionUID = 42L;
 
-  protected final EqualityComparator<Object> cmp;
-
-  public AbstractTrieSetMultimap(final EqualityComparator<Object> cmp) {
-    this.cmp = cmp;
+  public AbstractTrieSetMultimap() {
   }
 
   abstract R getRootNode();
@@ -210,7 +206,7 @@ public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R ext
   public final boolean containsKey(final Object o) {
     try {
       final K key = (K) o;
-      return getRootNode().containsKey(key, transformHashCode(key.hashCode()), 0, cmp);
+      return getRootNode().containsKey(key, transformHashCode(key.hashCode()), 0);
     } catch (ClassCastException unused) {
       return false;
     }
@@ -219,7 +215,7 @@ public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R ext
   @Override
   public final boolean containsValue(final Object o) {
     for (Iterator<V> iterator = valueIterator(); iterator.hasNext(); ) {
-      if (cmp.equals(iterator.next(), o)) {
+      if (Objects.equals(iterator.next(), o)) {
         return true;
       }
     }
@@ -231,7 +227,7 @@ public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R ext
     try {
       final K key = (K) o0;
       final V val = (V) o1;
-      return getRootNode().containsTuple(key, val, transformHashCode(key.hashCode()), 0, cmp);
+      return getRootNode().containsTuple(key, val, transformHashCode(key.hashCode()), 0);
     } catch (ClassCastException unused) {
       return false;
     }
@@ -242,7 +238,7 @@ public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R ext
     try {
       final K key = (K) o;
       final Optional<C> values =
-          getRootNode().findByKey(key, transformHashCode(key.hashCode()), 0, cmp);
+          getRootNode().findByKey(key, transformHashCode(key.hashCode()), 0);
 
       if (values.isPresent()) {
         return internalFormatToCollection(values.get());
@@ -483,7 +479,7 @@ public abstract class AbstractTrieSetMultimap<K, V, C extends Iterable<V>, R ext
           final V value = (V) entry.getValue();
 
           boolean containsTuple =
-              getRootNode().containsTuple(key, value, transformHashCode(key.hashCode()), 0, cmp);
+              getRootNode().containsTuple(key, value, transformHashCode(key.hashCode()), 0);
 
           if (!containsTuple) {
             return false;

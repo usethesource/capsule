@@ -9,10 +9,8 @@ package io.usethesource.capsule.util.collection;
 
 import java.util.AbstractSet;
 import java.util.Collection;
-import java.util.Comparator;
 
 import io.usethesource.capsule.Set;
-import io.usethesource.capsule.util.EqualityComparator;
 
 @Deprecated
 public abstract class AbstractImmutableSet<E> extends AbstractSet<E> implements Set.Immutable<E> {
@@ -61,16 +59,6 @@ public abstract class AbstractImmutableSet<E> extends AbstractSet<E> implements 
   public boolean containsAll(Collection<?> c) {
     for (Object item : c) {
       if (!contains(item)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public boolean containsAllEquivalent(Collection<?> c, EqualityComparator<Object> cmp) {
-    for (Object item : c) {
-      if (!containsEquivalent(item, cmp)) {
         return false;
       }
     }

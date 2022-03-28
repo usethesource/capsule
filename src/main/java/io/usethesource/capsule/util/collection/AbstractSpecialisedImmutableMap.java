@@ -16,7 +16,6 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 
-import io.usethesource.capsule.util.EqualityComparator;
 import io.usethesource.capsule.util.iterator.EmptySupplierIterator;
 import io.usethesource.capsule.util.iterator.SupplierIterator;
 
@@ -111,11 +110,6 @@ public abstract class AbstractSpecialisedImmutableMap<K, V>
 
   @Override
   public boolean equals(final Object other) {
-    return equivalent(other, Object::equals);
-  }
-
-  @Override
-  public boolean equivalent(final Object other, final EqualityComparator<Object> cmp) {
     if (other == this) {
       return true;
     }
@@ -129,10 +123,10 @@ public abstract class AbstractSpecialisedImmutableMap<K, V>
 
         if (this.size() == that.size()) {
           for (Entry<K, V> e : that.entrySet()) {
-            if (!this.containsKeyEquivalent(e.getKey(), cmp)) {
+            if (!this.containsKey(e.getKey())) {
               return false;
             }
-            if (!Objects.equals(e.getValue(), this.getEquivalent(e.getKey(), cmp))) {
+            if (!Objects.equals(e.getValue(), this.get(e.getKey()))) {
               return false;
             }
           }
@@ -161,18 +155,6 @@ public abstract class AbstractSpecialisedImmutableMap<K, V>
       Map<? extends K, ? extends V> map) {
     io.usethesource.capsule.Map.Transient<K, V> tmp = asTransient();
     if (tmp.__putAll(map)) {
-      return tmp.freeze();
-    } else {
-      return this;
-    }
-  }
-
-  @Override
-  public io.usethesource.capsule.Map.Immutable<K, V> __putAllEquivalent(
-      Map<? extends K, ? extends V> map,
-      EqualityComparator<Object> cmp) {
-    io.usethesource.capsule.Map.Transient<K, V> tmp = asTransient();
-    if (tmp.__putAllEquivalent(map, cmp)) {
       return tmp.freeze();
     } else {
       return this;
@@ -258,27 +240,12 @@ class Map0<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public boolean containsKeyEquivalent(Object key, EqualityComparator<Object> cmp) {
-    return false;
-  }
-
-  @Override
   public boolean containsValue(Object val) {
     return false;
   }
 
   @Override
-  public boolean containsValueEquivalent(Object val, EqualityComparator<Object> cmp) {
-    return false;
-  }
-
-  @Override
   public V get(Object key) {
-    return null;
-  }
-
-  @Override
-  public V getEquivalent(Object key, EqualityComparator<Object> cmp) {
     return null;
   }
 
@@ -313,19 +280,7 @@ class Map0<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public io.usethesource.capsule.Map.Immutable<K, V> __putEquivalent(K key, V val,
-      EqualityComparator<Object> cmp) {
-    return mapOf(key, val);
-  }
-
-  @Override
   public io.usethesource.capsule.Map.Immutable<K, V> __remove(K key) {
-    return this;
-  }
-
-  @Override
-  public io.usethesource.capsule.Map.Immutable<K, V> __removeEquivalent(K key,
-      EqualityComparator<Object> cmp) {
     return this;
   }
 
@@ -367,15 +322,6 @@ class Map1<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public boolean containsKeyEquivalent(Object key, EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public boolean containsValue(Object val) {
     if (val.equals(val1)) {
       return true;
@@ -385,26 +331,8 @@ class Map1<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public boolean containsValueEquivalent(Object val, EqualityComparator<Object> cmp) {
-    if (cmp.equals(val, val1)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public V get(Object key) {
     if (key.equals(key1)) {
-      return val1;
-    } else {
-      return null;
-    }
-  }
-
-  @Override
-  public V getEquivalent(Object key, EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
       return val1;
     } else {
       return null;
@@ -486,28 +414,8 @@ class Map1<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public io.usethesource.capsule.Map.Immutable<K, V> __putEquivalent(K key, V val,
-      EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return mapOf(key, val);
-    } else {
-      return mapOf(key1, val1, key, val);
-    }
-  }
-
-  @Override
   public io.usethesource.capsule.Map.Immutable<K, V> __remove(K key) {
     if (key.equals(key1)) {
-      return mapOf();
-    } else {
-      return this;
-    }
-  }
-
-  @Override
-  public io.usethesource.capsule.Map.Immutable<K, V> __removeEquivalent(K key,
-      EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
       return mapOf();
     } else {
       return this;
@@ -564,17 +472,6 @@ class Map2<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public boolean containsKeyEquivalent(Object key, EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return true;
-    } else if (cmp.equals(key, key2)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public boolean containsValue(Object val) {
     if (val.equals(val1)) {
       return true;
@@ -586,32 +483,10 @@ class Map2<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public boolean containsValueEquivalent(Object val, EqualityComparator<Object> cmp) {
-    if (cmp.equals(val, val1)) {
-      return true;
-    } else if (cmp.equals(val, val2)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public V get(Object key) {
     if (key.equals(key1)) {
       return val1;
     } else if (key.equals(key2)) {
-      return val2;
-    } else {
-      return null;
-    }
-  }
-
-  @Override
-  public V getEquivalent(Object key, EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return val1;
-    } else if (cmp.equals(key, key2)) {
       return val2;
     } else {
       return null;
@@ -701,34 +576,10 @@ class Map2<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public io.usethesource.capsule.Map.Immutable<K, V> __putEquivalent(K key, V val,
-      EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return mapOf(key, val, key2, val2);
-    } else if (cmp.equals(key, key2)) {
-      return mapOf(key1, val1, key, val);
-    } else {
-      return mapOf(key1, val1, key2, val2, key, val);
-    }
-  }
-
-  @Override
   public io.usethesource.capsule.Map.Immutable<K, V> __remove(K key) {
     if (key.equals(key1)) {
       return mapOf(key2, val2);
     } else if (key.equals(key2)) {
-      return mapOf(key1, val1);
-    } else {
-      return this;
-    }
-  }
-
-  @Override
-  public io.usethesource.capsule.Map.Immutable<K, V> __removeEquivalent(K key,
-      EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return mapOf(key2, val2);
-    } else if (cmp.equals(key, key2)) {
       return mapOf(key1, val1);
     } else {
       return this;
@@ -794,19 +645,6 @@ class Map3<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public boolean containsKeyEquivalent(Object key, EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return true;
-    } else if (cmp.equals(key, key2)) {
-      return true;
-    } else if (cmp.equals(key, key3)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public boolean containsValue(Object val) {
     if (val.equals(val1)) {
       return true;
@@ -820,38 +658,12 @@ class Map3<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public boolean containsValueEquivalent(Object val, EqualityComparator<Object> cmp) {
-    if (cmp.equals(val, val1)) {
-      return true;
-    } else if (cmp.equals(val, val2)) {
-      return true;
-    } else if (cmp.equals(val, val3)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public V get(Object key) {
     if (key.equals(key1)) {
       return val1;
     } else if (key.equals(key2)) {
       return val2;
     } else if (key.equals(key3)) {
-      return val3;
-    } else {
-      return null;
-    }
-  }
-
-  @Override
-  public V getEquivalent(Object key, EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return val1;
-    } else if (cmp.equals(key, key2)) {
-      return val2;
-    } else if (cmp.equals(key, key3)) {
       return val3;
     } else {
       return null;
@@ -947,40 +759,12 @@ class Map3<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public io.usethesource.capsule.Map.Immutable<K, V> __putEquivalent(K key, V val,
-      EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return mapOf(key, val, key2, val2, key3, val3);
-    } else if (cmp.equals(key, key2)) {
-      return mapOf(key1, val1, key, val, key3, val3);
-    } else if (cmp.equals(key, key3)) {
-      return mapOf(key1, val1, key2, val2, key, val);
-    } else {
-      return mapOf(key1, val1, key2, val2, key3, val3, key, val);
-    }
-  }
-
-  @Override
   public io.usethesource.capsule.Map.Immutable<K, V> __remove(K key) {
     if (key.equals(key1)) {
       return mapOf(key2, val2, key3, val3);
     } else if (key.equals(key2)) {
       return mapOf(key1, val1, key3, val3);
     } else if (key.equals(key3)) {
-      return mapOf(key1, val1, key2, val2);
-    } else {
-      return this;
-    }
-  }
-
-  @Override
-  public io.usethesource.capsule.Map.Immutable<K, V> __removeEquivalent(K key,
-      EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return mapOf(key2, val2, key3, val3);
-    } else if (cmp.equals(key, key2)) {
-      return mapOf(key1, val1, key3, val3);
-    } else if (cmp.equals(key, key3)) {
       return mapOf(key1, val1, key2, val2);
     } else {
       return this;
@@ -1057,21 +841,6 @@ class Map4<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public boolean containsKeyEquivalent(Object key, EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return true;
-    } else if (cmp.equals(key, key2)) {
-      return true;
-    } else if (cmp.equals(key, key3)) {
-      return true;
-    } else if (cmp.equals(key, key4)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public boolean containsValue(Object val) {
     if (val.equals(val1)) {
       return true;
@@ -1087,21 +856,6 @@ class Map4<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public boolean containsValueEquivalent(Object val, EqualityComparator<Object> cmp) {
-    if (cmp.equals(val, val1)) {
-      return true;
-    } else if (cmp.equals(val, val2)) {
-      return true;
-    } else if (cmp.equals(val, val3)) {
-      return true;
-    } else if (cmp.equals(val, val4)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public V get(Object key) {
     if (key.equals(key1)) {
       return val1;
@@ -1110,21 +864,6 @@ class Map4<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
     } else if (key.equals(key3)) {
       return val3;
     } else if (key.equals(key4)) {
-      return val4;
-    } else {
-      return null;
-    }
-  }
-
-  @Override
-  public V getEquivalent(Object key, EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return val1;
-    } else if (cmp.equals(key, key2)) {
-      return val2;
-    } else if (cmp.equals(key, key3)) {
-      return val3;
-    } else if (cmp.equals(key, key4)) {
       return val4;
     } else {
       return null;
@@ -1226,22 +965,6 @@ class Map4<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public io.usethesource.capsule.Map.Immutable<K, V> __putEquivalent(K key, V val,
-      EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return mapOf(key, val, key2, val2, key3, val3, key4, val4);
-    } else if (cmp.equals(key, key2)) {
-      return mapOf(key1, val1, key, val, key3, val3, key4, val4);
-    } else if (cmp.equals(key, key3)) {
-      return mapOf(key1, val1, key2, val2, key, val, key4, val4);
-    } else if (cmp.equals(key, key4)) {
-      return mapOf(key1, val1, key2, val2, key3, val3, key, val);
-    } else {
-      return mapOf(key1, val1, key2, val2, key3, val3, key4, val4, key, val);
-    }
-  }
-
-  @Override
   public io.usethesource.capsule.Map.Immutable<K, V> __remove(K key) {
     if (key.equals(key1)) {
       return mapOf(key2, val2, key3, val3, key4, val4);
@@ -1250,22 +973,6 @@ class Map4<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
     } else if (key.equals(key3)) {
       return mapOf(key1, val1, key2, val2, key4, val4);
     } else if (key.equals(key4)) {
-      return mapOf(key1, val1, key2, val2, key3, val3);
-    } else {
-      return this;
-    }
-  }
-
-  @Override
-  public io.usethesource.capsule.Map.Immutable<K, V> __removeEquivalent(K key,
-      EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return mapOf(key2, val2, key3, val3, key4, val4);
-    } else if (cmp.equals(key, key2)) {
-      return mapOf(key1, val1, key3, val3, key4, val4);
-    } else if (cmp.equals(key, key3)) {
-      return mapOf(key1, val1, key2, val2, key4, val4);
-    } else if (cmp.equals(key, key4)) {
       return mapOf(key1, val1, key2, val2, key3, val3);
     } else {
       return this;
@@ -1354,23 +1061,6 @@ class Map5<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public boolean containsKeyEquivalent(Object key, EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return true;
-    } else if (cmp.equals(key, key2)) {
-      return true;
-    } else if (cmp.equals(key, key3)) {
-      return true;
-    } else if (cmp.equals(key, key4)) {
-      return true;
-    } else if (cmp.equals(key, key5)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public boolean containsValue(Object val) {
     if (val.equals(val1)) {
       return true;
@@ -1388,23 +1078,6 @@ class Map5<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public boolean containsValueEquivalent(Object val, EqualityComparator<Object> cmp) {
-    if (cmp.equals(val, val1)) {
-      return true;
-    } else if (cmp.equals(val, val2)) {
-      return true;
-    } else if (cmp.equals(val, val3)) {
-      return true;
-    } else if (cmp.equals(val, val4)) {
-      return true;
-    } else if (cmp.equals(val, val5)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public V get(Object key) {
     if (key.equals(key1)) {
       return val1;
@@ -1415,23 +1088,6 @@ class Map5<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
     } else if (key.equals(key4)) {
       return val4;
     } else if (key.equals(key5)) {
-      return val5;
-    } else {
-      return null;
-    }
-  }
-
-  @Override
-  public V getEquivalent(Object key, EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return val1;
-    } else if (cmp.equals(key, key2)) {
-      return val2;
-    } else if (cmp.equals(key, key3)) {
-      return val3;
-    } else if (cmp.equals(key, key4)) {
-      return val4;
-    } else if (cmp.equals(key, key5)) {
       return val5;
     } else {
       return null;
@@ -1539,24 +1195,6 @@ class Map5<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
   }
 
   @Override
-  public io.usethesource.capsule.Map.Immutable<K, V> __putEquivalent(K key, V val,
-      EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return mapOf(key, val, key2, val2, key3, val3, key4, val4, key5, val5);
-    } else if (cmp.equals(key, key2)) {
-      return mapOf(key1, val1, key, val, key3, val3, key4, val4, key5, val5);
-    } else if (cmp.equals(key, key3)) {
-      return mapOf(key1, val1, key2, val2, key, val, key4, val4, key5, val5);
-    } else if (cmp.equals(key, key4)) {
-      return mapOf(key1, val1, key2, val2, key3, val3, key, val, key5, val5);
-    } else if (cmp.equals(key, key5)) {
-      return mapOf(key1, val1, key2, val2, key3, val3, key4, val4, key, val);
-    } else {
-      return mapOf(key1, val1, key2, val2, key3, val3, key4, val4, key5, val5, key, val);
-    }
-  }
-
-  @Override
   public io.usethesource.capsule.Map.Immutable<K, V> __remove(K key) {
     if (key.equals(key1)) {
       return mapOf(key2, val2, key3, val3, key4, val4, key5, val5);
@@ -1567,24 +1205,6 @@ class Map5<K, V> extends AbstractSpecialisedImmutableMap<K, V> {
     } else if (key.equals(key4)) {
       return mapOf(key1, val1, key2, val2, key3, val3, key5, val5);
     } else if (key.equals(key5)) {
-      return mapOf(key1, val1, key2, val2, key3, val3, key4, val4);
-    } else {
-      return this;
-    }
-  }
-
-  @Override
-  public io.usethesource.capsule.Map.Immutable<K, V> __removeEquivalent(K key,
-      EqualityComparator<Object> cmp) {
-    if (cmp.equals(key, key1)) {
-      return mapOf(key2, val2, key3, val3, key4, val4, key5, val5);
-    } else if (cmp.equals(key, key2)) {
-      return mapOf(key1, val1, key3, val3, key4, val4, key5, val5);
-    } else if (cmp.equals(key, key3)) {
-      return mapOf(key1, val1, key2, val2, key4, val4, key5, val5);
-    } else if (cmp.equals(key, key4)) {
-      return mapOf(key1, val1, key2, val2, key3, val3, key5, val5);
-    } else if (cmp.equals(key, key5)) {
       return mapOf(key1, val1, key2, val2, key3, val3, key4, val4);
     } else {
       return this;

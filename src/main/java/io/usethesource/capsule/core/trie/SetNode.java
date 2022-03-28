@@ -10,24 +10,17 @@ package io.usethesource.capsule.core.trie;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
-import io.usethesource.capsule.util.EqualityComparator;
-
 public interface SetNode<K, R extends SetNode<K, R>> extends Node {
 
-  boolean contains(final K key, final int keyHash, final int shift,
-      final EqualityComparator<Object> cmp);
+  boolean contains(final K key, final int keyHash, final int shift);
 
-  Optional<K> findByKey(final K key, final int keyHash, final int shift,
-      final EqualityComparator<Object> cmp);
+  Optional<K> findByKey(final K key, final int keyHash, final int shift);
 
   R updated(final AtomicReference<Thread> mutator, final K key, final int keyHash, final int shift,
-      final SetNodeResult<K> details, final EqualityComparator<Object> cmp);
+            final SetNodeResult<K> details);
 
   R removed(final AtomicReference<Thread> mutator, final K key, final int keyHash, final int shift,
-      final SetNodeResult<K> details, final EqualityComparator<Object> cmp);
-
-  // TODO: move to {@code Node} interface
-  boolean equivalent(final Object other, final EqualityComparator<Object> cmp);
+            final SetNodeResult<K> details);
 
   boolean hasPayload();
 
@@ -55,18 +48,15 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
 
   int recursivePayloadHashCode();
 
-  default R union(final AtomicReference<Thread> mutator, R that, final int shift,
-      final EqualityComparator<Object> cmp) {
+  default R union(final AtomicReference<Thread> mutator, R that, final int shift) {
     throw new UnsupportedOperationException();
   }
 
-  default R intersect(final AtomicReference<Thread> mutator, R that, final int shift,
-      final EqualityComparator<Object> cmp) {
+  default R intersect(final AtomicReference<Thread> mutator, R that, final int shift) {
     throw new UnsupportedOperationException();
   }
 
-  default R subtract(final AtomicReference<Thread> mutator, R that, final int shift,
-      final EqualityComparator<Object> cmp) {
+  default R subtract(final AtomicReference<Thread> mutator, R that, final int shift) {
     throw new UnsupportedOperationException();
   }
 
