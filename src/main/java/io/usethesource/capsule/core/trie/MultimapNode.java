@@ -8,7 +8,6 @@
 package io.usethesource.capsule.core.trie;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @param <C> is a (collection) representation of one or more values
@@ -25,7 +24,7 @@ public interface MultimapNode<K, V, C, R extends MultimapNode<K, V, C, R>> exten
   
   V unbox(C values);
 
-  default R inserted(AtomicReference<Thread> mutator, K key, C values, int keyHash, int shift, MultimapResult<K, V, C> details) {
+  default R inserted(UniqueIdentity mutator, K key, C values, int keyHash, int shift, MultimapResult<K, V, C> details) {
     if (mustUnbox(values)) {
       return insertedSingle(mutator, key, unbox(values), keyHash, shift, details);
     } else {
@@ -33,11 +32,11 @@ public interface MultimapNode<K, V, C, R extends MultimapNode<K, V, C, R>> exten
     }
   }
 
-  R insertedSingle(AtomicReference<Thread> mutator, K key, V value, int keyHash, int shift, MultimapResult<K, V, C> details);
+  R insertedSingle(UniqueIdentity mutator, K key, V value, int keyHash, int shift, MultimapResult<K, V, C> details);
 
-  R insertedMultiple(AtomicReference<Thread> mutator, K key, C values, int keyHash, int shift, MultimapResult<K, V, C> details);
+  R insertedMultiple(UniqueIdentity mutator, K key, C values, int keyHash, int shift, MultimapResult<K, V, C> details);
 
-  default R updated(AtomicReference<Thread> mutator, K key, C values, int keyHash, int shift, MultimapResult<K, V, C> details) {
+  default R updated(UniqueIdentity mutator, K key, C values, int keyHash, int shift, MultimapResult<K, V, C> details) {
     if (mustUnbox(values)) {
       return updatedSingle(mutator, key, unbox(values), keyHash, shift, details);
     } else {
@@ -45,19 +44,19 @@ public interface MultimapNode<K, V, C, R extends MultimapNode<K, V, C, R>> exten
     }
   }
 
-  R updatedSingle(AtomicReference<Thread> mutator, K key, V value, int keyHash, int shift, MultimapResult<K, V, C> details);
+  R updatedSingle(UniqueIdentity mutator, K key, V value, int keyHash, int shift, MultimapResult<K, V, C> details);
 
-  R updatedMultiple(AtomicReference<Thread> mutator, K key, C values, int keyHash, int shift, MultimapResult<K, V, C> details);
+  R updatedMultiple(UniqueIdentity mutator, K key, C values, int keyHash, int shift, MultimapResult<K, V, C> details);
 
   /**
    * Removes the {@code key} / {@code val} tuple.
    */
-  R removed(AtomicReference<Thread> mutator, K key, V value, int keyHash, int shift, MultimapResult<K, V, C> details);
+  R removed(UniqueIdentity mutator, K key, V value, int keyHash, int shift, MultimapResult<K, V, C> details);
 
   /**
    * Removes all values associated with {@code key}.
    */
-  R removed(AtomicReference<Thread> mutator, K key, int keyHash, int shift, MultimapResult<K, V, C> details);
+  R removed(UniqueIdentity mutator, K key, int keyHash, int shift, MultimapResult<K, V, C> details);
 
   // TODO: remove from interface
   @Deprecated
@@ -73,13 +72,13 @@ public interface MultimapNode<K, V, C, R extends MultimapNode<K, V, C, R>> exten
 
   // TODO: remove from interface
   @Deprecated
-  default R copyAndUpdateBitmaps(AtomicReference<Thread> mutator, final long bitmap) {
+  default R copyAndUpdateBitmaps(UniqueIdentity mutator, final long bitmap) {
     throw new IllegalStateException();
   }
 
 //  // TODO: remove from interface
 //  @Deprecated
-//  default R copyAndUpdateBitmaps(AtomicReference<Thread> mutator, final int bitmap0,
+//  default R copyAndUpdateBitmaps(UniqueIdentity mutator, final int bitmap0,
 //      final int bitmap1) {
 //    throw new IllegalStateException();
 //  }

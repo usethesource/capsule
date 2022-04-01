@@ -18,8 +18,8 @@ public class BottomUpTransientNodeTransformer<SN extends Node, DN extends Node> 
 
   private static final int MAX_DEPTH = 7;
 
-  private final BiFunction<SN, AtomicReference<Thread>, DN> nodeMapper;
-  private final AtomicReference<Thread> mutator;
+  private final BiFunction<SN, UniqueIdentity, DN> nodeMapper;
+  private  UniqueIdentity mutator;
   private final DN dstRootNode;
 
   private int stackIndex = -1;
@@ -27,9 +27,9 @@ public class BottomUpTransientNodeTransformer<SN extends Node, DN extends Node> 
   private final ListIterator<DN>[] dstIteratorStack = new ListIterator[MAX_DEPTH];
 
   public BottomUpTransientNodeTransformer(final SN srcRootNode,
-      final BiFunction<SN, AtomicReference<Thread>, DN> nodeMapper) {
+      final BiFunction<SN, UniqueIdentity, DN> nodeMapper) {
     this.nodeMapper = nodeMapper;
-    this.mutator = new AtomicReference<>(Thread.currentThread());
+    this.mutator = new UniqueIdentity();
     this.dstRootNode = nodeMapper.apply(srcRootNode, mutator);
 
     final ListIterator<SN> srcIterator = (ListIterator<SN>) srcRootNode.nodeArray().iterator();
@@ -46,7 +46,7 @@ public class BottomUpTransientNodeTransformer<SN extends Node, DN extends Node> 
       processStack();
     }
 
-    mutator.set(null);
+    mutator=new UniqueIdentity();
     return dstRootNode;
   }
 

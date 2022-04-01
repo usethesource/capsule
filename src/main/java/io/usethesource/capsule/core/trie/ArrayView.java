@@ -29,7 +29,7 @@ public interface ArrayView<T> extends Iterable<T> {
     throw new UnsupportedOperationException();
   }
 
-  default void set(int index, T item, AtomicReference<?> writeCapabilityToken) {
+  default void set(int index, T item, UniqueIdentity writeCapabilityToken) {
     throw new UnsupportedOperationException();
   }
 

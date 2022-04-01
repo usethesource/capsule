@@ -29,6 +29,7 @@ import io.usethesource.capsule.Set;
 import io.usethesource.capsule.core.trie.ArrayView;
 import io.usethesource.capsule.core.trie.SetNode;
 import io.usethesource.capsule.core.trie.SetNodeResult;
+import io.usethesource.capsule.core.trie.UniqueIdentity;
 
 public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializable {
 
@@ -469,8 +470,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     static final int TUPLE_LENGTH = 1;
 
-    static final <T> boolean isAllowedToEdit(AtomicReference<?> x, AtomicReference<?> y) {
-      return x != null && y != null && (x == y || x.get() == y.get());
+    static final <T> boolean isAllowedToEdit(UniqueIdentity x, UniqueIdentity y) {
+      return x != null && y != null && x == y;
     }
 
     @Override
@@ -633,19 +634,19 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       return inv1 && inv2 && inv3 && inv4 && inv5;
     }
 
-    abstract CompactSetNode<K> copyAndInsertValue(final AtomicReference<Thread> mutator,
+    abstract CompactSetNode<K> copyAndInsertValue(final UniqueIdentity mutator,
         final int bitpos, final K key);
 
-    abstract CompactSetNode<K> copyAndRemoveValue(final AtomicReference<Thread> mutator,
+    abstract CompactSetNode<K> copyAndRemoveValue(final UniqueIdentity mutator,
         final int bitpos);
 
-    abstract CompactSetNode<K> copyAndSetNode(final AtomicReference<Thread> mutator,
+    abstract CompactSetNode<K> copyAndSetNode(final UniqueIdentity mutator,
         final int bitpos, final AbstractSetNode<K> node);
 
-    abstract CompactSetNode<K> copyAndMigrateFromInlineToNode(final AtomicReference<Thread> mutator,
+    abstract CompactSetNode<K> copyAndMigrateFromInlineToNode(final UniqueIdentity mutator,
         final int bitpos, final AbstractSetNode<K> node);
 
-    abstract CompactSetNode<K> copyAndMigrateFromNodeToInline(final AtomicReference<Thread> mutator,
+    abstract CompactSetNode<K> copyAndMigrateFromNodeToInline(final UniqueIdentity mutator,
         final int bitpos, final AbstractSetNode<K> node);
 
     static final <K> CompactSetNode<K> mergeTwoKeyValPairs(final K key0, final int keyHash0,
@@ -680,26 +681,26 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       }
     }
 
-    static final <K> CompactSetNode<K> nodeOf(final AtomicReference<Thread> mutator,
+    static final <K> CompactSetNode<K> nodeOf(final UniqueIdentity mutator,
         final int nodeMap, final int dataMap, final Object[] nodes) {
       return new BitmapIndexedSetNode<>(mutator, nodeMap, dataMap, nodes);
     }
 
-    static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator) {
+    static final <K> CompactSetNode<K> nodeOf(UniqueIdentity mutator) {
       return EMPTY_NODE;
     }
 
-    static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator,
+    static final <K> CompactSetNode<K> nodeOf(UniqueIdentity mutator,
         final int dataMap, final K key, final int keyHash) {
       return nodeOf(mutator, 0, dataMap, new Object[]{key});
     }
 
-    static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator, final int dataMap,
+    static final <K> CompactSetNode<K> nodeOf(UniqueIdentity mutator, final int dataMap,
         final K key0, final int keyHash0, final K key1, final int keyHash1) {
       return nodeOf(mutator, 0, dataMap, new Object[]{key0, key1});
     }
 
-    static final <K> CompactSetNode<K> nodeOf(AtomicReference<Thread> mutator,
+    static final <K> CompactSetNode<K> nodeOf(UniqueIdentity mutator,
         final int nodeMap, final AbstractSetNode<K> node) {
       return nodeOf(mutator, nodeMap, 0, new Object[]{node});
     }
@@ -768,7 +769,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    public AbstractSetNode<K> updated(final AtomicReference<Thread> mutator, final K key,
+    public AbstractSetNode<K> updated(final UniqueIdentity mutator, final K key,
                                       final int keyHash, final int shift, final SetNodeResult<K> details) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -813,7 +814,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    public AbstractSetNode<K> removed(final AtomicReference<Thread> mutator, final K key, final int keyHash,
+    public AbstractSetNode<K> removed(final UniqueIdentity mutator, final K key, final int keyHash,
                                       final int shift, final SetNodeResult<K> details) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -941,8 +942,8 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     private final int nodeMap;
     private final int dataMap;
 
-    CompactMixedSetNode(final AtomicReference<Thread> mutator, final int nodeMap,
-        final int dataMap) {
+    CompactMixedSetNode(final UniqueIdentity mutator, final int nodeMap,
+                        final int dataMap) {
       this.nodeMap = nodeMap;
       this.dataMap = dataMap;
     }
@@ -961,10 +962,10 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
   private static final class BitmapIndexedSetNode<K> extends CompactMixedSetNode<K> {
 
-    transient final AtomicReference<Thread> mutator;
+    transient final UniqueIdentity mutator;
     final Object[] nodes;
 
-    private BitmapIndexedSetNode(final AtomicReference<Thread> mutator, final int nodeMap,
+    private BitmapIndexedSetNode(final UniqueIdentity mutator, final int nodeMap,
         final int dataMap, final Object[] nodes) {
       super(mutator, nodeMap, dataMap);
 
@@ -1013,7 +1014,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
         @Override
         public void set(int index, AbstractSetNode<K> item,
-            AtomicReference<?> writeCapabilityToken) {
+            UniqueIdentity writeCapabilityToken) {
           if (!isAllowedToEdit(BitmapIndexedSetNode.this.mutator, writeCapabilityToken)) {
             throw new IllegalStateException();
           }
@@ -1039,7 +1040,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
 //    @Override
-//    public void setNode(final AtomicReference<Thread> mutator, final int index,
+//    public void setNode(final UniqueIdentity mutator, final int index,
 //        final AbstractSetNode<K> node) {
 //      if (isAllowedToEdit(this.mutator, mutator)) {
 //        nodes[nodes.length - 1 - index] = node;
@@ -1184,7 +1185,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    CompactSetNode<K> copyAndSetNode(final AtomicReference<Thread> mutator, final int bitpos,
+    CompactSetNode<K> copyAndSetNode(final UniqueIdentity mutator, final int bitpos,
         final AbstractSetNode<K> newNode) {
 
       final int nodeIndex = nodeIndex(bitpos);
@@ -1212,7 +1213,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    CompactSetNode<K> copyAndInsertValue(final AtomicReference<Thread> mutator, final int bitpos,
+    CompactSetNode<K> copyAndInsertValue(final UniqueIdentity mutator, final int bitpos,
         final K key) {
       final int idx = TUPLE_LENGTH * dataIndex(bitpos);
 
@@ -1228,7 +1229,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    CompactSetNode<K> copyAndRemoveValue(final AtomicReference<Thread> mutator, final int bitpos) {
+    CompactSetNode<K> copyAndRemoveValue(final UniqueIdentity mutator, final int bitpos) {
       final int idx = TUPLE_LENGTH * dataIndex(bitpos);
 
       final Object[] src = this.nodes;
@@ -1242,7 +1243,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    CompactSetNode<K> copyAndMigrateFromInlineToNode(final AtomicReference<Thread> mutator,
+    CompactSetNode<K> copyAndMigrateFromInlineToNode(final UniqueIdentity mutator,
         final int bitpos, final AbstractSetNode<K> node) {
 
       final int idxOld = TUPLE_LENGTH * dataIndex(bitpos);
@@ -1263,7 +1264,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    CompactSetNode<K> copyAndMigrateFromNodeToInline(final AtomicReference<Thread> mutator,
+    CompactSetNode<K> copyAndMigrateFromNodeToInline(final UniqueIdentity mutator,
         final int bitpos, final AbstractSetNode<K> node) {
 
       final int idxOld = this.nodes.length - 1 - nodeIndex(bitpos);
@@ -1328,7 +1329,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    public AbstractSetNode<K> updated(final AtomicReference<Thread> mutator, final K key,
+    public AbstractSetNode<K> updated(final UniqueIdentity mutator, final K key,
                                       final int keyHash, final int shift, final SetNodeResult<K> details) {
       assert this.hash == keyHash;
 
@@ -1354,7 +1355,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    public AbstractSetNode<K> removed(final AtomicReference<Thread> mutator, final K key,
+    public AbstractSetNode<K> removed(final UniqueIdentity mutator, final K key,
                                       final int keyHash, final int shift, final SetNodeResult<K> details) {
       for (int idx = 0; idx < keys.length; idx++) {
         if (Objects.equals(keys[idx], key)) {
@@ -1434,7 +1435,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
 //    @Override
-//    public void setNode(AtomicReference<Thread> mutator, int index, AbstractSetNode<K> node) {
+//    public void setNode(UniqueIdentity mutator, int index, AbstractSetNode<K> node) {
 //      throw new IllegalStateException("Is leaf node.");
 //    }
 
@@ -1511,31 +1512,31 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
     }
 
     @Override
-    CompactSetNode<K> copyAndInsertValue(final AtomicReference<Thread> mutator, final int bitpos,
+    CompactSetNode<K> copyAndInsertValue(final UniqueIdentity mutator, final int bitpos,
         final K key) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    CompactSetNode<K> copyAndRemoveValue(final AtomicReference<Thread> mutator,
+    CompactSetNode<K> copyAndRemoveValue(final UniqueIdentity mutator,
         final int bitpos) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    CompactSetNode<K> copyAndSetNode(final AtomicReference<Thread> mutator, final int bitpos,
+    CompactSetNode<K> copyAndSetNode(final UniqueIdentity mutator, final int bitpos,
         final AbstractSetNode<K> node) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    CompactSetNode<K> copyAndMigrateFromInlineToNode(final AtomicReference<Thread> mutator,
+    CompactSetNode<K> copyAndMigrateFromInlineToNode(final UniqueIdentity mutator,
         final int bitpos, final AbstractSetNode<K> node) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    CompactSetNode<K> copyAndMigrateFromNodeToInline(final AtomicReference<Thread> mutator,
+    CompactSetNode<K> copyAndMigrateFromNodeToInline(final UniqueIdentity mutator,
         final int bitpos, final AbstractSetNode<K> node) {
       throw new UnsupportedOperationException();
     }
@@ -1794,11 +1795,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       }
     }
 
-    protected boolean __insertWithCapability(AtomicReference<Thread> mutator, K key) {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
+    protected boolean __insertWithCapability(UniqueIdentity mutator, K key) {
       final int keyHash = key.hashCode();
       final SetNodeResult<K> details = SetNodeResult.unchanged();
 
@@ -1835,11 +1832,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
       return modified;
     }
 
-    protected boolean __removeWithCapability(AtomicReference<Thread> mutator, final K key) {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
+    protected boolean __removeWithCapability(UniqueIdentity mutator, final K key) {
       final int keyHash = key.hashCode();
       final SetNodeResult<K> details = SetNodeResult.unchanged();
 
@@ -2017,11 +2010,11 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
   static final class TransientTrieSet<K> extends AbstractTransientTrieSet<K> {
 
-    final private AtomicReference<Thread> mutator;
+     private UniqueIdentity mutator;
 
     TransientTrieSet(PersistentTrieSet<K> trieSet) {
       super(trieSet);
-      this.mutator = new AtomicReference<Thread>(Thread.currentThread());
+      this.mutator = new UniqueIdentity();
     }
 
     @Override
@@ -2036,11 +2029,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
     @Override
     public Set.Immutable<K> freeze() {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
-      mutator.set(null);
+      mutator=new UniqueIdentity();
       return new PersistentTrieSet<K>(rootNode, cachedHashCode, cachedSize);
     }
 

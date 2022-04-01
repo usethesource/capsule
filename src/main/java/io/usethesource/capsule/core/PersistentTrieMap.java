@@ -27,6 +27,7 @@ import java.util.function.BiFunction;
 import io.usethesource.capsule.core.trie.ArrayView;
 import io.usethesource.capsule.core.trie.MapNode;
 import io.usethesource.capsule.core.trie.MapNodeResult;
+import io.usethesource.capsule.core.trie.UniqueIdentity;
 
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 
@@ -571,8 +572,8 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
     static final int TUPLE_LENGTH = 2;
 
-    static final <T> boolean isAllowedToEdit(AtomicReference<?> x, AtomicReference<?> y) {
-      return x != null && y != null && (x == y || x.get() == y.get());
+    static final <T> boolean isAllowedToEdit(UniqueIdentity x, UniqueIdentity y) {
+      return x != null && y != null && x == y;
     }
 
     @Override
@@ -727,23 +728,23 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
       return inv1 && inv2 && inv3 && inv4 && inv5;
     }
 
-    abstract CompactMapNode<K, V> copyAndSetValue(final AtomicReference<Thread> mutator,
+    abstract CompactMapNode<K, V> copyAndSetValue(final UniqueIdentity mutator,
         final int bitpos, final V val);
 
-    abstract CompactMapNode<K, V> copyAndInsertValue(final AtomicReference<Thread> mutator,
+    abstract CompactMapNode<K, V> copyAndInsertValue(final UniqueIdentity mutator,
         final int bitpos, final K key, final V val);
 
-    abstract CompactMapNode<K, V> copyAndRemoveValue(final AtomicReference<Thread> mutator,
+    abstract CompactMapNode<K, V> copyAndRemoveValue(final UniqueIdentity mutator,
         final int bitpos);
 
-    abstract CompactMapNode<K, V> copyAndSetNode(final AtomicReference<Thread> mutator,
+    abstract CompactMapNode<K, V> copyAndSetNode(final UniqueIdentity mutator,
         final int bitpos, final AbstractMapNode<K, V> node);
 
     abstract CompactMapNode<K, V> copyAndMigrateFromInlineToNode(
-        final AtomicReference<Thread> mutator, final int bitpos, final AbstractMapNode<K, V> node);
+        final UniqueIdentity mutator, final int bitpos, final AbstractMapNode<K, V> node);
 
     abstract CompactMapNode<K, V> copyAndMigrateFromNodeToInline(
-        final AtomicReference<Thread> mutator, final int bitpos, final AbstractMapNode<K, V> node);
+        final UniqueIdentity mutator, final int bitpos, final AbstractMapNode<K, V> node);
 
     static final <K, V> CompactMapNode<K, V> mergeTwoKeyValPairs(final K key0, final V val0,
         final int keyHash0, final K key1, final V val1, final int keyHash1, final int shift) {
@@ -778,16 +779,16 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
       }
     }
 
-    static final <K, V> CompactMapNode<K, V> nodeOf(final AtomicReference<Thread> mutator,
+    static final <K, V> CompactMapNode<K, V> nodeOf(final UniqueIdentity mutator,
         final int nodeMap, final int dataMap, final Object[] nodes) {
       return new BitmapIndexedMapNode<>(mutator, nodeMap, dataMap, nodes);
     }
 
-    static final <K, V> CompactMapNode<K, V> nodeOf(AtomicReference<Thread> mutator) {
+    static final <K, V> CompactMapNode<K, V> nodeOf(UniqueIdentity mutator) {
       return EMPTY_NODE;
     }
 
-    static final <K, V> CompactMapNode<K, V> nodeOf(AtomicReference<Thread> mutator,
+    static final <K, V> CompactMapNode<K, V> nodeOf(UniqueIdentity mutator,
         final int nodeMap, final int dataMap, final K key, final V val) {
       assert nodeMap == 0;
       return nodeOf(mutator, (0), dataMap, new Object[]{key, val});
@@ -859,7 +860,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    public AbstractMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
+    public AbstractMapNode<K, V> updated(final UniqueIdentity mutator, final K key, final V val,
                                          final int keyHash, final int shift, final MapNodeResult<K, V> details) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -901,7 +902,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    public AbstractMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
+    public AbstractMapNode<K, V> removed(final UniqueIdentity mutator, final K key,
                                          final int keyHash, final int shift, final MapNodeResult<K, V> details) {
       final int mask = mask(keyHash, shift);
       final int bitpos = bitpos(mask);
@@ -1029,7 +1030,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     private final int nodeMap;
     private final int dataMap;
 
-    CompactMixedMapNode(final AtomicReference<Thread> mutator, final int nodeMap,
+    CompactMixedMapNode(final UniqueIdentity mutator, final int nodeMap,
         final int dataMap) {
       this.nodeMap = nodeMap;
       this.dataMap = dataMap;
@@ -1049,10 +1050,10 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
   private static final class BitmapIndexedMapNode<K, V> extends CompactMixedMapNode<K, V> {
 
-    transient final AtomicReference<Thread> mutator;
+    transient final UniqueIdentity mutator;
     final Object[] nodes;
 
-    private BitmapIndexedMapNode(final AtomicReference<Thread> mutator, final int nodeMap,
+    private BitmapIndexedMapNode(final UniqueIdentity mutator, final int nodeMap,
         final int dataMap, final Object[] nodes) {
       super(mutator, nodeMap, dataMap);
 
@@ -1088,7 +1089,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
         }
 
         /**
-         * TODO: replace with {{@link #set(int, AbstractMapNode, AtomicReference)}}
+         * TODO: replace with {{@code #set(int, AbstractMapNode, AtomicReference)}}
          */
         @Override
         public void set(int index, AbstractMapNode<K, V> item) {
@@ -1101,7 +1102,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
         @Override
         public void set(int index, AbstractMapNode<K, V> item,
-            AtomicReference<?> writeCapabilityToken) {
+            UniqueIdentity writeCapabilityToken) {
           if (!isAllowedToEdit(BitmapIndexedMapNode.this.mutator, writeCapabilityToken)) {
             throw new IllegalStateException();
           }
@@ -1250,7 +1251,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    CompactMapNode<K, V> copyAndSetValue(final AtomicReference<Thread> mutator, final int bitpos,
+    CompactMapNode<K, V> copyAndSetValue(final UniqueIdentity mutator, final int bitpos,
         final V val) {
       final int idx = TUPLE_LENGTH * dataIndex(bitpos) + 1;
 
@@ -1271,7 +1272,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    CompactMapNode<K, V> copyAndSetNode(final AtomicReference<Thread> mutator, final int bitpos,
+    CompactMapNode<K, V> copyAndSetNode(final UniqueIdentity mutator, final int bitpos,
         final AbstractMapNode<K, V> node) {
 
       final int idx = this.nodes.length - 1 - nodeIndex(bitpos);
@@ -1293,7 +1294,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    CompactMapNode<K, V> copyAndInsertValue(final AtomicReference<Thread> mutator, final int bitpos,
+    CompactMapNode<K, V> copyAndInsertValue(final UniqueIdentity mutator, final int bitpos,
         final K key, final V val) {
       final int idx = TUPLE_LENGTH * dataIndex(bitpos);
 
@@ -1310,7 +1311,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    CompactMapNode<K, V> copyAndRemoveValue(final AtomicReference<Thread> mutator,
+    CompactMapNode<K, V> copyAndRemoveValue(final UniqueIdentity mutator,
         final int bitpos) {
       final int idx = TUPLE_LENGTH * dataIndex(bitpos);
 
@@ -1325,7 +1326,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    CompactMapNode<K, V> copyAndMigrateFromInlineToNode(final AtomicReference<Thread> mutator,
+    CompactMapNode<K, V> copyAndMigrateFromInlineToNode(final UniqueIdentity mutator,
         final int bitpos, final AbstractMapNode<K, V> node) {
 
       final int idxOld = TUPLE_LENGTH * dataIndex(bitpos);
@@ -1346,7 +1347,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    CompactMapNode<K, V> copyAndMigrateFromNodeToInline(final AtomicReference<Thread> mutator,
+    CompactMapNode<K, V> copyAndMigrateFromNodeToInline(final UniqueIdentity mutator,
         final int bitpos, final AbstractMapNode<K, V> node) {
 
       final int idxOld = this.nodes.length - 1 - nodeIndex(bitpos);
@@ -1413,7 +1414,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    public AbstractMapNode<K, V> updated(final AtomicReference<Thread> mutator, final K key, final V val,
+    public AbstractMapNode<K, V> updated(final UniqueIdentity mutator, final K key, final V val,
                                          final int keyHash, final int shift, final MapNodeResult<K, V> details) {
       assert this.hash == keyHash;
 
@@ -1464,7 +1465,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    public AbstractMapNode<K, V> removed(final AtomicReference<Thread> mutator, final K key,
+    public AbstractMapNode<K, V> removed(final UniqueIdentity mutator, final K key,
                                          final int keyHash, final int shift, final MapNodeResult<K, V> details) {
       for (int idx = 0; idx < keys.length; idx++) {
         if (Objects.equals(keys[idx], key)) {
@@ -1624,37 +1625,37 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
     }
 
     @Override
-    CompactMapNode<K, V> copyAndSetValue(final AtomicReference<Thread> mutator, final int bitpos,
+    CompactMapNode<K, V> copyAndSetValue(final UniqueIdentity mutator, final int bitpos,
         final V val) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    CompactMapNode<K, V> copyAndInsertValue(final AtomicReference<Thread> mutator, final int bitpos,
+    CompactMapNode<K, V> copyAndInsertValue(final UniqueIdentity mutator, final int bitpos,
         final K key, final V val) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    CompactMapNode<K, V> copyAndRemoveValue(final AtomicReference<Thread> mutator,
+    CompactMapNode<K, V> copyAndRemoveValue(final UniqueIdentity mutator,
         final int bitpos) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    CompactMapNode<K, V> copyAndSetNode(final AtomicReference<Thread> mutator, final int bitpos,
+    CompactMapNode<K, V> copyAndSetNode(final UniqueIdentity mutator, final int bitpos,
         final AbstractMapNode<K, V> node) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    CompactMapNode<K, V> copyAndMigrateFromInlineToNode(final AtomicReference<Thread> mutator,
+    CompactMapNode<K, V> copyAndMigrateFromInlineToNode(final UniqueIdentity mutator,
         final int bitpos, final AbstractMapNode<K, V> node) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    CompactMapNode<K, V> copyAndMigrateFromNodeToInline(final AtomicReference<Thread> mutator,
+    CompactMapNode<K, V> copyAndMigrateFromNodeToInline(final UniqueIdentity mutator,
         final int bitpos, final AbstractMapNode<K, V> node) {
       throw new UnsupportedOperationException();
     }
@@ -1867,13 +1868,13 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
   static final class TransientTrieMap<K, V> implements
       io.usethesource.capsule.Map.Transient<K, V> {
 
-    final private AtomicReference<Thread> mutator;
+    private UniqueIdentity mutator;
     private AbstractMapNode<K, V> rootNode;
     private int cachedHashCode;
     private int cachedSize;
 
     TransientTrieMap(PersistentTrieMap<K, V> trieMap) {
-      this.mutator = new AtomicReference<Thread>(Thread.currentThread());
+      this.mutator = new UniqueIdentity();
       this.rootNode = trieMap.rootNode;
       this.cachedHashCode = trieMap.cachedHashCode;
       this.cachedSize = trieMap.cachedSize;
@@ -1962,10 +1963,6 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
     @Override
     public V __put(final K key, final V val) {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
       final int keyHash = key.hashCode();
       final MapNodeResult<K, V> details = MapNodeResult.unchanged();
 
@@ -2023,10 +2020,6 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
     @Override
     public V __remove(final K key) {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
       final int keyHash = key.hashCode();
       final MapNodeResult<K, V> details = MapNodeResult.unchanged();
 
@@ -2338,11 +2331,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
     @Override
     public io.usethesource.capsule.Map.Immutable<K, V> freeze() {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
-      mutator.set(null);
+      mutator=new UniqueIdentity();
       return new PersistentTrieMap<K, V>(rootNode, cachedHashCode, cachedSize);
     }
   }

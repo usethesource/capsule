@@ -8,7 +8,6 @@
 package io.usethesource.capsule.core.trie;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 public interface SetNode<K, R extends SetNode<K, R>> extends Node {
 
@@ -16,10 +15,10 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
 
   Optional<K> findByKey(final K key, final int keyHash, final int shift);
 
-  R updated(final AtomicReference<Thread> mutator, final K key, final int keyHash, final int shift,
+  R updated(final UniqueIdentity mutator, final K key, final int keyHash, final int shift,
             final SetNodeResult<K> details);
 
-  R removed(final AtomicReference<Thread> mutator, final K key, final int keyHash, final int shift,
+  R removed(final UniqueIdentity mutator, final K key, final int keyHash, final int shift,
             final SetNodeResult<K> details);
 
   boolean hasPayload();
@@ -48,15 +47,15 @@ public interface SetNode<K, R extends SetNode<K, R>> extends Node {
 
   int recursivePayloadHashCode();
 
-  default R union(final AtomicReference<Thread> mutator, R that, final int shift) {
+  default R union(final UniqueIdentity mutator, R that, final int shift) {
     throw new UnsupportedOperationException();
   }
 
-  default R intersect(final AtomicReference<Thread> mutator, R that, final int shift) {
+  default R intersect(final UniqueIdentity mutator, R that, final int shift) {
     throw new UnsupportedOperationException();
   }
 
-  default R subtract(final AtomicReference<Thread> mutator, R that, final int shift) {
+  default R subtract(final UniqueIdentity mutator, R that, final int shift) {
     throw new UnsupportedOperationException();
   }
 

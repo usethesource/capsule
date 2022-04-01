@@ -22,9 +22,9 @@ public class BottomUpImmutableNodeTransformer<SN extends Node, DN extends Node> 
 
   private static final int MAX_DEPTH = 7;
 
-  //  private final BiFunction<SN, AtomicReference<Thread>, DN> nodeMapper;
+  //  private final BiFunction<SN, UniqueIdentity, DN> nodeMapper;
   private final BiFunction<SN, DN[], DN> nodeMapper;
-  private final AtomicReference<Thread> mutator;
+  private UniqueIdentity mutator;
   private final DN dstRootNode;
 
   private final IntFunction<DN[]> arrayConstructor;
@@ -51,7 +51,7 @@ public class BottomUpImmutableNodeTransformer<SN extends Node, DN extends Node> 
     mappedNodesStack.ensureCapacity(128);
     this.nodeMapper = nodeMapper;
     this.arrayConstructor = arrayConstructor;
-    this.mutator = new AtomicReference<>(Thread.currentThread());
+    this.mutator = new UniqueIdentity();
     this.dstRootNode = null; // nodeMapper.apply(srcRootNode, mutator);
 
     final ListIterator<SN> srcIterator = (ListIterator<SN>) srcRootNode.nodeArray().iterator();
@@ -73,7 +73,7 @@ public class BottomUpImmutableNodeTransformer<SN extends Node, DN extends Node> 
       processStack();
     }
 
-    mutator.set(null);
+    mutator=new UniqueIdentity();
     return dstRootNode;
   }
 

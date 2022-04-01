@@ -32,6 +32,7 @@ import io.usethesource.capsule.core.trie.EitherSingletonOrCollection;
 import io.usethesource.capsule.core.trie.EitherSingletonOrCollection.Type;
 import io.usethesource.capsule.core.trie.MultimapNode;
 import io.usethesource.capsule.core.trie.MultimapResult;
+import io.usethesource.capsule.core.trie.UniqueIdentity;
 import io.usethesource.capsule.util.ArrayUtils;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap;
 import io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableSet;
@@ -193,8 +194,8 @@ public class PersistentTrieSetMultimap<K, V> extends
       return values.findFirst().get();
     }
 
-    static final boolean isAllowedToEdit(AtomicReference<?> x, AtomicReference<?> y) {
-      return x != null && y != null && (x == y || x.get() == y.get());
+    static final boolean isAllowedToEdit(UniqueIdentity x, UniqueIdentity y) {
+      return x != null && y != null && x == y;
     }
 
     @Override
@@ -365,7 +366,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     /***** CONVERISONS *****/
 
-//    abstract PersistentTrieSet.AbstractSetNode<K> toSetNode(AtomicReference<Thread> mutator);
+//    abstract PersistentTrieSet.AbstractSetNode<K> toSetNode(UniqueIdentity mutator);
 
 // abstract PersistentTrieSet.AbstractSetNode<K> toSetNode(
     // PersistentTrieSet.AbstractSetNode<K>... newChildren);
@@ -439,53 +440,53 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     abstract CompactSetMultimapNode<K, V> copyAndSetSingletonValue(
-        final AtomicReference<Thread> mutator, final int bitpos, final V val);
+        final UniqueIdentity mutator, final int bitpos, final V val);
 
     abstract CompactSetMultimapNode<K, V> copyAndSetCollectionValue(
-        final AtomicReference<Thread> mutator, final int bitpos,
+        final UniqueIdentity mutator, final int bitpos,
         final io.usethesource.capsule.Set.Immutable<V> valColl);
 
-    abstract CompactSetMultimapNode<K, V> copyAndSetNode(final AtomicReference<Thread> mutator,
+    abstract CompactSetMultimapNode<K, V> copyAndSetNode(final UniqueIdentity mutator,
         final int bitpos, final AbstractSetMultimapNode<K, V> node);
 
     abstract CompactSetMultimapNode<K, V> copyAndInsertSingleton(
-        final AtomicReference<Thread> mutator, final int bitpos, final K key, final V val);
+        final UniqueIdentity mutator, final int bitpos, final K key, final V val);
 
-    abstract CompactSetMultimapNode<K, V> copyAndInsertCollection(AtomicReference<Thread> mutator,
+    abstract CompactSetMultimapNode<K, V> copyAndInsertCollection(UniqueIdentity mutator,
         int bitpos,
         K key, io.usethesource.capsule.Set.Immutable<V> values);
 
     abstract CompactSetMultimapNode<K, V> copyAndMigrateFromSingletonToCollection(
-        final AtomicReference<Thread> mutator, final int bitpos, final K key,
+        final UniqueIdentity mutator, final int bitpos, final K key,
         final io.usethesource.capsule.Set.Immutable<V> valColl);
 
     abstract CompactSetMultimapNode<K, V> copyAndRemoveSingleton(
-        final AtomicReference<Thread> mutator, final int bitpos);
+        final UniqueIdentity mutator, final int bitpos);
 
     /*
      * Batch updated, necessary for removedAll.
      */
     abstract CompactSetMultimapNode<K, V> copyAndRemoveCollection(
-        final AtomicReference<Thread> mutator, final int bitpos);
+        final UniqueIdentity mutator, final int bitpos);
 
     abstract CompactSetMultimapNode<K, V> copyAndMigrateFromSingletonToNode(
-        final AtomicReference<Thread> mutator, final int bitpos,
+        final UniqueIdentity mutator, final int bitpos,
         final AbstractSetMultimapNode<K, V> node);
 
     abstract CompactSetMultimapNode<K, V> copyAndMigrateFromNodeToSingleton(
-        final AtomicReference<Thread> mutator, final int bitpos,
+        final UniqueIdentity mutator, final int bitpos,
         final AbstractSetMultimapNode<K, V> node); // node get's unwrapped inside method
 
     abstract CompactSetMultimapNode<K, V> copyAndMigrateFromCollectionToNode(
-        final AtomicReference<Thread> mutator, final int bitpos,
+        final UniqueIdentity mutator, final int bitpos,
         final AbstractSetMultimapNode<K, V> node);
 
     abstract CompactSetMultimapNode<K, V> copyAndMigrateFromNodeToCollection(
-        final AtomicReference<Thread> mutator, final int bitpos,
+        final UniqueIdentity mutator, final int bitpos,
         final AbstractSetMultimapNode<K, V> node); // node get's unwrapped inside method
 
     abstract CompactSetMultimapNode<K, V> copyAndMigrateFromCollectionToSingleton(
-        final AtomicReference<Thread> mutator, final int bitpos, final K key, final V val);
+        final UniqueIdentity mutator, final int bitpos, final K key, final V val);
 
     static final <K, V> CompactSetMultimapNode<K, V> mergeTwoSingletonPairs(final K key0,
         final V val0, final int keyHash0, final K key1, final V val1, final int keyHash1, final int shift) {
@@ -593,16 +594,16 @@ public class PersistentTrieSetMultimap<K, V> extends
       EMPTY_NODE = new BitmapIndexedSetMultimapNode<>(null, (0), (0), new Object[]{});
     }
 
-    static final <K, V> CompactSetMultimapNode<K, V> nodeOf(final AtomicReference<Thread> mutator,
+    static final <K, V> CompactSetMultimapNode<K, V> nodeOf(final UniqueIdentity mutator,
         final int nodeMap, final int dataMap, final Object[] nodes) {
       return new BitmapIndexedSetMultimapNode<>(mutator, nodeMap, dataMap, nodes);
     }
 
-    static final <K, V> CompactSetMultimapNode<K, V> nodeOf(AtomicReference<Thread> mutator) {
+    static final <K, V> CompactSetMultimapNode<K, V> nodeOf(UniqueIdentity mutator) {
       return EMPTY_NODE;
     }
 
-    static final <K, V> CompactSetMultimapNode<K, V> nodeOf(AtomicReference<Thread> mutator,
+    static final <K, V> CompactSetMultimapNode<K, V> nodeOf(UniqueIdentity mutator,
         final int nodeMap, final int dataMap, final K key,
         final io.usethesource.capsule.Set.Immutable<V> valColl) {
       assert nodeMap == 0;
@@ -745,7 +746,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override // TODO: final
-    public AbstractSetMultimapNode<K, V> insertedSingle(final AtomicReference<Thread> mutator,
+    public AbstractSetMultimapNode<K, V> insertedSingle(final UniqueIdentity mutator,
                                                         final K key,
                                                         final V value, final int keyHash, final int shift,
                                                         final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
@@ -839,7 +840,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     // TODO: final
     @Override
-    public AbstractSetMultimapNode<K, V> insertedMultiple(final AtomicReference<Thread> mutator,
+    public AbstractSetMultimapNode<K, V> insertedMultiple(final UniqueIdentity mutator,
                                                           final K key, final io.usethesource.capsule.Set.Immutable<V> values, final int keyHash,
                                                           final int shift,
                                                           final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
@@ -934,7 +935,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
-    public final AbstractSetMultimapNode<K, V> updated(AtomicReference<Thread> mutator,
+    public final AbstractSetMultimapNode<K, V> updated(UniqueIdentity mutator,
                                                        K key,
                                                        io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift,
                                                        MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
@@ -947,7 +948,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override // TODO: final
-    public AbstractSetMultimapNode<K, V> updatedSingle(final AtomicReference<Thread> mutator,
+    public AbstractSetMultimapNode<K, V> updatedSingle(final UniqueIdentity mutator,
                                                        final K key,
                                                        final V value, final int keyHash, final int shift,
                                                        final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
@@ -1027,7 +1028,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override // TODO: final
-    public AbstractSetMultimapNode<K, V> updatedMultiple(AtomicReference<Thread> mutator,
+    public AbstractSetMultimapNode<K, V> updatedMultiple(UniqueIdentity mutator,
                                                          K key,
                                                          io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift,
                                                          MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
@@ -1107,7 +1108,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override // TODO: final
-    public AbstractSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator,
+    public AbstractSetMultimapNode<K, V> removed(final UniqueIdentity mutator,
                                                  final K key,
                                                  final V value, final int keyHash, final int shift,
                                                  final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
@@ -1216,7 +1217,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override // TODO: final
-    public AbstractSetMultimapNode<K, V> removed(final AtomicReference<Thread> mutator,
+    public AbstractSetMultimapNode<K, V> removed(final UniqueIdentity mutator,
                                                  final K key,
                                                  final int keyHash, final int shift,
                                                  final MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
@@ -1329,7 +1330,7 @@ public class PersistentTrieSetMultimap<K, V> extends
       return this;
     }
 
-    abstract CompactSetMultimapNode<K, V> canonicalize(AtomicReference<Thread> mutator,
+    abstract CompactSetMultimapNode<K, V> canonicalize(UniqueIdentity mutator,
         final int keyHash, final int shift);
 
     /**
@@ -1423,7 +1424,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     private final int rawMap1; // former nodeMap
     private final int rawMap2; // former dataMap
 
-    CompactMixedSetMultimapNode(final AtomicReference<Thread> mutator, final int nodeMap,
+    CompactMixedSetMultimapNode(final UniqueIdentity mutator, final int nodeMap,
         final int dataMap) {
       this.rawMap1 = nodeMap;
       this.rawMap2 = dataMap;
@@ -1471,10 +1472,10 @@ public class PersistentTrieSetMultimap<K, V> extends
   private static final class BitmapIndexedSetMultimapNode<K, V>
       extends CompactMixedSetMultimapNode<K, V> {
 
-    transient final AtomicReference<Thread> mutator;
+    transient final UniqueIdentity mutator;
     final Object[] nodes;
 
-    private BitmapIndexedSetMultimapNode(final AtomicReference<Thread> mutator, final int rawMap1,
+    private BitmapIndexedSetMultimapNode(final UniqueIdentity mutator, final int rawMap1,
         final int rawMap2, final Object[] nodes) {
       super(mutator, rawMap1, rawMap2);
 
@@ -1554,7 +1555,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
         @Override
         public void set(int index, AbstractSetMultimapNode<K, V> item,
-            AtomicReference<?> writeCapabilityToken) {
+            UniqueIdentity writeCapabilityToken) {
           if (!isAllowedToEdit(BitmapIndexedSetMultimapNode.this.mutator, writeCapabilityToken)) {
             throw new IllegalStateException();
           }
@@ -1633,7 +1634,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
 //    @Override
-//    PersistentTrieSet.AbstractSetNode<K> toSetNode(final AtomicReference<Thread> mutator) {
+//    PersistentTrieSet.AbstractSetNode<K> toSetNode(final UniqueIdentity mutator) {
 //      final int mergedPayloadMap = rawMap2();
 //
 //      final ArrayView<K> dataArray0 = dataArray(0, 0);
@@ -1745,7 +1746,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
-    CompactSetMultimapNode<K, V> copyAndSetSingletonValue(final AtomicReference<Thread> mutator,
+    CompactSetMultimapNode<K, V> copyAndSetSingletonValue(final UniqueIdentity mutator,
         final int bitpos, final V val) {
 
       final int idx = TUPLE_LENGTH * dataIndex(bitpos) + 1;
@@ -1755,7 +1756,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
-    CompactSetMultimapNode<K, V> copyAndSetCollectionValue(final AtomicReference<Thread> mutator,
+    CompactSetMultimapNode<K, V> copyAndSetCollectionValue(final UniqueIdentity mutator,
         final int bitpos, final io.usethesource.capsule.Set.Immutable<V> valColl) {
 
       final int idx = TUPLE_LENGTH * (arity(dataMap()) + collIndex(bitpos)) + 1;
@@ -1764,7 +1765,7 @@ public class PersistentTrieSetMultimap<K, V> extends
       return updatedNode;
     }
 
-    private CompactSetMultimapNode<K, V> copyAndSetXxxValue(final AtomicReference<Thread> mutator,
+    private CompactSetMultimapNode<K, V> copyAndSetXxxValue(final UniqueIdentity mutator,
         final int idx, final Object newValue) {
       final CompactSetMultimapNode<K, V> updatedNode;
       if (isAllowedToEdit(this.mutator, mutator)) {
@@ -1785,7 +1786,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
-    CompactSetMultimapNode<K, V> copyAndSetNode(final AtomicReference<Thread> mutator,
+    CompactSetMultimapNode<K, V> copyAndSetNode(final UniqueIdentity mutator,
         final int bitpos, final AbstractSetMultimapNode<K, V> node) {
 
       final int idx = this.nodes.length - 1 - nodeIndex(bitpos);
@@ -1807,7 +1808,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
-    CompactSetMultimapNode<K, V> copyAndInsertSingleton(final AtomicReference<Thread> mutator,
+    CompactSetMultimapNode<K, V> copyAndInsertSingleton(final UniqueIdentity mutator,
         final int bitpos, final K key, final V val) {
       final int idx = TUPLE_LENGTH * dataIndex(bitpos);
 
@@ -1824,7 +1825,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
-    CompactSetMultimapNode<K, V> copyAndInsertCollection(final AtomicReference<Thread> mutator,
+    CompactSetMultimapNode<K, V> copyAndInsertCollection(final UniqueIdentity mutator,
         final int bitpos, final K key, final io.usethesource.capsule.Set.Immutable<V> valColl) {
       final int idx = TUPLE_LENGTH * (arity(dataMap()) + collIndex(bitpos));
 
@@ -1842,7 +1843,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromSingletonToCollection(
-        AtomicReference<Thread> mutator, int bitpos, K key,
+        UniqueIdentity mutator, int bitpos, K key,
         io.usethesource.capsule.Set.Immutable<V> valColl) {
 
       final int idxOld = TUPLE_LENGTH * index(dataMap(), bitpos);
@@ -1865,7 +1866,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromCollectionToSingleton(
-        AtomicReference<Thread> mutator, int bitpos, K key, V val) {
+        UniqueIdentity mutator, int bitpos, K key, V val) {
 
       // TODO: does not support src == dst yet for shifting
 
@@ -1888,7 +1889,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
-    CompactSetMultimapNode<K, V> copyAndRemoveSingleton(final AtomicReference<Thread> mutator,
+    CompactSetMultimapNode<K, V> copyAndRemoveSingleton(final UniqueIdentity mutator,
         final int bitpos) {
       final int idx = TUPLE_LENGTH * dataIndex(bitpos);
 
@@ -1903,7 +1904,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
-    CompactSetMultimapNode<K, V> copyAndRemoveCollection(final AtomicReference<Thread> mutator,
+    CompactSetMultimapNode<K, V> copyAndRemoveCollection(final UniqueIdentity mutator,
         final int bitpos) {
       final int idx = TUPLE_LENGTH * (arity(dataMap()) + collIndex(bitpos));
 
@@ -1919,7 +1920,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromSingletonToNode(
-        final AtomicReference<Thread> mutator, final int bitpos,
+        final UniqueIdentity mutator, final int bitpos,
         final AbstractSetMultimapNode<K, V> node) {
 
       final int idxOld = TUPLE_LENGTH * dataIndex(bitpos);
@@ -1932,7 +1933,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromCollectionToNode(
-        AtomicReference<Thread> mutator,
+        UniqueIdentity mutator,
         int bitpos, AbstractSetMultimapNode<K, V> node) {
 
       final int idxOld = TUPLE_LENGTH * (arity(dataMap()) + index(collMap(), bitpos));
@@ -1962,7 +1963,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromNodeToSingleton(
-        final AtomicReference<Thread> mutator, final int bitpos,
+        final UniqueIdentity mutator, final int bitpos,
         final AbstractSetMultimapNode<K, V> node) {
 
       final int idxOld = this.nodes.length - 1 - nodeIndex(bitpos);
@@ -1978,7 +1979,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromNodeToCollection(
-        AtomicReference<Thread> mutator,
+        UniqueIdentity mutator,
         int bitpos, AbstractSetMultimapNode<K, V> node) {
 
       final int idxOld = this.nodes.length - 1 - nodeIndex(bitpos);
@@ -2011,7 +2012,7 @@ public class PersistentTrieSetMultimap<K, V> extends
       return dst;
     }
 
-    public CompactSetMultimapNode<K, V> copyAndUpdateBitmaps(AtomicReference<Thread> mutator,
+    public CompactSetMultimapNode<K, V> copyAndUpdateBitmaps(UniqueIdentity mutator,
         final int rawMap1, final int rawMap2) {
       return nodeOf(mutator, rawMap1, rawMap2, nodes);
     }
@@ -2031,7 +2032,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
-    CompactSetMultimapNode<K, V> canonicalize(AtomicReference<Thread> mutator, final int keyHash,
+    CompactSetMultimapNode<K, V> canonicalize(UniqueIdentity mutator, final int keyHash,
         final int shift) {
       if (shift > 0) {
         int rawMap1 = rawMap1();
@@ -2104,39 +2105,39 @@ public class PersistentTrieSetMultimap<K, V> extends
       throw UOE_FACTORY.get();
     }
 
-    public CompactSetMultimapNode<K, V> copyAndUpdateBitmaps(AtomicReference<Thread> mutator,
+    public CompactSetMultimapNode<K, V> copyAndUpdateBitmaps(UniqueIdentity mutator,
         int rawMap1,
         int rawMap2) {
       throw UOE_FACTORY.get();
     }
 
     @Override
-    CompactSetMultimapNode<K, V> copyAndSetSingletonValue(AtomicReference<Thread> mutator,
+    CompactSetMultimapNode<K, V> copyAndSetSingletonValue(UniqueIdentity mutator,
         int bitpos, V val) {
       throw UOE_FACTORY.get();
     }
 
     @Override
-    CompactSetMultimapNode<K, V> copyAndSetCollectionValue(AtomicReference<Thread> mutator,
+    CompactSetMultimapNode<K, V> copyAndSetCollectionValue(UniqueIdentity mutator,
         int bitpos, io.usethesource.capsule.Set.Immutable<V> valColl) {
       throw UOE_FACTORY.get();
     }
 
     @Override
-    CompactSetMultimapNode<K, V> copyAndSetNode(AtomicReference<Thread> mutator, int bitpos,
+    CompactSetMultimapNode<K, V> copyAndSetNode(UniqueIdentity mutator, int bitpos,
         AbstractSetMultimapNode<K, V> node) {
       throw UOE_FACTORY.get();
     }
 
     @Override
-    CompactSetMultimapNode<K, V> copyAndInsertSingleton(AtomicReference<Thread> mutator,
+    CompactSetMultimapNode<K, V> copyAndInsertSingleton(UniqueIdentity mutator,
         int bitpos,
         K key, V val) {
       throw UOE_FACTORY.get();
     }
 
     @Override
-    CompactSetMultimapNode<K, V> copyAndInsertCollection(AtomicReference<Thread> mutator,
+    CompactSetMultimapNode<K, V> copyAndInsertCollection(UniqueIdentity mutator,
         int bitpos,
         K key, io.usethesource.capsule.Set.Immutable<V> values) {
       throw UOE_FACTORY.get();
@@ -2145,54 +2146,54 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromSingletonToCollection(
-        AtomicReference<Thread> mutator, int bitpos, K key,
+        UniqueIdentity mutator, int bitpos, K key,
         io.usethesource.capsule.Set.Immutable<V> valColl) {
       throw UOE_FACTORY.get();
     }
 
     @Override
-    CompactSetMultimapNode<K, V> copyAndRemoveSingleton(AtomicReference<Thread> mutator,
+    CompactSetMultimapNode<K, V> copyAndRemoveSingleton(UniqueIdentity mutator,
         int bitpos) {
       throw UOE_FACTORY.get();
     }
 
     @Override
-    CompactSetMultimapNode<K, V> copyAndRemoveCollection(AtomicReference<Thread> mutator,
+    CompactSetMultimapNode<K, V> copyAndRemoveCollection(UniqueIdentity mutator,
         int bitpos) {
       throw UOE_FACTORY.get();
     }
 
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromSingletonToNode(
-        AtomicReference<Thread> mutator,
+        UniqueIdentity mutator,
         int bitpos, AbstractSetMultimapNode<K, V> node) {
       throw UOE_FACTORY.get();
     }
 
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromNodeToSingleton(
-        AtomicReference<Thread> mutator,
+        UniqueIdentity mutator,
         int bitpos, AbstractSetMultimapNode<K, V> node) {
       throw UOE_FACTORY.get();
     }
 
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromCollectionToNode(
-        AtomicReference<Thread> mutator,
+        UniqueIdentity mutator,
         int bitpos, AbstractSetMultimapNode<K, V> node) {
       throw UOE_FACTORY.get();
     }
 
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromNodeToCollection(
-        AtomicReference<Thread> mutator,
+        UniqueIdentity mutator,
         int bitpos, AbstractSetMultimapNode<K, V> node) {
       throw UOE_FACTORY.get();
     }
 
     @Override
     CompactSetMultimapNode<K, V> copyAndMigrateFromCollectionToSingleton(
-        AtomicReference<Thread> mutator, int bitpos, K key, V val) {
+        UniqueIdentity mutator, int bitpos, K key, V val) {
       throw UOE_FACTORY.get();
     }
 
@@ -2202,7 +2203,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
-    CompactSetMultimapNode<K, V> canonicalize(AtomicReference<Thread> mutator, int keyHash,
+    CompactSetMultimapNode<K, V> canonicalize(UniqueIdentity mutator, int keyHash,
         int shift) {
       throw UOE_FACTORY.get();
     }
@@ -2236,7 +2237,7 @@ public class PersistentTrieSetMultimap<K, V> extends
         () -> new UnsupportedOperationException("Not yet implemented @ HashCollisionNode.");
 
 //    @Override
-//    PersistentTrieSet.AbstractSetNode<K> toSetNode(AtomicReference<Thread> mutator) {
+//    PersistentTrieSet.AbstractSetNode<K> toSetNode(UniqueIdentity mutator) {
 //      // is leaf; ignore mutator
 //      return PersistentTrieSet.AbstractSetNode.newHashCollisonNode(hash,
 //          (K[]) collisionContent.stream().map(Map.Entry::getKey).toArray());
@@ -2394,7 +2395,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
-    public AbstractSetMultimapNode<K, V> insertedSingle(AtomicReference<Thread> mutator, K key,
+    public AbstractSetMultimapNode<K, V> insertedSingle(UniqueIdentity mutator, K key,
                                                         V value,
                                                         int keyHash, int shift,
                                                         MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
@@ -2467,7 +2468,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
-    public AbstractSetMultimapNode<K, V> insertedMultiple(AtomicReference<Thread> mutator, K key, io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
+    public AbstractSetMultimapNode<K, V> insertedMultiple(UniqueIdentity mutator, K key, io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
       Optional<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> optionalTuple =
           collisionContent.stream().filter(entry -> Objects.equals(key, entry.getKey())).findAny();
 
@@ -2529,7 +2530,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
-    public AbstractSetMultimapNode<K, V> updatedSingle(AtomicReference<Thread> mutator, K key,
+    public AbstractSetMultimapNode<K, V> updatedSingle(UniqueIdentity mutator, K key,
                                                        V value,
                                                        int keyHash,
                                                        int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
@@ -2581,7 +2582,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
-    public AbstractSetMultimapNode<K, V> updatedMultiple(AtomicReference<Thread> mutator, K key, io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
+    public AbstractSetMultimapNode<K, V> updatedMultiple(UniqueIdentity mutator, K key, io.usethesource.capsule.Set.Immutable<V> values, int keyHash, int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
       Optional<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> optionalTuple =
           collisionContent.stream().filter(entry -> Objects.equals(key, entry.getKey())).findAny();
 
@@ -2630,7 +2631,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
-    public AbstractSetMultimapNode<K, V> removed(AtomicReference<Thread> mutator, K key, V value,
+    public AbstractSetMultimapNode<K, V> removed(UniqueIdentity mutator, K key, V value,
                                                  int keyHash,
                                                  int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
       Optional<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> optionalTuple =
@@ -2680,7 +2681,7 @@ public class PersistentTrieSetMultimap<K, V> extends
     }
 
     @Override
-    public AbstractSetMultimapNode<K, V> removed(AtomicReference<Thread> mutator, K key,
+    public AbstractSetMultimapNode<K, V> removed(UniqueIdentity mutator, K key,
                                                  int keyHash,
                                                  int shift, MultimapResult<K, V, io.usethesource.capsule.Set.Immutable<V>> details) {
       final Optional<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> optionalTuple =
@@ -2797,11 +2798,7 @@ public class PersistentTrieSetMultimap<K, V> extends
 
     @Override
     public SetMultimap.Immutable<K, V> freeze() {
-      if (mutator.get() == null) {
-        throw new IllegalStateException("Transient already frozen.");
-      }
-
-      mutator.set(null);
+      mutator=new UniqueIdentity();
       return new PersistentTrieSetMultimap<K, V>(rootNode, cachedSize, cachedKeySetHashCode, cachedKeySetSize);
     }
   }

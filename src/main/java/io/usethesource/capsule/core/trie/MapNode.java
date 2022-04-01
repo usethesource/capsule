@@ -8,7 +8,6 @@
 package io.usethesource.capsule.core.trie;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 public interface MapNode<K, V, R extends MapNode<K, V, R>> extends Node {
 
@@ -16,10 +15,10 @@ public interface MapNode<K, V, R extends MapNode<K, V, R>> extends Node {
 
   Optional<V> findByKey(final K key, final int keyHash, final int shift);
 
-  R updated(final AtomicReference<Thread> mutator, final K key,
+  R updated(final UniqueIdentity mutator, final K key,
             final V val, final int keyHash, final int shift, final MapNodeResult<K, V> details);
 
-  R removed(final AtomicReference<Thread> mutator, final K key,
+  R removed(final UniqueIdentity mutator, final K key,
             final int keyHash, final int shift, final MapNodeResult<K, V> details);
 
 }

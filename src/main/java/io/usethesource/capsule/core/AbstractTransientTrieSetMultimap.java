@@ -15,6 +15,7 @@ import io.usethesource.capsule.Set;
 import io.usethesource.capsule.SetMultimap;
 import io.usethesource.capsule.core.trie.MultimapNode;
 import io.usethesource.capsule.core.trie.MultimapResult;
+import io.usethesource.capsule.core.trie.UniqueIdentity;
 
 import static io.usethesource.capsule.core.trie.MultimapResult.Modification.INSERTED_KEY;
 import static io.usethesource.capsule.core.trie.MultimapResult.Modification.REMOVED_KEY;
@@ -27,7 +28,7 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
 
   protected static final boolean DEBUG = false;
 
-  protected final AtomicReference<Thread> mutator;
+  protected UniqueIdentity mutator;
 
   protected R rootNode;
   // private int cachedHashCode;
@@ -38,7 +39,7 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
 
 
   protected AbstractTransientTrieSetMultimap(AbstractPersistentTrieSetMultimap<K, V, C, R> trieSetMultimap) {
-    this.mutator = new AtomicReference<Thread>(Thread.currentThread());
+    this.mutator = new UniqueIdentity();
     this.rootNode = trieSetMultimap.rootNode;
     // // this.cachedHashCode = trieSetMultimap.cachedHashCode;
     this.cachedSize = trieSetMultimap.cachedSize;
@@ -83,10 +84,6 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
 
   @Override
   public final boolean __insert(K key, io.usethesource.capsule.Set.Immutable<V> valueCollection) {
-    if (mutator.get() == null) {
-      throw new IllegalStateException("Transient already frozen.");
-    }
-
     if (valueCollection.isEmpty()) {
       return false;
     }
@@ -134,10 +131,6 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
   
   @Override
   public final boolean __put(K key, io.usethesource.capsule.Set.Immutable<V> valueCollection) {
-    if (mutator.get() == null) {
-      throw new IllegalStateException("Transient already frozen.");
-    }
-
     if (valueCollection.isEmpty()) {
       return __remove(key);
     }
@@ -194,10 +187,6 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
 
   @Override
   public final boolean __remove(final K key, final V value) {
-    if (mutator.get() == null) {
-      throw new IllegalStateException("Transient already frozen.");
-    }
-
     final int keyHash = key.hashCode();
     final MultimapResult<K, V, C> details = MultimapResult.unchanged();
 
@@ -235,11 +224,7 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
 
   @Override
   public final boolean __remove(K key) {
-    if (mutator.get() == null) {
-      throw new IllegalStateException("Transient already frozen.");
-    }
-
-    final int keyHash = key.hashCode();
+     final int keyHash = key.hashCode();
     final MultimapResult<K, V, C> details = MultimapResult.unchanged();
 
     final R newRootNode =
