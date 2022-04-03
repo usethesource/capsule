@@ -1868,7 +1868,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
   static final class TransientTrieMap<K, V> implements
       io.usethesource.capsule.Map.Transient<K, V> {
 
-    private UniqueIdentity mutator;
+    private volatile UniqueIdentity mutator;
     private AbstractMapNode<K, V> rootNode;
     private int cachedHashCode;
     private int cachedSize;

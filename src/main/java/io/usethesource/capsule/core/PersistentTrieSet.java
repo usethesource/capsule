@@ -2010,7 +2010,7 @@ public class PersistentTrieSet<K> implements Set.Immutable<K>, java.io.Serializa
 
   static final class TransientTrieSet<K> extends AbstractTransientTrieSet<K> {
 
-     private UniqueIdentity mutator;
+     private volatile UniqueIdentity mutator;
 
     TransientTrieSet(PersistentTrieSet<K> trieSet) {
       super(trieSet);

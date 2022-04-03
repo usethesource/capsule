@@ -28,7 +28,7 @@ public abstract class AbstractTransientTrieSetMultimap<K, V, C extends Iterable<
 
   protected static final boolean DEBUG = false;
 
-  protected UniqueIdentity mutator;
+  protected volatile UniqueIdentity mutator;
 
   protected R rootNode;
   // private int cachedHashCode;
