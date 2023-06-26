@@ -710,11 +710,6 @@ public class JmhSetMultimapBenchmarks {
 //        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_PROTOTYPE_OLD")
 //        .param("valueFactoryFactory", "VF_CHAMP_MAP_AS_MULTIMAP")
 //        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HCHAMP")
-        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT")
-//        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED")
-        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_INTERLINKED")
-//        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_NEW")
-        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_PATH_INTERLINKED")
 //        .param("valueFactoryFactory", "VF_SCALA")
 //        .param("valueFactoryFactory", "VF_CLOJURE")
         .build();

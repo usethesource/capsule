@@ -14,13 +14,6 @@ import io.usethesource.capsule.core.PersistentBidirectionalTrieSetMultimap;
 import io.usethesource.capsule.core.PersistentTrieMap;
 import io.usethesource.capsule.core.PersistentTrieSet;
 import io.usethesource.capsule.core.PersistentTrieSetMultimap;
-import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge;
-import io.usethesource.capsule.experimental.memoized.TrieMap_5Bits_Memoized_LazyHashCode;
-import io.usethesource.capsule.experimental.memoized.TrieSet_5Bits_Memoized_LazyHashCode;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT;
-import io.usethesource.capsule.experimental.multimap.TrieSetMultimap_HHAMT_Specialized;
-import io.usethesource.capsule.experimental.specialized.TrieMap_5Bits_Spec0To8;
-import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8;
 import io.usethesource.criterion.api.JmhValueFactory;
 import io.usethesource.criterion.impl.immutable.guava.ImmutableGuavaValueFactory;
 import io.usethesource.criterion.impl.persistent.paguro.PaguroValueFactory;
@@ -46,13 +39,6 @@ public class BenchmarkUtils {
       public JmhValueFactory getInstance() {
         return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(
             PersistentTrieSet.class, PersistentTrieMap.class, PersistentTrieSetMultimap.class);
-      }
-    },
-    VF_CHAMP_SPECIALIZED {
-      @Override
-      public JmhValueFactory getInstance() {
-        return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(
-            TrieSet_5Bits_Spec0To8.class, TrieMap_5Bits_Spec0To8.class, null);
       }
     },
     VF_VAVR {
@@ -85,67 +71,12 @@ public class BenchmarkUtils {
         return new ImmutableGuavaValueFactory();
       }
     },
-    VF_CHAMP_MEMOIZED {
-      @Override
-      public JmhValueFactory getInstance() {
-        return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(
-            TrieSet_5Bits_Memoized_LazyHashCode.class, TrieMap_5Bits_Memoized_LazyHashCode.class,
-            PersistentTrieSetMultimap.class);
-      }
-    },
-    VF_CHAMP_HETEROGENEOUS {
-      @Override
-      public JmhValueFactory getInstance() {
-        // TODO: replace set implementation with heterogeneous set
-        // implementation
-        return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(
-            PersistentTrieSet.class, TrieMap_5Bits_Heterogeneous_BleedingEdge.class,
-            PersistentTrieSetMultimap.class);
-      }
-    },
     VF_CHAMP_MULTIMAP_HCHAMP {
       @Override
       public JmhValueFactory getInstance() {
         return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(
             PersistentTrieSet.class, null,
             PersistentTrieSetMultimap.class);
-      }
-    },
-    VF_CHAMP_MULTIMAP_HHAMT {
-      @Override
-      public JmhValueFactory getInstance() {
-        return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(
-            PersistentTrieSet.class, null,
-            TrieSetMultimap_HHAMT.class);
-      }
-    },
-    VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED {
-      @Override
-      public JmhValueFactory getInstance() {
-        return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(
-            PersistentTrieSet.class, null,
-            TrieSetMultimap_HHAMT_Specialized.class);
-      }
-    },
-    /**
-     * Option is equal to {@link #VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED}, but used to tag the usage
-     * of system property
-     * {@literal -Dio.usethesource.capsule.RangecopyUtils.dontUseSunMiscUnsafeCopyMemory=true}.
-     */
-    VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED_NO_COPYMEMORY {
-      @Override
-      public JmhValueFactory getInstance() {
-        return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(
-            PersistentTrieSet.class, null,
-            TrieSetMultimap_HHAMT_Specialized.class);
-      }
-    },
-    VF_CHAMP_MULTIMAP_HHAMT_NEW {
-      @Override
-      public JmhValueFactory getInstance() {
-        return new io.usethesource.criterion.impl.persistent.champ.ChampValueFactory(
-            PersistentTrieSet.class, null,
-            null);
       }
     },
     VF_BINARY_RELATION {
