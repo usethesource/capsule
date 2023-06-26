@@ -21,8 +21,6 @@ import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 import io.usethesource.capsule.Set;
 import io.usethesource.capsule.generators.set.AbstractSetGenerator;
 import io.usethesource.capsule.generators.set.SetGeneratorDefault;
-import io.usethesource.capsule.generators.set.SetGeneratorMemoizedLazyHashCode;
-import io.usethesource.capsule.generators.set.SetGeneratorSpec0To8;
 import io.usethesource.criterion.api.JmhValue;
 import io.usethesource.criterion.generators.JmhSleepingIntegerGenerator;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -54,25 +52,13 @@ public class JmhCapsuleSetBenchmark {
       public Class<? extends AbstractSetGenerator> generatorClass() {
         return SetGeneratorDefault.class;
       }
-    },
-    MEMCHAMP {
-      @Override
-      public Class<? extends AbstractSetGenerator> generatorClass() {
-        return SetGeneratorMemoizedLazyHashCode.class;
-      }
-    },
-    SPEC0to8 {
-      @Override
-      public Class<? extends AbstractSetGenerator> generatorClass() {
-        return SetGeneratorSpec0To8.class;
-      }
     };
 
     public abstract Class<? extends AbstractSetGenerator> generatorClass();
 
   }
 
-  @Param({"CHAMP", "MEMCHAMP"})
+  @Param({"CHAMP"})
   protected SetGeneratorClassEnum generatorDescriptor;
 
 //  static final Class<? extends Set.Immutable> classUnderTest =
@@ -346,7 +332,6 @@ public class JmhCapsuleSetBenchmark {
         .forks(0)
         .shouldDoGC(true)
         .param("generatorDescriptor", "CHAMP")
-//        .param("generatorDescriptor", "MEMCHAMP")
         .param("run", "0")
 //        .param("run", "1")
 //        .param("run", "2")

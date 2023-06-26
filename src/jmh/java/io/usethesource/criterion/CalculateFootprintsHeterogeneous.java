@@ -41,17 +41,9 @@ import com.pholser.junit.quickcheck.internal.generator.SimpleGenerationStatus;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 import gnu.trove.map.hash.TIntIntHashMap;
 import io.usethesource.capsule.SetMultimap;
-import io.usethesource.capsule.api.TernaryRelation;
-import io.usethesource.capsule.api.Triple;
 import io.usethesource.capsule.core.PersistentTrieMap;
-import io.usethesource.capsule.experimental.heterogeneous.TrieMap_5Bits_Heterogeneous_BleedingEdge;
-import io.usethesource.capsule.experimental.specialized.TrieSet_5Bits_Spec0To8_IntKey;
-import io.usethesource.capsule.generators.TripleGenerator;
 import io.usethesource.capsule.generators.multimap.AbstractSetMultimapGenerator;
-import io.usethesource.capsule.generators.multimap.SetMultimapGenerator_HCHAMP;
-import io.usethesource.capsule.generators.relation.AbstractTernaryRelationGenerator;
 import io.usethesource.capsule.generators.relation.BidirectionalTrieSetMultimapGenerator;
-import io.usethesource.capsule.generators.relation.TernaryTrieSetMultimapGenerator;
 import io.usethesource.criterion.BenchmarkUtils.Archetype;
 import io.usethesource.criterion.BenchmarkUtils.DataType;
 import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
@@ -63,8 +55,6 @@ import org.apache.mahout.math.map.OpenIntIntHashMap;
 
 import static io.usethesource.capsule.util.collection.AbstractSpecialisedImmutableMap.entryOf;
 import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_CHAMP_MULTIMAP_HCHAMP;
-import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT;
-import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED;
 import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_CLOJURE;
 import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_DEXX;
 import static io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory.VF_VAVR;
@@ -186,8 +176,6 @@ public final class CalculateFootprintsHeterogeneous {
 
     final EnumSet<ValueFactoryFactory> factories = EnumSet
         .of(VF_CHAMP_MULTIMAP_HCHAMP,
-            VF_CHAMP_MULTIMAP_HHAMT,
-            VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED,
             VF_SCALA,
             VF_CLOJURE);
 
@@ -227,7 +215,7 @@ public final class CalculateFootprintsHeterogeneous {
     final Set<Supplier<String>> experiments = new HashSet<>();
 
     experiments.add(() -> createAndMeasureGuavaImmutableMap(data, size, run, preset)); // Reference
-    experiments.add(() -> createAndMeasureTrieMapHeterogeneous_asMap(data, size, run, preset));
+    // experiments.add(() -> createAndMeasureTrieMapHeterogeneous_asMap(data, size, run, preset));
 
     experiments.add(() -> createAndMeasureFastUtilInt2IntOpenHashMap(data, size, run, preset));
     experiments.add(() -> createAndMeasureMahoutMutableIntIntHashMap(data, size, run, preset));
@@ -271,37 +259,11 @@ public final class CalculateFootprintsHeterogeneous {
         (factory) -> createAndMeasureTrieMap(factory, size, run, preset);
 
     final EnumSet<ValueFactoryFactory> factories = EnumSet
-        .of(VF_CHAMP_MULTIMAP_HCHAMP,
-            VF_CHAMP_MULTIMAP_HHAMT,
-            VF_CHAMP_MULTIMAP_HHAMT_SPECIALIZED);
+        .of(VF_CHAMP_MULTIMAP_HCHAMP);
 
     return factories.stream()
         .map(executeExperiment)
         .collect(Collectors.toList());
-  }
-
-  private static void measureBinaryAndTernaryMultimaps() {
-    int elementCount = 1048576;
-
-    final Class<? extends AbstractSetMultimapGenerator<? extends SetMultimap.Immutable>>[] generatorClasses =
-        new Class[]{BidirectionalTrieSetMultimapGenerator.class,
-            SetMultimapGenerator_HCHAMP.class};
-
-    System.out.println("\n\n\n\n");
-
-    {
-      final String result = createAndMeasureXXX_2(TernaryTrieSetMultimapGenerator.class,
-          elementCount, 2, 2, 0, RETAINED_SIZE_WITH_BOXED_INTEGER_FILTER);
-
-      System.out.println("\n" + result + "\n\n\n\n");
-    }
-
-    Arrays.asList(generatorClasses).forEach(clazz -> {
-      final String result = createAndMeasureXXX(clazz, elementCount, 2, 2, 0,
-          RETAINED_SIZE_WITH_BOXED_INTEGER_FILTER);
-
-      System.out.println("\n" + result + "\n\n\n\n");
-    });
   }
 
   // public static void testPrintStatsRandomSmallAndBigIntegers() {
@@ -515,55 +477,6 @@ public final class CalculateFootprintsHeterogeneous {
         DataType.SET_MULTIMAP, Archetype.IMMUTABLE, false, elementCount, run, preset);
   }
 
-  public static String createAndMeasureTrieMapHeterogeneous_asMap(final Object[] data,
-      int elementCount, int run, MemoryFootprintPreset preset) {
-    TrieMap_5Bits_Heterogeneous_BleedingEdge ys =
-        (TrieMap_5Bits_Heterogeneous_BleedingEdge) TrieMap_5Bits_Heterogeneous_BleedingEdge.of();
-
-    // simulating a multimap with a specialized nested integer set
-    for (int keyIdx = 0; keyIdx < data.length; keyIdx++) {
-      Object o = data[keyIdx];
-      int intValue = ((Integer) o).intValue();
-
-      ys = (TrieMap_5Bits_Heterogeneous_BleedingEdge) ys.__put(intValue, intValue);
-    }
-
-    final String shortName = "HHAMT_AS_MAP<int, int>";
-
-    return measureAndReport(ys, shortName, DataType.MAP, Archetype.PERSISTENT, false, elementCount,
-        run, preset);
-  }
-
-  public static String createAndMeasureTrieMapHeterogeneous_asMultimap(final Object[] data,
-      int elementCount, int run, MemoryFootprintPreset preset) {
-    TrieMap_5Bits_Heterogeneous_BleedingEdge ys =
-        (TrieMap_5Bits_Heterogeneous_BleedingEdge) TrieMap_5Bits_Heterogeneous_BleedingEdge.of();
-
-    // simulating a multimap with a specialized nested integer set
-    for (int keyIdx = 0; keyIdx < data.length; keyIdx++) {
-      Object o = data[keyIdx];
-      int intValue = ((Integer) o).intValue();
-
-      if (keyIdx % stepSizeOneToOneSelector == 0) {
-        ys = (TrieMap_5Bits_Heterogeneous_BleedingEdge) ys.__put(intValue, intValue);
-      } else {
-        io.usethesource.capsule.Set.Immutable<Integer> nestedSet =
-            TrieSet_5Bits_Spec0To8_IntKey.of();
-
-        for (int i = 0; i < multimapValueSize; i++) {
-          nestedSet = nestedSet.__insert(i);
-        }
-
-        ys = (TrieMap_5Bits_Heterogeneous_BleedingEdge) ys.__put(o, nestedSet);
-      }
-    }
-
-    final String shortName = "HHAMT_AS_SET_MULTIMAP<int, int>";
-
-    return measureAndReport(ys, shortName, DataType.SET_MULTIMAP, Archetype.PERSISTENT, false,
-        elementCount, run, preset);
-  }
-
   public static String createAndMeasurePersistentMap(ValueFactoryFactory valueFactoryFactory,
       int elementCount, int run, MemoryFootprintPreset preset) {
     try {
@@ -658,57 +571,6 @@ public final class CalculateFootprintsHeterogeneous {
     return (Class<T>) clazz;
   }
 
-  public static String createAndMeasureXXX_2(
-      Class<? extends AbstractTernaryRelationGenerator<? extends TernaryRelation.Immutable>> generatorClass,
-      int elementCount, int multimapValueSize, int stepSizeOneToOneSelector, int run,
-      MemoryFootprintPreset preset) {
-
-    final Class<TernaryRelation.Immutable<Integer, Integer, Integer, Triple<Integer, Integer, Integer>>> targetClass = classCast(
-        TernaryRelation.Immutable.class);
-
-    final ComponentizedGenerator<TernaryRelation.Immutable<Integer, Integer, Integer, Triple<Integer, Integer, Integer>>> generator =
-        new ComponentizedGenerator(targetClass) {
-          @Override
-          public TernaryRelation.Immutable<Integer, Integer, Integer, Triple<Integer, Integer, Integer>> generate(
-              SourceOfRandomness sourceOfRandomness, GenerationStatus generationStatus) {
-            return null;
-          }
-        };
-
-    try {
-      final AbstractTernaryRelationGenerator<? extends TernaryRelation.Immutable> gen =
-          generatorClass.newInstance();
-
-      gen.configure(size(elementCount, elementCount));
-
-      Generator<Triple> tripleGenerator = new TripleGenerator();
-      tripleGenerator.addComponentGenerators(
-          Arrays.asList(new IntegerGenerator(), new IntegerGenerator(), new IntegerGenerator()));
-
-      gen.addComponentGenerators(Arrays.asList(new IntegerGenerator(), new IntegerGenerator(),
-          new IntegerGenerator(), tripleGenerator));
-
-      final SourceOfRandomness random =
-          new SourceOfRandomness(new Random(seedFromSizeAndRun(elementCount, run)));
-
-      final GenerationStatus status =
-          new SimpleGenerationStatus(new GeometricDistribution(), random, 1);
-
-      final Object setMultimapInstance = gen.generate(random, status);
-
-      // System.out.println(setMultimapInstance);
-
-      return measureAndReport(setMultimapInstance, generatorClass.getName(), DataType.SET_MULTIMAP,
-          Archetype.PERSISTENT, false, elementCount, run, preset);
-    } catch (InstantiationException e) {
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
-    }
-
-    return "ERROR";
-  }
-
   public static String createAndMeasureTrieSetMultimap(ValueFactoryFactory valueFactoryFactory,
       int elementCount, int multimapValueSize, int stepSizeOneToOneSelector, int run,
       MemoryFootprintPreset preset) {
@@ -761,44 +623,6 @@ public final class CalculateFootprintsHeterogeneous {
 
     // String longName = String.format(
     // "io.usethesource.capsule.TrieMap_5Bits_Spec0To8", isSpecialized);
-
-    return measureAndReport(ys, shortName, DataType.MAP, Archetype.PERSISTENT, false, elementCount,
-        run, preset);
-  }
-
-  public static String createAndMeasureTrieMapHeterogeneous(final Object[] data, int elementCount,
-      int run, MemoryFootprintPreset preset, boolean storePrimivesBoxed) {
-    TrieMap_5Bits_Heterogeneous_BleedingEdge ys =
-        (TrieMap_5Bits_Heterogeneous_BleedingEdge) TrieMap_5Bits_Heterogeneous_BleedingEdge.of();
-
-    for (Object v : data) {
-      if (v instanceof Integer && storePrimivesBoxed) {
-        // PureInteger boxedValue = new PureInteger(((Integer) v).intValue());
-        Integer boxedValue = (Integer) v;
-
-        ys = (TrieMap_5Bits_Heterogeneous_BleedingEdge) ys.__put(boxedValue, boxedValue);
-        assert ys.containsKey(boxedValue);
-      } else if (v instanceof Integer && !storePrimivesBoxed) {
-        int unboxedValue = ((Integer) v).intValue();
-
-        ys = (TrieMap_5Bits_Heterogeneous_BleedingEdge) ys.__put(unboxedValue, unboxedValue);
-        assert ys.containsKey(unboxedValue);
-        // } else {
-        // ys = (TrieMap_5Bits_Heterogeneous_BleedingEdge) ys.__put(v, v);
-        // assert ys.containsKey(v);
-      }
-    }
-
-    final String shortName = storePrimivesBoxed ? "HTrieMap [Boxed]" : "HTrieMap [Primitive]";
-
-    // String shortName = String.format("TrieMap[%13s, storePrimivesBoxed =
-    // %5s]",
-    // "heterogeneous", storePrimivesBoxed);
-    //
-    // String longName = String.format(
-    // "io.usethesource.capsule.TrieMap_Heterogeneous[storePrimivesBoxed =
-    // %5s]",
-    // storePrimivesBoxed);
 
     return measureAndReport(ys, shortName, DataType.MAP, Archetype.PERSISTENT, false, elementCount,
         run, preset);

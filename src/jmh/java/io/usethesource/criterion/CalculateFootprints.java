@@ -26,8 +26,6 @@ import clojure.lang.PersistentHashSet;
 import io.usethesource.capsule.Map;
 import io.usethesource.capsule.core.PersistentTrieMap;
 import io.usethesource.capsule.core.PersistentTrieSet;
-import io.usethesource.capsule.experimental.memoized.TrieMap_5Bits_Memoized_LazyHashCode;
-import io.usethesource.capsule.experimental.memoized.TrieSet_5Bits_Memoized_LazyHashCode;
 import io.usethesource.criterion.BenchmarkUtils.Archetype;
 import io.usethesource.criterion.BenchmarkUtils.DataType;
 import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
@@ -182,10 +180,6 @@ public final class CalculateFootprints {
           results.add(measureFootprintOfPersistentChampSet(testSet, count, run,
               Optional.of(ValueFactoryFactory.VF_CHAMP.toString()), PersistentTrieSet.class));
 
-          results.add(measureFootprintOfPersistentChampSet(testSet, count, run,
-              Optional.of(ValueFactoryFactory.VF_CHAMP_MEMOIZED.toString()),
-              TrieSet_5Bits_Memoized_LazyHashCode.class));
-
 //          results.add(measureFootprintOfPersistentChampSet(testSet, count, run,
 //              Optional.of(ValueFactoryFactory.VF_AXIOM.toString()),
 //              AxiomHashTrieSet.class));
@@ -206,10 +200,6 @@ public final class CalculateFootprints {
         if (reportMap) {
           results.add(measureFootprintOfPersistentChampMap(testSet, count, run,
               Optional.of(ValueFactoryFactory.VF_CHAMP.toString()), PersistentTrieMap.class));
-
-          results.add(measureFootprintOfPersistentChampMap(testSet, count, run,
-              Optional.of(ValueFactoryFactory.VF_CHAMP_MEMOIZED.toString()),
-              TrieMap_5Bits_Memoized_LazyHashCode.class));
 
 //          results.add(measureFootprintOfPersistentChampMap(testSet, count, run,
 //              Optional.of(ValueFactoryFactory.VF_AXIOM.toString()),
