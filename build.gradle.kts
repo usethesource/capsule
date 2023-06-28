@@ -48,6 +48,11 @@ repositories {
   }
 }
 
+tasks.register("memoryMeasurerLocation") {
+  val jarFile = configurations.jmh.get().files.first { it.name.contains("memory-measurer") }
+  println(jarFile.toString())
+}
+
 java {
   withSourcesJar()
 
