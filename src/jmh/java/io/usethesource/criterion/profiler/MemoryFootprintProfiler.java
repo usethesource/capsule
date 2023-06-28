@@ -18,15 +18,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import objectexplorer.ObjectGraphMeasurer.Footprint;
 import org.openjdk.jmh.infra.BenchmarkParams;
 import org.openjdk.jmh.infra.IterationParams;
 import org.openjdk.jmh.profile.InternalProfiler;
-import org.openjdk.jmh.profile.ProfilerResult;
 import org.openjdk.jmh.results.AggregationPolicy;
 import org.openjdk.jmh.results.IterationResult;
+import org.openjdk.jmh.results.ScalarResult;
 import org.openjdk.jmh.results.Result;
-import org.openjdk.jmh.results.ResultRole;
 
 public class MemoryFootprintProfiler implements InternalProfiler {
 
@@ -52,7 +50,7 @@ public class MemoryFootprintProfiler implements InternalProfiler {
    * @return profiler results
    */
   @Override
-  public Collection<? extends Result<ProfilerResult>> afterIteration(
+  public Collection<? extends Result> afterIteration(
       BenchmarkParams benchmarkParams, IterationParams iterationParams, IterationResult result) {
 
     try {
@@ -67,7 +65,7 @@ public class MemoryFootprintProfiler implements InternalProfiler {
           Predicates.not(Predicates.instanceOf(JmhValue.class));
       final Predicate<Object> predicateRetainedSize = Predicates.alwaysTrue();
 
-      final List<ProfilerResult> profilerResults = new ArrayList<>();
+      final List<ScalarResult> profilerResults = new ArrayList<>();
 
       /**
        * Traverse object graph for measuring memory footprint (in bytes).
@@ -75,12 +73,9 @@ public class MemoryFootprintProfiler implements InternalProfiler {
       long memoryInBytes = objectexplorer.MemoryMeasurer
           .measureBytes(objectToMeasure, predicateDataStructureOverhead);
 
-      // NOTE: non-standard constructor for passing ResultRole.PRIMARY
-      final ProfilerResult memoryResult =
-          new ProfilerResult(ResultRole.PRIMARY, "memory", memoryInBytes, UNIT_BYTES, POLICY);
+      final ScalarResult memoryResult =
+          new ScalarResult("memory", memoryInBytes, UNIT_BYTES, POLICY);
 
-      // hack: substitute results
-      result.resetResults();
       result.addResult(memoryResult);
 
 //      /**

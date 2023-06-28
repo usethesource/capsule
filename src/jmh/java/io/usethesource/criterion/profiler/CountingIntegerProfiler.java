@@ -13,10 +13,10 @@ import java.util.Collection;
 import org.openjdk.jmh.infra.BenchmarkParams;
 import org.openjdk.jmh.infra.IterationParams;
 import org.openjdk.jmh.profile.InternalProfiler;
-import org.openjdk.jmh.profile.ProfilerResult;
 import org.openjdk.jmh.results.AggregationPolicy;
 import org.openjdk.jmh.results.IterationResult;
 import org.openjdk.jmh.results.Result;
+import org.openjdk.jmh.results.ScalarResult;
 
 import io.usethesource.criterion.CountingInteger;
 
@@ -41,16 +41,16 @@ public class CountingIntegerProfiler implements InternalProfiler {
    * @return profiler results
    */
   @Override
-  public Collection<? extends Result<ProfilerResult>> afterIteration(
+  public Collection<? extends Result> afterIteration(
       BenchmarkParams benchmarkParams, IterationParams iterationParams, IterationResult result) {
     String unit = "invocations";
     AggregationPolicy policy = AggregationPolicy.AVG;
 
-    final ProfilerResult hashCodeResult =
-        new ProfilerResult("hashCode", CountingInteger.getHashcodeCounter(), unit, policy);
+    final ScalarResult hashCodeResult =
+        new ScalarResult("hashCode", CountingInteger.getHashcodeCounter(), unit, policy);
 
-    final ProfilerResult equalsResult =
-        new ProfilerResult("equals", CountingInteger.getEqualsCounter(), unit, policy);
+    final ScalarResult equalsResult =
+        new ScalarResult("equals", CountingInteger.getEqualsCounter(), unit, policy);
 
     return Arrays.asList(hashCodeResult, equalsResult);
   }
