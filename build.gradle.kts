@@ -8,9 +8,9 @@ version = version.let { conformVersionToMavenConvention("${it}") }
 fun conformVersionToMavenConvention(it: String): String =
   if (project.hasProperty("releaseBuild")) "${it}" else "${it}-SNAPSHOT"
 
-val junitVersion by extra { "5.8.2" }
+val junitVersion by extra { "5.10.0" }
 val junitQuickcheckVersion by extra { "1.0" }
-val slf4jVersion by extra { "1.7.36" }
+val slf4jVersion by extra { "2.0.9" }
 
 dependencies {
   testImplementation("com.pholser:junit-quickcheck-core:${junitQuickcheckVersion}")
