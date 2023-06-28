@@ -31,7 +31,6 @@ import io.usethesource.criterion.BenchmarkUtils.DataType;
 import io.usethesource.criterion.BenchmarkUtils.ValueFactoryFactory;
 import io.usethesource.criterion.FootprintUtils.MemoryFootprintPreset;
 import io.usethesource.criterion.api.JmhValue;
-import scala.Tuple2;
 
 public final class CalculateFootprints {
 
@@ -143,7 +142,7 @@ public final class CalculateFootprints {
     scala.collection.immutable.HashSet<JmhValue> set = new scala.collection.immutable.HashSet<>();
 
     for (JmhValue v : testSet) {
-      set = set.$plus(v);
+      set = (scala.collection.immutable.HashSet<JmhValue>) set.$plus(v);
     }
 
     return FootprintUtils.measureAndReport(set, shortName.orElse(classToName(clazz)), DataType.SET,
@@ -159,7 +158,7 @@ public final class CalculateFootprints {
         new scala.collection.immutable.HashMap<>();
 
     for (JmhValue v : testSet) {
-      map = map.$plus(new Tuple2<>(v, v));
+      map = (scala.collection.immutable.HashMap<JmhValue, JmhValue>) map.$plus(new scala.Tuple2<>(v, v));
     }
 
     return FootprintUtils.measureAndReport(map, shortName.orElse(classToName(clazz)), DataType.MAP,
