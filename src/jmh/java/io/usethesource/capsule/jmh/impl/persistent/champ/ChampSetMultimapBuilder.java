@@ -13,8 +13,8 @@ import io.usethesource.capsule.jmh.api.JmhValue;
 
 final class ChampSetMultimapBuilder implements JmhSetMultimap.Builder {
 
-  protected SetMultimap.Immutable<JmhValue, JmhValue> mapContent;
-  protected JmhSetMultimap constructedMap;
+  private SetMultimap.Immutable<JmhValue, JmhValue> mapContent;
+  private JmhSetMultimap constructedMap;
 
   ChampSetMultimapBuilder() {
     mapContent = SetMultimap.Immutable.of();
@@ -27,7 +27,7 @@ final class ChampSetMultimapBuilder implements JmhSetMultimap.Builder {
     mapContent = mapContent.__insert(key, value);
   }
 
-  protected void checkMutation() {
+  private void checkMutation() {
     if (constructedMap != null) {
       throw new UnsupportedOperationException("Mutation of a finalized map is not supported.");
     }

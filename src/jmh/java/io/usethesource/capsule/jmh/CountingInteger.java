@@ -30,7 +30,7 @@ public class CountingInteger implements JmhValue {
     return EQUALS_COUNTER;
   }
 
-  private int value;
+  private final int value;
 
   CountingInteger(int value) {
     this.value = value;

@@ -20,7 +20,7 @@ public class SleepingInteger implements JmhValue {
   private static final int MAX_SLEEP_IN_MILLISECONDS = 0;
   private static final int MAX_SLEEP_IN_NANOSECONDS = 10;
 
-  private int value;
+  private final int value;
 
   public SleepingInteger(int value) {
     this.value = value;

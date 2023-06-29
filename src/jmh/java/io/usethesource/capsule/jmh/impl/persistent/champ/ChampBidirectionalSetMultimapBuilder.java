@@ -14,8 +14,8 @@ import io.usethesource.capsule.jmh.api.JmhValue;
 
 final class ChampBidirectionalSetMultimapBuilder implements JmhSetMultimap.Builder {
 
-  protected SetMultimap.Immutable<JmhValue, JmhValue> mapContent;
-  protected JmhSetMultimap constructedMap;
+  private SetMultimap.Immutable<JmhValue, JmhValue> mapContent;
+  private JmhSetMultimap constructedMap;
 
   ChampBidirectionalSetMultimapBuilder() {
     mapContent = BinaryRelation.Immutable.of();
@@ -28,7 +28,7 @@ final class ChampBidirectionalSetMultimapBuilder implements JmhSetMultimap.Build
     mapContent = mapContent.__insert(key, value);
   }
 
-  protected void checkMutation() {
+  private void checkMutation() {
     if (constructedMap != null) {
       throw new UnsupportedOperationException("Mutation of a finalized map is not supported.");
     }

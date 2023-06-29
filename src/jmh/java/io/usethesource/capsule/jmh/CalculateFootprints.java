@@ -33,8 +33,8 @@ import io.usethesource.capsule.jmh.BenchmarkUtils.ValueFactoryFactory;
 
 public final class CalculateFootprints {
 
-  private static boolean reportSet = true;
-  private static boolean reportMap = true;
+  private static final boolean reportSet = true;
+  private static final boolean reportMap = true;
 
   public static java.util.Set<JmhValue> setUpTestSetWithRandomContent(int size, int run) {
     java.util.Set<JmhValue> setWriter = new HashSet<>();
@@ -68,7 +68,7 @@ public final class CalculateFootprints {
     }
   }
 
-  public static final String classToName(Class<?> clazz) {
+  public static String classToName(Class<?> clazz) {
     return Objects.toString(clazz.getCanonicalName());
   }
 
@@ -178,14 +178,6 @@ public final class CalculateFootprints {
           results.add(measureFootprintOfPersistentChampSet(testSet, count, run,
               Optional.of(ValueFactoryFactory.VF_CHAMP.toString()), PersistentTrieSet.class));
 
-//          results.add(measureFootprintOfPersistentChampSet(testSet, count, run,
-//              Optional.of(ValueFactoryFactory.VF_AXIOM.toString()),
-//              AxiomHashTrieSet.class));
-
-//          results.add(measureFootprintOfPersistentChampSet(testSet, count, run,
-//              Optional.of(ValueFactoryFactory.VF_CHAMP_EXTENDED.toString()),
-//              PersistentTrieSetExtended.class));
-
           results.add(measureFootprintOfPersistentClojureSet(testSet, count, run,
               Optional.of(ValueFactoryFactory.VF_CLOJURE.toString())));
 
@@ -198,14 +190,6 @@ public final class CalculateFootprints {
         if (reportMap) {
           results.add(measureFootprintOfPersistentChampMap(testSet, count, run,
               Optional.of(ValueFactoryFactory.VF_CHAMP.toString()), PersistentTrieMap.class));
-
-//          results.add(measureFootprintOfPersistentChampMap(testSet, count, run,
-//              Optional.of(ValueFactoryFactory.VF_AXIOM.toString()),
-//              AxiomHashTrieMap.class));
-
-//          results.add(measureFootprintOfPersistentChampMap(testSet, count, run,
-//                  Optional.of("VF_CHAMP_EXTENDED"),
-//                  PersistentTrieMapExtended.class));
 
           results.add(measureFootprintOfPersistentClojureMap(testSet, count, run,
               Optional.of(ValueFactoryFactory.VF_CLOJURE.toString())));

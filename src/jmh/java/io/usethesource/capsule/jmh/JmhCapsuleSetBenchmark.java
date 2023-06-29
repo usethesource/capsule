@@ -8,6 +8,7 @@
 package io.usethesource.capsule.jmh;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -117,7 +118,7 @@ public class JmhCapsuleSetBenchmark {
 
       collectionGenerator = generatorDescriptor.generatorClass().newInstance();
       collectionGenerator.configure(CalculateFootprintsHeterogeneous.size(size, size));
-      collectionGenerator.addComponentGenerators(Arrays.asList(itemGenerator));
+      collectionGenerator.addComponentGenerators(List.of(itemGenerator));
 
       testSetCommon = collectionGenerator.generate(random0, status0);
 

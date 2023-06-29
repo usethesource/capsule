@@ -16,7 +16,7 @@ import scala.collection.mutable.Builder;
 
 class ScalaSetMultimapWriter implements JmhSetMultimap.Builder {
 
-  protected final Builder<Tuple2<JmhValue, JmhValue>, MultiDict<JmhValue, JmhValue>> builder = MultiDict$.MODULE$.<JmhValue, JmhValue>newBuilder();
+  protected final Builder<Tuple2<JmhValue, JmhValue>, MultiDict<JmhValue, JmhValue>> builder = MultiDict$.MODULE$.newBuilder();
 
   protected ScalaSetMultimapWriter() {
     super();

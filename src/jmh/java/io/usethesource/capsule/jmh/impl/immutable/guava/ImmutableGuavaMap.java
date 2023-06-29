@@ -19,7 +19,7 @@ public final class ImmutableGuavaMap implements JmhMap {
 
   private final ImmutableMap<JmhValue, JmhValue> content;
 
-  protected ImmutableGuavaMap(ImmutableMap<JmhValue, JmhValue> content) {
+  ImmutableGuavaMap(ImmutableMap<JmhValue, JmhValue> content) {
     this.content = content;
   }
 

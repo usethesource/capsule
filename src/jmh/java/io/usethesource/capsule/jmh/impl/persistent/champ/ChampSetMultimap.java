@@ -18,7 +18,7 @@ public final class ChampSetMultimap implements JmhSetMultimap {
 
   private final SetMultimap.Immutable<JmhValue, JmhValue> content;
 
-  protected ChampSetMultimap(SetMultimap.Immutable<JmhValue, JmhValue> content) {
+  ChampSetMultimap(SetMultimap.Immutable<JmhValue, JmhValue> content) {
     this.content = content;
   }
 

@@ -9,6 +9,6 @@ package io.usethesource.capsule.jmh.api;
 
 public interface JmhBuilder {
 
-  public JmhValue done();
+  JmhValue done();
 
 }

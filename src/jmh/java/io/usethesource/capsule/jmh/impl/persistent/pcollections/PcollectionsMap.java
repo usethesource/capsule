@@ -19,7 +19,7 @@ public final class PcollectionsMap implements JmhMap {
 
   private final HashPMap<JmhValue, JmhValue> content;
 
-  protected PcollectionsMap(HashPMap<JmhValue, JmhValue> content) {
+  PcollectionsMap(HashPMap<JmhValue, JmhValue> content) {
     this.content = content;
   }
 

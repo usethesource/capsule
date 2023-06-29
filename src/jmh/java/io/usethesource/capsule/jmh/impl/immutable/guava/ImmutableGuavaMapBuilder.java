@@ -19,8 +19,8 @@ final class ImmutableGuavaMapBuilder implements JmhMap.Builder {
 
   // NOTE: ImmutableMap.Builder cannot handle duplicate arguments
   // protected ImmutableMap.Builder<JmhValue, JmhValue> mapContent;
-  protected HashMap<JmhValue, JmhValue> mapContent;
-  protected JmhMap constructedMap;
+  private HashMap<JmhValue, JmhValue> mapContent;
+  private JmhMap constructedMap;
 
   ImmutableGuavaMapBuilder() {
     // mapContent = ImmutableMap.builder();
@@ -56,7 +56,7 @@ final class ImmutableGuavaMapBuilder implements JmhMap.Builder {
     }
   }
 
-  protected void checkMutation() {
+  private void checkMutation() {
     if (constructedMap != null) {
       throw new UnsupportedOperationException("Mutation of a finalized map is not supported.");
     }

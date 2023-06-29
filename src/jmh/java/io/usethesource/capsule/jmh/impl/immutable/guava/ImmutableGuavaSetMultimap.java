@@ -20,7 +20,7 @@ public final class ImmutableGuavaSetMultimap implements JmhSetMultimap {
 
   private final ImmutableSetMultimap<JmhValue, JmhValue> content;
 
-  protected ImmutableGuavaSetMultimap(ImmutableSetMultimap<JmhValue, JmhValue> content) {
+  ImmutableGuavaSetMultimap(ImmutableSetMultimap<JmhValue, JmhValue> content) {
     this.content = content;
   }
 

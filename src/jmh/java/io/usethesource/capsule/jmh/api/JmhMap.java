@@ -13,40 +13,40 @@ import java.util.Map.Entry;
 
 public interface JmhMap extends Iterable<JmhValue>, JmhValue {
 
-  public boolean isEmpty();
+  boolean isEmpty();
 
-  public int size();
+  int size();
 
-  public JmhMap put(JmhValue key, JmhValue value);
+  JmhMap put(JmhValue key, JmhValue value);
 
-  public JmhMap removeKey(JmhValue key);
+  JmhMap removeKey(JmhValue key);
 
   /**
    * @return the value that is mapped to this key, or null if no such value exists
    */
-  public JmhValue get(JmhValue key);
+  JmhValue get(JmhValue key);
 
-  public boolean containsKey(JmhValue key);
+  boolean containsKey(JmhValue key);
 
-  public boolean containsValue(JmhValue value);
+  boolean containsValue(JmhValue value);
 
   /**
    * @return an iterator over the keys of the map
    */
   @Override
-  public Iterator<JmhValue> iterator();
+  Iterator<JmhValue> iterator();
 
   /**
    * @return an iterator over the values of the map
    */
-  public Iterator<JmhValue> valueIterator();
+  Iterator<JmhValue> valueIterator();
 
   /**
    * @return an iterator over the keys-value pairs of the map
    */
-  public Iterator<Entry<JmhValue, JmhValue>> entryIterator();
+  Iterator<Entry<JmhValue, JmhValue>> entryIterator();
 
-  public static interface Builder extends JmhBuilder {
+  interface Builder extends JmhBuilder {
 
     void put(JmhValue key, JmhValue value);
 

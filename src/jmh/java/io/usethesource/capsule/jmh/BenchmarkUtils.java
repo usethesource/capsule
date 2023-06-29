@@ -85,7 +85,7 @@ public class BenchmarkUtils {
     public abstract JmhValueFactory getInstance();
   }
 
-  public static enum DataType {
+  public enum DataType {
     MAP, SET_MULTIMAP, SET
   }
 
@@ -93,7 +93,7 @@ public class BenchmarkUtils {
     MUTABLE, IMMUTABLE, PERSISTENT
   }
 
-  public static enum SampleDataSelection {
+  public enum SampleDataSelection {
     MATCH, RANDOM
   }
 

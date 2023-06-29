@@ -706,10 +706,6 @@ public class JmhSetMultimapBenchmarks {
         .param("valueFactoryFactory", "VF_GUAVA_IMMUTABLE")
 //        .param("valueFactoryFactory", "VF_BINARY_RELATION")
 //        .param("valueFactoryFactory", "VF_CHAMP")
-//        .param("valueFactoryFactory", "VF_CHAMP_HETEROGENEOUS")
-//        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_PROTOTYPE_OLD")
-//        .param("valueFactoryFactory", "VF_CHAMP_MAP_AS_MULTIMAP")
-//        .param("valueFactoryFactory", "VF_CHAMP_MULTIMAP_HCHAMP")
 //        .param("valueFactoryFactory", "VF_SCALA")
 //        .param("valueFactoryFactory", "VF_CLOJURE")
         .build();

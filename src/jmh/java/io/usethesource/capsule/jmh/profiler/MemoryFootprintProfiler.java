@@ -99,7 +99,7 @@ public class MemoryFootprintProfiler implements InternalProfiler {
       return profilerResults;
     } catch (Exception e) {
       e.printStackTrace();
-      return Arrays.asList();
+      return List.of();
     }
   }
 

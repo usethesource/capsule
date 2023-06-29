@@ -14,7 +14,7 @@ import org.openjdk.jmh.annotations.CompilerControl.Mode;
 @CompilerControl(Mode.DONT_INLINE)
 public class PureIntegerWithCustomHashCode implements JmhValue {
 
-  private int value;
+  private final int value;
 
   PureIntegerWithCustomHashCode(int value) {
     this.value = value;
