@@ -7,17 +7,18 @@
  */
 package io.usethesource.capsule.jmh.impl.persistent.champ;
 
+import io.usethesource.capsule.BinaryRelation;
 import io.usethesource.capsule.SetMultimap;
 import io.usethesource.capsule.jmh.api.JmhSetMultimap;
 import io.usethesource.capsule.jmh.api.JmhValue;
 
-final class ChampSetMultimapBuilder implements JmhSetMultimap.Builder {
+final class ChampBidirectionalSetMultimapBuilder implements JmhSetMultimap.Builder {
 
   protected SetMultimap.Immutable<JmhValue, JmhValue> mapContent;
   protected JmhSetMultimap constructedMap;
 
-  ChampSetMultimapBuilder() {
-    mapContent = SetMultimap.Immutable.of();
+  ChampBidirectionalSetMultimapBuilder() {
+    mapContent = BinaryRelation.Immutable.of();
     constructedMap = null;
   }
 

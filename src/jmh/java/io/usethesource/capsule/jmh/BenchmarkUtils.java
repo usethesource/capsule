@@ -42,8 +42,13 @@ public class BenchmarkUtils {
     VF_CHAMP {
       @Override
       public JmhValueFactory getInstance() {
-        return new ChampValueFactory(
-            PersistentTrieSet.class, PersistentTrieMap.class, PersistentTrieSetMultimap.class);
+        return new ChampValueFactory(false);
+      }
+    },
+    VF_BINARY_RELATION {
+      @Override
+      public JmhValueFactory getInstance() {
+        return new ChampValueFactory(true);
       }
     },
     VF_VAVR {
@@ -74,22 +79,6 @@ public class BenchmarkUtils {
       @Override
       public JmhValueFactory getInstance() {
         return new ImmutableGuavaValueFactory();
-      }
-    },
-    VF_CHAMP_MULTIMAP_HCHAMP {
-      @Override
-      public JmhValueFactory getInstance() {
-        return new ChampValueFactory(
-            PersistentTrieSet.class, null,
-            PersistentTrieSetMultimap.class);
-      }
-    },
-    VF_BINARY_RELATION {
-      @Override
-      public JmhValueFactory getInstance() {
-        return new ChampValueFactory(
-            PersistentTrieSet.class, null,
-            PersistentBidirectionalTrieSetMultimap.class);
       }
     };
 
