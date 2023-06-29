@@ -72,7 +72,7 @@ public final class CalculateFootprints {
     return Objects.toString(clazz.getCanonicalName());
   }
 
-  public static String measureFootprintOfPersistentChampSet(final Set<JmhValue> testSet,
+  public static String measureFootprintOfPersistentCapsuleSet(final Set<JmhValue> testSet,
       int elementCount, int run, Optional<String> shortName, final Class<?> clazz) {
 
     io.usethesource.capsule.Set.Immutable<JmhValue> set =
@@ -88,7 +88,7 @@ public final class CalculateFootprints {
         FootprintUtils.MemoryFootprintPreset.DATA_STRUCTURE_OVERHEAD);
   }
 
-  public static String measureFootprintOfPersistentChampMap(final Set<JmhValue> testSet,
+  public static String measureFootprintOfPersistentCapsuleMap(final Set<JmhValue> testSet,
       int elementCount, int run, Optional<String> shortName, final Class<?> clazz) {
 
     Map.Immutable<JmhValue, JmhValue> map =
@@ -175,8 +175,8 @@ public final class CalculateFootprints {
         final Set<JmhValue> testSet = setUpTestSetWithRandomContent(count, run);
 
         if (reportSet) {
-          results.add(measureFootprintOfPersistentChampSet(testSet, count, run,
-              Optional.of(ValueFactoryFactory.VF_CHAMP.toString()), PersistentTrieSet.class));
+          results.add(measureFootprintOfPersistentCapsuleSet(testSet, count, run,
+              Optional.of(ValueFactoryFactory.VF_CAPSULE.toString()), PersistentTrieSet.class));
 
           results.add(measureFootprintOfPersistentClojureSet(testSet, count, run,
               Optional.of(ValueFactoryFactory.VF_CLOJURE.toString())));
@@ -188,8 +188,8 @@ public final class CalculateFootprints {
         }
 
         if (reportMap) {
-          results.add(measureFootprintOfPersistentChampMap(testSet, count, run,
-              Optional.of(ValueFactoryFactory.VF_CHAMP.toString()), PersistentTrieMap.class));
+          results.add(measureFootprintOfPersistentCapsuleMap(testSet, count, run,
+              Optional.of(ValueFactoryFactory.VF_CAPSULE.toString()), PersistentTrieMap.class));
 
           results.add(measureFootprintOfPersistentClojureMap(testSet, count, run,
               Optional.of(ValueFactoryFactory.VF_CLOJURE.toString())));

@@ -5,7 +5,7 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.capsule.jmh.impl.persistent.champ;
+package io.usethesource.capsule.jmh.impl.persistent.capsule;
 
 import java.util.Iterator;
 
@@ -13,11 +13,11 @@ import io.usethesource.capsule.Set;
 import io.usethesource.capsule.jmh.api.JmhSet;
 import io.usethesource.capsule.jmh.api.JmhValue;
 
-public final class ChampSet implements JmhSet {
+public final class CapsuleSet implements JmhSet {
 
   private final Set.Immutable<JmhValue> content;
 
-  public ChampSet(Set.Immutable<JmhValue> content) {
+  public CapsuleSet(Set.Immutable<JmhValue> content) {
     this.content = content;
   }
 
@@ -28,30 +28,30 @@ public final class ChampSet implements JmhSet {
 
   @Override
   public JmhSet insert(JmhValue value) {
-    return new ChampSet(content.__insert(value));
+    return new CapsuleSet(content.__insert(value));
   }
 
   @Override
   public JmhSet delete(JmhValue value) {
-    return new ChampSet(content.__remove(value));
+    return new CapsuleSet(content.__remove(value));
   }
 
   @Override
   public JmhSet union(JmhSet other) {
-    final ChampSet that = (ChampSet) other;
-    return new ChampSet(content.union(that.content));
+    final CapsuleSet that = (CapsuleSet) other;
+    return new CapsuleSet(content.union(that.content));
   }
 
   @Override
   public JmhSet subtract(JmhSet other) {
-    final ChampSet that = (ChampSet) other;
-    return new ChampSet(content.subtract(that.content));
+    final CapsuleSet that = (CapsuleSet) other;
+    return new CapsuleSet(content.subtract(that.content));
   }
 
   @Override
   public JmhSet intersect(JmhSet other) {
-    final ChampSet that = (ChampSet) other;
-    return new ChampSet(content.intersect(that.content));
+    final CapsuleSet that = (CapsuleSet) other;
+    return new CapsuleSet(content.intersect(that.content));
   }
 
 //  @Override
@@ -59,7 +59,7 @@ public final class ChampSet implements JmhSet {
 //    // NOTE: remove; makes use of static factory!
 //    final Set.Transient<JmhValue> builder = Set.Transient.of();
 //    iterable.forEach(builder::__insert);
-//    return new ChampSet(builder.freeze());
+//    return new CapsuleSet(builder.freeze());
 //  }
 
   @Override
@@ -96,8 +96,8 @@ public final class ChampSet implements JmhSet {
       return false;
     }
 
-    if (other instanceof ChampSet) {
-      ChampSet that = (ChampSet) other;
+    if (other instanceof CapsuleSet) {
+      CapsuleSet that = (CapsuleSet) other;
 
       if (this.size() != that.size()) {
         return false;

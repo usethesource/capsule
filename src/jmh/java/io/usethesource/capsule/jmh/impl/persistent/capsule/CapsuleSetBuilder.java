@@ -5,29 +5,29 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.capsule.jmh.impl.persistent.champ;
+package io.usethesource.capsule.jmh.impl.persistent.capsule;
 
 import io.usethesource.capsule.Set;
 import io.usethesource.capsule.jmh.api.JmhValue;
 import io.usethesource.capsule.jmh.impl.AbstractSetBuilder;
 
-final class ChampSetBuilder extends
+final class CapsuleSetBuilder extends
     AbstractSetBuilder<JmhValue, Set.Immutable<JmhValue>> {
 
-  ChampSetBuilder() {
-    super(Set.Immutable.of(), set -> set::__insert, ChampSet::new);
+  CapsuleSetBuilder() {
+    super(Set.Immutable.of(), set -> set::__insert, CapsuleSet::new);
   }
 
 }
 
-//final class ChampSetBuilder extends
+//final class CapsuleSetBuilder extends
 //    AbstractSetBuilder<JmhValue, Set.Transient<JmhValue>> {
 //
-//  ChampSetBuilder(SetFactory setFactory) {
+//  CapsuleSetBuilder(SetFactory setFactory) {
 //    super(
 //        setFactory.transientOf(),
 //        set -> (item) -> { set.__insert(item); return set; },
-//        set -> new ChampSet(set.freeze()));
+//        set -> new CapsuleSet(set.freeze()));
 //  }
 //
 //}

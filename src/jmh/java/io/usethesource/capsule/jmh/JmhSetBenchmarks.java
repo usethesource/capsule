@@ -453,7 +453,7 @@ public class JmhSetBenchmarks {
 //        .param("size", "2048")
         .param("size", "1048576")
         .param("valueFactoryFactory", "VF_SCALA")
-        .param("valueFactoryFactory", "VF_CHAMP")
+        .param("valueFactoryFactory", "VF_CAPSULE")
         .build();
     // @formatter:off
     // @formatter:on

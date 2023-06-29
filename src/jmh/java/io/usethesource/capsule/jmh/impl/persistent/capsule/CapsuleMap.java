@@ -5,7 +5,7 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.capsule.jmh.impl.persistent.champ;
+package io.usethesource.capsule.jmh.impl.persistent.capsule;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -17,11 +17,11 @@ import io.usethesource.capsule.jmh.api.JmhValue;
 /*
  * Operates: * without types * with equals() instead of isEqual()
  */
-public final class ChampMap implements JmhMap {
+public final class CapsuleMap implements JmhMap {
 
   private final Map.Immutable<JmhValue, JmhValue> content;
 
-  ChampMap(Map.Immutable<JmhValue, JmhValue> content) {
+  CapsuleMap(Map.Immutable<JmhValue, JmhValue> content) {
     this.content = content;
   }
 
@@ -37,12 +37,12 @@ public final class ChampMap implements JmhMap {
 
   @Override
   public JmhMap put(JmhValue key, JmhValue value) {
-    return new ChampMap(content.__put(key, value));
+    return new CapsuleMap(content.__put(key, value));
   }
 
   @Override
   public JmhMap removeKey(JmhValue key) {
-    return new ChampMap(content.__remove(key));
+    return new CapsuleMap(content.__remove(key));
   }
 
   @Override
@@ -74,8 +74,8 @@ public final class ChampMap implements JmhMap {
       return false;
     }
 
-    if (other instanceof ChampMap) {
-      ChampMap that = (ChampMap) other;
+    if (other instanceof CapsuleMap) {
+      CapsuleMap that = (CapsuleMap) other;
 
       if (this.size() != that.size()) {
         return false;

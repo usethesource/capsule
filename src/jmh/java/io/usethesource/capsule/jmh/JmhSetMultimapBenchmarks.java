@@ -705,7 +705,7 @@ public class JmhSetMultimapBenchmarks {
         .param("stepSizeOneToOneSelector", "2") // 2
         .param("valueFactoryFactory", "VF_GUAVA_IMMUTABLE")
 //        .param("valueFactoryFactory", "VF_BINARY_RELATION")
-//        .param("valueFactoryFactory", "VF_CHAMP")
+//        .param("valueFactoryFactory", "VF_CAPSULE")
 //        .param("valueFactoryFactory", "VF_SCALA")
 //        .param("valueFactoryFactory", "VF_CLOJURE")
         .build();

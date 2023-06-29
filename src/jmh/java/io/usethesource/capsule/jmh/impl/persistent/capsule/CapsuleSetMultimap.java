@@ -5,7 +5,7 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.capsule.jmh.impl.persistent.champ;
+package io.usethesource.capsule.jmh.impl.persistent.capsule;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -14,11 +14,11 @@ import io.usethesource.capsule.SetMultimap;
 import io.usethesource.capsule.jmh.api.JmhSetMultimap;
 import io.usethesource.capsule.jmh.api.JmhValue;
 
-public final class ChampSetMultimap implements JmhSetMultimap {
+public final class CapsuleSetMultimap implements JmhSetMultimap {
 
   private final SetMultimap.Immutable<JmhValue, JmhValue> content;
 
-  ChampSetMultimap(SetMultimap.Immutable<JmhValue, JmhValue> content) {
+  CapsuleSetMultimap(SetMultimap.Immutable<JmhValue, JmhValue> content) {
     this.content = content;
   }
 
@@ -34,22 +34,22 @@ public final class ChampSetMultimap implements JmhSetMultimap {
 
   @Override
   public JmhSetMultimap insert(JmhValue key, JmhValue value) {
-    return new ChampSetMultimap(content.__insert(key, value));
+    return new CapsuleSetMultimap(content.__insert(key, value));
   }
 
   @Override
   public JmhSetMultimap remove(JmhValue key, JmhValue value) {
-    return new ChampSetMultimap(content.__remove(key, value));
+    return new CapsuleSetMultimap(content.__remove(key, value));
   }
 
   @Override
   public JmhSetMultimap put(JmhValue key, JmhValue value) {
-    return new ChampSetMultimap(content.__put(key, value));
+    return new CapsuleSetMultimap(content.__put(key, value));
   }
 
   @Override
   public JmhSetMultimap remove(JmhValue key) {
-    return new ChampSetMultimap(content.__remove(key));
+    return new CapsuleSetMultimap(content.__remove(key));
   }
 
   @Override
@@ -91,8 +91,8 @@ public final class ChampSetMultimap implements JmhSetMultimap {
       return false;
     }
 
-    if (other instanceof ChampSetMultimap) {
-      ChampSetMultimap that = (ChampSetMultimap) other;
+    if (other instanceof CapsuleSetMultimap) {
+      CapsuleSetMultimap that = (CapsuleSetMultimap) other;
 
       if (this.size() != that.size()) {
         return false;
