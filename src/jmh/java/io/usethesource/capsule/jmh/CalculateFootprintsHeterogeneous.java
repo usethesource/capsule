@@ -155,7 +155,7 @@ public final class CalculateFootprintsHeterogeneous {
             stepSizeOneToOneSelector, run, preset);
 
     final EnumSet<BenchmarkUtils.ValueFactoryFactory> factories = EnumSet
-        .of(BenchmarkUtils.ValueFactoryFactory.VF_CHAMP,
+        .of(BenchmarkUtils.ValueFactoryFactory.VF_CAPSULE,
             BenchmarkUtils.ValueFactoryFactory.VF_SCALA,
             BenchmarkUtils.ValueFactoryFactory.VF_CLOJURE);
 
@@ -239,7 +239,7 @@ public final class CalculateFootprintsHeterogeneous {
         (factory) -> createAndMeasureTrieMap(factory, size, run, preset);
 
     final EnumSet<BenchmarkUtils.ValueFactoryFactory> factories = EnumSet
-        .of(BenchmarkUtils.ValueFactoryFactory.VF_CHAMP);
+        .of(BenchmarkUtils.ValueFactoryFactory.VF_CAPSULE);
 
     return factories.stream()
         .map(executeExperiment)
@@ -330,21 +330,6 @@ public final class CalculateFootprintsHeterogeneous {
 
     return data;
   }
-
-  // public static String createAndMeasureMultiChamp(final Object[] data, int elementCount, int run,
-  // MemoryFootprintPreset preset) {
-  // ImmutableSetMultimap<Integer, Integer> ys = TrieSetMultimap_BleedingEdge.of();
-  //
-  // for (Object o : data) {
-  // for (int i = 0; i < multimapValueCount; i++) {
-  // ys = ys.__put((Integer) o, (Integer) i);
-  // }
-  // }
-  //
-  // return measureAndReport(ys, "io.usethesource.capsule.TrieSetMultimap_BleedingEdge",
-  // DataType.MULTIMAP,
-  // Archetype.PERSISTENT, false, elementCount, run, preset);
-  // }
 
   public static String createAndMeasureGsImmutableSetMultimap(final Object[] data, int elementCount,
       int run, FootprintUtils.MemoryFootprintPreset preset) {

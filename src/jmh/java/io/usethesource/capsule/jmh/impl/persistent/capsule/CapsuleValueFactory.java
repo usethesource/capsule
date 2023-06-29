@@ -5,41 +5,41 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.capsule.jmh.impl.persistent.champ;
+package io.usethesource.capsule.jmh.impl.persistent.capsule;
 
 import io.usethesource.capsule.jmh.api.JmhMap;
 import io.usethesource.capsule.jmh.api.JmhSet;
 import io.usethesource.capsule.jmh.api.JmhSetMultimap;
 import io.usethesource.capsule.jmh.api.JmhValueFactory;
 
-public class ChampValueFactory implements JmhValueFactory {
+public class CapsuleValueFactory implements JmhValueFactory {
 
   private final boolean useBinaryRelation;
 
-  public ChampValueFactory(boolean useBinaryRelation) {
+  public CapsuleValueFactory(boolean useBinaryRelation) {
     this.useBinaryRelation = useBinaryRelation;
   }
 
   @Override
   public JmhSet.Builder setBuilder() {
-    return new ChampSetBuilder();
+    return new CapsuleSetBuilder();
   }
 
   @Override
   public JmhMap.Builder mapBuilder() {
-    return new ChampMapBuilder();
+    return new CapsuleMapBuilder();
   }
 
   @Override
   public JmhSetMultimap.Builder setMultimapBuilder() {
     return useBinaryRelation ?
-            new ChampBidirectionalSetMultimapBuilder() :
-            new ChampSetMultimapBuilder();
+            new CapsuleBidirectionalSetMultimapBuilder() :
+            new CapsuleSetMultimapBuilder();
   }
 
   @Override
   public String toString() {
-    return "VF_CHAMP";
+    return "VF_CAPSULE";
   }
 
 }

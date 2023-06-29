@@ -10,13 +10,9 @@ package io.usethesource.capsule.jmh;
 import java.util.Arrays;
 import java.util.Random;
 
-import io.usethesource.capsule.core.PersistentBidirectionalTrieSetMultimap;
-import io.usethesource.capsule.core.PersistentTrieMap;
-import io.usethesource.capsule.core.PersistentTrieSet;
-import io.usethesource.capsule.core.PersistentTrieSetMultimap;
 import io.usethesource.capsule.jmh.api.JmhValueFactory;
 import io.usethesource.capsule.jmh.impl.immutable.guava.ImmutableGuavaValueFactory;
-import io.usethesource.capsule.jmh.impl.persistent.champ.ChampValueFactory;
+import io.usethesource.capsule.jmh.impl.persistent.capsule.CapsuleValueFactory;
 import io.usethesource.capsule.jmh.impl.persistent.clojure.ClojureValueFactory;
 import io.usethesource.capsule.jmh.impl.persistent.dexx.DexxValueFactory;
 import io.usethesource.capsule.jmh.impl.persistent.paguro.PaguroValueFactory;
@@ -39,16 +35,16 @@ public class BenchmarkUtils {
         return new ScalaValueFactory();
       }
     },
-    VF_CHAMP {
+    VF_CAPSULE {
       @Override
       public JmhValueFactory getInstance() {
-        return new ChampValueFactory(false);
+        return new CapsuleValueFactory(false);
       }
     },
     VF_BINARY_RELATION {
       @Override
       public JmhValueFactory getInstance() {
-        return new ChampValueFactory(true);
+        return new CapsuleValueFactory(true);
       }
     },
     VF_VAVR {

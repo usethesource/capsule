@@ -7,7 +7,6 @@
  */
 package io.usethesource.capsule.jmh;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -46,30 +45,6 @@ import static io.usethesource.capsule.jmh.BenchmarkUtils.seedFromSizeAndRun;
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
 public class JmhCapsuleSetBenchmark {
-
-  public enum SetGeneratorClassEnum {
-    CHAMP {
-      @Override
-      public Class<? extends AbstractSetGenerator> generatorClass() {
-        return SetGeneratorDefault.class;
-      }
-    };
-
-    public abstract Class<? extends AbstractSetGenerator> generatorClass();
-
-  }
-
-  @Param({"CHAMP"})
-  protected SetGeneratorClassEnum generatorDescriptor;
-
-//  static final Class<? extends Set.Immutable> classUnderTest =
-//      TrieSet_5Bits_Memoized_LazyHashCode.class;
-//
-//  @Param({SetGeneratorMemoizedLazyHashCode.class})
-//
-//  static final Class<?> generatorClass = SetGeneratorMemoizedLazyHashCode.class;
-
-  // RuntimeCodeGenerationTestSuite.generatorClass(classUnderTest, JmhValue.class);
 
   /*
    * val l = (for (i <- 0 to 23) yield s"'${Math.pow(2, i).toInt}'") val r = (for (i <- 0 to 23)
@@ -113,32 +88,29 @@ public class JmhCapsuleSetBenchmark {
     final SourceOfRandomness random0 = new SourceOfRandomness(new Random(13));
     final GenerationStatus status0 = freshGenerationStatus.apply(random0);
 
-    try {
-      itemGenerator = new JmhSleepingIntegerGenerator();
+    itemGenerator = new JmhSleepingIntegerGenerator();
 
-      collectionGenerator = generatorDescriptor.generatorClass().newInstance();
-      collectionGenerator.configure(CalculateFootprintsHeterogeneous.size(size, size));
-      collectionGenerator.addComponentGenerators(List.of(itemGenerator));
+    collectionGenerator = new SetGeneratorDefault<>();
+    collectionGenerator.configure(CalculateFootprintsHeterogeneous.size(size, size));
+    collectionGenerator.addComponentGenerators(List.of(itemGenerator));
 
-      testSetCommon = collectionGenerator.generate(random0, status0);
+    testSetCommon = collectionGenerator.generate(random0, status0);
 
-      SourceOfRandomness random = freshRandom.get();
-      GenerationStatus status = freshGenerationStatus.apply(random);
+    SourceOfRandomness random = freshRandom.get();
+    GenerationStatus status = freshGenerationStatus.apply(random);
 
-      testSet1 = collectionGenerator.generate(random, status).__insertAll(testSetCommon);
-      testSet2 = collectionGenerator.generate(random, status).__insertAll(testSetCommon);
+    testSet1 = collectionGenerator.generate(random, status).__insertAll(testSetCommon);
+    testSet2 = collectionGenerator.generate(random, status).__insertAll(testSetCommon);
 
-      random = freshRandom.get();
-      status = freshGenerationStatus.apply(random);
+    random = freshRandom.get();
+    status = freshGenerationStatus.apply(random);
 
-      testSet1Duplicate = collectionGenerator.generate(random, status).__insertAll(testSetCommon);
-      testSet2Duplicate = collectionGenerator.generate(random, status).__insertAll(testSetCommon);
+    testSet1Duplicate = collectionGenerator.generate(random, status).__insertAll(testSetCommon);
+    testSet2Duplicate = collectionGenerator.generate(random, status).__insertAll(testSetCommon);
 
 //      assert testSet1.size() == size;
 //      assert testSet2.size() == size;
-    } catch (InstantiationException | IllegalAccessException e) {
-      throw new RuntimeException(e);
-    }
+
 //
 //    final Set<JmhValue> elements = testSet1.stream().map(Triple::_0)
 //        .collect(CapsuleCollectors.toSet());
@@ -332,7 +304,7 @@ public class JmhCapsuleSetBenchmark {
         .measurementIterations(10)
         .forks(0)
         .shouldDoGC(true)
-        .param("generatorDescriptor", "CHAMP")
+        .param("generatorDescriptor", "CAPSULE")
         .param("run", "0")
 //        .param("run", "1")
 //        .param("run", "2")

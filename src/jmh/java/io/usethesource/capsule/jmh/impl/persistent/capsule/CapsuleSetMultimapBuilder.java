@@ -5,18 +5,18 @@
  * This file is licensed under the BSD 2-Clause License, which accompanies this project
  * and is available under https://opensource.org/licenses/BSD-2-Clause.
  */
-package io.usethesource.capsule.jmh.impl.persistent.champ;
+package io.usethesource.capsule.jmh.impl.persistent.capsule;
 
 import io.usethesource.capsule.SetMultimap;
 import io.usethesource.capsule.jmh.api.JmhSetMultimap;
 import io.usethesource.capsule.jmh.api.JmhValue;
 
-final class ChampSetMultimapBuilder implements JmhSetMultimap.Builder {
+final class CapsuleSetMultimapBuilder implements JmhSetMultimap.Builder {
 
   private SetMultimap.Immutable<JmhValue, JmhValue> mapContent;
   private JmhSetMultimap constructedMap;
 
-  ChampSetMultimapBuilder() {
+  CapsuleSetMultimapBuilder() {
     mapContent = SetMultimap.Immutable.of();
     constructedMap = null;
   }
@@ -36,7 +36,7 @@ final class ChampSetMultimapBuilder implements JmhSetMultimap.Builder {
   @Override
   public JmhSetMultimap done() {
     if (constructedMap == null) {
-      constructedMap = new ChampSetMultimap(mapContent);
+      constructedMap = new CapsuleSetMultimap(mapContent);
     }
 
     return constructedMap;
