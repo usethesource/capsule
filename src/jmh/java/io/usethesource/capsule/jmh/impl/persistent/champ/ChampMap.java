@@ -21,7 +21,7 @@ public final class ChampMap implements JmhMap {
 
   private final Map.Immutable<JmhValue, JmhValue> content;
 
-  protected ChampMap(Map.Immutable<JmhValue, JmhValue> content) {
+  ChampMap(Map.Immutable<JmhValue, JmhValue> content) {
     this.content = content;
   }
 

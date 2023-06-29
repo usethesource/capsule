@@ -13,8 +13,8 @@ import io.usethesource.capsule.jmh.api.JmhValue;
 
 final class ImmutableGuavaSetBuilder implements JmhSet.Builder {
 
-  protected ImmutableSet.Builder<JmhValue> setContent;
-  protected JmhSet constructedSet;
+  private ImmutableSet.Builder<JmhValue> setContent;
+  private JmhSet constructedSet;
 
   ImmutableGuavaSetBuilder() {
     setContent = ImmutableSet.builder();
@@ -33,7 +33,7 @@ final class ImmutableGuavaSetBuilder implements JmhSet.Builder {
     setContent.addAll(collection);
   }
 
-  protected void checkMutation() {
+  private void checkMutation() {
     if (constructedSet != null) {
       throw new UnsupportedOperationException("Mutation of a finalized map is not supported.");
     }

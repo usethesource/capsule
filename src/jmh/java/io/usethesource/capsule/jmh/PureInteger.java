@@ -14,7 +14,7 @@ import org.openjdk.jmh.annotations.CompilerControl.Mode;
 @CompilerControl(Mode.DONT_INLINE)
 public class PureInteger implements JmhValue {
 
-  private int value;
+  private final int value;
 
   public PureInteger(int value) {
     this.value = value;

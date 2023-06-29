@@ -18,7 +18,7 @@ public final class VavrMap implements JmhMap {
 
   private final HashMap<JmhValue, JmhValue> content;
 
-  protected VavrMap(HashMap<JmhValue, JmhValue> content) {
+  VavrMap(HashMap<JmhValue, JmhValue> content) {
     this.content = content;
   }
 

@@ -9,7 +9,7 @@ package io.usethesource.capsule.jmh.api;
 
 public interface JmhValueFactory {
 
-  static RuntimeException FACTORY_NOT_YET_IMPLEMENTED_EXCEPTION =
+  RuntimeException FACTORY_NOT_YET_IMPLEMENTED_EXCEPTION =
       new UnsupportedOperationException("Not yet implemented.");
 
   // default JmhSet set() {

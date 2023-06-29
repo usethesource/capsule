@@ -44,7 +44,7 @@ public interface JmhSetMultimap extends JmhValue { // Iterable<JmhValue>
 
   java.util.Set<JmhValue> keySet();
 
-  public static interface Builder extends JmhBuilder {
+  interface Builder extends JmhBuilder {
 
     void insert(JmhValue key, JmhValue value);
 

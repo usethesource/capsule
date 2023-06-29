@@ -110,7 +110,7 @@ public class ClojureSetMultimap implements JmhSetMultimap {
 
   @Override
   public boolean containsValue(JmhValue value) {
-    return ((APersistentMap) xs).values().contains(value);
+    return ((APersistentMap) xs).containsValue(value);
   }
 
   @Override

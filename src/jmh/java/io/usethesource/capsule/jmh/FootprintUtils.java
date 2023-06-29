@@ -108,7 +108,7 @@ public final class FootprintUtils {
       if (isAppendingToFile) {
         Files.write(file, lines, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
       } else {
-        Files.write(file, Arrays.asList(CSV_HEADER), StandardCharsets.UTF_8);
+        Files.write(file, List.of(CSV_HEADER), StandardCharsets.UTF_8);
         Files.write(file, lines, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
       }
     } catch (Exception e) {

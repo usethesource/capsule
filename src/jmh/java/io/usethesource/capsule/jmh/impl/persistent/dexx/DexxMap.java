@@ -19,7 +19,7 @@ public final class DexxMap implements JmhMap {
 
   private final HashMap<JmhValue, JmhValue> content;
 
-  protected DexxMap(HashMap<JmhValue, JmhValue> content) {
+  DexxMap(HashMap<JmhValue, JmhValue> content) {
     this.content = content;
   }
 

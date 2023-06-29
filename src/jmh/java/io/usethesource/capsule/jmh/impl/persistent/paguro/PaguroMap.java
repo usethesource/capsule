@@ -19,7 +19,7 @@ public final class PaguroMap implements JmhMap {
 
   private final PersistentHashMap<JmhValue, JmhValue> content;
 
-  protected PaguroMap(PersistentHashMap<JmhValue, JmhValue> content) {
+  PaguroMap(PersistentHashMap<JmhValue, JmhValue> content) {
     this.content = content;
   }
 

@@ -67,9 +67,9 @@ public final class CalculateFootprintsHeterogeneous {
     }
   }
 
-  private static int multimapValueSize = 2;
+  private static final int multimapValueSize = 2;
 
-  private static int stepSizeOneToOneSelector = 2;
+  private static final int stepSizeOneToOneSelector = 2;
 
   public static void main(String[] args) throws InstantiationException, IllegalAccessException {
 //    final String userHome = System.getProperty("user.home");
@@ -263,12 +263,12 @@ public final class CalculateFootprintsHeterogeneous {
   // int size = thisExpSize - m * stride;
   // }
 
-  public static final <X, Y, Z> Z extractAndApply(Map.Entry<X, Y> tuple,
-      BiFunction<X, Y, Z> mapper) {
+  public static <X, Y, Z> Z extractAndApply(Map.Entry<X, Y> tuple,
+                                            BiFunction<X, Y, Z> mapper) {
     return mapper.apply(tuple.getKey(), tuple.getValue());
   }
 
-  public static final <X, Y> List<Map.Entry<X, Y>> product(List<X> xs, List<Y> ys) {
+  public static <X, Y> List<Map.Entry<X, Y>> product(List<X> xs, List<Y> ys) {
     List<Map.Entry<X, Y>> xys = new ArrayList<>(xs.size() * ys.size());
 
     for (X x : xs) {
@@ -291,7 +291,7 @@ public final class CalculateFootprintsHeterogeneous {
     }
 
     List<Integer> exponentialRange = tmpExponentialRange.stream().skip(1)
-        .limit(2 * tmpExponentialRange1.size() - 2).collect(Collectors.toList());
+        .limit(2L * tmpExponentialRange1.size() - 2).collect(Collectors.toList());
 
     return exponentialRange;
   }
@@ -320,10 +320,10 @@ public final class CalculateFootprintsHeterogeneous {
     }
 
     System.out.println();
-    System.out.println(String.format("PRIMITIVE:   %10d (%.2f percent)", smallCount,
-        100. * smallCount / (smallCount + bigCount)));
-    System.out.println(String.format("BIG_INTEGER: %10d (%.2f percent)", bigCount,
-        100. * bigCount / (smallCount + bigCount)));
+    System.out.printf("PRIMITIVE:   %10d (%.2f percent)%n", smallCount,
+        100. * smallCount / (smallCount + bigCount));
+    System.out.printf("BIG_INTEGER: %10d (%.2f percent)%n", bigCount,
+        100. * bigCount / (smallCount + bigCount));
     // System.out.println(String.format("UNIQUE: %10d (%.2f percent)",
     // map.size(), 100. * map.size() / (smallCount + bigCount)));
     System.out.println();
@@ -409,7 +409,7 @@ public final class CalculateFootprintsHeterogeneous {
         BenchmarkUtils.DataType.MAP, BenchmarkUtils.Archetype.IMMUTABLE, false, elementCount, run, preset);
   }
 
-  private final static JmhValue box(int i) {
+  private static JmhValue box(int i) {
     return new PureIntegerWithCustomHashCode(i);
   }
 
@@ -494,7 +494,7 @@ public final class CalculateFootprintsHeterogeneous {
     return "ERROR";
   }
 
-  public final static Size size(int min, int max) {
+  public static Size size(int min, int max) {
     return new Size() {
       @Override
       public int min() {
@@ -547,7 +547,7 @@ public final class CalculateFootprintsHeterogeneous {
     return "ERROR";
   }
 
-  public static final <T> Class<T> classCast(Class clazz) {
+  public static <T> Class<T> classCast(Class clazz) {
     return (Class<T>) clazz;
   }
 
@@ -601,9 +601,6 @@ public final class CalculateFootprintsHeterogeneous {
 
     String shortName = "TrieMap [Boxed]";
 
-    // String longName = String.format(
-    // "io.usethesource.capsule.TrieMap_5Bits_Spec0To8", isSpecialized);
-
     return measureAndReport(ys, shortName, BenchmarkUtils.DataType.MAP, BenchmarkUtils.Archetype.PERSISTENT, false, elementCount,
         run, preset);
   }
@@ -617,9 +614,7 @@ public final class CalculateFootprintsHeterogeneous {
       assert ys.containsKey(v);
     }
 
-    String shortName = String.format("HashMap");
-
-    String.format("java.util.HashMap");
+    String shortName = "HashMap";
 
     return measureAndReport(ys, shortName, BenchmarkUtils.DataType.MAP, BenchmarkUtils.Archetype.MUTABLE, false, elementCount,
         run, preset);

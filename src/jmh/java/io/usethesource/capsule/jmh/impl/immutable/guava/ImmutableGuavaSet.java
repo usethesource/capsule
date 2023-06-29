@@ -19,7 +19,7 @@ public final class ImmutableGuavaSet implements JmhSet {
 
   private final ImmutableSet<JmhValue> content;
 
-  protected ImmutableGuavaSet(ImmutableSet<JmhValue> content) {
+  ImmutableGuavaSet(ImmutableSet<JmhValue> content) {
     this.content = content;
   }
 
