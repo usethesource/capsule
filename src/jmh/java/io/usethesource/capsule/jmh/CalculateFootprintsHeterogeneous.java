@@ -155,7 +155,7 @@ public final class CalculateFootprintsHeterogeneous {
             stepSizeOneToOneSelector, run, preset);
 
     final EnumSet<BenchmarkUtils.ValueFactoryFactory> factories = EnumSet
-        .of(BenchmarkUtils.ValueFactoryFactory.VF_CHAMP_MULTIMAP_HCHAMP,
+        .of(BenchmarkUtils.ValueFactoryFactory.VF_CHAMP,
             BenchmarkUtils.ValueFactoryFactory.VF_SCALA,
             BenchmarkUtils.ValueFactoryFactory.VF_CLOJURE);
 
@@ -239,7 +239,7 @@ public final class CalculateFootprintsHeterogeneous {
         (factory) -> createAndMeasureTrieMap(factory, size, run, preset);
 
     final EnumSet<BenchmarkUtils.ValueFactoryFactory> factories = EnumSet
-        .of(BenchmarkUtils.ValueFactoryFactory.VF_CHAMP_MULTIMAP_HCHAMP);
+        .of(BenchmarkUtils.ValueFactoryFactory.VF_CHAMP);
 
     return factories.stream()
         .map(executeExperiment)

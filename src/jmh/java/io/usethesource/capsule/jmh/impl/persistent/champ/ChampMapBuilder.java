@@ -8,15 +8,14 @@
 package io.usethesource.capsule.jmh.impl.persistent.champ;
 
 import io.usethesource.capsule.Map;
-import io.usethesource.capsule.MapFactory;
 import io.usethesource.capsule.jmh.api.JmhValue;
 import io.usethesource.capsule.jmh.impl.AbstractMapBuilder;
 
 final class ChampMapBuilder extends
     AbstractMapBuilder<JmhValue, Map.Immutable<JmhValue, JmhValue>> {
 
-  ChampMapBuilder(MapFactory mapFactory) {
-    super(mapFactory.of(), map -> map::__put, ChampMap::new);
+  ChampMapBuilder() {
+    super(Map.Immutable.of(), map -> map::__put, ChampMap::new);
   }
 
 }

@@ -7,9 +7,6 @@
  */
 package io.usethesource.capsule.jmh.impl.persistent.champ;
 
-import io.usethesource.capsule.MapFactory;
-import io.usethesource.capsule.SetFactory;
-import io.usethesource.capsule.SetMultimapFactory;
 import io.usethesource.capsule.jmh.api.JmhMap;
 import io.usethesource.capsule.jmh.api.JmhSet;
 import io.usethesource.capsule.jmh.api.JmhSetMultimap;
@@ -17,30 +14,27 @@ import io.usethesource.capsule.jmh.api.JmhValueFactory;
 
 public class ChampValueFactory implements JmhValueFactory {
 
-  private final SetFactory setFactory;
-  private final MapFactory mapFactory;
-  private final SetMultimapFactory setMultimapFactory;
+  private final boolean useBinaryRelation;
 
-  public ChampValueFactory(final Class<?> targetSetClass, final Class<?> targetMapClass,
-      final Class<?> targetSetMultimapClass) {
-    setFactory = targetSetClass == null ? null : new SetFactory(targetSetClass);
-    mapFactory = targetMapClass == null ? null : new MapFactory(targetMapClass);
-    setMultimapFactory = targetSetMultimapClass == null ? null : new SetMultimapFactory(targetSetMultimapClass);
+  public ChampValueFactory(boolean useBinaryRelation) {
+    this.useBinaryRelation = useBinaryRelation;
   }
 
   @Override
   public JmhSet.Builder setBuilder() {
-    return new ChampSetBuilder(setFactory);
+    return new ChampSetBuilder();
   }
 
   @Override
   public JmhMap.Builder mapBuilder() {
-    return new ChampMapBuilder(mapFactory);
+    return new ChampMapBuilder();
   }
 
   @Override
   public JmhSetMultimap.Builder setMultimapBuilder() {
-    return new ChampSetMultimapBuilder(setMultimapFactory);
+    return useBinaryRelation ?
+            new ChampBidirectionalSetMultimapBuilder() :
+            new ChampSetMultimapBuilder();
   }
 
   @Override
