@@ -12,6 +12,7 @@ import java.util.Random;
 
 import io.usethesource.capsule.jmh.api.JmhValueFactory;
 import io.usethesource.capsule.jmh.impl.immutable.guava.ImmutableGuavaValueFactory;
+import io.usethesource.capsule.jmh.impl.persistent.bifurcan.BifurcanValueFactory;
 import io.usethesource.capsule.jmh.impl.persistent.capsule.CapsuleValueFactory;
 import io.usethesource.capsule.jmh.impl.persistent.clojure.ClojureValueFactory;
 import io.usethesource.capsule.jmh.impl.persistent.dexx.DexxValueFactory;
@@ -23,6 +24,12 @@ import io.usethesource.capsule.jmh.impl.persistent.vavr.VavrValueFactory;
 public class BenchmarkUtils {
 
   public enum ValueFactoryFactory {
+    VF_BIFURCAN {
+      @Override
+      public JmhValueFactory getInstance() {
+        return new BifurcanValueFactory();
+      }
+    },
     VF_CLOJURE {
       @Override
       public JmhValueFactory getInstance() {

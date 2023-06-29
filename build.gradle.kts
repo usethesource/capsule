@@ -28,6 +28,7 @@ dependencies {
 
   /*** 3rd party Java libraries with persistent data structures ***/
   jmh(group = "com.github.andrewoma.dexx", name = "collection", version = "0.7")
+  jmh(group = "io.lacuna", name = "bifurcan", version = "0.2.0-alpha6")
   jmh(group = "io.vavr", name = "vavr", version = "0.10.4")
   jmh(group = "org.organicdesign", name = "Paguro", version = "3.10.3")
   jmh(group = "org.pcollections", name = "pcollections", version = "4.0.1")
