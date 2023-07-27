@@ -45,6 +45,21 @@ To obtain the latest available version for Java 8, insert the following snippet 
 
 Snippets for other build tools and dependency management systems may vary slightly.
 
+## Exploring Capsule
+
+Build the library and spawn a Java shell to interactively explore Capsule, e.g.:
+
+```shell
+$ ./gradlew clean build
+$ jshell --class-path ./build/libs/capsule-*-SNAPSHOT.jar
+
+|  Welcome to JShell
+|  For an introduction type: /help intro
+
+jshell> var set = io.usethesource.capsule.Set.Immutable.of(1, 2);
+set ==> {1, 2}
+```
+
 # Background: Efficient Immutable Data Structures on the JVM
 The standard libraries of recent Java Virtual Machine languages, such as Clojure or Scala, contain scalable and well-performing immutable collection data structures that are implemented as Hash-Array Mapped Tries (HAMTs). HAMTs already feature efficient lookup, insert, and delete operations, however due to their tree-based nature their memory footprints and the runtime performance of iteration and equality checking lag behind array-based counterparts.
 
