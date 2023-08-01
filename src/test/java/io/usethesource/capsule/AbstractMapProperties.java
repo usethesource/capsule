@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
 
@@ -26,6 +27,22 @@ import static org.junit.Assert.*;
  * NOTE: use e.g. @When(seed = 3666151076704776907L) to fix seed for reproducing test run.
  */
 public abstract class AbstractMapProperties<T, CT extends Map.Immutable<T, T>> {
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void convertToJavaMapAndCheckSize(CT input) {
+    assertEquals(new HashMap<T, T>(input).size(), input.size());
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void convertToJavaMapAndCheckHashCode(CT input) {
+    assertEquals(new HashMap<T, T>(input).hashCode(), input.hashCode());
+  }
+
+  @Property(trials = DEFAULT_TRIALS)
+  public void convertToJavaMapAndCheckEquality(CT input) {
+    assertEquals("input.equals(convertToJavaSet)", input, new HashMap<T, T>(input));
+    assertEquals("convertToJavaSet.equals(input)", new HashMap<T, T>(input), input);
+  }
 
   @Property(trials = DEFAULT_TRIALS)
   public void serializationRoundtrip(CT input) throws Exception {
