@@ -1,13 +1,12 @@
 plugins {
   `java-library`
+  `maven-publish`
 }
 
-val majorMinorPatchVersion = "0.7.2"
-val isSnapshotBuild = !project.hasProperty("isReleaseBuild")
+version = version.let { conformVersionToMavenConvention("${it}") }
 
-version = majorMinorPatchVersion.let {
-  if (isSnapshotBuild) "${it}-SNAPSHOT" else "${it}"
-}
+fun conformVersionToMavenConvention(it: String): String =
+  if (project.hasProperty("releaseBuild")) "${it}" else "${it}-SNAPSHOT"
 
 val junitVersion by extra { "5.8.2" }
 val junitQuickcheckVersion by extra { "1.0" }
@@ -21,6 +20,8 @@ dependencies {
 }
 
 java {
+  withSourcesJar()
+
   toolchain {
     languageVersion.set(JavaLanguageVersion.of(11))
   }
@@ -32,7 +33,7 @@ tasks.compileJava {
 
 tasks.jar {
   manifest {
-    attributes["Automatic-Module-Name"] = "io.usethesource.capsule"
+    attributes["Automatic-Module-Name"] = "${rootProject.group}.${rootProject.name}"
   }
 }
 
@@ -49,6 +50,27 @@ tasks.test {
       excludeTestsMatching("*SetMultimapPropertiesTestSuite\$PersistentTrieSetMultimapTest.sizeAfterInsertKeyValues")
       excludeTestsMatching("*SetMultimapPropertiesTestSuite\$PersistentTrieSetMultimapTest.sizeAfterTransientInsertKeyValues")
       excludeTestsMatching("*SetMultimapPropertiesTestSuite\$PersistentBidirectionalTrieSetMultimapTest.sizeAfterInsertKeyValues")
+    }
+  }
+}
+
+publishing {
+  publications {
+    create<MavenPublication>("maven") {
+      groupId = System.getenv("CAPSULE_MAVEN_PUBLICATION_GROUP_ID") ?: groupId
+      artifactId = System.getenv("CAPSULE_MAVEN_PUBLICATION_ARTIFACT_ID") ?: artifactId
+      version = System.getenv("CAPSULE_MAVEN_PUBLICATION_VERSION")?.let { conformVersionToMavenConvention("${it}") } ?: version
+
+      pom {
+        licenses {
+          license {
+            name.set("BSD 2-Clause Simplified License")
+            url.set("https://raw.githubusercontent.com/usethesource/capsule/main/LICENSE")
+          }
+        }
+      }
+
+      from(components["java"])
     }
   }
 }
