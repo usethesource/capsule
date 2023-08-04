@@ -40,18 +40,6 @@ tasks.jar {
 tasks.test {
   maxParallelForks = 8
   maxHeapSize = "1G"
-
-  filter {
-    if (isSnapshotBuild) {
-      excludeTestsMatching("*stepwise*")
-    }
-
-    if (project.hasProperty("ignoreKnownFailures")) {
-      excludeTestsMatching("*SetMultimapPropertiesTestSuite\$PersistentTrieSetMultimapTest.sizeAfterInsertKeyValues")
-      excludeTestsMatching("*SetMultimapPropertiesTestSuite\$PersistentTrieSetMultimapTest.sizeAfterTransientInsertKeyValues")
-      excludeTestsMatching("*SetMultimapPropertiesTestSuite\$PersistentBidirectionalTrieSetMultimapTest.sizeAfterInsertKeyValues")
-    }
-  }
 }
 
 publishing {
