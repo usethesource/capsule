@@ -381,6 +381,14 @@ public class JmhMapBenchmarks {
     }
   }
 
+  @Benchmark
+  @OperationsPerInvocation(CACHED_NUMBERS_SIZE)
+  public void timeGet(Blackhole bh) {
+    for (int i = 0; i < CACHED_NUMBERS_SIZE; i++) {
+      bh.consume(testMap.get(cachedNumbers[i]));
+    }
+  }
+
   // @Benchmark
   // @OperationsPerInvocation(CACHED_NUMBERS_SIZE)
   // public void timeContainsKeyInt(Blackhole bh) {
