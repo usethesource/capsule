@@ -134,25 +134,25 @@
     <dependency>
       <groupId>com.pholser</groupId>
       <artifactId>junit-quickcheck-core</artifactId>
-      <version>${junitQuickcheckVersion}</version>
+      <version>1.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.pholser</groupId>
       <artifactId>junit-quickcheck-generators</artifactId>
-      <version>${junitQuickcheckVersion}</version>
+      <version>1.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.junit.vintage</groupId>
       <artifactId>junit-vintage-engine</artifactId>
-      <version>${junitVersion}</version>
+      <version>5.8.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>${slf4jVersion}</version>
+      <version>1.7.32</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
