@@ -44,6 +44,7 @@ dependencies {
 
 repositories {
   maven {
+    mavenCentral()
     url = uri("https://jitpack.io") // required to resolve `com.github.msteindorfer:memory-measurer:<version>`
   }
 }
