@@ -12,3 +12,7 @@ target/
 .gradle
 build
 gradlew.bat
+
+.settings
+pom.xml.releaseBackup
+release.properties
