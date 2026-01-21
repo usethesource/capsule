@@ -169,7 +169,7 @@ public class SetSmokeTest {
         .of(hash_n2147483648_obj1, hash_p1073741824_obj2);
 
     for (CollidableInteger x : xs) {
-      todo.remove(x);
+      todo.remove(x); 
     }
 
     assertEquals(Collections.EMPTY_SET, todo);
@@ -189,6 +189,19 @@ public class SetSmokeTest {
   }
 
   @Test
+  public void TwoCollisionsZeroEquals() {
+    CollidableInteger hash0_obj1 = new CollidableInteger(1, 0);
+    CollidableInteger hash0_obj2 = new CollidableInteger(2, 0);
+
+    io.usethesource.capsule.Set.Immutable<CollidableInteger> xs = PersistentTrieSet
+        .of(hash0_obj1, hash0_obj2);
+    io.usethesource.capsule.Set.Immutable<CollidableInteger> ys = PersistentTrieSet
+        .of(hash0_obj2, hash0_obj1);
+
+    assertEquals(xs, ys);
+  }
+
+  @Test
   public void ThreeCollisionsEquals() {
     CollidableInteger hash98304_obj1 = new CollidableInteger(1, 98304);
     CollidableInteger hash98304_obj2 = new CollidableInteger(2, 98304);
@@ -203,6 +216,20 @@ public class SetSmokeTest {
   }
 
   @Test
+  public void ThreeCollisionsZeroEquals() {
+    CollidableInteger hash0_obj1 = new CollidableInteger(1, 0);
+    CollidableInteger hash0_obj2 = new CollidableInteger(2, 0);
+    CollidableInteger hash0_obj3 = new CollidableInteger(3, 0);
+
+    io.usethesource.capsule.Set.Immutable<CollidableInteger> xs = PersistentTrieSet
+        .of(hash0_obj1, hash0_obj2, hash0_obj3);
+    io.usethesource.capsule.Set.Immutable<CollidableInteger> ys = PersistentTrieSet
+        .of(hash0_obj3, hash0_obj2, hash0_obj1);
+
+    assertEquals(xs, ys);
+  }
+
+  @Test
   public void RemovalFromCollisonNodeEqualsSingelton() {
     CollidableInteger hash98304_obj1 = new CollidableInteger(1, 98304);
     CollidableInteger hash98304_obj2 = new CollidableInteger(2, 98304);
@@ -210,6 +237,18 @@ public class SetSmokeTest {
     io.usethesource.capsule.Set.Immutable<CollidableInteger> xs = PersistentTrieSet.of(hash98304_obj1);
     io.usethesource.capsule.Set.Immutable<CollidableInteger> ys =
         PersistentTrieSet.of(hash98304_obj1, hash98304_obj2).__remove(hash98304_obj2);
+
+    assertEquals(xs, ys);
+  }
+
+  @Test
+  public void RemovalFromCollisonNodeEqualsSingeltonZero() {
+    CollidableInteger hash0_obj1 = new CollidableInteger(1, 0);
+    CollidableInteger hash0_obj2 = new CollidableInteger(2, 0);
+
+    io.usethesource.capsule.Set.Immutable<CollidableInteger> xs = PersistentTrieSet.of(hash0_obj1);
+    io.usethesource.capsule.Set.Immutable<CollidableInteger> ys =
+        PersistentTrieSet.of(hash0_obj1, hash0_obj2).__remove(hash0_obj2);
 
     assertEquals(xs, ys);
   }
@@ -244,6 +283,20 @@ public class SetSmokeTest {
         .of(hash98304_obj1, hash98304_obj2, hash268435456_obj3).__remove(hash268435456_obj3);
     io.usethesource.capsule.Set.Immutable<CollidableInteger> ys = PersistentTrieSet
         .of(hash98304_obj1, hash98304_obj2);
+
+    assertEquals(xs, ys);
+  }
+
+  @Test
+  public void CollisionWithMergeInlineAbove1Zero() {
+    CollidableInteger hash0_obj1 = new CollidableInteger(1, 0);
+    CollidableInteger hash0_obj2 = new CollidableInteger(2, 0);
+    CollidableInteger hash0_obj3 = new CollidableInteger(3, 0);
+
+    io.usethesource.capsule.Set.Immutable<CollidableInteger> xs = PersistentTrieSet
+        .of(hash0_obj1, hash0_obj2, hash0_obj3).__remove(hash0_obj3);
+    io.usethesource.capsule.Set.Immutable<CollidableInteger> ys = PersistentTrieSet
+        .of(hash0_obj1, hash0_obj2);
 
     assertEquals(xs, ys);
   }

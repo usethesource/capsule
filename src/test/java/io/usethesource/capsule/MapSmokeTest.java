@@ -191,6 +191,15 @@ public class MapSmokeTest {
 
     Map.Immutable map = mapOf();
 
+    int collisionHash = 0;
+    Map.Immutable res0 = map.__put(p(11, collisionHash), p(11, collisionHash)).__put(p(12, collisionHash), p(12, collisionHash));
+    assertTrue(res0.containsKey(p(11, collisionHash)));
+    assertTrue(res0.containsKey(p(12, collisionHash)));
+    res0 = res0.__remove(p(12, collisionHash));
+    assertTrue(res0.containsKey(p(11, collisionHash)));
+    assertFalse(res0.containsKey(p(12, collisionHash)));
+    assertEquals(mapOf(p(11, collisionHash), p(11, collisionHash)), res0);
+
     Map.Immutable res1 = map.__put(p(11, 1), p(11, 1)).__put(p(12, 1), p(12, 1));
     assertTrue(res1.containsKey(p(11, 1)));
     assertTrue(res1.containsKey(p(12, 1)));
@@ -213,27 +222,33 @@ public class MapSmokeTest {
 
   @Test
   public void testCheckCompactionFromBeginUponDelete_HashCollisionNode2() {
+      testCheckCompactionFromBeginUponDelete_HashCollisionNode2(0);
+      testCheckCompactionFromBeginUponDelete_HashCollisionNode2(1);
+      testCheckCompactionFromBeginUponDelete_HashCollisionNode2(32769);
+  }
+
+  private void testCheckCompactionFromBeginUponDelete_HashCollisionNode2(int hash) {
 
     Map.Immutable map = mapOf();
 
     Map.Immutable res1 =
-        map.__put(p(32769_1, 32769), p(32769_1, 32769)).__put(p(32769_2, 32769), p(32769_2, 32769));
+        map.__put(p(32769_1, 32769), p(32769_1, hash)).__put(p(32769_2, hash), p(32769_2, hash));
     assertEquals(2, res1.size());
-    assertTrue(res1.containsKey(p(32769_1, 32769)));
-    assertTrue(res1.containsKey(p(32769_2, 32769)));
+    assertTrue(res1.containsKey(p(32769_1, hash)));
+    assertTrue(res1.containsKey(p(32769_2, hash)));
 
     Map.Immutable res2 = res1.__put(p(1, 1), p(1, 1));
     assertEquals(3, res2.size());
     assertTrue(res2.containsKey(p(1, 1)));
-    assertTrue(res2.containsKey(p(32769_1, 32769)));
-    assertTrue(res2.containsKey(p(32769_2, 32769)));
+    assertTrue(res2.containsKey(p(32769_1, hash)));
+    assertTrue(res2.containsKey(p(32769_2, hash)));
 
-    Map.Immutable res3 = res2.__remove(p(32769_2, 32769));
+    Map.Immutable res3 = res2.__remove(p(32769_2, hash));
     assertEquals(2, res3.size());
     assertTrue(res3.containsKey(p(1, 1)));
-    assertTrue(res3.containsKey(p(32769_1, 32769)));
+    assertTrue(res3.containsKey(p(32769_1, hash)));
 
-    Map.Immutable expected = mapOf(p(1, 1), p(1, 1), p(32769_1, 32769), p(32769_1, 32769));
+    Map.Immutable expected = mapOf(p(1, 1), p(1, 1), p(32769_1, hash), p(32769_1, hash));
     assertEquals(expected, res3);
   }
 
