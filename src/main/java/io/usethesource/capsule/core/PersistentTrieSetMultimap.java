@@ -2223,6 +2223,8 @@ public class PersistentTrieSetMultimap<K, V> extends
         final List<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> collisionContent) {
       this.hash = hash;
       this.collisionContent = collisionContent;
+
+      assert this.collisionContent.size() >= 2;
     }
 
     @Override
