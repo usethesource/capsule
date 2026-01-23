@@ -2654,8 +2654,24 @@ public class PersistentTrieSetMultimap<K, V> extends
                 .filter(kImmutableSetEntry -> kImmutableSetEntry != optionalTuple.get())
                 .collect(Collectors.toList());
 
-            details.modified(REMOVED_PAYLOAD, MultimapResult.Modification.flag(REMOVED_KEY, REMOVED_VALUE));
-            return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
+            if (updatedCollisionContent.size() == 1) {
+              /*
+               * Create a root node that stores data for the single remaining key. This node will a) either become the
+               * new root returned, or b) unwrapped and inlined on the path upwards.
+               */
+              Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>> remainingEntry = updatedCollisionContent.get(0);
+
+              K remainingKey = remainingEntry.getKey();
+              // Passing the `remainingValues` set as an argument to `MultimapNode#inserted`. The method ensures to unbox
+              // singleton sets, hence we do not have to deal with the case distinction between 1:1 and 1:n mappings here.
+              io.usethesource.capsule.Set.Immutable<V> remainingValues = remainingEntry.getValue();
+
+              details.modified(REMOVED_PAYLOAD, MultimapResult.Modification.flag(REMOVED_KEY, REMOVED_VALUE));
+              return CompactSetMultimapNode.<K, V>nodeOf(null).inserted(null, remainingKey, remainingValues, keyHash, 0, MultimapResult.unchanged());
+            } else {
+              details.modified(REMOVED_PAYLOAD, MultimapResult.Modification.flag(REMOVED_KEY, REMOVED_VALUE));
+              return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
+            }
           } else {
             Function<Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>, Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>>> substitutionMapper =
                 (kImmutableSetEntry) -> {
@@ -2700,12 +2716,30 @@ public class PersistentTrieSetMultimap<K, V> extends
             .filter(kImmutableSetEntry -> kImmutableSetEntry != optionalTuple.get())
             .collect(Collectors.toList());
 
-        if (values.size() == 1) {
-          details.modified(REMOVED_PAYLOAD, MultimapResult.Modification.flag(REMOVED_KEY, REMOVED_VALUE), values);
-          return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
+        if (updatedCollisionContent.size() == 1) {
+          /*
+           * Create a root node that stores data for the single remaining key. This node will a) either become the
+           * new root returned, or b) unwrapped and inlined on the path upwards.
+           */
+          Map.Entry<K, io.usethesource.capsule.Set.Immutable<V>> remainingEntry = updatedCollisionContent.get(0);
+
+          K remainingKey = remainingEntry.getKey();
+          // Passing the `remainingValues` set as an argument to `MultimapNode#inserted`. The method ensures to unbox
+          // singleton sets, hence we do not have to deal with the case distinction between 1:1 and 1:n mappings here.
+          io.usethesource.capsule.Set.Immutable<V> remainingValues = remainingEntry.getValue();
+
+          if (values.size() == 1) {
+            details.modified(REMOVED_PAYLOAD, MultimapResult.Modification.flag(REMOVED_KEY, REMOVED_VALUE), values);
+          } else {
+            details.modified(REMOVED_PAYLOAD, MultimapResult.Modification.flag(REMOVED_KEY, REMOVED_VALUE_COLLECTION), values);
+          }
+          return CompactSetMultimapNode.<K, V>nodeOf(null).inserted(null, remainingKey, remainingValues, keyHash, 0, MultimapResult.unchanged());
         } else {
-          details
-              .modified(REMOVED_PAYLOAD, MultimapResult.Modification.flag(REMOVED_KEY, REMOVED_VALUE_COLLECTION), values);
+          if (values.size() == 1) {
+            details.modified(REMOVED_PAYLOAD, MultimapResult.Modification.flag(REMOVED_KEY, REMOVED_VALUE), values);
+          } else {
+            details.modified(REMOVED_PAYLOAD, MultimapResult.Modification.flag(REMOVED_KEY, REMOVED_VALUE_COLLECTION), values);
+          }
           return new HashCollisionNode<K, V>(hash, updatedCollisionContent);
         }
       }
