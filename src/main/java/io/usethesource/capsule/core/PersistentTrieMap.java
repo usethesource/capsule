@@ -214,7 +214,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
   @Override
   public void putAll(final Map<? extends K, ? extends V> m) {
-    throw new UnsupportedOperationException();
+      __putAll(m);
   }
 
   @Override
@@ -1910,7 +1910,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
 
     @Override
     public void putAll(final Map<? extends K, ? extends V> m) {
-      throw new UnsupportedOperationException();
+       __putAll(m);
     }
 
     @Override
@@ -1918,11 +1918,13 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
       throw new UnsupportedOperationException();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public V remove(final Object key) {
-      throw new UnsupportedOperationException();
+       return __remove((K) key);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean containsKey(final Object o) {
       try {
@@ -1943,6 +1945,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
       return false;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public V get(final Object o) {
       try {
@@ -2266,6 +2269,7 @@ public class PersistentTrieMap<K, V> implements io.usethesource.capsule.Map.Immu
       return entrySet;
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public boolean equals(final Object other) {
       if (other == this) {
         return true;
