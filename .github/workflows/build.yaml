@@ -12,9 +12,11 @@ on:
 jobs:
   builds:
     runs-on: ubuntu-latest
+    env:
+      MAVEN_OPTS: "-Xmx512M -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up JDK 11
         uses: actions/setup-java@v1
         with:
