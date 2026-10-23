@@ -37,7 +37,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.0</version>
           <configuration>
-            <release>11</release>
+            <release>21</release>
           </configuration>
       </plugin>
       <plugin>
@@ -71,7 +71,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.7</version>
+        <version>0.8.15</version>
         <!-- <configuration>
           <destfile>${topleveldir}/target/jacoco.exec</destfile>
           <datafile>${topleveldir}/target/jacoco.exec</datafile>
