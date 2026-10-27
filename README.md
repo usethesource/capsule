@@ -23,13 +23,23 @@ Binary builds of Capsule are deployed in the usethesource repository. In case yo
 
 Furthermore, you have to declare Capsule as a dependency.
 
-To obtain the latest release for Java 11+, insert the following snippet in your `pom.xml` file:
+To obtain the latest version for Java 21+, insert the following snippet in your `pom.xml` file:
+```
+<dependency>
+  <groupId>io.usethesource</groupId>
+  <artifactId>capsule</artifactId>
+  <version>0.8.0</version>
+</dependency>
+```
+
+
+To obtain the latest available version for Java 11, insert the following snippet in your `pom.xml` file:
 
 ```
 <dependency>
   <groupId>io.usethesource</groupId>
   <artifactId>capsule</artifactId>
-  <version>0.7.1</version>
+  <version>0.7.2</version>
 </dependency>
 ```
 
